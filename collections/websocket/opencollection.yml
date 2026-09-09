@@ -56,17 +56,7 @@ docs:
 
     ## Errors and error_catalog
 
-    All WebSocket error guidance lives in this collection overview. Error frames use the following envelope:
-
-    ```json
-    {
-      "event": "error",
-      "data": {
-        "code": "<backend error code>",
-        "message": "<backend error message>"
-      }
-    }
-    ```
+    All WebSocket error guidance lives in this collection overview. The current repository verifies the `INVALID_ACTION` error code, but it does not contain a concrete server error body or verified message text. No fabricated error JSON is shown here.
 
     ### Known error codes
 
