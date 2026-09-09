@@ -146,30 +146,33 @@ bru run collections/rest-api --env local
 
 The CLI is optional and is not bundled with this repository.
 
-## 🚀 Automated documentation and GitHub Pages
+## 📚 Native Bruno API documentation and GitHub Pages
 
-Every push that changes the Bruno workspace on the `bruno` branch triggers [`.github/workflows/bruno-docs.yml`](.github/workflows/bruno-docs.yml). The workflow:
+The Bruno workspace is the single source of truth for both the interactive Bruno documentation and generated collection documentation. Workspace, collection, folder, request, and response-example content must be maintained in the Bruno files on `bruno`.
 
-1. 🔍 Checks out `bruno`.
-2. 📚 Discovers every `opencollection.yml` under `collections/`.
-3. 📝 Parses collection, folder, request, response-example, WebSocket-message, script, and Markdown data.
-4. 🎨 Generates a responsive static site in `dist/bruno-docs`.
-5. 🌿 Publishes only the generated site to the `bruno-docs` branch.
+### Current automation support
 
-The generator is intentionally based on the repository's actual OpenCollection YAML format. It does not assume that Bruno provides a static HTML export command. New collections are discovered automatically when their directory contains an `opencollection.yml` file.
+As of 2026-09-09, the installed Bruno Desktop release is 4.1.0. Bruno's supported native HTML documentation flow is available in the desktop application:
 
-### 🌐 One-time GitHub Pages setup
+1. Open a collection in Bruno.
+2. Open **Collection Settings → Documentation → Generate Docs**.
+3. Select the environment to include.
+4. Generate and save the collection's native HTML file.
 
-Repository administrators must configure GitHub Pages once:
+The official Bruno CLI supports running collections and creating execution reports, but it does not expose a verified command for the desktop **Generate Docs** feature. This repository therefore intentionally does not contain a custom parser, custom HTML generator, or GitHub Actions workflow that pretends to generate Bruno API documentation. Bruno execution reports are not a substitute for native API documentation.
 
-1. Open **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Select branch **`bruno-docs`** and folder **`/(root)`**.
-4. Save the setting and wait for the first Pages deployment.
+When Bruno provides an officially supported headless command for native documentation generation, a workflow may be added after that command has been verified against the installed and official tooling. Until then, native HTML generation is a documented manual release step rather than an invented CI implementation.
 
-The workflow needs repository Actions permission to write contents. In **Settings → Actions → General → Workflow permissions**, enable **Read and write permissions** if the repository default is read-only. The workflow itself requests only `contents: write`.
+### 🌐 Publishing native output with GitHub Pages
 
-Generated HTML is never edited manually on `bruno-docs`; update the Bruno workspace on `bruno` and push again. If the generated output has not changed, the workflow skips the commit.
+To publish native output manually:
+
+1. Generate one HTML file per collection using Bruno Desktop.
+2. Switch to the `bruno-docs` branch, or create it if it does not exist.
+3. Place only the Bruno-generated files and a minimal root `index.html` linking to them in that branch. Do not rewrite or template the collection HTML.
+4. In **Settings → Pages**, choose **Deploy from a branch**, select **`bruno-docs`**, and select **`/(root)`**.
+
+The root index may link to files such as `rest-api-documentation.html` and `websocket-documentation.html`, but it must not duplicate their request content or recreate Bruno's interface. Do not include real session IDs, credentials, tokens, cookies, or private environment values in generated output.
 
 ## 🛡️ Security
 
