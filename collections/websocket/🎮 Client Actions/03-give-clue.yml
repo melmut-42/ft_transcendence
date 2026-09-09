@@ -22,20 +22,38 @@ websocket:
             }
           }
 docs: |-
-  # `give_clue`
+  # ⚡ give_clue
 
-  Verified client message example:
+  ## 📝 Overview
 
-  ```json
-  {
-    "event": "give_clue",
-    "data": {
-      "room_id": 1001,
-      "clue": "SPACE",
-      "number": 3
-    }
-  }
-  ```
+  Documents the client event `give_clue`. This is a stateful outbound action and must only be used when the current room, role, turn, and game state satisfy its backend preconditions.
 
-  The message is disabled by default because it is valid only when the game is active, the sender is the spymaster, and the sender has the turn. The server transitions from `WAITING_FOR_CLUE` to `GUESSING` after accepting it.
+  ## 🔌 Connection
 
+  `{{wsUrl}}/ws?session_id={{session_id}}`
+
+  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+
+  ## 📥 Message behavior
+
+  The request contains the verified JSON message shown in Bruno's message editor. It is disabled by default because acceptance depends on live game state.
+
+  ## 📤 Expected observation
+
+  Observe the handshake, server event, or error frame in Bruno's WebSocket message history.
+
+  ## 🧭 Typical workflow
+
+  Open `connect`, prepare the required room state, select this event only when its preconditions are true, and observe the resulting server event or error envelope.
+
+  ## 🧪 Testing guidance
+
+  Confirm that the action is accepted only for the correct identity, role, turn, and game state. Rejected actions must not mutate state or create a successful action log.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
+
+  ## 📌 Contract boundary
+
+  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.

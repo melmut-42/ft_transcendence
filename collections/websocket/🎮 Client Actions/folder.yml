@@ -4,7 +4,24 @@ info:
 
 docs:
   content: |-
-    # Client actions
+    # 🎮 Client Actions
 
-    The event names are part of the known contract. `give_clue` is the only client action with a saved payload schema. The other action messages are disabled reference scaffolds so opening a request never sends an invented or destructive payload.
+    This folder contains client-to-server event references for the active room/game socket. 🎮 These are stateful actions, so they should be selected only after the connection, membership, role, and turn prerequisites are satisfied.
+
+    ## 📥 Known actions
+
+    `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn` are the event names currently documented by the contract.
+
+    ## 🧭 How to use this folder
+
+    1. 🔌 Open `connect` with a valid session.
+    2. 👥 Prepare the required room and player state.
+    3. 🎯 Choose the action that matches the current role and game state.
+    4. 📤 Observe the resulting server event or error envelope.
+
+    `give_clue` is the only client action with a verified payload schema. The other messages are disabled reference scaffolds so the workspace never sends guessed or destructive fields.
+
+    > ⚠️ **State-changing requests**
+    >
+    > Do not batch-run this folder. An accepted action changes game state; a rejected action should leave state unchanged.
   type: text/markdown

@@ -1,0 +1,80 @@
+name: 📚 Generate Bruno API Documentation
+
+on:
+  push:
+    branches:
+      - bruno
+    paths:
+      - "workspace.yml"
+      - "collections/**"
+      - "environments/**"
+      - "scripts/generate-bruno-docs/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/bruno-docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bruno-documentation
+  cancel-in-progress: true
+
+jobs:
+  generate-and-publish:
+    name: Build and publish static documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 🔍 Check out the bruno source branch
+        uses: actions/checkout@v4
+        with:
+          ref: bruno
+          fetch-depth: 0
+
+      - name: 🟢 Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 📦 Install generator dependencies
+        run: npm ci
+
+      - name: 📝 Generate documentation website
+        run: npm run docs:generate
+
+      - name: 🌿 Publish generated site to bruno-docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          archive="$(mktemp /tmp/bruno-docs.XXXXXX.tar.gz)"
+          tar -czf "$archive" -C dist/bruno-docs .
+
+          if git ls-remote --exit-code --heads origin bruno-docs >/dev/null 2>&1; then
+            git fetch origin bruno-docs
+            git checkout -B bruno-docs origin/bruno-docs
+          else
+            git checkout --orphan bruno-docs
+          fi
+
+          git rm -rf . >/dev/null 2>&1 || true
+          git clean -fdx
+          tar -xzf "$archive"
+          rm -f "$archive"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Generated documentation is unchanged; skipping commit."
+            exit 0
+          fi
+
+          git commit -m "📚 docs: update Bruno API documentation"
+          git push origin HEAD:bruno-docs

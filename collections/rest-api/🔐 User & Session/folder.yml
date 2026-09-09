@@ -4,7 +4,26 @@ info:
 
 docs:
   content: |-
-    # User and session bootstrap
+    # 👤 User & Session
 
-    `POST /users/enter` creates or enters a temporary username session. It is the only authentication/bootstrap endpoint in the known contract.
+    This folder contains the temporary identity bootstrap used by the rest of the workspace. 👤 It creates or enters a username-based session so later room requests can be authenticated without introducing passwords, JWTs, or unsupported account-management behavior.
+
+    ## 🧭 When to use these requests
+
+    - Run `Enter user` first to create the primary temporary user.
+    - Run `Enter second user` when the room workflow needs another participant.
+    - Use `Enter invalid username` to verify validation behavior.
+    - Use `Enter duplicate username` to verify the exact `USERNAME_TAKEN` conflict.
+
+    ## 🔗 Runtime chaining
+
+    Successful responses populate session and user identifiers in Bruno runtime variables. Those values are consumed by the Rooms folder and are not written to the committed environment file.
+
+    > 🔐 **Security**
+    >
+    > Session IDs are temporary secrets. Keep them in Bruno's local environment storage and leave committed secret variables blank.
+
+    ## 🧪 Testing focus
+
+    Verify the `201`, `400 INVALID_REQUEST`, and `409 USERNAME_TAKEN` examples. The native examples are safe to inspect without sending a request.
   type: text/markdown

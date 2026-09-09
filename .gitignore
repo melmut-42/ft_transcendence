@@ -6,3 +6,5 @@ reports/
 !.env.example
 environments/*.private.yml
 collections/**/environments/*.private.yml
+node_modules/
+dist/

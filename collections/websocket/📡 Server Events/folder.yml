@@ -4,7 +4,25 @@ info:
 
 docs:
   content: |-
-    # Server events
+    # 📡 Server Events
 
-    These are server-emitted event names observed on the shared socket. Payload fields are intentionally not invented where the contract did not provide them.
+    This folder catalogs server-emitted event names observed on the shared room/game socket. 📡 Use these requests as passive observers while exercising the REST and client-action workflows.
+
+    ## 📤 Event groups
+
+    - 👥 Player lifecycle: `player_joined`, `player_left`, `player_disconnected`, `player_reconnected`
+    - 🎮 Game lifecycle: `game_started`, `game_finished`
+    - 🔄 Turn and action flow: `clue_given`, `card_revealed`, `turn_changed`, `game_action_logged`
+
+    ## 🧭 Observation workflow
+
+    Open an authenticated connection, prepare the appropriate room state, and then observe the event that should follow the relevant action. These requests send no outgoing message by themselves.
+
+    > 📌 **Contract boundary**
+    >
+    > The event names are documented, but payload fields are not invented where the backend contract did not provide them. Treat the server frame as authoritative.
+
+    ## 🧪 Testing focus
+
+    Confirm event ordering, connection status transitions, and state changes against the action that triggered them. Capture unexpected frames for backend investigation rather than editing this workspace with guessed fields.
   type: text/markdown

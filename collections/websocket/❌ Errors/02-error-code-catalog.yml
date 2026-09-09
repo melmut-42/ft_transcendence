@@ -11,26 +11,38 @@ settings:
   timeout: 30000
   keepAliveInterval: 0
 docs: |-
-  # WebSocket error codes
+  # ⚡ error_code_catalog
 
-  Known error codes:
+  ## 📝 Overview
 
-  - `UNAUTHORIZED`
-  - `FORBIDDEN`
-  - `INVALID_REQUEST`
-  - `USERNAME_TAKEN`
-  - `ROOM_NOT_FOUND`
-  - `ROOM_NOT_JOINABLE`
-  - `USER_ALREADY_IN_ROOM`
-  - `NOT_ENOUGH_PLAYERS`
-  - `GAME_NOT_STARTED`
-  - `GAME_ALREADY_STARTED`
-  - `INVALID_ACTION`
-  - `NOT_YOUR_TURN`
-  - `INVALID_ROLE`
-  - `CARD_NOT_FOUND`
-  - `CARD_ALREADY_REVEALED`
-  - `INVALID_GAME_STATE`
+  Documents the WebSocket error behavior and known failure vocabulary associated with rejected actions or handshake problems.
 
-  This request is a passive observer and sends no outgoing message. The exact code depends on the invalid action and current game state.
+  ## 🔌 Connection
 
+  `{{wsUrl}}/ws?session_id={{session_id}}`
+
+  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+
+  ## 📥 Message behavior
+
+  This request sends no outgoing message. Use it to establish a connection or observe incoming frames.
+
+  ## 📤 Expected observation
+
+  Observe the documented error envelope or error code associated with the deliberate failure.
+
+  ## 🧭 Typical workflow
+
+  Open an authenticated connection when required, perform a deliberate test action, and compare the captured frame with the documented envelope.
+
+  ## 🧪 Testing guidance
+
+  Confirm the error event, code, and message, then verify that state remains unchanged.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
+
+  ## 📌 Contract boundary
+
+  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.

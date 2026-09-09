@@ -11,11 +11,38 @@ settings:
   timeout: 30000
   keepAliveInterval: 0
 docs: |-
-  # Server event: `player_reconnected`
+  # ⚡ player_reconnected
 
-  The server broadcast a player reconnection.
+  ## 📝 Overview
 
-  **Event name:** `player_reconnected`
+  Provides a passive observation point for the server event `player_reconnected`. The request does not invent payload fields that are not present in the known contract.
 
-  This request opens the shared authenticated socket and sends no outgoing message. Capture the server frame in Bruno's message history. The field-level payload schema was not provided by the application contract, so this documentation intentionally records the event name without inventing payload fields.
+  ## 🔌 Connection
 
+  `{{wsUrl}}/ws?session_id={{session_id}}`
+
+  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+
+  ## 📥 Message behavior
+
+  This request sends no outgoing message. Use it to establish a connection or observe incoming frames.
+
+  ## 📤 Expected observation
+
+  Observe the server-emitted `player_reconnected` event on the shared socket.
+
+  ## 🧭 Typical workflow
+
+  Open `connect`, perform the related REST or client action in a prepared room, and capture this server frame in Bruno's message history.
+
+  ## 🧪 Testing guidance
+
+  Confirm the event name and ordering. Treat unlisted payload fields as undocumented rather than guessing their meaning.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
+
+  ## 📌 Contract boundary
+
+  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.

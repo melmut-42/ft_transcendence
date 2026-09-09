@@ -1,0 +1,103 @@
+info:
+  name: "Enter second user"
+  type: http
+  seq: 2
+  tags:
+    - smoke
+    - bootstrap
+http:
+  method: POST
+  url: "{{baseUrl}}/users/enter"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "username": "{{second_user_username}}"
+      }
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const suffix = Date.now().toString(36);
+        bru.setVar("second_user_username", "second_user_" + suffix);
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.session) {
+          bru.setVar("second_user_session_id", String(res.body.session.session_id));
+        }
+    - type: tests
+      code: |-
+        test("creates a second temporary user session", function() {
+          expect(res.status).to.equal(201);
+          expect(res.body.user.username).to.be.a("string");
+          expect(res.body.session.session_id).to.be.a("number");
+          expect(res.body.active_room).to.equal(null);
+        });
+examples:
+  - name: "201 Created"
+    response:
+      status: 201
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "user": { "user_id": 43, "username": "player_two" },
+            "session": { "session_id": 7002, "expires_at": 1788883200 },
+            "active_room": null
+          }
+docs: |-
+  # 📥 Enter second user
+  
+  ## 📝 Overview
+  
+  Creates a second temporary username-based session for the room workflow. This is a separate test identity, not a backend-specific guest account or a new authentication mechanism.
+  
+  ## 📍 Endpoint
+  
+  `POST {{baseUrl}}/users/enter`
+  
+  ## 🔐 Authentication
+  
+  No existing session is required. A successful response creates a temporary session for later protected requests.
+  
+  ## 📦 Request body
+  
+  The request sends JSON with a generated unique username.
+  
+  ```json
+  {
+    "username": "{{second_user_username}}"
+  }
+  ```
+  
+  ## 📤 Response scenarios
+  
+  - `201` — 201 Created
+  
+  The native response example shows the returned user, temporary session, expiry, and null active room.
+  
+  ## 🧭 Typical workflow
+  
+  Run after `Enter user` and before `Join room as second user`. The runtime script stores `second_user_session_id` for protected room requests.
+  
+  ## 🧪 Testing guidance
+  
+  Use the `local` environment and confirm that the generated username is unique for the run. Keep the session value in Bruno's local secret storage.
+  
+  > 💡 **Tip**
+  >
+  > This request creates a generic second test user. Preserve `host` only where the room protocol assigns that real backend role.
+  
+  ## 🧩 Workspace metadata
+  
+  Tags: smoke, bootstrap.
+  
+  The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.

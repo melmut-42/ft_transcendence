@@ -1,16 +1,16 @@
 info:
-  name: "Join without session"
+  name: "Join room as second user"
   type: http
-  seq: 15
+  seq: 3
   tags:
-    - negative
+    - smoke
+    - rooms
 http:
   method: POST
   url: "{{baseUrl}}/rooms/join"
   headers:
     - name: X-Session-Id
       value: "{{second_user_session_id}}"
-      disabled: true
     - name: Content-Type
       value: application/json
     - name: Accept
@@ -25,26 +25,13 @@ runtime:
   scripts:
     - type: tests
       code: |-
-        test("rejects joining without a session header", function() {
-          expect(res.status).to.equal(401);
+        test("joins the waiting room", function() {
+          expect(res.status).to.equal(200);
+          expect(res.body.room_id).to.equal(Number(bru.getVar("room_id")));
+          expect(res.body.players).to.be.an("array");
         });
-examples:
-  - name: "401 Unauthorized"
-    response:
-      status: 401
-      headers:
-        - name: Content-Type
-          value: application/json
-      body:
-        type: json
-        data: |-
-          {
-            "error": {
-              "code": "UNAUTHORIZED"
-            }
-          }
 docs: |-
-  # 📥 Join without session
+  # 📥 Join room as second user
 
   ## 📝 Overview
 
@@ -70,7 +57,7 @@ docs: |-
 
   ## 📤 Response scenarios
 
-  - `401` — 401 Unauthorized
+  - `200` — 200 OK — joined room
 
   Review the native example body for the complete response shape.
 
@@ -80,7 +67,7 @@ docs: |-
 
   ## 🧪 Testing guidance
 
-  This is a deliberate negative scenario. Keep its prepared inputs intact and verify both the HTTP status and the contract error code.
+  Use the native response example as a quick contract reference, then run the request against a local backend when the required variables are populated.
 
   > 💡 **Tip**
   >
@@ -89,6 +76,27 @@ docs: |-
 
   ## 🧩 Workspace metadata
 
-  Tags: negative.
+  Tags: smoke, rooms.
 
   The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.
+examples:
+  - name: "200 OK — joined room"
+    response:
+      status: 200
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "room_id": 1001,
+            "status": "WAITING",
+            "host": { "user_id": 42, "username": "player_one" },
+            "players": [
+              { "user_id": 42, "username": "player_one", "role": "HOST", "connection_status": "CONNECTED" },
+              { "user_id": 43, "username": "player_two", "role": "OPERATIVE", "connection_status": "CONNECTED" }
+            ],
+            "minimum_players": 4,
+            "game": null
+          }

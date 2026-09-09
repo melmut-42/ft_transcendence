@@ -1,10 +1,11 @@
 info:
-  name: "Enter duplicate username"
+  name: Enter duplicate username
   type: http
-  seq: 4
+  seq: 3
   tags:
     - negative
     - chained
+
 http:
   method: POST
   url: "{{baseUrl}}/users/enter"
@@ -17,8 +18,9 @@ http:
     type: json
     data: |-
       {
-        "username": "{{host_username}}"
+        "username": "{{user_username}}"
       }
+
 runtime:
   scripts:
     - type: tests
@@ -27,8 +29,16 @@ runtime:
           expect(res.status).to.equal(409);
           expect(res.body.error.code).to.equal("USERNAME_TAKEN");
         });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
 examples:
-  - name: "409 USERNAME_TAKEN"
+  - name: 409 USERNAME_TAKEN
     response:
       status: 409
       headers:
@@ -42,7 +52,53 @@ examples:
               "code": "USERNAME_TAKEN"
             }
           }
-docs: |-
-  # Duplicate username
 
-  Run after `01 Enter host user`. Reusing the generated host username should return `409 USERNAME_TAKEN`.
+docs: |-
+  # 📥 Enter duplicate username
+
+  ## 📝 Overview
+
+  Creates a temporary username-based session that subsequent room requests can reuse. This is the workspace bootstrap step; it is not password registration or JWT login.
+
+  ## 📍 Endpoint
+
+  `POST {{baseUrl}}/users/enter`
+
+  ## 🔐 Authentication
+
+  No existing session is required. A successful response creates a temporary session for later protected requests.
+
+  ## 📦 Request body
+
+  The request sends JSON. Use the fields already present in the request editor; do not replace runtime placeholders with committed secrets.
+
+  ```json
+  {
+    "username": "{{user_username}}"
+  }
+  ```
+
+  ## 📤 Response scenarios
+
+  - `409` — 409 USERNAME_TAKEN
+
+  Review the native example body for the complete response shape.
+
+  ## 🧭 Typical workflow
+
+  Run this request before protected room requests. Its runtime script saves the session and user identifiers for the rest of the workspace.
+
+  ## 🧪 Testing guidance
+
+  This is a deliberate negative scenario. Keep its prepared inputs intact and verify both the HTTP status and the contract error code.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment and inspect the native response examples before sending a state-changing request.
+
+
+  ## 🧩 Workspace metadata
+
+  Tags: negative, chained.
+
+  The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.

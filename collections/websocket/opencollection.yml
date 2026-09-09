@@ -2,6 +2,7 @@ opencollection: 1.0.0
 
 info:
   name: ⚡ WebSocket API
+  version: "1.1.0"
 config:
   proxy:
     inherit: true
@@ -16,11 +17,46 @@ config:
 
 docs:
   content: |-
-    # ft_transcendence WebSocket API
+    # ⚡ ft_transcendence WebSocket API
 
-    Connect to `{{wsUrl}}/ws?session_id={{session_id}}`.
+    Welcome to the real-time API reference. 🔌 This collection documents the single shared room/game socket, its connection lifecycle, known client actions, server event names, and the error envelope used for rejected actions.
 
-    The socket is shared by all room/game events. The server validates identity, membership, role, turn, and game state. Client messages use the event envelope; only the `give_clue` payload is recorded here as a verified field-level example. Other client action fields are deliberately not guessed.
+    ## 🎯 What this collection covers
+
+    - 🔌 Authenticated, missing-session, and invalid-session connection scenarios
+    - 🎮 Client actions: `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn`
+    - 📡 Server events: player lifecycle, game lifecycle, turn changes, card reveals, and action logging
+    - ❌ Error observation using the known `{ event, data: { code, message } }` envelope
+
+    ## 🔌 Connection details
+
+    Connect with:
+
+    `{{wsUrl}}/ws?session_id={{session_id}}`
+
+    Select the `local` environment so `wsUrl` resolves to `ws://localhost:3000`. WebSocket authentication uses the `session_id` query parameter during the handshake; it does not use the REST `X-Session-Id` header. 🔐
+
+    ## 🧭 Real-time workflow
+
+    1. 🌍 Select `local` and obtain a temporary session from the REST collection.
+    2. 🔌 Open `connect` and confirm the socket is established.
+    3. 👥 Prepare the required room membership and role/state.
+    4. 📥 Select one client action only when its preconditions are satisfied.
+    5. 📤 Observe server events and error frames in Bruno's message history.
+
+    The server validates identity, membership, role, turn, and game state. Rejected actions must not mutate state or create a successful action log.
+
+    > ⚠️ **Payload accuracy**
+    >
+    > `give_clue` is the only client action with a verified field-level payload in the current contract. Other action requests remain disabled reference scaffolds; their fields must not be invented.
+
+    ## 🧪 Testing guidance
+
+    Use the connection and event requests individually. Do not batch-run the complete collection: some requests are passive observers, some are interactive, and several require a prepared game state. Review the `error_envelope` request when testing invalid actions.
+
+    ## 🔖 Version
+
+    This collection is version `1.1.0`, matching the REST collection's documentation and consistency pass.
   type: text/markdown
 bundled: false
 extensions: {}

@@ -4,7 +4,28 @@ info:
 
 docs:
   content: |-
-    # WebSocket connection
+    # 🔌 WebSocket Connection
 
-    WebSocket authentication uses the `session_id` query parameter, not `X-Session-Id`.
+    This folder explains how to open the shared real-time connection used by room and game events. 🔌 It contains authenticated, missing-session, and invalid-session scenarios so connection failures are visible and testable.
+
+    ## 🌍 Connection URL
+
+    `{{wsUrl}}/ws?session_id={{session_id}}`
+
+    The URL comes from the selected environment. With `local`, it resolves to `ws://localhost:3000`.
+
+    ## 🔐 Authentication behavior
+
+    WebSocket authentication uses the `session_id` query parameter during the handshake. It is separate from REST authentication, where protected requests use `X-Session-Id`.
+
+    ## 🧭 Lifecycle
+
+    1. Run the REST user-entry request.
+    2. Confirm `session_id` is populated at runtime.
+    3. Open `connect`.
+    4. Observe server frames or handshake errors.
+
+    > ⚠️ **Do not reuse committed secrets**
+    >
+    > The committed environment intentionally leaves session values blank. Use Bruno's local runtime storage.
   type: text/markdown

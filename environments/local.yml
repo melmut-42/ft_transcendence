@@ -13,16 +13,16 @@ variables:
     secret: true
     type: string
     description: "Current session ID; populated by the REST bootstrap request"
-  - name: host_session_id
+  - name: user_session_id
     value: ""
     secret: true
     type: string
-    description: "Host session ID; populated by the REST bootstrap request"
-  - name: guest_session_id
+    description: "Primary user session ID; populated by the REST bootstrap request"
+  - name: second_user_session_id
     value: ""
     secret: true
     type: string
-    description: "Guest session ID; populated by the REST bootstrap request"
+    description: "Second user session ID; populated by the REST bootstrap request"
   - name: outsider_session_id
     value: ""
     secret: true

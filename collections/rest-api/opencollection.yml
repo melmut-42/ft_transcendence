@@ -2,6 +2,7 @@ opencollection: 1.0.0
 
 info:
   name: 🌐 REST API
+  version: "1.1.0"
 config:
   proxy:
     inherit: true
@@ -16,13 +17,44 @@ config:
 
 docs:
   content: |-
-    # ft_transcendence REST API
+    # 🌐 ft_transcendence REST API
 
-    Base URL: `{{baseUrl}}`.
+    Welcome to the HTTP side of the `ft_transcendence` API. 🚀 This collection is a practical reference for onboarding, smoke testing, regression checks, and investigating the room lifecycle without guessing at undocumented endpoints.
 
-    Authentication is temporary username-based session state. Protected requests send `X-Session-Id: {{session_id}}`. The API currently exposes user entry, room creation, room joining, and authoritative room snapshots.
+    ## 🎯 What this collection covers
 
-    Room states are `WAITING`, `READY`, `IN_PROGRESS`, and `FINISHED`. A room needs four players, and only the host can start a game through the shared WebSocket.
+    - 👤 Temporary username entry and session creation through `POST /users/enter`
+    - ➕ Room creation through `POST /rooms`
+    - 🔗 Room joining through `POST /rooms/join`
+    - 📊 Authoritative room snapshots through `GET /rooms/:room_id`
+    - ✅ Successful response examples and ❌ contract-level error scenarios
+
+    ## 🌍 Before you send a request
+
+    1. Start the backend on `http://localhost:3000`.
+    2. Select the workspace-level `local` environment.
+    3. Run `Enter user`, then `Enter second user`, to create temporary sessions.
+    4. Run `Create room as host` to populate `room_id` for the remaining smoke flow.
+
+    The base URL comes from `{{baseUrl}}`. Protected requests send `X-Session-Id`; this is temporary session authentication, not password, JWT, or production identity management. 🔐
+
+    ## 🧭 Recommended workflow
+
+    `Enter user` → `Enter second user` → `Create room as host` → `Get room state as host` → `Join room as second user` → `Get room state as second user`
+
+    Runtime scripts chain session and room identifiers between requests. Negative requests are intentionally separate so they can be run without hiding the expected failure behind a happy-path assertion.
+
+    ## 📤 Reading responses
+
+    Room responses are authoritative snapshots. Room states include `WAITING`, `READY`, `IN_PROGRESS`, and `FINISHED`; a room needs four players before the host can start a game through the shared WebSocket. Review the native response examples on each request before exercising a manual scenario.
+
+    > ⚠️ **Prepared-state scenarios**
+    >
+    > Outsider access and in-progress/finished-room tests require IDs and sessions prepared outside the default smoke flow. Do not replace the documented placeholders with real secrets in Git.
+
+    ## 🔖 Version
+
+    This collection is version `1.1.0`. The version tracks the documented workspace structure and coverage, not a new backend API release.
   type: text/markdown
 bundled: false
 extensions: {}

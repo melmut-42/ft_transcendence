@@ -9,7 +9,7 @@ http:
   url: "{{baseUrl}}/rooms"
   headers:
     - name: X-Session-Id
-      value: "{{host_session_id}}"
+      value: "{{user_session_id}}"
       disabled: true
     - name: Accept
       value: application/json
@@ -36,6 +36,45 @@ examples:
             }
           }
 docs: |-
-  # Missing session
+  # 📥 Create room without session
 
-  The `X-Session-Id` header is intentionally disabled. Expected response: `401` with a message that a valid `X-Session-Id` is required.
+  ## 📝 Overview
+
+  Creates a room for the authenticated user. The backend assigns the host role in the returned room snapshot and the runtime script stores `room_id` for the next requests.
+
+  ## 📍 Endpoint
+
+  `POST {{baseUrl}}/rooms`
+
+  ## 🔐 Authentication
+
+  A valid temporary session is required in `X-Session-Id`. The selected environment supplies the value at runtime.
+
+  ## 📦 Request body
+
+  No request body is required for this request.
+
+  ## 📤 Response scenarios
+
+  - `401` — 401 Unauthorized
+
+  Review the native example body for the complete response shape.
+
+  ## 🧭 Typical workflow
+
+  Run after the user-entry flow. On success, continue with room-state retrieval, joining, or the documented negative room scenarios.
+
+  ## 🧪 Testing guidance
+
+  This is a deliberate negative scenario. Keep its prepared inputs intact and verify both the HTTP status and the contract error code.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment and inspect the native response examples before sending a state-changing request.
+
+
+  ## 🧩 Workspace metadata
+
+  Tags: negative.
+
+  The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.

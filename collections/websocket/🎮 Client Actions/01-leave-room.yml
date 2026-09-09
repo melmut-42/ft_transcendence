@@ -14,9 +14,38 @@ websocket:
         type: text
         data: "<replace with the contract-confirmed leave_room data payload before enabling>"
 docs: |-
-  # `leave_room`
+  # ⚡ leave_room
 
-  Client event name: `leave_room`.
+  ## 📝 Overview
 
-  The field-level payload schema was not provided by the application contract. The reference message is intentionally disabled and must be replaced with the server-confirmed `data` payload before sending.
+  Documents the client event `leave_room`. This is a stateful outbound action and must only be used when the current room, role, turn, and game state satisfy its backend preconditions.
 
+  ## 🔌 Connection
+
+  `{{wsUrl}}/ws?session_id={{session_id}}`
+
+  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+
+  ## 📥 Message behavior
+
+  The message is a disabled reference scaffold. Its field-level payload is not confirmed by the API contract, so replace it only after the backend protocol is verified.
+
+  ## 📤 Expected observation
+
+  Observe the handshake, server event, or error frame in Bruno's WebSocket message history.
+
+  ## 🧭 Typical workflow
+
+  Open `connect`, prepare the required room state, select this event only when its preconditions are true, and observe the resulting server event or error envelope.
+
+  ## 🧪 Testing guidance
+
+  Confirm that the action is accepted only for the correct identity, role, turn, and game state. Rejected actions must not mutate state or create a successful action log.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
+
+  ## 📌 Contract boundary
+
+  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.

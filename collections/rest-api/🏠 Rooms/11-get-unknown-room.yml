@@ -13,7 +13,7 @@ http:
       type: path
   headers:
     - name: X-Session-Id
-      value: "{{host_session_id}}"
+      value: "{{user_session_id}}"
     - name: Accept
       value: application/json
 runtime:
@@ -40,6 +40,45 @@ examples:
             }
           }
 docs: |-
-  # Unknown room snapshot
+  # 📥 Get unknown room
 
-  Expected response: `404 ROOM_NOT_FOUND`.
+  ## 📝 Overview
+
+  Retrieves the authoritative room snapshot for the path parameter `room_id`. Access depends on the authenticated user's membership and authorization.
+
+  ## 📍 Endpoint
+
+  `GET {{baseUrl}}/rooms/:room_id`
+
+  ## 🔐 Authentication
+
+  A valid temporary session is required in `X-Session-Id`. The selected environment supplies the value at runtime.
+
+  ## 📦 Request body
+
+  No request body is required for this request.
+
+  ## 📤 Response scenarios
+
+  - `404` — 404 ROOM_NOT_FOUND
+
+  Review the native example body for the complete response shape.
+
+  ## 🧭 Typical workflow
+
+  Run after `room_id` and a suitable session are available. Use the manual outsider request only with a session that is not a room member.
+
+  ## 🧪 Testing guidance
+
+  This is a deliberate negative scenario. Keep its prepared inputs intact and verify both the HTTP status and the contract error code.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment and inspect the native response examples before sending a state-changing request.
+
+
+  ## 🧩 Workspace metadata
+
+  Tags: negative.
+
+  The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.

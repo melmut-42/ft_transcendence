@@ -4,7 +4,29 @@ info:
 
 docs:
   content: |-
-    # Rooms
+    # 🏠 Rooms
 
-    Room requests use `X-Session-Id`. The server returns an authoritative room snapshot with membership and connection status. A player can belong to only one room at a time.
+    This folder covers the room lifecycle after a temporary user session exists. 🏠 Requests create rooms, join rooms, retrieve authoritative state, and exercise membership and state restrictions.
+
+    ## 📊 What the responses represent
+
+    The backend returns the authoritative room snapshot, including the room ID, lifecycle status, host role, players, connection status, minimum player count, and game state when those fields are part of the known response. A user can belong to only one room at a time.
+
+    ## 🧭 Recommended flow
+
+    1. 🔐 Run `Enter user` and retain the generated session.
+    2. ➕ Run `Create room as host`; the response chains `room_id`.
+    3. 📤 Retrieve the room with `Get room state as host`.
+    4. 👤 Run `Enter second user`, then `Join room as second user`.
+    5. 📊 Retrieve the room as the second user.
+
+    The remaining requests are deliberate negative or prepared-state checks for missing sessions, invalid IDs, duplicate membership, forbidden access, and non-joinable room states.
+
+    > ⚠️ **State sensitivity**
+    >
+    > Manual requests such as outsider access and in-progress/finished-room joins require prepared sessions or room IDs. Do not treat their placeholders as automatically runnable smoke tests.
+
+    ## 🧪 Testing focus
+
+    Review the native examples for `201`, `200`, `400`, `401`, `403`, `404`, `409`, and `422` outcomes, and confirm that the error code—not only the HTTP status—matches the contract.
   type: text/markdown

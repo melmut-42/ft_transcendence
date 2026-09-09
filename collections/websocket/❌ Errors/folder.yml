@@ -4,7 +4,30 @@ info:
 
 docs:
   content: |-
-    # Errors
+    # ❌ Errors
 
-    Rejected actions use the shared envelope `{ "event": "error", "data": { "code": "...", "message": "..." } }`. Rejections must not mutate state or create a successful action log.
+    This folder documents the failure contract for the shared WebSocket. ❌ It helps developers distinguish transport/handshake failures from rejected actions after a connection has been established.
+
+    ## 📦 Error envelope
+
+    ```json
+    {
+      "event": "error",
+      "data": {
+        "code": "INVALID_ACTION",
+        "message": "This action is not allowed in the current state."
+      }
+    }
+    ```
+
+    ## 🧭 How to test errors
+
+    1. 🔌 Establish a valid connection.
+    2. 🎮 Prepare an action that is invalid for the current role, turn, or state.
+    3. 📤 Capture the error frame.
+    4. 🧪 Confirm the code and message, then verify that state and successful action logs were not changed.
+
+    > 📌 **Keep the catalog accurate**
+    >
+    > Add an error code here only when it is confirmed by the backend contract or an observed response. Do not infer a new code from a client-side guess.
   type: text/markdown

@@ -1,10 +1,10 @@
 info:
-  name: "Get room as outsider"
+  name: "Get room state as second user"
   type: http
-  seq: 12
+  seq: 4
   tags:
-    - manual
-    - negative
+    - smoke
+    - rooms
 http:
   method: GET
   url: "{{baseUrl}}/rooms/:room_id"
@@ -14,21 +14,22 @@ http:
       type: path
   headers:
     - name: X-Session-Id
-      value: "{{outsider_session_id}}"
+      value: "{{second_user_session_id}}"
     - name: Accept
       value: application/json
 runtime:
   scripts:
     - type: tests
       code: |-
-        test("forbids a non-member from reading a room", function() {
-          expect(res.status).to.equal(403);
-          expect(res.body.error.code).to.equal("FORBIDDEN");
+        test("allows a room member to read the snapshot", function() {
+          expect(res.status).to.equal(200);
+          expect(res.body.room_id).to.equal(Number(bru.getVar("room_id")));
+          expect(res.body.players).to.be.an("array");
         });
 examples:
-  - name: "403 FORBIDDEN"
+  - name: "200 OK"
     response:
-      status: 403
+      status: 200
       headers:
         - name: Content-Type
           value: application/json
@@ -36,12 +37,18 @@ examples:
         type: json
         data: |-
           {
-            "error": {
-              "code": "FORBIDDEN"
-            }
+            "room_id": 1001,
+            "status": "WAITING",
+            "host": { "user_id": 42, "username": "player_one" },
+            "players": [
+              { "user_id": 42, "username": "player_one", "role": "HOST", "connection_status": "CONNECTED" },
+              { "user_id": 43, "username": "player_two", "role": "OPERATIVE", "connection_status": "CONNECTED" }
+            ],
+            "minimum_players": 4,
+            "game": null
           }
 docs: |-
-  # 📥 Get room as outsider
+  # 📥 Get room state as second user
 
   ## 📝 Overview
 
@@ -61,7 +68,7 @@ docs: |-
 
   ## 📤 Response scenarios
 
-  - `403` — 403 FORBIDDEN
+  - `200` — 200 OK
 
   Review the native example body for the complete response shape.
 
@@ -71,18 +78,15 @@ docs: |-
 
   ## 🧪 Testing guidance
 
-  This is a deliberate negative scenario. Keep its prepared inputs intact and verify both the HTTP status and the contract error code.
+  Use the native response example as a quick contract reference, then run the request against a local backend when the required variables are populated.
 
   > 💡 **Tip**
   >
   > Use the `local` environment and inspect the native response examples before sending a state-changing request.
 
-  > ⚠️ **Prepared state required**
-  >
-  > This scenario depends on a prepared session or room state. It is not part of the default smoke flow.
 
   ## 🧩 Workspace metadata
 
-  Tags: manual, negative.
+  Tags: smoke, rooms.
 
   The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.

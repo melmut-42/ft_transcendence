@@ -10,7 +10,7 @@ http:
   url: "{{baseUrl}}/rooms"
   headers:
     - name: X-Session-Id
-      value: "{{host_session_id}}"
+      value: "{{user_session_id}}"
     - name: Accept
       value: application/json
 runtime:
@@ -30,25 +30,48 @@ runtime:
           expect(res.body.minimum_players).to.equal(4);
         });
 docs: |-
-  # Create room
+  # 📥 Create room as host
 
-  Creates a room for the authenticated user. The request has no body. The returned `room_id` is stored for the rest of the smoke flow.
+  ## 📝 Overview
 
-  **Success: 201**
+  Creates a room for the authenticated user. The backend assigns the host role in the returned room snapshot and the runtime script stores `room_id` for the next requests.
 
-  ```json
-  {
-    "room_id": 1001,
-    "status": "WAITING",
-    "host": { "user_id": 42, "username": "player_one" },
-    "players": [
-      { "user_id": 42, "username": "player_one", "role": "HOST", "connection_status": "CONNECTED" }
-    ],
-    "minimum_players": 4,
-    "game": null
-  }
-  ```
+  ## 📍 Endpoint
 
+  `POST {{baseUrl}}/rooms`
+
+  ## 🔐 Authentication
+
+  A valid temporary session is required in `X-Session-Id`. The selected environment supplies the value at runtime.
+
+  ## 📦 Request body
+
+  No request body is required for this request.
+
+  ## 📤 Response scenarios
+
+  - `201` — 201 Created — waiting room
+
+  Review the native example body for the complete response shape.
+
+  ## 🧭 Typical workflow
+
+  Run after the user-entry flow. On success, continue with room-state retrieval, joining, or the documented negative room scenarios.
+
+  ## 🧪 Testing guidance
+
+  Use the native response example as a quick contract reference, then run the request against a local backend when the required variables are populated.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment and inspect the native response examples before sending a state-changing request.
+
+
+  ## 🧩 Workspace metadata
+
+  Tags: smoke, rooms.
+
+  The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.
 examples:
   - name: "201 Created — waiting room"
     response:

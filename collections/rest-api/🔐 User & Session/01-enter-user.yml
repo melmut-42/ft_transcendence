@@ -1,10 +1,10 @@
 info:
-  name: Enter invalid username
+  name: "Enter user"
   type: http
-  seq: 2
+  seq: 1
   tags:
-    - negative
-
+    - smoke
+    - bootstrap
 http:
   method: POST
   url: "{{baseUrl}}/users/enter"
@@ -17,43 +17,31 @@ http:
     type: json
     data: |-
       {
-        "username": "ab"
+        "username": "{{user_username}}"
       }
-
 runtime:
   scripts:
+    - type: before-request
+      code: |-
+        const suffix = Date.now().toString(36);
+        bru.setVar("user_username", "user_" + suffix);
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.session) {
+          bru.setVar("session_id", String(res.body.session.session_id));
+          bru.setVar("user_session_id", String(res.body.session.session_id));
+          bru.setVar("user_id", String(res.body.user.user_id));
+        }
     - type: tests
       code: |-
-        test("rejects an invalid username", function() {
-          expect(res.status).to.equal(400);
-          expect(res.body.error.code).to.equal("INVALID_REQUEST");
+        test("creates a temporary user session", function() {
+          expect(res.status).to.equal(201);
+          expect(res.body.user.username).to.be.a("string");
+          expect(res.body.session.session_id).to.be.a("number");
+          expect(res.body.active_room).to.equal(null);
         });
-
-settings:
-  encodeUrl: true
-  timeout: 0
-  followRedirects: true
-  maxRedirects: 5
-  forwardAuthorizationHeader: true
-
-examples:
-  - name: 400 INVALID_REQUEST
-    response:
-      status: 400
-      headers:
-        - name: Content-Type
-          value: application/json
-      body:
-        type: json
-        data: |-
-          {
-            "error": {
-              "code": "INVALID_REQUEST"
-            }
-          }
-
 docs: |-
-  # 📥 Enter invalid username
+  # 📥 Enter user
 
   ## 📝 Overview
 
@@ -73,13 +61,13 @@ docs: |-
 
   ```json
   {
-    "username": "ab"
+    "username": "{{user_username}}"
   }
   ```
 
   ## 📤 Response scenarios
 
-  - `400` — 400 INVALID_REQUEST
+  - `201` — 201 Created
 
   Review the native example body for the complete response shape.
 
@@ -89,7 +77,7 @@ docs: |-
 
   ## 🧪 Testing guidance
 
-  This is a deliberate negative scenario. Keep its prepared inputs intact and verify both the HTTP status and the contract error code.
+  Use the native response example as a quick contract reference, then run the request against a local backend when the required variables are populated.
 
   > 💡 **Tip**
   >
@@ -98,6 +86,21 @@ docs: |-
 
   ## 🧩 Workspace metadata
 
-  Tags: negative.
+  Tags: smoke, bootstrap.
 
   The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.
+examples:
+  - name: "201 Created"
+    response:
+      status: 201
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "user": { "user_id": 42, "username": "player_one" },
+            "session": { "session_id": 7001, "expires_at": 1788883200 },
+            "active_room": null
+          }
