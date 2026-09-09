@@ -1,0 +1,21 @@
+info:
+  name: "game_started"
+  type: websocket
+  seq: 3
+  tags:
+    - event
+    - observation
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Server event: `game_started`
+
+  The host started the game after the room reached the minimum player count.
+
+  **Event name:** `game_started`
+
+  This request opens the shared authenticated socket and sends no outgoing message. Capture the server frame in Bruno's message history. The field-level payload schema was not provided by the application contract, so this documentation intentionally records the event name without inventing payload fields.
+

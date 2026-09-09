@@ -1,0 +1,21 @@
+info:
+  name: "card_revealed"
+  type: websocket
+  seq: 5
+  tags:
+    - event
+    - observation
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Server event: `card_revealed`
+
+  The server broadcast a card reveal. The backend determines the result; do not infer or submit result fields.
+
+  **Event name:** `card_revealed`
+
+  This request opens the shared authenticated socket and sends no outgoing message. Capture the server frame in Bruno's message history. The field-level payload schema was not provided by the application contract, so this documentation intentionally records the event name without inventing payload fields.
+

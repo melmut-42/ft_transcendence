@@ -1,0 +1,45 @@
+info:
+  name: "Get unknown room"
+  type: http
+  seq: 11
+  tags:
+    - negative
+http:
+  method: GET
+  url: "{{baseUrl}}/rooms/:room_id"
+  params:
+    - name: room_id
+      value: "2147483647"
+      type: path
+  headers:
+    - name: X-Session-Id
+      value: "{{host_session_id}}"
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("reports an unknown room", function() {
+          expect(res.status).to.equal(404);
+          expect(res.body.error.code).to.equal("ROOM_NOT_FOUND");
+        });
+examples:
+  - name: "404 ROOM_NOT_FOUND"
+    response:
+      status: 404
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "ROOM_NOT_FOUND"
+            }
+          }
+docs: |-
+  # Unknown room snapshot
+
+  Expected response: `404 ROOM_NOT_FOUND`.

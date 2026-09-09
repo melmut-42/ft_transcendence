@@ -1,0 +1,53 @@
+info:
+  name: "Get room state as guest"
+  type: http
+  seq: 4
+  tags:
+    - smoke
+    - rooms
+http:
+  method: GET
+  url: "{{baseUrl}}/rooms/:room_id"
+  params:
+    - name: room_id
+      value: "{{room_id}}"
+      type: path
+  headers:
+    - name: X-Session-Id
+      value: "{{guest_session_id}}"
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("allows a room member to read the snapshot", function() {
+          expect(res.status).to.equal(200);
+          expect(res.body.room_id).to.equal(Number(bru.getVar("room_id")));
+          expect(res.body.players).to.be.an("array");
+        });
+examples:
+  - name: "200 OK"
+    response:
+      status: 200
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "room_id": 1001,
+            "status": "WAITING",
+            "host": { "user_id": 42, "username": "player_one" },
+            "players": [
+              { "user_id": 42, "username": "player_one", "role": "HOST", "connection_status": "CONNECTED" },
+              { "user_id": 43, "username": "player_two", "role": "OPERATIVE", "connection_status": "CONNECTED" }
+            ],
+            "minimum_players": 4,
+            "game": null
+          }
+docs: |-
+  # Get room state as guest
+
+  Confirms that a joined member can read the same authoritative room snapshot subject to role-based redaction.

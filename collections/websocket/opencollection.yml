@@ -1,0 +1,26 @@
+opencollection: 1.0.0
+
+info:
+  name: ⚡ WebSocket API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+docs:
+  content: |-
+    # ft_transcendence WebSocket API
+
+    Connect to `{{wsUrl}}/ws?session_id={{session_id}}`.
+
+    The socket is shared by all room/game events. The server validates identity, membership, role, turn, and game state. Client messages use the event envelope; only the `give_clue` payload is recorded here as a verified field-level example. Other client action fields are deliberately not guessed.
+  type: text/markdown
+bundled: false
+extensions: {}

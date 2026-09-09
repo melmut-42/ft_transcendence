@@ -1,0 +1,10 @@
+info:
+  name: 🏠 Rooms
+  type: folder
+
+docs:
+  content: |-
+    # Rooms
+
+    Room requests use `X-Session-Id`. The server returns an authoritative room snapshot with membership and connection status. A player can belong to only one room at a time.
+  type: text/markdown

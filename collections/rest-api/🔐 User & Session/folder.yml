@@ -1,0 +1,10 @@
+info:
+  name: 🔐 User & Session
+  type: folder
+
+docs:
+  content: |-
+    # User and session bootstrap
+
+    `POST /users/enter` creates or enters a temporary username session. It is the only authentication/bootstrap endpoint in the known contract.
+  type: text/markdown

@@ -1,0 +1,49 @@
+info:
+  name: "Join unknown room"
+  type: http
+  seq: 8
+  tags:
+    - negative
+http:
+  method: POST
+  url: "{{baseUrl}}/rooms/join"
+  headers:
+    - name: X-Session-Id
+      value: "{{guest_session_id}}"
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "room_id": 2147483647
+      }
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("reports an unknown room", function() {
+          expect(res.status).to.equal(404);
+          expect(res.body.error.code).to.equal("ROOM_NOT_FOUND");
+        });
+examples:
+  - name: "404 ROOM_NOT_FOUND"
+    response:
+      status: 404
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "ROOM_NOT_FOUND"
+            }
+          }
+docs: |-
+  # Unknown room
+
+  Uses a large room ID intended to be absent. Expected response: `404 ROOM_NOT_FOUND`.

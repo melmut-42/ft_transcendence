@@ -4,7 +4,118 @@ info:
   type: workspace
 
 collections:
+  - name: "🌐 ft_transcendence REST API"
+    path: "collections/rest-api"
+  - name: "⚡ ft_transcendence WebSocket API"
+    path: "collections/websocket"
 
 specs:
 
-docs: ''
+docs: |-
+  ## Project purpose
+  
+  This workspace is the version-controlled API testing and documentation surface for the `ft_transcendence` project. It is designed for backend development, frontend integration, QA, regression testing, debugging, onboarding, and interactive real-time protocol checks.
+  
+  The workspace intentionally documents only the known application contract. It does not add chat, tournaments, friends, notifications, passwords, JWT, or other unsupported modules.
+  
+  ## Collections
+  
+  ### 🌐 REST API
+  
+  The REST collection contains the temporary username/session bootstrap and room lifecycle endpoints:
+  
+  - `POST /users/enter`
+  - `POST /rooms`
+  - `POST /rooms/join`
+  - `GET /rooms/:room_id`
+  
+  It includes happy paths, validation failures, authentication failures, membership/authorization failures, missing rooms, duplicate membership, and prepared-state room errors.
+  
+  ### ⚡ WebSocket API
+  
+  The WebSocket collection documents the shared raw WebSocket connection:
+  
+  `{{wsUrl}}/ws?session_id={{session_id}}`
+  
+  It is organized into concise connection, client action, server event, and error requests. The known client events are `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn`. The known server events are `player_joined`, `player_left`, `game_started`, `clue_given`, `card_revealed`, `turn_changed`, `player_disconnected`, `player_reconnected`, `game_finished`, and `game_action_logged`.
+  
+  ## Local setup
+  
+  1. Start the `ft_transcendence` backend so it listens on `http://localhost:3000`.
+  2. Open this workspace directory in Bruno.
+  3. Select the workspace-level `local` environment.
+  4. Run the REST requests in the documented order.
+  5. Open `connect` after a session exists to inspect the shared WebSocket.
+  6. Use the manual/prepared-state requests only when their documented prerequisites are satisfied.
+  
+  The committed environment has safe local defaults and blank session variables. It contains no real credentials or production secrets.
+  
+  ## Environment and authentication
+  
+  The `local` environment defines `baseUrl`, `wsUrl`, temporary session variables, room chaining variables, and optional prepared-state IDs.
+  
+  REST authentication is temporary username-based session authentication. `POST /users/enter` returns a user, a temporary session, an expiry value, and the current active room. Protected REST requests send `X-Session-Id`.
+  
+  WebSocket authentication is separate at the transport level: the session is supplied as the `session_id` query parameter during the handshake. The socket is shared by room and game events; events are not separate HTTP routes.
+  
+  ## Main workflows
+  
+  ### REST room workflow
+  
+  Run these requests in order:
+  
+  1. `Enter host user`
+  2. `Enter guest user`
+  3. `Create room as host`
+  4. `Get room state as host`
+  5. `Join room as guest`
+  6. `Get room state as guest`
+  
+  The host and guest requests generate unique usernames. Runtime scripts capture session IDs, user IDs, and the created room ID for later requests.
+  
+  ### Game/WebSocket workflow
+  
+  Prepare a room with the required number of players, open `connect`, and then use the action request that matches the current role, turn, and game state. Only `give_clue` has a verified field-level payload example in the known contract. Its message is disabled by default because sending it changes game state.
+  
+  ## Request chaining and testing
+  
+  The REST bootstrap uses before-request scripts to generate unique usernames and after-response scripts to store returned IDs in runtime variables. Tests validate HTTP status, response structure, room lifecycle status, minimum player count, and contract error codes.
+  
+  Negative requests are intentionally visible and independently runnable. They cover invalid input, missing sessions, duplicate usernames/membership, missing resources, forbidden access, and room states that are not joinable.
+  
+  Do not batch-run the entire WebSocket collection. WebSocket requests are interactive observers or manually enabled action references, and some require a prepared game state.
+  
+  ## WebSocket rules
+  
+  - A room needs four players before the host can start a game.
+  - Only the host can start the game.
+  - The spymaster sends a clue while the game is waiting for a clue.
+  - Accepted clues move the game into guessing.
+  - Card reveals occur during guessing.
+  - The backend determines the reveal result. Clients must never submit `card_type`, `correct`, or a predicted result.
+  - `end_turn` is supported during guessing.
+  - The server validates identity, membership, role, turn, and state.
+  - Rejected actions must not mutate state or create a successful action log.
+  - Spymasters may receive card types; operatives receive `card_type: null` before the game ends.
+  
+  ## Known limitations
+  
+  The application contract provides only one complete client payload example: `give_clue`. The other client event files therefore contain disabled reference messages rather than guessed fields. Server event files intentionally record the known event names without inventing undocumented payload shapes.
+  
+  Requests tagged `manual` require a valid prepared session or room state. For example, outsider access needs a session that is not a room member, and in-progress/finished-room join tests need room IDs in those states.
+  
+  ## Security guidance
+  
+  Never commit production credentials, API keys, database credentials, passwords, or real session IDs. Session variables are marked secret and are blank in the committed environment. Use Bruno's local environment storage or process environment variables for sensitive values.
+  
+  ## New developer checklist
+  
+  - Switch to the `bruno` branch.
+  - Open the workspace directory in Bruno.
+  - Select the `local` environment.
+  - Start the backend on port 3000.
+  - Run the REST smoke workflow in order.
+  - Inspect native response examples from each request.
+  - Use the WebSocket connection after a valid session exists.
+  - Read each manual request's prerequisite documentation before sending it.
+  - Keep request names, examples, tests, and docs aligned with the backend contract.

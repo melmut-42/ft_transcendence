@@ -1,0 +1,21 @@
+info:
+  name: "player_joined"
+  type: websocket
+  seq: 1
+  tags:
+    - event
+    - observation
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Server event: `player_joined`
+
+  A player joined the room. Observe the event after a member completes the REST join flow.
+
+  **Event name:** `player_joined`
+
+  This request opens the shared authenticated socket and sends no outgoing message. Capture the server frame in Bruno's message history. The field-level payload schema was not provided by the application contract, so this documentation intentionally records the event name without inventing payload fields.
+

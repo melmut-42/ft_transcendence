@@ -1,0 +1,48 @@
+info:
+  name: "Enter duplicate username"
+  type: http
+  seq: 4
+  tags:
+    - negative
+    - chained
+http:
+  method: POST
+  url: "{{baseUrl}}/users/enter"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "username": "{{host_username}}"
+      }
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("rejects a username that is already taken", function() {
+          expect(res.status).to.equal(409);
+          expect(res.body.error.code).to.equal("USERNAME_TAKEN");
+        });
+examples:
+  - name: "409 USERNAME_TAKEN"
+    response:
+      status: 409
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "USERNAME_TAKEN"
+            }
+          }
+docs: |-
+  # Duplicate username
+
+  Run after `01 Enter host user`. Reusing the generated host username should return `409 USERNAME_TAKEN`.

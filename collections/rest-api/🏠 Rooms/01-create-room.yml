@@ -1,0 +1,71 @@
+info:
+  name: "Create room as host"
+  type: http
+  seq: 1
+  tags:
+    - smoke
+    - rooms
+http:
+  method: POST
+  url: "{{baseUrl}}/rooms"
+  headers:
+    - name: X-Session-Id
+      value: "{{host_session_id}}"
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.room_id !== undefined) {
+          bru.setVar("room_id", String(res.body.room_id));
+        }
+    - type: tests
+      code: |-
+        test("creates a waiting room", function() {
+          expect(res.status).to.equal(201);
+          expect(res.body.status).to.equal("WAITING");
+          expect(res.body.host.user_id).to.be.a("number");
+          expect(res.body.players).to.be.an("array");
+          expect(res.body.minimum_players).to.equal(4);
+        });
+docs: |-
+  # Create room
+
+  Creates a room for the authenticated user. The request has no body. The returned `room_id` is stored for the rest of the smoke flow.
+
+  **Success: 201**
+
+  ```json
+  {
+    "room_id": 1001,
+    "status": "WAITING",
+    "host": { "user_id": 42, "username": "player_one" },
+    "players": [
+      { "user_id": 42, "username": "player_one", "role": "HOST", "connection_status": "CONNECTED" }
+    ],
+    "minimum_players": 4,
+    "game": null
+  }
+  ```
+
+examples:
+  - name: "201 Created — waiting room"
+    response:
+      status: 201
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "room_id": 1001,
+            "status": "WAITING",
+            "host": { "user_id": 42, "username": "player_one" },
+            "players": [
+              { "user_id": 42, "username": "player_one", "role": "HOST", "connection_status": "CONNECTED" }
+            ],
+            "minimum_players": 4,
+            "game": null
+          }

@@ -1,0 +1,50 @@
+info:
+  name: "Join in-progress room"
+  type: http
+  seq: 13
+  tags:
+    - manual
+    - negative
+http:
+  method: POST
+  url: "{{baseUrl}}/rooms/join"
+  headers:
+    - name: X-Session-Id
+      value: "{{outsider_session_id}}"
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "room_id": {{prepared_in_progress_room_id}}
+      }
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("rejects joining a room that is already in progress", function() {
+          expect(res.status).to.equal(409);
+          expect(res.body.error.code).to.equal("ROOM_NOT_JOINABLE");
+        });
+examples:
+  - name: "409 ROOM_NOT_JOINABLE"
+    response:
+      status: 409
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "ROOM_NOT_JOINABLE"
+            }
+          }
+docs: |-
+  # In-progress room
+
+  **Manual scenario.** Set `prepared_in_progress_room_id` to a valid `IN_PROGRESS` room and use a session that is not a member. Expected response: `409 ROOM_NOT_JOINABLE`.

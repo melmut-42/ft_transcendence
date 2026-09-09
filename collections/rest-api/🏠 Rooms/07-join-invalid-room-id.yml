@@ -1,0 +1,49 @@
+info:
+  name: "Join with invalid room ID"
+  type: http
+  seq: 7
+  tags:
+    - negative
+http:
+  method: POST
+  url: "{{baseUrl}}/rooms/join"
+  headers:
+    - name: X-Session-Id
+      value: "{{guest_session_id}}"
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "room_id": "not-a-room-id"
+      }
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("rejects an invalid room ID", function() {
+          expect(res.status).to.equal(400);
+          expect(res.body.error.code).to.equal("INVALID_REQUEST");
+        });
+examples:
+  - name: "400 INVALID_REQUEST"
+    response:
+      status: 400
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "INVALID_REQUEST"
+            }
+          }
+docs: |-
+  # Invalid room ID
+
+  Expected response: `400 INVALID_REQUEST`.

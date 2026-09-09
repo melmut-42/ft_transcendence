@@ -1,0 +1,23 @@
+info:
+  name: "connect"
+  type: websocket
+  seq: 1
+  tags:
+    - interactive
+    - smoke
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Authenticated WebSocket connection
+
+  Run the REST bootstrap request first so `session_id` contains a valid temporary session. Connects to the shared room socket.
+
+  ```text
+  {{wsUrl}}/ws?session_id={{session_id}}
+  ```
+
+  All room and game events are exchanged on this connection. The server validates identity and membership from the session.
+

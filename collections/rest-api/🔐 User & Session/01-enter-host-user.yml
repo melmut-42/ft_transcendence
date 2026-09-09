@@ -1,0 +1,80 @@
+info:
+  name: "Enter host user"
+  type: http
+  seq: 1
+  tags:
+    - smoke
+    - bootstrap
+http:
+  method: POST
+  url: "{{baseUrl}}/users/enter"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "username": "{{host_username}}"
+      }
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const suffix = Date.now().toString(36);
+        bru.setVar("host_username", "host_" + suffix);
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.session) {
+          bru.setVar("session_id", String(res.body.session.session_id));
+          bru.setVar("host_session_id", String(res.body.session.session_id));
+          bru.setVar("host_user_id", String(res.body.user.user_id));
+        }
+    - type: tests
+      code: |-
+        test("creates a temporary user session", function() {
+          expect(res.status).to.equal(201);
+          expect(res.body.user.username).to.be.a("string");
+          expect(res.body.session.session_id).to.be.a("number");
+          expect(res.body.active_room).to.equal(null);
+        });
+docs: |-
+  # Enter host user
+
+  Creates a temporary username session. The runtime scripts save the returned session as both `session_id` and `host_session_id` for the room flow.
+
+  **Request**
+
+  ```json
+  { "username": "player_one" }
+  ```
+
+  Usernames must contain 3–24 letters, digits, or underscores. This workspace generates a unique test username per run.
+
+  **Success: 201**
+
+  ```json
+  {
+    "user": { "user_id": 42, "username": "player_one" },
+    "session": { "session_id": 7001, "expires_at": 1788883200 },
+    "active_room": null
+  }
+  ```
+
+examples:
+  - name: "201 Created"
+    response:
+      status: 201
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "user": { "user_id": 42, "username": "player_one" },
+            "session": { "session_id": 7001, "expires_at": 1788883200 },
+            "active_room": null
+          }

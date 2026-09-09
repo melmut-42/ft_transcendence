@@ -1,0 +1,10 @@
+info:
+  name: 📡 Server Events
+  type: folder
+
+docs:
+  content: |-
+    # Server events
+
+    These are server-emitted event names observed on the shared socket. Payload fields are intentionally not invented where the contract did not provide them.
+  type: text/markdown

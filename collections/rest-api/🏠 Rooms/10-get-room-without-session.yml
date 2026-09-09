@@ -1,0 +1,45 @@
+info:
+  name: "Get room without session"
+  type: http
+  seq: 10
+  tags:
+    - negative
+http:
+  method: GET
+  url: "{{baseUrl}}/rooms/:room_id"
+  params:
+    - name: room_id
+      value: "{{room_id}}"
+      type: path
+  headers:
+    - name: X-Session-Id
+      value: "{{host_session_id}}"
+      disabled: true
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("rejects a protected room read without a session", function() {
+          expect(res.status).to.equal(401);
+        });
+examples:
+  - name: "401 Unauthorized"
+    response:
+      status: 401
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "UNAUTHORIZED"
+            }
+          }
+docs: |-
+  # Missing session on room read
+
+  The session header is intentionally disabled. Expected response: `401`.

@@ -1,0 +1,21 @@
+info:
+  name: "clue_given"
+  type: websocket
+  seq: 4
+  tags:
+    - event
+    - observation
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Server event: `clue_given`
+
+  The server broadcast the accepted clue. The exact server payload fields were not provided.
+
+  **Event name:** `clue_given`
+
+  This request opens the shared authenticated socket and sends no outgoing message. Capture the server frame in Bruno's message history. The field-level payload schema was not provided by the application contract, so this documentation intentionally records the event name without inventing payload fields.
+

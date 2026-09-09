@@ -1,0 +1,10 @@
+info:
+  name: 🎮 Client Actions
+  type: folder
+
+docs:
+  content: |-
+    # Client actions
+
+    The event names are part of the known contract. `give_clue` is the only client action with a saved payload schema. The other action messages are disabled reference scaffolds so opening a request never sends an invented or destructive payload.
+  type: text/markdown

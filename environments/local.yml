@@ -1,0 +1,42 @@
+name: local
+variables:
+  - name: baseUrl
+    value: "http://localhost:3000"
+    type: string
+    description: "HTTP API origin"
+  - name: wsUrl
+    value: "ws://localhost:3000"
+    type: string
+    description: "WebSocket origin"
+  - name: session_id
+    value: ""
+    secret: true
+    type: string
+    description: "Current session ID; populated by the REST bootstrap request"
+  - name: host_session_id
+    value: ""
+    secret: true
+    type: string
+    description: "Host session ID; populated by the REST bootstrap request"
+  - name: guest_session_id
+    value: ""
+    secret: true
+    type: string
+    description: "Guest session ID; populated by the REST bootstrap request"
+  - name: outsider_session_id
+    value: ""
+    secret: true
+    type: string
+    description: "Optional session for the manual outsider-forbidden scenario"
+  - name: room_id
+    value: ""
+    type: number
+    description: "Room ID; populated by room creation"
+  - name: prepared_in_progress_room_id
+    value: ""
+    type: number
+    description: "Optional manual room ID whose status is IN_PROGRESS"
+  - name: prepared_finished_room_id
+    value: ""
+    type: number
+    description: "Optional manual room ID whose status is FINISHED"

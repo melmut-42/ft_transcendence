@@ -1,0 +1,22 @@
+info:
+  name: "end_turn"
+  type: websocket
+  seq: 5
+  tags:
+    - action
+    - manual
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "end_turn — payload schema to be confirmed"
+      selected: false
+      message:
+        type: text
+        data: "<replace with the contract-confirmed end_turn data payload before enabling>"
+docs: |-
+  # `end_turn`
+
+  Client event name: `end_turn`.
+
+  Supported during the guessing phase. The field-level payload schema was not provided, so this message is disabled.
+

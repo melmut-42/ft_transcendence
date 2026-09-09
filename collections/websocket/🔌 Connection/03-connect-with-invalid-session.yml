@@ -1,0 +1,16 @@
+info:
+  name: "connect_invalid_session"
+  type: websocket
+  seq: 3
+  tags:
+    - manual
+    - negative
+websocket:
+  url: "{{wsUrl}}/ws?session_id=invalid-session"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Invalid WebSocket session
+
+  Negative handshake scenario using a deliberately invalid session ID. The server should reject the connection or emit its documented unauthorized behavior. This request has no message payload.

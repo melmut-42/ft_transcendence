@@ -1,0 +1,42 @@
+info:
+  name: "Create second room as host"
+  type: http
+  seq: 6
+  tags:
+    - negative
+    - chained
+http:
+  method: POST
+  url: "{{baseUrl}}/rooms"
+  headers:
+    - name: X-Session-Id
+      value: "{{host_session_id}}"
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("prevents a player from creating a second room", function() {
+          expect(res.status).to.equal(409);
+          expect(res.body.error.code).to.equal("USER_ALREADY_IN_ROOM");
+        });
+examples:
+  - name: "409 USER_ALREADY_IN_ROOM"
+    response:
+      status: 409
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "USER_ALREADY_IN_ROOM"
+            }
+          }
+docs: |-
+  # Duplicate room membership
+
+  Run after `01 Create room as host`. A player already belonging to a room cannot create another one. Expected response: `409 USER_ALREADY_IN_ROOM`.

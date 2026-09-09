@@ -1,0 +1,54 @@
+info:
+  name: "Get room state as host"
+  type: http
+  seq: 2
+  tags:
+    - smoke
+    - rooms
+http:
+  method: GET
+  url: "{{baseUrl}}/rooms/:room_id"
+  params:
+    - name: room_id
+      value: "{{room_id}}"
+      type: path
+  headers:
+    - name: X-Session-Id
+      value: "{{host_session_id}}"
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns the authoritative room snapshot", function() {
+          expect(res.status).to.equal(200);
+          expect(res.body.room_id).to.equal(Number(bru.getVar("room_id")));
+          expect(res.body.status).to.be.oneOf(["WAITING", "READY", "IN_PROGRESS", "FINISHED"]);
+          expect(res.body.players).to.be.an("array");
+        });
+docs: |-
+  # Get room state
+
+  Returns the authoritative room snapshot. Membership is required; the endpoint may redact fields according to the requesting user's role.
+
+examples:
+  - name: "200 OK — authoritative snapshot"
+    response:
+      status: 200
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "room_id": 1001,
+            "status": "WAITING",
+            "host": { "user_id": 42, "username": "player_one" },
+            "players": [
+              { "user_id": 42, "username": "player_one", "role": "HOST", "connection_status": "CONNECTED" }
+            ],
+            "minimum_players": 4,
+            "game": null
+          }

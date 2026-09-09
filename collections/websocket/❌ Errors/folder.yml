@@ -1,0 +1,10 @@
+info:
+  name: ❌ Errors
+  type: folder
+
+docs:
+  content: |-
+    # Errors
+
+    Rejected actions use the shared envelope `{ "event": "error", "data": { "code": "...", "message": "..." } }`. Rejections must not mutate state or create a successful action log.
+  type: text/markdown

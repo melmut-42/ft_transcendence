@@ -1,0 +1,29 @@
+info:
+  name: "error_envelope"
+  type: websocket
+  seq: 1
+  tags:
+    - error
+    - observation
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Server error envelope
+
+  Rejected actions use the shared envelope:
+
+  ```json
+  {
+    "event": "error",
+    "data": {
+      "code": "INVALID_ACTION",
+      "message": "This action is not allowed in the current state."
+    }
+  }
+  ```
+
+  This observer sends no outgoing message. Capture error frames while exercising a deliberately invalid action in a prepared test room.
+

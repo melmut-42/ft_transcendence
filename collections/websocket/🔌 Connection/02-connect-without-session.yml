@@ -1,0 +1,17 @@
+info:
+  name: "connect_without_session"
+  type: websocket
+  seq: 2
+  tags:
+    - manual
+    - negative
+websocket:
+  url: "{{wsUrl}}/ws"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Unauthenticated WebSocket connection
+
+  Negative handshake scenario. No `session_id` query parameter is sent. The server should reject the connection or emit its documented unauthorized behavior. This request has no message payload.
+

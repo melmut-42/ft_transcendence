@@ -1,0 +1,22 @@
+info:
+  name: "leave_room"
+  type: websocket
+  seq: 1
+  tags:
+    - action
+    - manual
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "leave_room — payload schema to be confirmed"
+      selected: false
+      message:
+        type: text
+        data: "<replace with the contract-confirmed leave_room data payload before enabling>"
+docs: |-
+  # `leave_room`
+
+  Client event name: `leave_room`.
+
+  The field-level payload schema was not provided by the application contract. The reference message is intentionally disabled and must be replaced with the server-confirmed `data` payload before sending.
+

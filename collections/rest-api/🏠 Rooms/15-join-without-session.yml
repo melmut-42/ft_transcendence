@@ -1,0 +1,51 @@
+info:
+  name: "Join without session"
+  type: http
+  seq: 15
+  tags:
+    - negative
+http:
+  method: POST
+  url: "{{baseUrl}}/rooms/join"
+  headers:
+    - name: X-Session-Id
+      value: "{{guest_session_id}}"
+      disabled: true
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "room_id": {{room_id}}
+      }
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("rejects joining without a session header", function() {
+          expect(res.status).to.equal(401);
+        });
+examples:
+  - name: "401 Unauthorized"
+    response:
+      status: 401
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "UNAUTHORIZED"
+            }
+          }
+docs: |-
+  # Join without session
+
+  The `X-Session-Id` header is intentionally disabled. Expected response: `401`.
+
+

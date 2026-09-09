@@ -1,0 +1,28 @@
+opencollection: 1.0.0
+
+info:
+  name: 🌐 REST API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+docs:
+  content: |-
+    # ft_transcendence REST API
+
+    Base URL: `{{baseUrl}}`.
+
+    Authentication is temporary username-based session state. Protected requests send `X-Session-Id: {{session_id}}`. The API currently exposes user entry, room creation, room joining, and authoritative room snapshots.
+
+    Room states are `WAITING`, `READY`, `IN_PROGRESS`, and `FINISHED`. A room needs four players, and only the host can start a game through the shared WebSocket.
+  type: text/markdown
+bundled: false
+extensions: {}

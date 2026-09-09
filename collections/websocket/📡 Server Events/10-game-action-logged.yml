@@ -1,0 +1,21 @@
+info:
+  name: "game_action_logged"
+  type: websocket
+  seq: 10
+  tags:
+    - event
+    - observation
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # Server event: `game_action_logged`
+
+  The server broadcast the successful game action log event. Rejected actions must not create a successful action log.
+
+  **Event name:** `game_action_logged`
+
+  This request opens the shared authenticated socket and sends no outgoing message. Capture the server frame in Bruno's message history. The field-level payload schema was not provided by the application contract, so this documentation intentionally records the event name without inventing payload fields.
+

@@ -1,0 +1,46 @@
+info:
+  name: "Get room as outsider"
+  type: http
+  seq: 12
+  tags:
+    - manual
+    - negative
+http:
+  method: GET
+  url: "{{baseUrl}}/rooms/:room_id"
+  params:
+    - name: room_id
+      value: "{{room_id}}"
+      type: path
+  headers:
+    - name: X-Session-Id
+      value: "{{outsider_session_id}}"
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("forbids a non-member from reading a room", function() {
+          expect(res.status).to.equal(403);
+          expect(res.body.error.code).to.equal("FORBIDDEN");
+        });
+examples:
+  - name: "403 FORBIDDEN"
+    response:
+      status: 403
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "FORBIDDEN"
+            }
+          }
+docs: |-
+  # Outsider room snapshot
+
+  **Manual scenario.** Set `outsider_session_id` to a valid session that does not belong to `room_id`. Expected response: `403 FORBIDDEN`.

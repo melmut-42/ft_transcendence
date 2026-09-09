@@ -1,0 +1,22 @@
+info:
+  name: "start_game"
+  type: websocket
+  seq: 2
+  tags:
+    - action
+    - manual
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "start_game — payload schema to be confirmed"
+      selected: false
+      message:
+        type: text
+        data: "<replace with the contract-confirmed start_game data payload before enabling>"
+docs: |-
+  # `start_game`
+
+  Client event name: `start_game`.
+
+  Only the host may start a game, and the room needs four players. The field-level payload schema was not provided; the reference message remains disabled until it is confirmed.
+

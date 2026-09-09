@@ -1,9 +1,8 @@
-# Secrets
-.env*
-
-# Dependencies
-node_modules
-
-# OS files
 .DS_Store
-Thumbs.db
+.bruno/
+reports/
+.env
+.env.*
+!.env.example
+environments/*.private.yml
+collections/**/environments/*.private.yml

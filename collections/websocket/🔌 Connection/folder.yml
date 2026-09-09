@@ -1,0 +1,10 @@
+info:
+  name: 🔌 Connection
+  type: folder
+
+docs:
+  content: |-
+    # WebSocket connection
+
+    WebSocket authentication uses the `session_id` query parameter, not `X-Session-Id`.
+  type: text/markdown

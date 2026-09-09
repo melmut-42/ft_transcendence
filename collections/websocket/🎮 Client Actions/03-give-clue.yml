@@ -1,0 +1,41 @@
+info:
+  name: "give_clue"
+  type: websocket
+  seq: 3
+  tags:
+    - action
+    - verified-example
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "give_clue — verified contract example"
+      selected: false
+      message:
+        type: json
+        data: |-
+          {
+            "event": "give_clue",
+            "data": {
+              "room_id": 1001,
+              "clue": "SPACE",
+              "number": 3
+            }
+          }
+docs: |-
+  # `give_clue`
+
+  Verified client message example:
+
+  ```json
+  {
+    "event": "give_clue",
+    "data": {
+      "room_id": 1001,
+      "clue": "SPACE",
+      "number": 3
+    }
+  }
+  ```
+
+  The message is disabled by default because it is valid only when the game is active, the sender is the spymaster, and the sender has the turn. The server transitions from `WAITING_FOR_CLUE` to `GUESSING` after accepting it.
+

@@ -1,0 +1,36 @@
+info:
+  name: "error_code_catalog"
+  type: websocket
+  seq: 2
+  tags:
+    - error
+    - documentation
+websocket:
+  url: "{{wsUrl}}/ws?session_id={{session_id}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 0
+docs: |-
+  # WebSocket error codes
+
+  Known error codes:
+
+  - `UNAUTHORIZED`
+  - `FORBIDDEN`
+  - `INVALID_REQUEST`
+  - `USERNAME_TAKEN`
+  - `ROOM_NOT_FOUND`
+  - `ROOM_NOT_JOINABLE`
+  - `USER_ALREADY_IN_ROOM`
+  - `NOT_ENOUGH_PLAYERS`
+  - `GAME_NOT_STARTED`
+  - `GAME_ALREADY_STARTED`
+  - `INVALID_ACTION`
+  - `NOT_YOUR_TURN`
+  - `INVALID_ROLE`
+  - `CARD_NOT_FOUND`
+  - `CARD_ALREADY_REVEALED`
+  - `INVALID_GAME_STATE`
+
+  This request is a passive observer and sends no outgoing message. The exact code depends on the invalid action and current game state.
+

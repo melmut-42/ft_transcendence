@@ -1,0 +1,50 @@
+info:
+  name: "Join the same room again"
+  type: http
+  seq: 9
+  tags:
+    - negative
+    - chained
+http:
+  method: POST
+  url: "{{baseUrl}}/rooms/join"
+  headers:
+    - name: X-Session-Id
+      value: "{{guest_session_id}}"
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "room_id": {{room_id}}
+      }
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("prevents duplicate room membership", function() {
+          expect(res.status).to.equal(422);
+          expect(res.body.error.code).to.equal("USER_ALREADY_IN_ROOM");
+        });
+examples:
+  - name: "422 USER_ALREADY_IN_ROOM"
+    response:
+      status: 422
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "USER_ALREADY_IN_ROOM"
+            }
+          }
+docs: |-
+  # Duplicate join
+
+  Run after `03 Join room as guest`. Expected response: `422 USER_ALREADY_IN_ROOM`.
