@@ -11,9 +11,9 @@ docs:
     ## 🧭 When to use these requests
 
     - Run `Enter user` first to create the primary temporary user.
-    - Run `Enter second user` when the room workflow needs another participant.
-    - Use `Enter invalid username` to verify validation behavior.
-    - Use `Enter duplicate username` to verify the exact `USERNAME_TAKEN` conflict.
+    - Use the prepared `guest_session_id` environment variable when a room workflow needs another participant.
+    - Inspect the native `400 INVALID_REQUEST` example to verify validation behavior.
+    - Inspect the native `409 USERNAME_TAKEN` example to verify the exact conflict contract.
 
     ## 🔗 Runtime chaining
 

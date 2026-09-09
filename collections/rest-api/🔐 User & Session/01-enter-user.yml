@@ -68,6 +68,8 @@ docs: |-
   ## 📤 Response scenarios
 
   - `201` — 201 Created
+  - `400` — INVALID_REQUEST
+  - `409` — USERNAME_TAKEN
 
   Review the native example body for the complete response shape.
 
@@ -120,4 +122,66 @@ examples:
             "user": { "user_id": 42, "username": "player_one" },
             "session": { "session_id": 7001, "expires_at": 1788883200 },
             "active_room": null
+          }
+  - name: 400 INVALID_REQUEST
+    request:
+      url: "{{baseUrl}}/users/enter"
+      method: "POST"
+      headers:
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "username": "ab"
+          }
+    response:
+      status: 400
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "INVALID_REQUEST"
+            }
+          }
+  - name: 409 USERNAME_TAKEN
+    request:
+      url: "{{baseUrl}}/users/enter"
+      method: "POST"
+      headers:
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "username": "{{user_username}}"
+          }
+    response:
+      status: 409
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "USERNAME_TAKEN"
+            }
           }

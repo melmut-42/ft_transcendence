@@ -18,11 +18,11 @@ variables:
     secret: true
     type: string
     description: "Primary user session ID; populated by the REST bootstrap request"
-  - name: second_user_session_id
+  - name: guest_session_id
     value: ""
     secret: true
     type: string
-    description: "Second user session ID; populated by the REST bootstrap request"
+    description: "Optional prepared guest session ID for manual room-join scenarios"
   - name: outsider_session_id
     value: ""
     secret: true

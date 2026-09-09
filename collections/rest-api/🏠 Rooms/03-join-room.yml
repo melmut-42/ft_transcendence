@@ -1,0 +1,297 @@
+info:
+  name: "Join room"
+  type: http
+  seq: 3
+  tags:
+    - smoke
+    - rooms
+http:
+  method: POST
+  url: "{{baseUrl}}/rooms/join"
+  headers:
+    - name: X-Session-Id
+      value: "{{guest_session_id}}"
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "room_id": {{room_id}}
+      }
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("joins the waiting room", function() {
+          expect(res.status).to.equal(200);
+          expect(res.body.room_id).to.equal(Number(bru.getVar("room_id")));
+          expect(res.body.players).to.be.an("array");
+        });
+docs: |-
+  # 📥 Join room
+
+  ## 📝 Overview
+
+  Attempts to add the authenticated user to the room identified by `room_id`. The response reflects whether the room exists, is joinable, and does not already contain the user.
+
+  ## 📍 Endpoint
+
+  `POST {{baseUrl}}/rooms/join`
+
+  ## 🔐 Authentication
+
+  A valid temporary session is required in `X-Session-Id`. For a guest workflow, set the prepared `guest_session_id` in the selected local environment.
+
+  ## 📦 Request body
+
+  The request sends JSON. Use the fields already present in the request editor; do not replace runtime placeholders with committed secrets.
+
+  ```json
+  {
+    "room_id": {{room_id}}
+  }
+  ```
+
+  ## 📤 Response scenarios
+
+  - `200` — 200 OK — joined room
+  - `400` — INVALID_REQUEST
+  - `401` — Unauthorized
+  - `404` — ROOM_NOT_FOUND
+  - `409` — ROOM_NOT_JOINABLE
+  - `422` — USER_ALREADY_IN_ROOM
+
+  Review the native example body for the complete response shape.
+
+  ## 🧭 Typical workflow
+
+  Run after a host has created a room and a prepared guest session plus `room_id` are available. This is a manual/prepared-state scenario; a successful join can be followed by room-state retrieval and WebSocket observation.
+
+  ## 🧪 Testing guidance
+
+  Use the native response example as a quick contract reference, then run the request against a local backend when the required variables are populated.
+
+  > 💡 **Tip**
+  >
+  > Use the `local` environment and inspect the native response examples before sending a state-changing request.
+
+
+  ## 🧩 Workspace metadata
+
+  Tags: smoke, rooms.
+
+  The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.
+examples:
+  - name: "200 OK — joined room"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{guest_session_id}}"
+          enabled: true
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": {{room_id}}
+          }
+    response:
+      status: 200
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "room_id": 1001,
+            "status": "WAITING",
+            "host": { "user_id": 42, "username": "player_one" },
+            "players": [
+              { "user_id": 42, "username": "player_one", "role": "HOST", "connection_status": "CONNECTED" },
+              { "user_id": 43, "username": "player_two", "role": "OPERATIVE", "connection_status": "CONNECTED" }
+            ],
+            "minimum_players": 4,
+            "game": null
+          }
+  - name: "400 INVALID_REQUEST"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{guest_session_id}}"
+          enabled: true
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": "not-a-room-id"
+          }
+    response:
+      status: 400
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "INVALID_REQUEST"
+            }
+          }
+  - name: "401 Unauthorized"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{guest_session_id}}"
+          enabled: false
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": {{room_id}}
+          }
+    response:
+      status: 401
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "UNAUTHORIZED"
+            }
+          }
+  - name: "404 ROOM_NOT_FOUND"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{guest_session_id}}"
+          enabled: true
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": 2147483647
+          }
+    response:
+      status: 404
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "ROOM_NOT_FOUND"
+            }
+          }
+  - name: "409 ROOM_NOT_JOINABLE"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{outsider_session_id}}"
+          enabled: true
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": {{prepared_in_progress_room_id}}
+          }
+    response:
+      status: 409
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "ROOM_NOT_JOINABLE"
+            }
+          }
+  - name: "422 USER_ALREADY_IN_ROOM"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{guest_session_id}}"
+          enabled: true
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": {{room_id}}
+          }
+    response:
+      status: 422
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "USER_ALREADY_IN_ROOM"
+            }
+          }

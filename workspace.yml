@@ -52,7 +52,7 @@ docs: |-
 
   ## ⚙️ Environment and authentication
 
-  The `local` environment defines `baseUrl`, `wsUrl`, temporary session variables, room chaining variables, and optional prepared-state IDs.
+  The `local` environment defines `baseUrl`, `wsUrl`, temporary session variables, room chaining variables, and optional prepared-state IDs such as `guest_session_id`.
 
   REST authentication is temporary username-based session authentication. `POST /users/enter` returns a user, a temporary session, an expiry value, and the current active room. Protected REST requests send `X-Session-Id`.
 
@@ -65,13 +65,12 @@ docs: |-
   Run these requests in order:
 
   1. `Enter user`
-  2. `Enter second user`
-  3. `Create room as host`
-  4. `Get room state as host`
-  5. `Join room as second user`
-  6. `Get room state as second user`
+  2. `Create room as host`
+  3. `Get room state`
+  4. Set a prepared `guest_session_id` and run `Join room`
+  5. `Get room state`
 
-  The user-entry requests generate unique usernames. Runtime scripts capture session IDs, user IDs, and the created room ID for later requests.
+  `Enter user` generates a unique username. Runtime scripts capture the host session, user ID, and created room ID; the guest session is a manual prepared-state value.
 
   ### 🎮 Game/WebSocket workflow
 
@@ -81,7 +80,7 @@ docs: |-
 
   The REST bootstrap uses before-request scripts to generate unique usernames and after-response scripts to store returned IDs in runtime variables. Tests validate HTTP status, response structure, room lifecycle status, minimum player count, and contract error codes.
 
-  Negative requests are intentionally visible and independently runnable. They cover invalid input, missing sessions, duplicate usernames/membership, missing resources, forbidden access, and room states that are not joinable.
+  Native response examples are grouped under the canonical endpoint requests. They cover invalid input, missing sessions, duplicate usernames/membership, missing resources, forbidden access, and room states that are not joinable.
 
   Do not batch-run the entire WebSocket collection. WebSocket requests are interactive observers or manually enabled action references, and some require a prepared game state.
 

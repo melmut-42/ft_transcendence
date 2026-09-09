@@ -53,25 +53,24 @@ Select the `local` environment in Bruno. It defines:
 
 - `baseUrl`: `http://localhost:3000`
 - `wsUrl`: `ws://localhost:3000`
-- runtime session variables populated by the REST bootstrap
+- runtime session variables populated by the REST bootstrap, plus an optional prepared guest session
 - `room_id` and optional prepared-state room IDs
 
-The REST bootstrap requests generate unique usernames and chain temporary values such as `user_session_id`, `second_user_session_id`, and `room_id` at runtime. Session variables are marked secret and are intentionally empty in Git.
+The REST bootstrap generates a unique username and chains temporary values such as `user_session_id` and `room_id` at runtime. Set `guest_session_id` only when running the prepared guest-join scenario. Session variables are marked secret and are intentionally empty in Git.
 
 ## 🌐 REST smoke flow
 
 When the backend is running, execute these requests in order:
 
 1. `REST API / User & Session / Enter user`
-2. `REST API / User & Session / Enter second user`
-3. `REST API / Rooms / Create room as host`
-4. `REST API / Rooms / Get room state as host`
-5. `REST API / Rooms / Join room as second user`
-6. `REST API / Rooms / Get room state as second user`
+2. `REST API / Rooms / Create room as host`
+3. `REST API / Rooms / Get room state`
+4. Set a prepared `guest_session_id`, then run `REST API / Rooms / Join room`
+5. `REST API / Rooms / Get room state`
 
-The collection also includes native response examples for successful and error scenarios, including invalid input, missing sessions, duplicate usernames, duplicate membership, missing rooms, forbidden access, and non-joinable rooms.
+Each endpoint request groups its native response examples for successful and error scenarios, including invalid input, missing sessions, duplicate usernames, duplicate membership, missing rooms, forbidden access, and non-joinable rooms.
 
-Requests marked as manual or prepared-state scenarios require suitable data. For example, the outsider request needs a session that is not a room member, while the in-progress and finished-room requests need room IDs in those states.
+Manual or prepared-state examples require suitable data. The forbidden-access example needs a session that is not a room member, while the non-joinable-room example needs a room in an in-progress or finished state.
 
 ## 📍 REST contract summary
 

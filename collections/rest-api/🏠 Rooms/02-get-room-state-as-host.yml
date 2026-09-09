@@ -1,5 +1,5 @@
 info:
-  name: "Get room state as host"
+  name: "Get room state"
   type: http
   seq: 2
   tags:
@@ -28,7 +28,7 @@ runtime:
           expect(res.body.players).to.be.an("array");
         });
 docs: |-
-  # 📥 Get room state as host
+  # 📥 Get room state
 
   ## 📝 Overview
 
@@ -54,7 +54,7 @@ docs: |-
 
   ## 🧭 Typical workflow
 
-  Run after `room_id` and a suitable session are available. Use the manual outsider request only with a session that is not a room member.
+  Run after `room_id` and a suitable session are available. Use the prepared guest session when validating membership, and use an outsider session only for the forbidden-access scenario.
 
   ## 🧪 Testing guidance
 
@@ -106,4 +106,97 @@ examples:
             ],
             "minimum_players": 4,
             "game": null
+          }
+  - name: "401 Unauthorized"
+    request:
+      url: "{{baseUrl}}/rooms/:room_id"
+      method: "GET"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: false
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params:
+        - name: "room_id"
+          value: "{{room_id}}"
+          type: "path"
+          enabled: true
+      body:
+        mode: none
+    response:
+      status: 401
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "UNAUTHORIZED"
+            }
+          }
+  - name: "403 FORBIDDEN"
+    request:
+      url: "{{baseUrl}}/rooms/:room_id"
+      method: "GET"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{outsider_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params:
+        - name: "room_id"
+          value: "{{room_id}}"
+          type: "path"
+          enabled: true
+      body:
+        mode: none
+    response:
+      status: 403
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "FORBIDDEN"
+            }
+          }
+  - name: "404 ROOM_NOT_FOUND"
+    request:
+      url: "{{baseUrl}}/rooms/:room_id"
+      method: "GET"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params:
+        - name: "room_id"
+          value: "2147483647"
+          type: "path"
+          enabled: true
+      body:
+        mode: none
+    response:
+      status: 404
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "ROOM_NOT_FOUND"
+            }
           }

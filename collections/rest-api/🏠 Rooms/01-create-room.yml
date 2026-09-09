@@ -51,6 +51,8 @@ docs: |-
   ## 📤 Response scenarios
 
   - `201` — 201 Created — waiting room
+  - `401` — Unauthorized
+  - `409` — USER_ALREADY_IN_ROOM
 
   Review the native example body for the complete response shape.
 
@@ -104,4 +106,58 @@ examples:
             ],
             "minimum_players": 4,
             "game": null
+          }
+  - name: "401 Unauthorized"
+    request:
+      url: "{{baseUrl}}/rooms"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: false
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: none
+    response:
+      status: 401
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "UNAUTHORIZED"
+            }
+          }
+  - name: "409 USER_ALREADY_IN_ROOM"
+    request:
+      url: "{{baseUrl}}/rooms"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: none
+    response:
+      status: 409
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "USER_ALREADY_IN_ROOM"
+            }
           }

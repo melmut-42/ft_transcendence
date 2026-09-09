@@ -16,17 +16,17 @@ docs:
 
     1. 🔐 Run `Enter user` and retain the generated session.
     2. ➕ Run `Create room as host`; the response chains `room_id`.
-    3. 📤 Retrieve the room with `Get room state as host`.
-    4. 👤 Run `Enter second user`, then `Join room as second user`.
-    5. 📊 Retrieve the room as the second user.
+    3. 📤 Retrieve the room with `Get room state`.
+    4. 👤 Set a prepared `guest_session_id`, then run `Join room`.
+    5. 📊 Retrieve the room again with `Get room state`.
 
-    The remaining requests are deliberate negative or prepared-state checks for missing sessions, invalid IDs, duplicate membership, forbidden access, and non-joinable room states.
+    The grouped native examples on these requests cover missing sessions, invalid IDs, duplicate membership, forbidden access, and non-joinable room states.
 
     > ⚠️ **State sensitivity**
     >
-    > Manual requests such as outsider access and in-progress/finished-room joins require prepared sessions or room IDs. Do not treat their placeholders as automatically runnable smoke tests.
+    > Manual examples such as outsider access and in-progress/finished-room joins require prepared sessions or room IDs. Do not treat their placeholders as automatically runnable smoke tests.
 
     ## 🧪 Testing focus
 
-    Review the native examples for `201`, `200`, `400`, `401`, `403`, `404`, `409`, and `422` outcomes, and confirm that the error code—not only the HTTP status—matches the contract.
+    Review the endpoint-level native examples for `201`, `200`, `400`, `401`, `403`, `404`, `409`, and `422` outcomes, and confirm that the error code—not only the HTTP status—matches the contract.
   type: text/markdown
