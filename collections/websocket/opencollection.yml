@@ -19,44 +19,45 @@ docs:
   content: |-
     # ⚡ ft_transcendence WebSocket API
 
-    Welcome to the real-time API reference. 🔌 This collection documents the single shared room/game socket, its connection lifecycle, known client actions, server event names, and the error envelope used for rejected actions.
+    This collection documents the shared room/game WebSocket used by `ft_transcendence`.
 
-    ## 🎯 What this collection covers
+    ## Transport and authentication
 
-    - 🔌 Authenticated, missing-session, and invalid-session connection scenarios
-    - 🎮 Client actions: `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn`
-    - 📡 Server events: player lifecycle, game lifecycle, turn changes, card reveals, and action logging
-    - ❌ Error observation using the known `{ event, data: { code, message } }` envelope
+    ```text
+    {{wsUrl}}/ws?session_id={{session_id}}
+    ```
 
-    ## 🔌 Connection details
+    Select the `local` environment. REST creates the temporary session; the WebSocket sends that session in the `session_id` query parameter during the handshake. The WebSocket does not use REST's `X-Session-Id` header.
 
-    Connect with:
+    ## Collection layout
 
-    `{{wsUrl}}/ws?session_id={{session_id}}`
+    - **Connection** — authenticated, missing-session, and invalid-session handshakes.
+    - **Client Actions** — known outbound event names; only `give_clue` has a verified payload example.
+    - **Server Events** — passive observers for known server event names.
+    - **Errors** — the known error envelope shape and guidance for capturing backend error codes.
 
-    Select the `local` environment so `wsUrl` resolves to `ws://localhost:3000`. WebSocket authentication uses the `session_id` query parameter during the handshake; it does not use the REST `X-Session-Id` header. 🔐
+    ## Recommended workflow
 
-    ## 🧭 Real-time workflow
+    1. Select `local` and run the REST `Enter user` request.
+    2. Open `connect` with the populated `session_id`.
+    3. Prepare the required room membership, role, turn, and game state.
+    4. Select one client action only when its preconditions are satisfied.
+    5. Observe the related server event or error frame in Bruno's message history.
 
-    1. 🌍 Select `local` and obtain a temporary session from the REST collection.
-    2. 🔌 Open `connect` and confirm the socket is established.
-    3. 👥 Prepare the required room membership and role/state.
-    4. 📥 Select one client action only when its preconditions are satisfied.
-    5. 📤 Observe server events and error frames in Bruno's message history.
+    Do not batch-run this collection. Some requests observe frames, while actions change live game state.
 
-    The server validates identity, membership, role, turn, and game state. Rejected actions must not mutate state or create a successful action log.
+    ## Known client events
 
-    > ⚠️ **Payload accuracy**
-    >
-    > `give_clue` is the only client action with a verified field-level payload in the current contract. Other action requests remain disabled reference scaffolds; their fields must not be invented.
+    `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn`.
 
-    ## 🧪 Testing guidance
+    ## Known server events
 
-    Use the connection and event requests individually. Do not batch-run the complete collection: some requests are passive observers, some are interactive, and several require a prepared game state. Review the `error_envelope` request when testing invalid actions.
+    `player_joined`, `player_left`, `game_started`, `clue_given`, `card_revealed`, `turn_changed`, `player_disconnected`, `player_reconnected`, `game_finished`, and `game_action_logged`.
 
-    ## 🔖 Version
+    ## Contract boundaries
 
-    This collection is version `1.1.0`, matching the REST collection's documentation and consistency pass.
-  type: text/markdown
+    The `give_clue` request contains the only complete client payload currently verified in this workspace. Other client messages stay disabled until their payloads are confirmed. Server event files document names and observation guidance without inventing payload fields.
+
+    The backend validates identity, membership, role, turn, and game state. Rejected actions must not mutate state or create a successful action log.
 bundled: false
 extensions: {}

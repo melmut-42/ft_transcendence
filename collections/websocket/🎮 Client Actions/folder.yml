@@ -6,22 +6,17 @@ docs:
   content: |-
     # 🎮 Client Actions
 
-    This folder contains client-to-server event references for the active room/game socket. 🎮 These are stateful actions, so they should be selected only after the connection, membership, role, and turn prerequisites are satisfied.
+    These requests document client-to-server event names for the shared socket.
 
-    ## 📥 Known actions
+    ## Known actions
 
-    `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn` are the event names currently documented by the contract.
+    `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn`.
 
-    ## 🧭 How to use this folder
+    ## Safe usage
 
-    1. 🔌 Open `connect` with a valid session.
-    2. 👥 Prepare the required room and player state.
-    3. 🎯 Choose the action that matches the current role and game state.
-    4. 📤 Observe the resulting server event or error envelope.
+    1. Open `connect` with a valid session.
+    2. Prepare the required room, membership, role, turn, and game state.
+    3. Select only the action that matches the current state.
+    4. Observe the resulting server event or `error` frame.
 
-    `give_clue` is the only client action with a verified payload schema. The other messages are disabled reference scaffolds so the workspace never sends guessed or destructive fields.
-
-    > ⚠️ **State-changing requests**
-    >
-    > Do not batch-run this folder. An accepted action changes game state; a rejected action should leave state unchanged.
-  type: text/markdown
+    `give_clue` is the only action with a verified field-level payload. The other action messages are disabled reference entries; do not replace their placeholders with guessed fields.

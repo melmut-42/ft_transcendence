@@ -13,36 +13,24 @@ settings:
 docs: |-
   # ⚡ player_left
 
-  ## 📝 Overview
+  ## Purpose
 
-  Provides a passive observation point for the server event `player_left`. The request does not invent payload fields that are not present in the known contract.
+  Passive observer for the server event `player_left`. This is a player lifecycle event emitted when a player leaves a room.
 
-  ## 🔌 Connection
+  ## URL and authentication
 
   `{{wsUrl}}/ws?session_id={{session_id}}`
 
-  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+  The session is supplied in the `session_id` query parameter. Open `connect` first; this request does not create a second connection workflow.
 
-  ## 📥 Message behavior
+  ## Message behavior
 
-  This request sends no outgoing message. Use it to establish a connection or observe incoming frames.
+  No outgoing application message is sent. Watch Bruno's message history for the `player_left` frame after the related room or game action.
 
-  ## 📤 Expected observation
+  ## Payload boundary
 
-  Observe the server-emitted `player_left` event on the shared socket.
+  The event name is documented, but no payload fields are added here unless confirmed by the backend contract. Do not treat a guessed payload as an API example.
 
-  ## 🧭 Typical workflow
+  ## Validation
 
-  Open `connect`, perform the related REST or client action in a prepared room, and capture this server frame in Bruno's message history.
-
-  ## 🧪 Testing guidance
-
-  Confirm the event name and ordering. Treat unlisted payload fields as undocumented rather than guessing their meaning.
-
-  > 💡 **Tip**
-  >
-  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
-
-  ## 📌 Contract boundary
-
-  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.
+  Compare the captured event name and ordering with the action or connection-state change that triggered it. Record unexpected frames for backend investigation.

@@ -13,36 +13,24 @@ settings:
 docs: |-
   # ⚡ connect
 
-  ## 📝 Overview
+  ## Purpose
 
-  Establishes or deliberately tests the shared WebSocket handshake for `connect`. The socket carries room and game events after the transport connection is accepted.
+  Opens the shared WebSocket with the session from the selected Bruno environment.
 
-  ## 🔌 Connection
+  ## URL and authentication
 
   `{{wsUrl}}/ws?session_id={{session_id}}`
 
-  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+  The session is sent as the `session_id` query parameter. It is not sent as the REST `X-Session-Id` header.
 
-  ## 📥 Message behavior
+  ## Usage
 
-  This request sends no outgoing message. Use it to establish a connection or observe incoming frames.
+  Run the REST `Enter user` request first, then open this connection. Once connected, observe server events and select a client action only when its documented game-state preconditions are satisfied.
 
-  ## 📤 Expected observation
+  ## Message behavior
 
-  Observe the handshake, server event, or error frame in Bruno's WebSocket message history.
+  This request sends no application message. It is the normal authenticated connection scenario.
 
-  ## 🧭 Typical workflow
+  ## Validation
 
-  Run the REST bootstrap first, populate a valid runtime session when appropriate, and then open the connection. Inspect the handshake result before selecting event or action messages.
-
-  ## 🧪 Testing guidance
-
-  Confirm the handshake outcome and keep session values in local secret storage.
-
-  > 💡 **Tip**
-  >
-  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
-
-  ## 📌 Contract boundary
-
-  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.
+  Confirm the handshake succeeds and keep the session value in Bruno's local secret storage.

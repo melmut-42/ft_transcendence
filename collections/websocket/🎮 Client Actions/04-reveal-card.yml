@@ -8,44 +8,36 @@ info:
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
   message:
-    - title: "reveal_card — payload schema to be confirmed"
+    - title: "reveal_card — reference payload not confirmed"
       selected: false
       message:
         type: text
-        data: "<replace with the contract-confirmed reveal_card data payload before enabling>"
+        data: "<payload not documented; keep reveal_card disabled>"
 docs: |-
   # ⚡ reveal_card
 
-  ## 📝 Overview
+  ## Purpose
 
-  Documents the client event `reveal_card`. This is a stateful outbound action and must only be used when the current room, role, turn, and game state satisfy its backend preconditions.
+  Documents the client event `reveal_card`. This is an action during the guessing phase.
 
-  ## 🔌 Connection
+  ## URL and authentication
 
   `{{wsUrl}}/ws?session_id={{session_id}}`
 
-  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+  The session is supplied in the `session_id` query parameter, not the REST `X-Session-Id` header.
 
-  ## 📥 Message behavior
+  ## Message behavior
 
-  The message is a disabled reference scaffold. Its field-level payload is not confirmed by the API contract, so replace it only after the backend protocol is verified.
+  Reference payload is not confirmed. Keep the message disabled until the backend contract is verified.
 
-  ## 📤 Expected observation
+  ## Workflow
 
-  Observe the handshake, server event, or error frame in Bruno's WebSocket message history.
+  Open `connect`, prepare the required room state, select this action only when its preconditions are true, and observe the resulting server event or error frame.
 
-  ## 🧭 Typical workflow
+  ## Validation
 
-  Open `connect`, prepare the required room state, select this event only when its preconditions are true, and observe the resulting server event or error envelope.
+  Confirm the backend enforces identity, membership, role, turn, and game-state rules. Rejected actions must not mutate state or create a successful action log.
 
-  ## 🧪 Testing guidance
+  ## Contract boundary
 
-  Confirm that the action is accepted only for the correct identity, role, turn, and game state. Rejected actions must not mutate state or create a successful action log.
-
-  > 💡 **Tip**
-  >
-  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
-
-  ## 📌 Contract boundary
-
-  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.
+  Do not infer undocumented fields. Update this request only after the backend protocol confirms the event payload.

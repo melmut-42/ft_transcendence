@@ -13,36 +13,18 @@ settings:
 docs: |-
   # ⚡ error_code_catalog
 
-  ## 📝 Overview
+  ## Purpose
 
-  Documents the WebSocket error behavior and known failure vocabulary associated with rejected actions or handshake problems.
+  Reference point for WebSocket error codes captured from the backend.
 
-  ## 🔌 Connection
+  ## Current contract status
 
-  `{{wsUrl}}/ws?session_id={{session_id}}`
+  This workspace does not contain a complete verified WebSocket error-code catalog. This request is documentation-only; it does not claim that REST error codes also apply to WebSocket frames.
 
-  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+  ## How to extend it safely
 
-  ## 📥 Message behavior
+  Add a code only after it is confirmed by a backend response or an authoritative backend contract. Record the event, exact code, exact message, and the state/action that produced it.
 
-  This request sends no outgoing message. Use it to establish a connection or observe incoming frames.
+  ## Related request
 
-  ## 📤 Expected observation
-
-  Observe the documented error envelope or error code associated with the deliberate failure.
-
-  ## 🧭 Typical workflow
-
-  Open an authenticated connection when required, perform a deliberate test action, and compare the captured frame with the documented envelope.
-
-  ## 🧪 Testing guidance
-
-  Confirm the error event, code, and message, then verify that state remains unchanged.
-
-  > 💡 **Tip**
-  >
-  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
-
-  ## 📌 Contract boundary
-
-  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.
+  Use `error_envelope` for the known frame shape and the Connection or Client Actions folders to reproduce a deliberate failure.

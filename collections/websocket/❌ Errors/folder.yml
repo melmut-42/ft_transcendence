@@ -6,28 +6,27 @@ docs:
   content: |-
     # ❌ Errors
 
-    This folder documents the failure contract for the shared WebSocket. ❌ It helps developers distinguish transport/handshake failures from rejected actions after a connection has been established.
+    This folder explains how to observe WebSocket failures at the handshake and action levels.
 
-    ## 📦 Error envelope
+    ## Envelope shape
+
+    The known shape is:
 
     ```json
     {
       "event": "error",
       "data": {
-        "code": "INVALID_ACTION",
-        "message": "This action is not allowed in the current state."
+        "code": "<backend error code>",
+        "message": "<backend error message>"
       }
     }
     ```
 
-    ## 🧭 How to test errors
+    The exact code and message must come from the backend response. Do not add a new error code based on a guessed scenario.
 
-    1. 🔌 Establish a valid connection.
-    2. 🎮 Prepare an action that is invalid for the current role, turn, or state.
-    3. 📤 Capture the error frame.
-    4. 🧪 Confirm the code and message, then verify that state and successful action logs were not changed.
+    ## How to test
 
-    > 📌 **Keep the catalog accurate**
-    >
-    > Add an error code here only when it is confirmed by the backend contract or an observed response. Do not infer a new code from a client-side guess.
-  type: text/markdown
+    1. Open a valid connection when the scenario requires authentication.
+    2. Trigger one deliberate handshake or action failure.
+    3. Capture the error frame in Bruno.
+    4. Verify the code/message and confirm rejected actions did not mutate state or create a successful action log.

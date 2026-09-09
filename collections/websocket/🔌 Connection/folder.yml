@@ -6,26 +6,20 @@ docs:
   content: |-
     # 🔌 WebSocket Connection
 
-    This folder explains how to open the shared real-time connection used by room and game events. 🔌 It contains authenticated, missing-session, and invalid-session scenarios so connection failures are visible and testable.
+    This folder contains the handshake scenarios for the shared room/game socket.
 
-    ## 🌍 Connection URL
+    ## Connection URL
 
-    `{{wsUrl}}/ws?session_id={{session_id}}`
+    ```text
+    {{wsUrl}}/ws?session_id={{session_id}}
+    ```
 
-    The URL comes from the selected environment. With `local`, it resolves to `ws://localhost:3000`.
+    Authentication is supplied only through the `session_id` query parameter. REST-protected requests use `X-Session-Id` separately.
 
-    ## 🔐 Authentication behavior
+    ## Scenarios
 
-    WebSocket authentication uses the `session_id` query parameter during the handshake. It is separate from REST authentication, where protected requests use `X-Session-Id`.
+    - `connect` — normal connection with a valid local session.
+    - `connect_without_session` — deliberate negative handshake without the query parameter.
+    - `connect_invalid_session` — deliberate negative handshake with the literal `invalid-session` value.
 
-    ## 🧭 Lifecycle
-
-    1. Run the REST user-entry request.
-    2. Confirm `session_id` is populated at runtime.
-    3. Open `connect`.
-    4. Observe server frames or handshake errors.
-
-    > ⚠️ **Do not reuse committed secrets**
-    >
-    > The committed environment intentionally leaves session values blank. Use Bruno's local runtime storage.
-  type: text/markdown
+    These requests send no application message. Inspect the handshake result and capture any server error frame in Bruno.

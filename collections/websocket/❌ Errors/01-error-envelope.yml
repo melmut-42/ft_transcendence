@@ -13,36 +13,32 @@ settings:
 docs: |-
   # ⚡ error_envelope
 
-  ## 📝 Overview
+  ## Purpose
 
-  Documents the WebSocket error behavior and known failure vocabulary associated with rejected actions or handshake problems.
+  Passive observer for the shared WebSocket error frame.
 
-  ## 🔌 Connection
+  ## URL and authentication
 
   `{{wsUrl}}/ws?session_id={{session_id}}`
 
-  The session is supplied in the `session_id` query parameter. REST's `X-Session-Id` header is not used for the WebSocket handshake.
+  Use a valid session when observing action-level errors. Handshake failures are covered by the Connection folder.
 
-  ## 📥 Message behavior
+  ## Known envelope
 
-  This request sends no outgoing message. Use it to establish a connection or observe incoming frames.
+  ```json
+  {
+    "event": "error",
+    "data": {
+      "code": "<backend error code>",
+      "message": "<backend error message>"
+    }
+  }
+  ```
 
-  ## 📤 Expected observation
+  ## Message behavior
 
-  Observe the documented error envelope or error code associated with the deliberate failure.
+  This request sends no outgoing message. Trigger one deliberate invalid action or observe a rejected handshake, then compare the captured frame with the envelope shape.
 
-  ## 🧭 Typical workflow
+  ## Validation
 
-  Open an authenticated connection when required, perform a deliberate test action, and compare the captured frame with the documented envelope.
-
-  ## 🧪 Testing guidance
-
-  Confirm the error event, code, and message, then verify that state remains unchanged.
-
-  > 💡 **Tip**
-  >
-  > Use the `local` environment, keep session values out of Git, and run one state-changing message at a time.
-
-  ## 📌 Contract boundary
-
-  Event names and the verified `give_clue` example are documented from the known contract. Undocumented client and server payload fields are intentionally left unguessed.
+  Confirm the backend-provided code and message. Do not assume a status code or error vocabulary that was not returned by the backend.
