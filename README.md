@@ -1,59 +1,90 @@
 # ft_transcendence Bruno workspace
 
-This is the Git-native Bruno workspace for the `ft_transcendence` API.
+This repository contains the Git-native [Bruno](https://www.usebruno.com/) workspace for the `ft_transcendence` API. It provides a reviewable, repeatable API-testing surface for backend developers, frontend developers, QA, and contributors.
 
-It contains two deliberately separate collections:
+The workspace documents the API contract currently known by the project. It does not add unsupported features such as chat, tournaments, friends, notifications, password authentication, or JWT authentication.
 
-- `ft_transcendence REST API` — the username/session bootstrap and room HTTP API.
-- `ft_transcendence WebSocket API` — the shared room socket, client action references, server event references, and error envelope.
+## What is included
 
-The workspace documents the API contract that is currently known. It does not add chat, tournaments, authentication/password, JWT, or other modules that are not part of the application contract.
+The workspace contains two collections:
 
-## Open the workspace
+- **ft_transcendence REST API** — temporary username/session bootstrap and room lifecycle requests.
+- **ft_transcendence WebSocket API** — the shared room socket, client action references, server event references, and error-envelope examples.
 
-After cloning, switch to the `bruno` branch, then open the repository directory in Bruno:
+The Bruno workspace documentation in `workspace.yml` contains the full project overview, setup notes, workflows, testing guidance, and known limitations. The sections below provide a quick-start reference for contributors.
 
-```bash
-git switch bruno
-```
+## Requirements
 
-Open this directory in Bruno:
+- [Bruno](https://www.usebruno.com/downloads) with support for native response examples and WebSocket requests.
+- A running `ft_transcendence` backend available at `http://localhost:3000` when sending requests.
 
-```text
-$HOME/Documents/bruno/ft_transcendence
-```
+This repository contains the Bruno API workspace; it does not replace the application backend.
 
-Select the `local` environment. The committed environment contains safe local defaults and blank session variables. Session IDs are temporary values returned by `POST /users/enter`; the REST bootstrap requests chain them automatically at runtime.
+## Getting started
+
+1. Clone the repository and open this directory in Bruno.
+2. If the workspace is maintained on the `bruno` branch, switch to it:
+
+   ```bash
+   git switch bruno
+   ```
+
+3. Start the backend according to the backend project's instructions.
+4. Open the workspace directory in Bruno.
+5. Select the workspace-level **local** environment.
+6. Run the REST smoke flow described below.
+
+The committed environment uses local URLs and blank session variables. Do not replace those blank values with real session IDs in a committed file.
 
 ## Repository structure
 
 ```text
-workspace.yml
-environments/local.yml
-collections/rest-api/
-collections/websocket/
+workspace.yml                  # Bruno workspace metadata and workspace documentation
+environments/local.yml         # Safe local variables; secrets remain blank
+collections/rest-api/          # REST collection and requests
+collections/websocket/         # WebSocket collection and requests
 ```
 
-All collection and environment files are plain text so changes are reviewable in Git and easy to maintain alongside backend changes.
+All collection and environment files are plain text, so changes can be reviewed and maintained alongside backend changes.
+
+## Configure the local environment
+
+Select the `local` environment in Bruno. It defines:
+
+- `baseUrl`: `http://localhost:3000`
+- `wsUrl`: `ws://localhost:3000`
+- runtime session variables populated by the REST bootstrap
+- `room_id` and optional prepared-state room IDs
+
+The REST bootstrap requests generate unique usernames and chain temporary values such as `host_session_id`, `guest_session_id`, and `room_id` at runtime. Session variables are marked secret and are intentionally empty in Git.
 
 ## REST smoke flow
 
-Run these requests in order when the API is available at `http://localhost:3000`:
+When the backend is running, execute these requests in order:
 
-1. `REST API / 01 User & Session / 01 Enter host user`
-2. `REST API / 01 User & Session / 02 Enter guest user`
-3. `REST API / 02 Rooms / 01 Create room as host`
-4. `REST API / 02 Rooms / 02 Get room state as host`
-5. `REST API / 02 Rooms / 03 Join room as guest`
-6. `REST API / 02 Rooms / 04 Get room state as guest`
+1. `REST API / User & Session / Enter host user`
+2. `REST API / User & Session / Enter guest user`
+3. `REST API / Rooms / Create room as host`
+4. `REST API / Rooms / Get room state as host`
+5. `REST API / Rooms / Join room as guest`
+6. `REST API / Rooms / Get room state as guest`
 
-The first two requests generate unique usernames and save `session_id`, `host_session_id`, `guest_session_id`, `host_user_id`, and `guest_user_id` in runtime variables. The room creation request saves `room_id` for subsequent requests.
+The collection also includes native response examples for successful and error scenarios, including invalid input, missing sessions, duplicate usernames, duplicate membership, missing rooms, forbidden access, and non-joinable rooms.
 
-Error scenarios are included beside the happy path. Requests tagged `manual` require a deliberately prepared state (for example, an outsider session or an in-progress room) and are not part of the default smoke flow.
+Requests marked as manual or prepared-state scenarios require suitable data. For example, the outsider request needs a session that is not a room member, while the in-progress and finished-room requests need room IDs in those states.
 
-## Secrets and local state
+## REST contract summary
 
-Do not commit production credentials, API keys, database credentials, or real user secrets. Temporary session IDs are marked secret and are blank in the committed environment. Use Bruno's local environment storage or process environment variables for anything sensitive.
+The known REST routes are:
+
+```text
+POST /users/enter
+POST /rooms
+POST /rooms/join
+GET  /rooms/:room_id
+```
+
+REST authentication uses temporary username-based sessions. Protected requests send the session in the `X-Session-Id` header. The workspace does not define password, JWT, registration, or login endpoints.
 
 ## WebSocket usage
 
@@ -63,29 +94,71 @@ The application uses one shared socket:
 {{wsUrl}}/ws?session_id={{session_id}}
 ```
 
-Open `WebSocket API / 01 Connection / 01 Connect with session` after a REST session exists. Client action folders contain native WebSocket request files. `give_clue` includes the only saved client payload schema currently known. The other action payloads are intentionally disabled reference messages because their field-level schemas were not provided by the API contract. Server event folders describe event names and the visibility/state rules without inventing server payload fields.
+Open `WebSocket API / Connection / connect` after a valid REST session exists. The known client events are:
 
-WebSocket messages are not separate HTTP routes. Use the connection request and send/observe messages on that shared connection. Bruno's WebSocket UI supports selecting a message before sending it.
+```text
+leave_room
+start_game
+give_clue
+reveal_card
+end_turn
+```
 
-## Contract notes
+The known server events are:
 
-- REST authentication is temporary username-based sessions; there is no password, JWT, registration, or login endpoint in this workspace.
-- REST protection uses `X-Session-Id`. WebSocket authentication uses the `session_id` query parameter.
+```text
+player_joined
+player_left
+game_started
+clue_given
+card_revealed
+turn_changed
+player_disconnected
+player_reconnected
+game_finished
+game_action_logged
+```
+
+`give_clue` contains the only complete client payload schema currently known by the contract. Other action messages are disabled reference messages rather than guessed payloads. Server event requests document event names without inventing undocumented payload fields.
+
+WebSocket messages are not separate HTTP routes. Use the connection request and select individual messages in Bruno's WebSocket UI. Do not batch-run the complete WebSocket collection: some messages are interactive or require a prepared game state.
+
+## Contract and game-state notes
+
 - A room needs four players before the host can start a game.
-- Server validation owns membership, role, turn, state, and card-result decisions. Clients must not send `card_type`, `correct`, or another predicted reveal result.
-- Operatives receive `card_type: null` before the game ends; spymasters receive the card type.
+- Only the host can start the game.
+- The server validates identity, membership, role, turn, and game state.
+- Clients must not submit `card_type`, `correct`, or a predicted reveal result.
+- Operatives receive `card_type: null` before the game ends; spymasters may receive the card type.
 - Rejected WebSocket actions must not mutate state or create a successful action log.
 
-## CLI / CI
+## Testing
 
-The Bruno CLI is optional and is not bundled in this repository. With Bruno's CLI installed, run the REST collection against the selected environment from the workspace directory:
+REST requests include native response examples, status checks, response-structure checks, and business-rule tests. Use the examples to review expected success and error envelopes without contacting the backend.
+
+The WebSocket collection is primarily interactive. Run connection and event requests individually, with the required session, role, turn, and room state prepared first.
+
+If Bruno's CLI is installed, the REST collection can be run from this directory:
 
 ```bash
 bru run collections/rest-api --env local
 ```
 
-Do not run the complete WebSocket collection as a batch smoke test: WebSocket requests are interactive and some message references intentionally require a prepared game state.
+The CLI is optional and is not bundled with this repository.
 
-## Testing and workflows
+## Security
 
-REST requests include meaningful status, schema, and business-rule tests. The bootstrap requests generate unique users and chain temporary IDs into the room workflow. The WebSocket collection is organized as interactive connection, action, server-event, and error observers; passive observers send no outgoing message, and unverified action payloads are disabled.
+Never commit production credentials, API keys, database credentials, passwords, or real session IDs. Keep sensitive values in Bruno's local environment storage or process environment variables. Review `environments/local.yml` before committing changes and keep secret variables blank unless the value is a safe placeholder.
+
+## Contributing
+
+When updating the workspace:
+
+1. Keep routes, methods, event names, payloads, and validation rules aligned with the backend contract.
+2. Use concise request names without numeric or descriptive prefixes.
+3. Add or update native Bruno response examples for every known response scenario.
+4. Keep unsupported or unknown payload fields disabled rather than guessing them.
+5. Validate YAML files and run `git diff --check` before opening a pull request.
+6. Do not commit generated secrets, real sessions, or local-only state.
+
+For broader workspace guidance, open the Bruno workspace Overview panel and read the documentation stored in `workspace.yml`.
