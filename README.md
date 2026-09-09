@@ -8,8 +8,8 @@ The workspace documents the API contract currently known by the project. It does
 
 The workspace contains two collections:
 
-- **ft_transcendence REST API** — temporary username/session bootstrap and room lifecycle requests.
-- **ft_transcendence WebSocket API** — the shared room socket, client action references, server event references, and error-envelope examples.
+- **REST API** — temporary username/session bootstrap and room lifecycle requests.
+- **WebSocket API** — the shared room socket, client action references, server event references, and error-envelope examples.
 
 The Bruno workspace documentation in `workspace.yml` contains the full project overview, setup notes, workflows, testing guidance, and known limitations. The sections below provide a quick-start reference for contributors.
 

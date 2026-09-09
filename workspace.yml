@@ -4,9 +4,9 @@ info:
   type: workspace
 
 collections:
-  - name: "🌐 ft_transcendence REST API"
+  - name: "🌐 REST API"
     path: "collections/rest-api"
-  - name: "⚡ ft_transcendence WebSocket API"
+  - name: "⚡ WebSocket API"
     path: "collections/websocket"
 
 specs:
