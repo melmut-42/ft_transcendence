@@ -20,7 +20,7 @@ git switch bruno
 Open this directory in Bruno:
 
 ```text
-/Users/yigit/Documents/bruno/ft_transcendence
+$HOME/Documents/bruno/ft_transcendence
 ```
 
 Select the `local` environment. The committed environment contains safe local defaults and blank session variables. Session IDs are temporary values returned by `POST /users/enter`; the REST bootstrap requests chain them automatically at runtime.
