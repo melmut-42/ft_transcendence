@@ -7,12 +7,6 @@ info:
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
-  message:
-    - title: "turn_changed — observation example"
-      selected: false
-      message:
-        type: text
-        data: "<observe the turn_changed server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0

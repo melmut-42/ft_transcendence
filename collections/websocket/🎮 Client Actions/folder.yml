@@ -19,4 +19,4 @@ docs:
     3. Select only the action that matches the current state.
     4. Observe the resulting server event or `error` frame.
 
-    `give_clue` is the only action with a verified field-level payload. The other action messages are disabled reference entries; do not replace their placeholders with guessed fields.
+    `give_clue` is the only action with a verified field-level payload. The other action requests intentionally contain no outgoing message until the backend contract verifies their payloads.

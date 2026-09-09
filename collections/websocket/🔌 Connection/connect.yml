@@ -7,12 +7,6 @@ info:
     - smoke
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
-  message:
-    - title: "Connection example — handshake only"
-      selected: false
-      message:
-        type: text
-        data: "<handshake; no application message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0

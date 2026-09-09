@@ -7,12 +7,6 @@ info:
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
-  message:
-    - title: "player_joined — observation example"
-      selected: false
-      message:
-        type: text
-        data: "<observe the player_joined server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0

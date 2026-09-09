@@ -59,6 +59,22 @@ docs: |-
 
   Review the native example body for the complete response shape.
 
+  ## 📊 Verified response fields
+
+  The saved `201` example verifies these fields for a newly created waiting room:
+
+  | Field | Type | Example / values | Description |
+  |-------|------|------------------|-------------|
+  | `room_id` | Integer | `1001` | Identifier assigned to the new room. |
+  | `status` | String | `WAITING` | The room is waiting for the remaining players. |
+  | `host` | Object | `{ "user_id": 42, "username": "player_one" }` | User who created the room and owns the host role. |
+  | `players` | Array | One player in the saved example. | Current room membership snapshot. |
+  | `players[].user_id` | Integer | `42` | Identifier of a room member. |
+  | `players[].username` | String | `player_one` | Username of a room member. |
+  | `players[].role` | String | `HOST` | Role assigned to the member in the saved example. |
+  | `players[].connection_status` | String | `CONNECTED` | Connection state shown for the member. |
+  | `game` | `null` | `null` | No game object is present while the room is waiting. |
+
   ## 🧭 Typical workflow
 
   Run after the user-entry flow. On success, continue with room-state retrieval, joining, or the documented negative room scenarios.

@@ -7,12 +7,6 @@ info:
     - manual
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
-  message:
-    - title: "end_turn — reference payload not confirmed"
-      selected: false
-      message:
-        type: text
-        data: "<payload not documented; keep end_turn disabled>"
 docs: |-
   # ⚡ end_turn
 
@@ -28,7 +22,7 @@ docs: |-
 
   ## Message behavior
 
-  Reference payload is not confirmed. Keep the message disabled until the backend contract is verified.
+  No outgoing message is configured because the payload is not verified in this repository. Do not enable this request until the backend contract is confirmed.
 
   ## Workflow
 

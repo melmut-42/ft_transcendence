@@ -59,6 +59,22 @@ docs: |-
 
   Review the native example body for the complete response shape.
 
+  ## 📊 Verified response fields
+
+  The saved `200` example verifies the waiting-room snapshot below. Populated game-state fields are not available in this repository, so no started or finished game schema is invented here.
+
+  | Field | Type | Example / values | Description |
+  |-------|------|------------------|-------------|
+  | `room_id` | Integer | `1001` | Identifier of the requested room. |
+  | `status` | String | `WAITING` | Current lifecycle state in the saved example. |
+  | `host` | Object | `{ "user_id": 42, "username": "player_one" }` | User who owns the host role. |
+  | `players` | Array | One player in the saved example. | Current room membership snapshot. |
+  | `players[].user_id` | Integer | `42` | Identifier of a room member. |
+  | `players[].username` | String | `player_one` | Username of a room member. |
+  | `players[].role` | String | `HOST` | Role assigned to the member in the saved example. |
+  | `players[].connection_status` | String | `CONNECTED` | Connection state shown for the member. |
+  | `game` | `null` | `null` | No game object is present in the saved waiting-room example. |
+
   ## 🧭 Typical workflow
 
   Run after `room_id` and a suitable session are available. Use the prepared guest session when validating membership, and use an outsider session only for the forbidden-access scenario.

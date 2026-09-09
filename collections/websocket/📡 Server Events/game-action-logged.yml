@@ -7,12 +7,6 @@ info:
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
-  message:
-    - title: "game_action_logged — observation example"
-      selected: false
-      message:
-        type: text
-        data: "<observe the game_action_logged server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0

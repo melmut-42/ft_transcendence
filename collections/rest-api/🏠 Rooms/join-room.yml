@@ -70,6 +70,22 @@ docs: |-
 
   Review the native example body for the complete response shape.
 
+  ## 📊 Verified response fields
+
+  The saved `200` example verifies these fields after a second player joins a waiting room:
+
+  | Field | Type | Example / values | Description |
+  |-------|------|------------------|-------------|
+  | `room_id` | Integer | `1001` | Identifier of the joined room. |
+  | `status` | String | `WAITING` | The room remains open for additional players. |
+  | `host` | Object | `{ "user_id": 42, "username": "player_one" }` | User who owns the host role. |
+  | `players` | Array | Two players in the saved example. | Current room membership snapshot after the join. |
+  | `players[].user_id` | Integer | `42`, `43` | Identifier of a room member. |
+  | `players[].username` | String | `player_one`, `player_two` | Username of a room member. |
+  | `players[].role` | String | `HOST`, `OPERATIVE` | Role assigned to each member in the saved example. |
+  | `players[].connection_status` | String | `CONNECTED` | Connection state shown for each member. |
+  | `game` | `null` | `null` | No game object is present while the room is waiting. |
+
   ## 🧭 Typical workflow
 
   Run after a host has created a room and a prepared guest session plus `room_id` are available. This is a manual/prepared-state scenario; a successful join can be followed by room-state retrieval and WebSocket observation.

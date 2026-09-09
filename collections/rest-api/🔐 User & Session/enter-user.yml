@@ -75,6 +75,20 @@ docs: |-
 
   Review the native example body for the complete response shape.
 
+  ## 📊 Verified response fields
+
+  The saved `201` example verifies these fields for the temporary identity session:
+
+  | Field | Type | Example / values | Description |
+  |-------|------|------------------|-------------|
+  | `user` | Object | `{ "user_id": 42, "username": "player_one" }` | Temporary user created by the request. |
+  | `user.user_id` | Integer | `42` | Identifier assigned to the temporary user. |
+  | `user.username` | String | `player_one` | Username accepted by the request. |
+  | `session` | Object | `{ "session_id": 7001, "expires_at": 1788883200 }` | Temporary session returned for later protected requests. |
+  | `session.session_id` | Integer | `7001` | Session identifier used by the workspace runtime. |
+  | `session.expires_at` | Integer | `1788883200` | Expiration value shown in the saved example. |
+  | `active_room` | `null` | `null` | The new user is not associated with a room yet. |
+
   ## 🧭 Typical workflow
 
   Run this request before protected room requests. Its runtime script saves the session and user identifiers for the rest of the workspace.
