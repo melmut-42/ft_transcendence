@@ -65,11 +65,13 @@ docs: |-
   }
   ```
 
-  ## 📤 Response scenarios
+  ## 📤 Response Scenarios
 
-  - `201` — 201 Created
-  - `400` — INVALID_REQUEST
-  - `409` — USERNAME_TAKEN
+  | Status | Response / Error | Description |
+  |--------|------------------|-------------|
+  | `201` | `Created` | The username was accepted, and a temporary user session was created for later authenticated requests. |
+  | `400` | `INVALID_REQUEST` | The submitted username data is missing or invalid; provide a valid username before retrying. |
+  | `409` | `USERNAME_TAKEN` | The requested username is already in use; choose a different username and retry. |
 
   Review the native example body for the complete response shape.
 

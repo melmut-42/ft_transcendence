@@ -57,14 +57,16 @@ docs: |-
   }
   ```
 
-  ## 📤 Response scenarios
+  ## 📤 Response Scenarios
 
-  - `200` — 200 OK — joined room
-  - `400` — INVALID_REQUEST
-  - `401` — Unauthorized
-  - `404` — ROOM_NOT_FOUND
-  - `409` — ROOM_NOT_JOINABLE
-  - `422` — USER_ALREADY_IN_ROOM
+  | Status | Response / Error | Description |
+  |--------|------------------|-------------|
+  | `200` | `OK` | The authenticated user successfully joined the waiting room, and the updated room snapshot was returned. |
+  | `400` | `INVALID_REQUEST` | The join request is malformed or contains invalid room data; correct the request body before retrying. |
+  | `401` | `Unauthorized` | The request was rejected because the user does not have a valid temporary session in `X-Session-Id`. |
+  | `404` | `ROOM_NOT_FOUND` | The requested room does not exist for the supplied `room_id`; verify the identifier before retrying. |
+  | `409` | `ROOM_NOT_JOINABLE` | The room cannot accept the user because its current lifecycle state does not allow joining. |
+  | `422` | `USER_ALREADY_IN_ROOM` | The user cannot join this room because they are already associated with an existing room. |
 
   Review the native example body for the complete response shape.
 

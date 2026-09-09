@@ -48,9 +48,14 @@ docs: |-
 
   No request body is required for this request.
 
-  ## 📤 Response scenarios
+  ## 📤 Response Scenarios
 
-  - `200` — 200 OK — authoritative snapshot
+  | Status | Response / Error | Description |
+  |--------|------------------|-------------|
+  | `200` | `OK` | The authoritative room snapshot was returned for the authenticated user. |
+  | `401` | `Unauthorized` | The request was rejected because the user does not have a valid temporary session in `X-Session-Id`. |
+  | `403` | `FORBIDDEN` | The authenticated user is not allowed to access this room, typically because they are not an authorized member. |
+  | `404` | `ROOM_NOT_FOUND` | The requested room does not exist for the supplied `room_id`; verify the identifier before retrying. |
 
   Review the native example body for the complete response shape.
 

@@ -50,11 +50,13 @@ docs: |-
 
   No request body is required for this request.
 
-  ## 📤 Response scenarios
+  ## 📤 Response Scenarios
 
-  - `201` — 201 Created — waiting room
-  - `401` — Unauthorized
-  - `409` — USER_ALREADY_IN_ROOM
+  | Status | Response / Error | Description |
+  |--------|------------------|-------------|
+  | `201` | `Created` | The room was successfully created and is now available in the waiting state. |
+  | `401` | `Unauthorized` | The request was rejected because the user does not have a valid temporary session in `X-Session-Id`. |
+  | `409` | `USER_ALREADY_IN_ROOM` | The room was not created because the authenticated user is already associated with an existing room. |
 
   Review the native example body for the complete response shape.
 
