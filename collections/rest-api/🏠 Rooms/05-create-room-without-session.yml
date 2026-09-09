@@ -22,6 +22,19 @@ runtime:
         });
 examples:
   - name: "401 Unauthorized"
+    request:
+      url: "{{baseUrl}}/rooms"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: false
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: none
     response:
       status: 401
       headers:

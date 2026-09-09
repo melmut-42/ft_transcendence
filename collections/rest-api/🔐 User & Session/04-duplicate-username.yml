@@ -39,6 +39,23 @@ settings:
 
 examples:
   - name: 409 USERNAME_TAKEN
+    request:
+      url: "{{baseUrl}}/users/enter"
+      method: "POST"
+      headers:
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "username": "{{user_username}}"
+          }
     response:
       status: 409
       headers:

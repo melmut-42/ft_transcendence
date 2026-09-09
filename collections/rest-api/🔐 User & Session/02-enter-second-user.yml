@@ -40,6 +40,23 @@ runtime:
         });
 examples:
   - name: "201 Created"
+    request:
+      url: "{{baseUrl}}/users/enter"
+      method: "POST"
+      headers:
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "username": "{{second_user_username}}"
+          }
     response:
       status: 201
       headers:

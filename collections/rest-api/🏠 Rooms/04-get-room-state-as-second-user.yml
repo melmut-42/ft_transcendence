@@ -28,6 +28,23 @@ runtime:
         });
 examples:
   - name: "200 OK"
+    request:
+      url: "{{baseUrl}}/rooms/:room_id"
+      method: "GET"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{second_user_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params:
+        - name: "room_id"
+          value: "{{room_id}}"
+          type: "path"
+          enabled: true
+      body:
+        mode: none
     response:
       status: 200
       headers:

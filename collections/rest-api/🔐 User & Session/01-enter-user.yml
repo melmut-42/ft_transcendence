@@ -91,6 +91,23 @@ docs: |-
   The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.
 examples:
   - name: "201 Created"
+    request:
+      url: "{{baseUrl}}/users/enter"
+      method: "POST"
+      headers:
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "username": "{{user_username}}"
+          }
     response:
       status: 201
       headers:

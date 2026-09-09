@@ -81,6 +81,26 @@ docs: |-
   The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.
 examples:
   - name: "200 OK — joined room"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{second_user_session_id}}"
+          enabled: true
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": {{room_id}}
+          }
     response:
       status: 200
       headers:

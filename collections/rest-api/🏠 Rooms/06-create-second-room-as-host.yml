@@ -23,6 +23,19 @@ runtime:
         });
 examples:
   - name: "409 USER_ALREADY_IN_ROOM"
+    request:
+      url: "{{baseUrl}}/rooms"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: none
     response:
       status: 409
       headers:

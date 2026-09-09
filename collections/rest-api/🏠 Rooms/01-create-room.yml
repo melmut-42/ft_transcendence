@@ -74,6 +74,19 @@ docs: |-
   The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.
 examples:
   - name: "201 Created — waiting room"
+    request:
+      url: "{{baseUrl}}/rooms"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: none
     response:
       status: 201
       headers:

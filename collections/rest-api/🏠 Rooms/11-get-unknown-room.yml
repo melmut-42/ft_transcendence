@@ -26,6 +26,23 @@ runtime:
         });
 examples:
   - name: "404 ROOM_NOT_FOUND"
+    request:
+      url: "{{baseUrl}}/rooms/:room_id"
+      method: "GET"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params:
+        - name: "room_id"
+          value: "2147483647"
+          type: "path"
+          enabled: true
+      body:
+        mode: none
     response:
       status: 404
       headers:

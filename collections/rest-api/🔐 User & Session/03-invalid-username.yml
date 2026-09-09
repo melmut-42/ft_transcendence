@@ -38,6 +38,23 @@ settings:
 
 examples:
   - name: 400 INVALID_REQUEST
+    request:
+      url: "{{baseUrl}}/users/enter"
+      method: "POST"
+      headers:
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "username": "ab"
+          }
     response:
       status: 400
       headers:

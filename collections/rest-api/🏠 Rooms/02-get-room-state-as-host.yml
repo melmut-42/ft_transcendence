@@ -72,6 +72,23 @@ docs: |-
   The request documentation describes the known contract only. If the backend changes, update the route, scripts, tests, and native examples together.
 examples:
   - name: "200 OK — authoritative snapshot"
+    request:
+      url: "{{baseUrl}}/rooms/:room_id"
+      method: "GET"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params:
+        - name: "room_id"
+          value: "{{room_id}}"
+          type: "path"
+          enabled: true
+      body:
+        mode: none
     response:
       status: 200
       headers:

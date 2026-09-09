@@ -30,6 +30,26 @@ runtime:
         });
 examples:
   - name: "401 Unauthorized"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{second_user_session_id}}"
+          enabled: false
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": {{room_id}}
+          }
     response:
       status: 401
       headers:

@@ -31,6 +31,26 @@ runtime:
         });
 examples:
   - name: "409 ROOM_NOT_JOINABLE"
+    request:
+      url: "{{baseUrl}}/rooms/join"
+      method: "POST"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{outsider_session_id}}"
+          enabled: true
+        - name: "Content-Type"
+          value: "application/json"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "room_id": {{prepared_in_progress_room_id}}
+          }
     response:
       status: 409
       headers:

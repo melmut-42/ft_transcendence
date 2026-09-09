@@ -27,6 +27,23 @@ runtime:
         });
 examples:
   - name: "403 FORBIDDEN"
+    request:
+      url: "{{baseUrl}}/rooms/:room_id"
+      method: "GET"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{outsider_session_id}}"
+          enabled: true
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params:
+        - name: "room_id"
+          value: "{{room_id}}"
+          type: "path"
+          enabled: true
+      body:
+        mode: none
     response:
       status: 403
       headers:

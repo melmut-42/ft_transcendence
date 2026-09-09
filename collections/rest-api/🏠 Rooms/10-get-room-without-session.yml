@@ -26,6 +26,23 @@ runtime:
         });
 examples:
   - name: "401 Unauthorized"
+    request:
+      url: "{{baseUrl}}/rooms/:room_id"
+      method: "GET"
+      headers:
+        - name: "X-Session-Id"
+          value: "{{user_session_id}}"
+          enabled: false
+        - name: "Accept"
+          value: "application/json"
+          enabled: true
+      params:
+        - name: "room_id"
+          value: "{{room_id}}"
+          type: "path"
+          enabled: true
+      body:
+        mode: none
     response:
       status: 401
       headers:
