@@ -37,6 +37,8 @@ docs: |-
 
   Attempts to add the authenticated user to the room identified by `room_id`. The response reflects whether the room exists, is joinable, and does not already contain the user.
 
+  Every room requires exactly four players. The returned `minimum_players` field is always `4`; it is informational and is not a configurable request option.
+
   ## 📍 Endpoint
 
   `POST {{baseUrl}}/rooms/join`

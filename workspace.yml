@@ -86,7 +86,7 @@ docs: |-
 
   ## ⚡ WebSocket rules
 
-  - A room needs four players before the host can start a game.
+  - Every room requires exactly four players. When returned by the REST API, `minimum_players` is always `4` and is not configurable.
   - Only the host can start the game.
   - The spymaster sends a clue while the game is waiting for a clue.
   - Accepted clues move the game into guessing.

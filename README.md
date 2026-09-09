@@ -48,7 +48,7 @@ Known WebSocket client actions are `leave_room`, `start_game`, `give_clue`, `rev
 
 ## Contract notes
 
-- A room needs four players before the host can start a game.
+- Every room requires exactly four players. When returned by the REST API, `minimum_players` is always `4` and is not configurable.
 - Only the host can start the game.
 - The server validates membership, role, turn, and game state.
 - Only the payloads supported by the known contract are documented; unknown WebSocket payloads remain reference-only.

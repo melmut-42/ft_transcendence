@@ -74,21 +74,7 @@ docs:
     | --- | --- | --- |
     | `INVALID_ACTION` | The requested client action is not allowed in the current role, turn, or game state. | WebSocket action rejection; confirm the exact backend message in a captured frame. |
 
-    `INVALID_ACTION` is the only WebSocket error code currently named by the workspace contract. No additional WebSocket code is treated as verified until it appears in an authoritative backend response or backend documentation. REST codes such as `INVALID_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `ROOM_NOT_FOUND`, `ROOM_NOT_JOINABLE`, `USER_ALREADY_IN_ROOM`, and `USERNAME_TAKEN` belong to the REST collection and must not be copied into the WebSocket catalog without backend evidence.
-
-    ### Related REST error codes
-
-    These codes are documented here for cross-collection reference only. They are verified REST responses and are not WebSocket error codes:
-
-    | Code | Description | REST meaning |
-    | --- | --- | --- |
-    | `INVALID_REQUEST` | The submitted request data is invalid. | Username or room-join validation failed. |
-    | `USERNAME_TAKEN` | The requested username is already in use. | `POST /users/enter` conflict. |
-    | `UNAUTHORIZED` | The request does not contain a valid temporary session. | Protected REST request has no valid `X-Session-Id`. |
-    | `FORBIDDEN` | The authenticated user is not allowed to access the room. | Room access was attempted by an outsider. |
-    | `ROOM_NOT_FOUND` | The requested room does not exist. | The supplied room ID cannot be resolved. |
-    | `ROOM_NOT_JOINABLE` | The room cannot accept another player in its current state. | Join attempted for an in-progress or finished room. |
-    | `USER_ALREADY_IN_ROOM` | The user already belongs to a room. | Duplicate room creation or room joining was attempted. |
+    `INVALID_ACTION` is the only WebSocket error code currently named by the workspace contract. No additional WebSocket code is treated as verified until it appears in an authoritative backend response or backend documentation. REST error codes are documented in the REST collection and are intentionally not duplicated in this WebSocket catalog.
 
     ### Error-testing procedure
 

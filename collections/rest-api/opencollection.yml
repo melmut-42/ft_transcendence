@@ -46,7 +46,7 @@ docs:
 
     ## 📤 Reading responses
 
-    Room responses are authoritative snapshots. Room states include `WAITING`, `READY`, `IN_PROGRESS`, and `FINISHED`; a room needs four players before the host can start a game through the shared WebSocket. Review the native response examples on each request before exercising a manual scenario.
+    Room responses are authoritative snapshots. Room states include `WAITING`, `READY`, `IN_PROGRESS`, and `FINISHED`; a room needs four players before the host can start a game through the shared WebSocket. The response field `minimum_players` is always `4`; the workspace does not support other values. Review the native response examples on each request before exercising a manual scenario.
 
     > ⚠️ **Prepared-state scenarios**
     >

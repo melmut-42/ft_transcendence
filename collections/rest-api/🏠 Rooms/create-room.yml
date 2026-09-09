@@ -36,6 +36,8 @@ docs: |-
 
   Creates a room for the authenticated user. The backend assigns the host role in the returned room snapshot and the runtime script stores `room_id` for the next requests.
 
+  Every room requires exactly four players. The returned `minimum_players` field is always `4`; it is informational and is not a configurable request option.
+
   ## 📍 Endpoint
 
   `POST {{baseUrl}}/rooms`

@@ -34,6 +34,8 @@ docs: |-
 
   Retrieves the authoritative room snapshot for the path parameter `room_id`. Access depends on the authenticated user's membership and authorization.
 
+  Every room requires exactly four players. When present in the snapshot, `minimum_players` is always `4`; the API does not support other minimum-player values.
+
   ## 📍 Endpoint
 
   `GET {{baseUrl}}/rooms/:room_id`
