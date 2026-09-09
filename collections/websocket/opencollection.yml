@@ -2,7 +2,7 @@ opencollection: 1.0.0
 
 info:
   name: ⚡ WebSocket API
-  version: "1.1.0"
+  version: 1.2.0
 config:
   proxy:
     inherit: true
@@ -103,5 +103,6 @@ docs:
     The `give_clue` request contains the only complete client payload currently verified in this workspace. Other client messages stay disabled until their payloads are confirmed. Server event files document names and observation guidance without inventing payload fields.
 
     The backend validates identity, membership, role, turn, and game state. Rejected actions must not mutate state or create a successful action log.
+  type: text/markdown
 bundled: false
 extensions: {}
