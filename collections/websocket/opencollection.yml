@@ -54,6 +54,50 @@ docs:
 
     `player_joined`, `player_left`, `game_started`, `clue_given`, `card_revealed`, `turn_changed`, `player_disconnected`, `player_reconnected`, `game_finished`, and `game_action_logged`.
 
+    ## Errors and error_catalog
+
+    All WebSocket error guidance lives in this collection overview. Error frames use the following envelope:
+
+    ```json
+    {
+      "event": "error",
+      "data": {
+        "code": "<backend error code>",
+        "message": "<backend error message>"
+      }
+    }
+    ```
+
+    ### Known error codes
+
+    | Code | Description | Scope |
+    | --- | --- | --- |
+    | `INVALID_ACTION` | The requested client action is not allowed in the current role, turn, or game state. | WebSocket action rejection; confirm the exact backend message in a captured frame. |
+
+    `INVALID_ACTION` is the only WebSocket error code currently named by the workspace contract. No additional WebSocket code is treated as verified until it appears in an authoritative backend response or backend documentation. REST codes such as `INVALID_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `ROOM_NOT_FOUND`, `ROOM_NOT_JOINABLE`, `USER_ALREADY_IN_ROOM`, and `USERNAME_TAKEN` belong to the REST collection and must not be copied into the WebSocket catalog without backend evidence.
+
+    ### Related REST error codes
+
+    These codes are documented here for cross-collection reference only. They are verified REST responses and are not WebSocket error codes:
+
+    | Code | Description | REST meaning |
+    | --- | --- | --- |
+    | `INVALID_REQUEST` | The submitted request data is invalid. | Username or room-join validation failed. |
+    | `USERNAME_TAKEN` | The requested username is already in use. | `POST /users/enter` conflict. |
+    | `UNAUTHORIZED` | The request does not contain a valid temporary session. | Protected REST request has no valid `X-Session-Id`. |
+    | `FORBIDDEN` | The authenticated user is not allowed to access the room. | Room access was attempted by an outsider. |
+    | `ROOM_NOT_FOUND` | The requested room does not exist. | The supplied room ID cannot be resolved. |
+    | `ROOM_NOT_JOINABLE` | The room cannot accept another player in its current state. | Join attempted for an in-progress or finished room. |
+    | `USER_ALREADY_IN_ROOM` | The user already belongs to a room. | Duplicate room creation or room joining was attempted. |
+
+    ### Error-testing procedure
+
+    1. Open `connect` when the failure scenario requires an authenticated session.
+    2. Prepare one deliberate handshake or client-action failure.
+    3. Capture the returned frame in Bruno's message history.
+    4. Record the exact `event`, `data.code`, and `data.message`.
+    5. Confirm a rejected action did not mutate state or create a successful action log.
+
     ## Contract boundaries
 
     The `give_clue` request contains the only complete client payload currently verified in this workspace. Other client messages stay disabled until their payloads are confirmed. Server event files document names and observation guidance without inventing payload fields.
