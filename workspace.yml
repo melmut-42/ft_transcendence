@@ -78,7 +78,7 @@ docs: |-
 
   ## 🔗 Request chaining and testing
 
-  The REST bootstrap uses before-request scripts to generate unique usernames and after-response scripts to store returned IDs in runtime variables. Tests validate HTTP status, response structure, room lifecycle status, minimum player count, and contract error codes.
+  The REST bootstrap uses before-request scripts to generate unique usernames and after-response scripts to store returned IDs in runtime variables. Tests validate HTTP status, response structure, room lifecycle status, and contract error codes.
 
   Native response examples are grouped under the canonical endpoint requests. They cover invalid input, missing sessions, duplicate usernames/membership, missing resources, forbidden access, and room states that are not joinable.
 
@@ -86,7 +86,7 @@ docs: |-
 
   ## ⚡ WebSocket rules
 
-  - Every room requires exactly four players. When returned by the REST API, `minimum_players` is always `4` and is not configurable.
+  - Every room requires exactly four players before the host can start a game.
   - Only the host can start the game.
   - The spymaster sends a clue while the game is waiting for a clue.
   - Accepted clues move the game into guessing.

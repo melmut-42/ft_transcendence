@@ -10,9 +10,9 @@ docs:
 
     ## 📊 What the responses represent
 
-    The backend returns the authoritative room snapshot, including the room ID, lifecycle status, host role, players, connection status, minimum player count, and game state when those fields are part of the known response. A user can belong to only one room at a time.
+    The backend returns the authoritative room snapshot, including the room ID, lifecycle status, host role, players, connection status, and game state when those fields are part of the known response. A user can belong to only one room at a time.
 
-    Every room requires exactly four players. When a snapshot includes `minimum_players`, its value is always `4`; clients must not treat it as configurable.
+    Every room requires exactly four players before the host can start the game.
 
     ## 🧭 Recommended flow
 
