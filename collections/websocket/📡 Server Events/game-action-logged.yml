@@ -1,21 +1,27 @@
 info:
-  name: "player_joined"
+  name: "game_action_logged"
   type: websocket
-  seq: 1
+  seq: 10
   tags:
     - event
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "game_action_logged — observation example"
+      selected: false
+      message:
+        type: text
+        data: "<observe the game_action_logged server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0
 docs: |-
-  # ⚡ player_joined
+  # ⚡ game_action_logged
 
   ## Purpose
 
-  Passive observer for the server event `player_joined`. This is a player lifecycle event emitted when a player joins a room.
+  Passive observer for the server event `game_action_logged`. This is an action-flow event associated with a recorded game action.
 
   ## URL and authentication
 
@@ -25,7 +31,7 @@ docs: |-
 
   ## Message behavior
 
-  No outgoing application message is sent. Watch Bruno's message history for the `player_joined` frame after the related room or game action.
+  No outgoing application message is sent. Watch Bruno's message history for the `game_action_logged` frame after the related room or game action.
 
   ## Payload boundary
 

@@ -1,21 +1,27 @@
 info:
-  name: "game_started"
+  name: "player_disconnected"
   type: websocket
-  seq: 3
+  seq: 7
   tags:
     - event
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "player_disconnected — observation example"
+      selected: false
+      message:
+        type: text
+        data: "<observe the player_disconnected server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0
 docs: |-
-  # ⚡ game_started
+  # ⚡ player_disconnected
 
   ## Purpose
 
-  Passive observer for the server event `game_started`. This is a game lifecycle event emitted when the game starts.
+  Passive observer for the server event `player_disconnected`. This is a player lifecycle event associated with a lost connection.
 
   ## URL and authentication
 
@@ -25,7 +31,7 @@ docs: |-
 
   ## Message behavior
 
-  No outgoing application message is sent. Watch Bruno's message history for the `game_started` frame after the related room or game action.
+  No outgoing application message is sent. Watch Bruno's message history for the `player_disconnected` frame after the related room or game action.
 
   ## Payload boundary
 

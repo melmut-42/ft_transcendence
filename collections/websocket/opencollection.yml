@@ -31,10 +31,10 @@ docs:
 
     ## Collection layout
 
-    - **Connection** — authenticated, missing-session, and invalid-session handshakes.
+    - **Connection** — the canonical authenticated handshake.
     - **Client Actions** — known outbound event names; only `give_clue` has a verified payload example.
     - **Server Events** — passive observers for known server event names.
-    - **Errors** — the known error envelope shape and guidance for capturing backend error codes.
+    - **Errors** — the error envelope, catalog guidance, and failure-testing rules.
 
     ## Recommended workflow
 

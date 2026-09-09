@@ -6,7 +6,7 @@ docs:
   content: |-
     # 🔌 WebSocket Connection
 
-    This folder contains the handshake scenarios for the shared room/game socket.
+    This folder contains the canonical handshake request for the shared room/game socket.
 
     ## Connection URL
 
@@ -16,10 +16,8 @@ docs:
 
     Authentication is supplied only through the `session_id` query parameter. REST-protected requests use `X-Session-Id` separately.
 
-    ## Scenarios
+    ## Connection request
 
-    - `connect` — normal connection with a valid local session.
-    - `connect_without_session` — deliberate negative handshake without the query parameter.
-    - `connect_invalid_session` — deliberate negative handshake with the literal `invalid-session` value.
+    `connect` opens the socket with a valid local session.
 
-    These requests send no application message. Inspect the handshake result and capture any server error frame in Bruno.
+    The collection does not keep separate missing-session or invalid-session child requests. Test those handshake failures against the backend only when the required scenario is prepared, and record the returned error using the guidance in the Errors folder.

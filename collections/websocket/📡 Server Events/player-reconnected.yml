@@ -1,21 +1,27 @@
 info:
-  name: "game_finished"
+  name: "player_reconnected"
   type: websocket
-  seq: 9
+  seq: 8
   tags:
     - event
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "player_reconnected — observation example"
+      selected: false
+      message:
+        type: text
+        data: "<observe the player_reconnected server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0
 docs: |-
-  # ⚡ game_finished
+  # ⚡ player_reconnected
 
   ## Purpose
 
-  Passive observer for the server event `game_finished`. This is a game lifecycle event emitted when the game finishes.
+  Passive observer for the server event `player_reconnected`. This is a player lifecycle event associated with a restored connection.
 
   ## URL and authentication
 
@@ -25,7 +31,7 @@ docs: |-
 
   ## Message behavior
 
-  No outgoing application message is sent. Watch Bruno's message history for the `game_finished` frame after the related room or game action.
+  No outgoing application message is sent. Watch Bruno's message history for the `player_reconnected` frame after the related room or game action.
 
   ## Payload boundary
 

@@ -1,21 +1,27 @@
 info:
-  name: "game_action_logged"
+  name: "game_started"
   type: websocket
-  seq: 10
+  seq: 3
   tags:
     - event
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "game_started — observation example"
+      selected: false
+      message:
+        type: text
+        data: "<observe the game_started server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0
 docs: |-
-  # ⚡ game_action_logged
+  # ⚡ game_started
 
   ## Purpose
 
-  Passive observer for the server event `game_action_logged`. This is an action-flow event associated with a recorded game action.
+  Passive observer for the server event `game_started`. This is a game lifecycle event emitted when the game starts.
 
   ## URL and authentication
 
@@ -25,7 +31,7 @@ docs: |-
 
   ## Message behavior
 
-  No outgoing application message is sent. Watch Bruno's message history for the `game_action_logged` frame after the related room or game action.
+  No outgoing application message is sent. Watch Bruno's message history for the `game_started` frame after the related room or game action.
 
   ## Payload boundary
 

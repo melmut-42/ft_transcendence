@@ -1,21 +1,27 @@
 info:
-  name: "player_reconnected"
+  name: "turn_changed"
   type: websocket
-  seq: 8
+  seq: 6
   tags:
     - event
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "turn_changed — observation example"
+      selected: false
+      message:
+        type: text
+        data: "<observe the turn_changed server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0
 docs: |-
-  # ⚡ player_reconnected
+  # ⚡ turn_changed
 
   ## Purpose
 
-  Passive observer for the server event `player_reconnected`. This is a player lifecycle event associated with a restored connection.
+  Passive observer for the server event `turn_changed`. This is a turn-flow event emitted when the active turn changes.
 
   ## URL and authentication
 
@@ -25,7 +31,7 @@ docs: |-
 
   ## Message behavior
 
-  No outgoing application message is sent. Watch Bruno's message history for the `player_reconnected` frame after the related room or game action.
+  No outgoing application message is sent. Watch Bruno's message history for the `turn_changed` frame after the related room or game action.
 
   ## Payload boundary
 

@@ -1,21 +1,27 @@
 info:
-  name: "player_disconnected"
+  name: "clue_given"
   type: websocket
-  seq: 7
+  seq: 4
   tags:
     - event
     - observation
 websocket:
   url: "{{wsUrl}}/ws?session_id={{session_id}}"
+  message:
+    - title: "clue_given — observation example"
+      selected: false
+      message:
+        type: text
+        data: "<observe the clue_given server frame; no outgoing message>"
 settings:
   timeout: 30000
   keepAliveInterval: 0
 docs: |-
-  # ⚡ player_disconnected
+  # ⚡ clue_given
 
   ## Purpose
 
-  Passive observer for the server event `player_disconnected`. This is a player lifecycle event associated with a lost connection.
+  Passive observer for the server event `clue_given`. This is a game action event associated with a processed clue.
 
   ## URL and authentication
 
@@ -25,7 +31,7 @@ docs: |-
 
   ## Message behavior
 
-  No outgoing application message is sent. Watch Bruno's message history for the `player_disconnected` frame after the related room or game action.
+  No outgoing application message is sent. Watch Bruno's message history for the `clue_given` frame after the related room or game action.
 
   ## Payload boundary
 
