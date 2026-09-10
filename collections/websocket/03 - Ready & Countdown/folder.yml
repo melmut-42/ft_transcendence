@@ -1,0 +1,8 @@
+info:
+  name: 03 - Ready & Countdown
+  type: folder
+  seq: 3
+docs: |-
+  # Ready and countdown
+
+  `ready=true` requires both team and role. Readiness is not sufficient by itself: all nine start clauses in workspace documentation must hold. The server automatically starts a three-second countdown when they do. Join, leave, team, role, or ready changes can cancel it and return the room to `WAITING`.

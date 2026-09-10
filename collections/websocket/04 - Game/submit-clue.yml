@@ -1,0 +1,118 @@
+info:
+  name: Submit clue
+  type: websocket
+  seq: 1
+  tags: [action, game]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+  message:
+    - title: Success - Ocean 2
+      selected: true
+      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0020","payload":{"word":"ocean","number":2}}'}
+    - title: Success - Space 3
+      selected: false
+      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0021","payload":{"word":" SPACE ","number":3}}'}
+    - title: Error - Operative cannot submit
+      selected: false
+      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0022","payload":{"word":"ocean","number":2}}'}
+    - title: Error - Wrong team
+      selected: false
+      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0023","payload":{"word":"space","number":3}}'}
+    - title: Error - Wrong phase
+      selected: false
+      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0024","payload":{"word":"ocean","number":2}}'}
+    - title: Error - Invalid number
+      selected: false
+      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0025","payload":{"word":"ocean","number":0}}'}
+    - title: Error - Multiple words
+      selected: false
+      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0026","payload":{"word":"deep ocean","number":2}}'}
+docs: |-
+  # Submit clue
+
+  ## Purpose and preconditions
+
+  Moves the active team from `WAITING_FOR_CLUE` to `GUESSING`. Only that team's `SPYMASTER` may submit. The room must be `IN_GAME` and the game unfinished.
+
+  ## Message and payload parameters
+
+  | Parameter | Location | Required | Type | Allowed values/range | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Actor identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `type` | envelope | yes | string enum | `game.clue.submit` | no | Operation | `game.clue.submit` |
+  | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0020` |
+  | `payload.word` | payload | yes | string | trim; one non-whitespace word; `1..30` Unicode characters | no | Clue stored in Unicode lowercase | `ocean` |
+  | `payload.number` | payload | yes | integer | `1..9` | no | Base guess count `N` | `2` |
+
+  Deterministic validation adds no word-list, board-word, inflection, or proper-noun restrictions. `" SPACE "` normalizes to `"space"`; `"deep ocean"` is invalid.
+
+  ## Success behavior and response
+
+  Request `req_0020` returns:
+
+  ```json
+  {"type":"ack","request_id":"req_0020","ok":true,"payload":{"game_id":5001,"current_turn":{"team":"RED","phase":"GUESSING","clue":{"word":"ocean","number":2},"guesses_remaining":3}}}
+  ```
+
+  The server emits exactly one event for a unique request:
+
+  ```json
+  {"type":"game.clue.submitted","event_id":"evt_0142","room_id":1001,"sent_at":"2026-09-10T08:43:30Z","payload":{"game_id":5001,"submitted_by_user_id":42,"team":"RED","clue":{"word":"ocean","number":2},"guesses_remaining":3,"current_turn":{"team":"RED","phase":"GUESSING"}}}
+  ```
+
+  Retrying identical `req_0020` returns the original ack without a second event or new turn.
+
+  The normalized Space example returns:
+
+  ```json
+  {"type":"ack","request_id":"req_0021","ok":true,"payload":{"game_id":5001,"current_turn":{"team":"RED","phase":"GUESSING","clue":{"word":"space","number":3},"guesses_remaining":4}}}
+  ```
+
+  It emits `game.clue.submitted` once with `clue.word="space"`, `clue.number=3`, and `guesses_remaining=4`.
+
+  ## Response/event fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `payload.game_id` | integer | yes | no | positive | Match |
+  | `payload.submitted_by_user_id` | integer | event only | no | active Spymaster ID | Actor |
+  | `payload.team` | enum | event only | no | `RED`, `BLUE` | Active team |
+  | `payload.clue.word` | string | yes | no | normalized rule | Public clue |
+  | `payload.clue.number` | integer | yes | no | `1..9` | `N` |
+  | `payload.guesses_remaining` | integer | yes | no | `2..10` | Exactly `N+1` at acceptance |
+  | `payload.current_turn.phase` | enum | yes | no | `GUESSING` | New phase |
+
+  ## Errors and state guarantees
+
+  - `ROLE_FORBIDDEN`: an Operative submits; message `Only the active team's Spymaster may submit a clue.`
+  - `NOT_YOUR_TURN`: inactive-team Spymaster submits.
+  - `INVALID_ROOM_STATE`: room is not `IN_GAME`.
+  - `INVALID_CLUE`: word missing, empty, over 30 characters, or contains whitespace.
+  - `INVALID_CLUE_NUMBER`: number is non-integer or outside `1..9`.
+  - `GAME_ALREADY_FINISHED`: phase is `GAME_OVER`.
+
+  Errors keep `WAITING_FOR_CLUE`, create no clue, and keep the socket open.
+
+  ```json
+  {"type":"error","request_id":"req_0022","error":{"code":"ROLE_FORBIDDEN","message":"Only the active team's Spymaster may submit a clue.","details":{"required_role":"SPYMASTER"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0023","error":{"code":"NOT_YOUR_TURN","message":"BLUE cannot submit a clue while RED is the active team.","details":{"active_team":"RED"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0024","error":{"code":"INVALID_ROOM_STATE","message":"A clue can be submitted only during WAITING_FOR_CLUE.","details":{"phase":"GUESSING"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0025","error":{"code":"INVALID_CLUE_NUMBER","message":"payload.number must be an integer from 1 through 9.","details":{"field":"payload.number","min":1,"max":9}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0026","error":{"code":"INVALID_CLUE","message":"payload.word must contain exactly one non-whitespace word.","details":{"field":"payload.word"}}}
+  ```

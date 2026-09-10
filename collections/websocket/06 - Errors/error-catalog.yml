@@ -1,0 +1,141 @@
+info:
+  name: Error catalog
+  type: websocket
+  seq: 1
+  tags: [error, reference]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+  message:
+    - title: Error trigger - Unknown event
+      selected: false
+      message: {type: json, data: '{"type":"room.start","request_id":"req_0090","payload":{}}'}
+    - title: Error trigger - Missing request ID
+      selected: false
+      message: {type: json, data: '{"type":"room.ready.set","payload":{"ready":true}}'}
+docs: |-
+  # WebSocket error catalog
+
+  ## Purpose and envelope
+
+  Defines all application error codes. An error is requester-only, changes no state, emits no success event, and keeps the socket open. The only exceptions are HTTP handshake rejection and optional close after repeated protocol abuse.
+
+  The reference connects with path `room_id` (required positive integer, example `1001`) and handshake header `X-Session-Id` (required active opaque member session, example `sess_A3redAgent9Kp`). Its two disabled messages use the same client envelope documented below; one intentionally uses unsupported type `room.start`, and one intentionally omits `request_id`.
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Member identity | `sess_A3redAgent9Kp` |
+  | `type` | envelope | yes | string | canonical operation name | no | Deliberately invalid in first example | `room.start` |
+  | `request_id` | envelope | yes | string | `1..64` visible ASCII | no | Deliberately absent in second example | `req_0090` |
+  | `payload` | envelope | yes | object | operation-specific | no | Command parameters | `{}` |
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `type` | string enum | yes | no | `error` | Response discriminator |
+  | `request_id` | string or null | yes | yes | echoed ID or `null` when absent/unparseable | Correlation |
+  | `error.code` | string enum | yes | no | catalog values | Machine-readable code |
+  | `error.message` | string | yes | no | concrete human-readable text | Explanation |
+  | `error.details` | object | yes | no | code-specific | Structured context |
+
+  ## Catalog
+
+  | Code | Caused by | State/socket behavior |
+  | --- | --- | --- |
+  | `INVALID_EVENT` | unknown type, bad envelope, duplicate ID reused with different content | unchanged; open |
+  | `INVALID_PAYLOAD` | missing/wrong-type/unrecognized payload field | unchanged; open |
+  | `UNAUTHORIZED` | session becomes invalid after connection | unchanged; server closes with policy code `4401` |
+  | `ROOM_NOT_FOUND` | room removed after connection race | unchanged; server closes with `4404` |
+  | `NOT_ROOM_MEMBER` | user no longer belongs to room | unchanged; server closes with `4403` |
+  | `INVALID_ROOM_STATE` | operation not legal in room status/phase | unchanged; open |
+  | `TEAM_REQUIRED` | ready/role before team | unchanged; open |
+  | `ROLE_REQUIRED` | ready before role | unchanged; open |
+  | `ROLE_CONFLICT` | second Spymaster on one team | unchanged; open |
+  | `NOT_YOUR_TURN` | inactive team attempts clue/guess/pass | unchanged; open |
+  | `ROLE_FORBIDDEN` | wrong room role attempts game action | unchanged; open |
+  | `INVALID_CLUE` | clue word fails deterministic rule | unchanged; open |
+  | `INVALID_CLUE_NUMBER` | clue number not integer `1..9` | unchanged; open |
+  | `INVALID_CARD` | card ID absent/invalid | unchanged; open |
+  | `CARD_ALREADY_REVEALED` | card was already revealed | unchanged; open |
+  | `NO_GUESSES_REMAINING` | stale guess/pass after zero | unchanged; open |
+  | `GAME_ALREADY_FINISHED` | game command after terminal result | unchanged; open |
+
+  ## Concrete examples
+
+  ```json
+  {"type":"error","request_id":"req_0090","error":{"code":"INVALID_EVENT","message":"Message type 'room.start' is not supported.","details":{"type":"room.start"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":null,"error":{"code":"INVALID_EVENT","message":"request_id is required for every client message.","details":{"field":"request_id"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0018","error":{"code":"ROLE_CONFLICT","message":"RED already has a Spymaster.","details":{"team":"RED","occupied_by_user_id":42}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0041","error":{"code":"NOT_YOUR_TURN","message":"BLUE cannot guess while RED is the active team.","details":{"active_team":"RED"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0045","error":{"code":"GAME_ALREADY_FINISHED","message":"Game 5001 has already finished.","details":{"game_id":5001,"winner":"RED"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0091","error":{"code":"INVALID_PAYLOAD","message":"payload.ready must be a boolean.","details":{"field":"payload.ready"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0092","error":{"code":"UNAUTHORIZED","message":"The session is no longer active.","details":{}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0093","error":{"code":"ROOM_NOT_FOUND","message":"Room 1001 was not found.","details":{"room_id":1001}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0094","error":{"code":"NOT_ROOM_MEMBER","message":"User 47 is not a member of room 1001.","details":{"room_id":1001,"user_id":47}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0095","error":{"code":"INVALID_ROOM_STATE","message":"This action is not allowed while room status is FINISHED.","details":{"status":"FINISHED"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0096","error":{"code":"TEAM_REQUIRED","message":"Select a team before becoming ready.","details":{"user_id":43}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0097","error":{"code":"ROLE_REQUIRED","message":"Select a role before becoming ready.","details":{"user_id":43}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0098","error":{"code":"ROLE_FORBIDDEN","message":"Only an active-team Operative may guess a card.","details":{"required_role":"OPERATIVE"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0099","error":{"code":"INVALID_CLUE","message":"payload.word must contain exactly one non-whitespace word.","details":{"field":"payload.word"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0100","error":{"code":"INVALID_CLUE_NUMBER","message":"payload.number must be an integer from 1 through 9.","details":{"field":"payload.number","min":1,"max":9}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0101","error":{"code":"INVALID_CARD","message":"Card 30 does not exist in game 5001.","details":{"card_id":30,"game_id":5001}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0102","error":{"code":"CARD_ALREADY_REVEALED","message":"Card 1 has already been revealed.","details":{"card_id":1}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0103","error":{"code":"NO_GUESSES_REMAINING","message":"RED has no guesses remaining in the current turn.","details":{"team":"RED","guesses_remaining":0}}}
+  ```
+
+  ## Validation invariant
+
+  Parsing and authorization complete before mutation. A rejected command cannot reveal a card, change score or turn, toggle ready, create/cancel countdown, or consume an idempotency result as success.

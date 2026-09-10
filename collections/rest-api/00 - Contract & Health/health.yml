@@ -1,0 +1,91 @@
+info:
+  name: Health and contract version
+  type: http
+  seq: 1
+  tags: [contract, health]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/health"
+  headers:
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns the draft contract version", function () {
+          expect(res.status).to.equal(200);
+          expect(res.body.data.status).to.equal("OK");
+          expect(res.body.data.contract_version).to.equal("2.0.0-draft");
+        });
+docs: |-
+  # Health and contract version
+
+  ## Purpose
+
+  Confirms that the HTTP process is reachable and declares the API contract version it serves. This endpoint is not an end-to-end gameplay readiness probe.
+
+  ## Preconditions and request
+
+  No session or request body is required.
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | --- | --- | --- | --- | --- | --- |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Success and response fields
+
+  `200 OK` uses the normal success envelope.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.status` | string enum | yes | no | `OK` | Process is serving requests |
+  | `data.contract_version` | string | yes | no | `2.0.0-draft` | Implemented contract revision |
+  | `data.server_time` | `string<date-time>` | yes | no | ISO 8601 UTC | Server clock at response creation |
+
+  ## State changes and events
+
+  None. No WebSocket event is emitted.
+
+  ## Errors and invariants
+
+  Infrastructure may return `503 Service Unavailable` with `SERVICE_UNAVAILABLE`; application authentication errors do not apply. A successful response does not assert that persistence or WebSocket subsystems are healthy.
+examples:
+  - name: Success - Service available
+    request:
+      url: "{{baseUrl}}/api/health"
+      method: GET
+      headers:
+        - name: Accept
+          value: application/json
+          enabled: true
+      params: []
+      body: { mode: none }
+    response:
+      status: 200
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {"data":{"status":"OK","contract_version":"2.0.0-draft","server_time":"2026-09-10T08:40:00Z"}}
+  - name: Error - Service unavailable
+    request:
+      url: "{{baseUrl}}/api/health"
+      method: GET
+      headers:
+        - name: Accept
+          value: application/json
+          enabled: true
+      params: []
+      body: { mode: none }
+    response:
+      status: 503
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {"error":{"code":"SERVICE_UNAVAILABLE","message":"The API is temporarily unavailable.","details":{}}}

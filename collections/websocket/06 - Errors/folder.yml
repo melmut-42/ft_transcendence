@@ -1,0 +1,8 @@
+info:
+  name: 06 - Errors
+  type: folder
+  seq: 6
+docs: |-
+  # WebSocket errors
+
+  Errors correlate to the rejected `request_id`, contain a concrete code and message, leave state unchanged, and normally keep the socket open. Handshake failures occur as HTTP responses before the WebSocket opens. Repeated protocol abuse is the only documented reason the server may close an authenticated socket after an application error.

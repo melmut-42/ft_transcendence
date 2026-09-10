@@ -1,0 +1,111 @@
+info:
+  name: Set ready
+  type: websocket
+  seq: 1
+  tags: [action, room, countdown]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+  message:
+    - title: Success - Ready true
+      selected: true
+      message: {type: json, data: '{"type":"room.ready.set","request_id":"req_0011","payload":{"ready":true}}'}
+    - title: Success - Ready false
+      selected: false
+      message: {type: json, data: '{"type":"room.ready.set","request_id":"req_0012","payload":{"ready":false}}'}
+    - title: Success - Last player triggers countdown
+      selected: false
+      message: {type: json, data: '{"type":"room.ready.set","request_id":"req_0013","payload":{"ready":true}}'}
+    - title: Success - Unready cancels countdown
+      selected: false
+      message: {type: json, data: '{"type":"room.ready.set","request_id":"req_0014","payload":{"ready":false}}'}
+    - title: Error - Team missing
+      selected: false
+      message: {type: json, data: '{"type":"room.ready.set","request_id":"req_0015","payload":{"ready":true}}'}
+    - title: Error - Role missing
+      selected: false
+      message: {type: json, data: '{"type":"room.ready.set","request_id":"req_0016","payload":{"ready":true}}'}
+docs: |-
+  # Set ready
+
+  ## Purpose and preconditions
+
+  Confirms or withdraws the member's current team/role configuration. `ready=true` is legal in `WAITING` only after both selections. `ready=false` is legal in `WAITING` and `COUNTDOWN` and cancels an active countdown.
+
+  ## Message and payload parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Authenticated member | `sess_C5blueAgent2Rm` |
+  | `type` | envelope | yes | string enum | `room.ready.set` | no | Operation | `room.ready.set` |
+  | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0011` |
+  | `payload.ready` | payload | yes | boolean | `true`, `false` | no | Desired readiness | `true` |
+
+  ## Success behavior
+
+  Every accepted change emits `room.player.updated` and `room.state`. The ack reports the post-evaluation state:
+
+  ```json
+  {"type":"ack","request_id":"req_0011","ok":true,"payload":{"user_id":42,"ready":true,"room_status":"WAITING","startable":false}}
+  ```
+
+  | Result field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `ack.payload.user_id` | integer | yes | no | positive | Updated member |
+  | `ack.payload.ready` | boolean | yes | no | `true`, `false` | Accepted readiness |
+  | `ack.payload.room_status` | enum | yes | no | `WAITING`, `COUNTDOWN` | State after full predicate evaluation |
+  | `ack.payload.startable` | boolean | yes | no | `true`, `false` | Full predicate result |
+  | `room.player.updated.payload.changed_fields[]` | array<string enum> | yes | no | `ready` | Updated field |
+
+  The ordinary unready example in `WAITING` returns `{"type":"ack","request_id":"req_0012","ok":true,"payload":{"user_id":42,"ready":false,"room_status":"WAITING","startable":false}}` and emits no countdown event.
+
+  ### Last readiness and automatic countdown
+
+  Immediately before processing user `45`, the server has this pre-request `WAITING` snapshot:
+
+  ```json
+  {"room_id":1001,"status":"WAITING","player_count":4,"startable":false,"players":[{"user_id":42,"team":"RED","role":"SPYMASTER","ready":true},{"user_id":43,"team":"RED","role":"OPERATIVE","ready":true},{"user_id":44,"team":"BLUE","role":"SPYMASTER","ready":true},{"user_id":45,"team":"BLUE","role":"OPERATIVE","ready":false}]}
+  ```
+
+  Applying request `req_0013` produces this final all-ready `WAITING` candidate inside the same server transaction, immediately before the lifecycle transition:
+
+  ```json
+  {"room_id":1001,"status":"WAITING","player_count":4,"startable":true,"players":[{"user_id":42,"team":"RED","role":"SPYMASTER","ready":true},{"user_id":43,"team":"RED","role":"OPERATIVE","ready":true},{"user_id":44,"team":"BLUE","role":"SPYMASTER","ready":true},{"user_id":45,"team":"BLUE","role":"OPERATIVE","ready":true}]}
+  ```
+
+  The server does not expose that candidate as a durable idle state: all clauses are true, so it atomically enters `COUNTDOWN`. The ack is post-transition:
+
+  ```json
+  {"type":"ack","request_id":"req_0013","ok":true,"payload":{"user_id":45,"ready":true,"room_status":"COUNTDOWN","startable":true}}
+  ```
+
+  The server emits `room.player.updated`, `room.countdown.started`, then a `room.state` with `status=COUNTDOWN`.
+
+  ### Countdown cancellation
+
+  Request `req_0014` from user `43` produces:
+
+  ```json
+  {"type":"ack","request_id":"req_0014","ok":true,"payload":{"user_id":43,"ready":false,"room_status":"WAITING","startable":false}}
+  ```
+
+  The server emits `room.player.updated`, `room.countdown.cancelled`, then `room.state`. No board is generated.
+
+  ## Errors
+
+  `TEAM_REQUIRED` and `ROLE_REQUIRED` reject `ready=true`; `INVALID_PAYLOAD` rejects non-boolean values; `NOT_ROOM_MEMBER`; `INVALID_ROOM_STATE` rejects `true` in countdown or any mutation in `IN_GAME`, `FINISHED`, `CLOSED`. Errors change no state.
+
+  ```json
+  {"type":"error","request_id":"req_0015","error":{"code":"TEAM_REQUIRED","message":"Select a team before becoming ready.","details":{"user_id":43}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0016","error":{"code":"ROLE_REQUIRED","message":"Select a role before becoming ready.","details":{"user_id":43}}}
+  ```
+
+  ## Invariants
+
+  Ready is tied to the exact current selections. Any later successful team or role change forces it to false. `all ready` is never used as a substitute for the complete start predicate.

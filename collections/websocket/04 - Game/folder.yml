@@ -1,0 +1,10 @@
+info:
+  name: 04 - Game
+  type: folder
+  seq: 4
+docs: |-
+  # Game
+
+  Game phase is `WAITING_FOR_CLUE | GUESSING | GAME_OVER`, separate from room status. The active Spymaster submits a clue and integer `N`; the active Operatives receive `N+1` guesses. Own cards may continue, opponent and neutral cards end the turn, assassin ends the game, and any team's last card wins immediately. Passing is voluntary during `GUESSING`.
+
+  Scores count revealed team cards, regardless of which team guessed them. Every reveal checks terminal conditions before emitting a turn change.

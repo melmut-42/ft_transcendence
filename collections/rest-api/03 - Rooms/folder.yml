@@ -1,0 +1,10 @@
+info:
+  name: 03 - Rooms
+  type: folder
+  seq: 3
+docs: |-
+  # Rooms
+
+  Creating joins the creator and assigns host. Only `WAITING` rooms accept joins, and a user may have one active room. The host transfers to the longest-present member after a host leaves `WAITING`; an empty room closes. Team, role, ready, countdown, and gameplay mutations use WebSocket.
+
+  A game can start only with at least four configured, ready members; exactly one Spymaster and at least one Operative per `RED` and `BLUE`. REST room snapshots use the same enums and privacy projections as realtime state.

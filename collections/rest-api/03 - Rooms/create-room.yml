@@ -1,0 +1,95 @@
+info:
+  name: Create room
+  type: http
+  seq: 1
+  tags: [rooms, smoke]
+http:
+  method: POST
+  url: "{{baseUrl}}/api/rooms"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.data) {
+          bru.setVar("roomId", String(res.body.data.room_id));
+        }
+    - type: tests
+      code: |-
+        test("creator is joined as unconfigured host", function () {
+          expect(res.status).to.equal(201);
+          expect(res.body.data.status).to.equal("WAITING");
+          expect(res.body.data.players[0].is_host).to.equal(true);
+          expect(res.body.data.players[0].team).to.equal(null);
+          expect(res.body.data.players[0].role).to.equal(null);
+          expect(res.body.data.players[0].ready).to.equal(false);
+        });
+docs: |-
+  # Create room
+
+  ## Purpose and preconditions
+
+  Creates a `WAITING` room, joins the authenticated creator, and makes that member host. The user must not already belong to any active room.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Creating user | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  There is no body: room capacity, passwords, timers, and custom boards are not contract features.
+
+  ## Response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.room_id` | integer | yes | no | positive | New room ID |
+  | `data.status` | string enum | yes | no | `WAITING` | Initial lifecycle state |
+  | `data.host_user_id` | integer | yes | no | creator ID | Current host |
+  | `data.player_count` | integer | yes | no | `1` | Current membership count |
+  | `data.startable` | boolean | yes | no | `false` | Full start predicate result |
+  | `data.players[]` | array<object> | yes | no | one creator | Members in join order |
+  | `data.players[].user_id` | integer | yes | no | positive | Member ID |
+  | `data.players[].username` | string | yes | no | username rule | Member username |
+  | `data.players[].team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
+  | `data.players[].role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Temporary role |
+  | `data.players[].ready` | boolean | yes | no | `false` | Readiness |
+  | `data.players[].is_host` | boolean | yes | no | `true` | Host marker |
+  | `data.players[].joined_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Used for host transfer |
+  | `data.game` | object or null | yes | yes | `null` | No game before countdown completes |
+  | `data.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Room creation time |
+
+  ## State changes and events
+
+  Sets the user's `active_room_id`; no socket exists yet, so no event is required. The response snapshot is authoritative. The script stores `roomId`.
+
+  ## Errors
+
+  `401 UNAUTHORIZED`; `409 ALREADY_IN_ROOM`. Neither creates a room.
+examples:
+  - name: Success - Newly created room
+    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":1,"startable":false,"players":[{"user_id":42,"username":"player_one","team":null,"role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}
+  - name: Error - Already in room
+    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 409
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"User 42 already belongs to active room 1001.","details":{"room_id":1001}}}'}
+  - name: Error - Unauthorized
+    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 401
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"UNAUTHORIZED","message":"A valid active session is required.","details":{}}}'}

@@ -1,0 +1,8 @@
+info:
+  name: 01 - Identity
+  type: folder
+  seq: 1
+docs: |-
+  # Identity
+
+  Identity is username-only. Usernames are trimmed, case-insensitively unique strings matching `^[A-Za-z0-9_]{3,20}$`. Registration atomically creates the persistent user and opaque session. `X-Session-Id` authenticates subsequent REST calls. Session deletion revokes the token without deleting the user or statistics.

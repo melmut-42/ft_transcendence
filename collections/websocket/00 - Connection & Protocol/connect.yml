@@ -1,0 +1,65 @@
+info:
+  name: Connect to room stream
+  type: websocket
+  seq: 1
+  tags: [connection, smoke]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Connect to room stream
+
+  ## Purpose
+
+  Opens the sole realtime channel for one REST-joined room. No subscription message is needed because `room_id` is in the path.
+
+  ## Preconditions and handshake parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | path | yes | integer | positive | no | Existing room already joined by user | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active opaque session | no | Same credential used by REST | `sess_A3redAgent9Kp` |
+
+  ## Success behavior
+
+  The server upgrades with HTTP `101 Switching Protocols`, then sends a role-safe `room.state`. If the room is `IN_GAME` or `FINISHED`, the snapshot includes the recipient-projected game board.
+
+  Initial event fields:
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `type` | string enum | yes | no | `room.state` | Snapshot event name |
+  | `event_id` | string | yes | no | unique in room stream | Ordering/correlation ID |
+  | `room_id` | integer | yes | no | positive | Subscribed room |
+  | `sent_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Event creation time |
+  | `payload.room` | object | yes | no | canonical room schema | Recipient-safe snapshot |
+
+  ## Failure behavior
+
+  | HTTP status | Code | Condition | Socket opens |
+  | --- | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | missing, invalid, revoked, or expired token | no |
+  | `404` | `ROOM_NOT_FOUND` | path room does not exist | no |
+  | `403` | `NOT_ROOM_MEMBER` | authenticated user is not a member | no |
+  | `409` | `INVALID_ROOM_STATE` | room is `CLOSED` | no |
+
+  A successful transport disconnect changes no membership state. Reconnect with the same session yields a current snapshot; missed incremental events need not be replayed.
+
+  ## Concrete frames
+
+  First frame for the newly created fixture room:
+
+  ```json
+  {"type":"room.state","event_id":"evt_0100","room_id":1001,"sent_at":"2026-09-10T08:41:01Z","payload":{"room":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":1,"startable":false,"players":[{"user_id":42,"username":"player_one","team":null,"role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}}
+  ```
+
+  Failed authentication body before upgrade:
+
+  ```json
+  {"error":{"code":"UNAUTHORIZED","message":"A valid active session is required.","details":{}}}
+  ```

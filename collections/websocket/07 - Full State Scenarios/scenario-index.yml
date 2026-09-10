@@ -1,0 +1,111 @@
+info:
+  name: Canonical scenario index
+  type: websocket
+  seq: 2
+  tags: [scenario, reference]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Canonical scenario index
+
+  ## End-to-end reconstruction
+
+  This passive reference maps each required state to its normative example. It sends no message.
+
+  It connects with required positive-integer path `room_id=1001` and required handshake header `X-Session-Id` containing an active opaque member session.
+
+  | Scenario | Fixture transition | Contract location |
+  | --- | --- | --- |
+  | Newly created room | user `42` creates `1001` | REST `Create room` |
+  | Four joined, unconfigured | users `42..45`, all selections null | REST `Get room snapshot` |
+  | Teams selected, roles incomplete | users `43` and `45` lack roles | REST `Get room snapshot` |
+  | Duplicate Spymaster | user `43` requests RED Spymaster occupied by `42` | WebSocket `Select role` |
+  | Roles valid, some unready | user `45` remains false | REST `Get room snapshot` |
+  | All four ready | `req_0013` changes user `45` | WebSocket `Set ready` |
+  | Countdown | seconds `3`, `2`, `1`, `0` | WebSocket `Countdown event reference` |
+  | Countdown cancelled | user `43` changes true to false | WebSocket `Set ready` |
+  | Game started | room `IN_GAME`, game `5001`, all 25 cards | `Full IN_GAME role projections` |
+  | Clue submitted | RED Spymaster, `ocean / 2`, 3 guesses | WebSocket `Submit clue` |
+  | Correct own guess | RED reveals card `5`, score `3-2`, 2 guesses | WebSocket `Guess card` |
+  | Neutral guess | RED reveals card `18`, BLUE turn | WebSocket `Guess card` |
+  | Opponent guess | RED reveals BLUE card `6`, blue score rises | WebSocket `Guess card` |
+  | Assassin | RED reveals card `25`, BLUE wins | WebSocket `Guess card` |
+  | Normal victory | card `17` completes RED | WebSocket `Guess card` |
+  | Opponent completion | RED reveals card `16`, completes BLUE | WebSocket `Guess card` |
+  | Finished game | room `FINISHED`, phase `GAME_OVER`, result event | below |
+
+  ## Finished game snapshot
+
+  This Spymaster-visible state follows the normal RED victory branch. The nine RED cards and five previously found BLUE cards are revealed. Spymasters continue to see the full map; an Operative projection MUST replace the colors of every remaining unrevealed card with `null`, even after `FINISHED`.
+
+  ```json
+  {
+    "type":"game.state",
+    "event_id":"evt_0183",
+    "room_id":1001,
+    "sent_at":"2026-09-10T08:50:01Z",
+    "payload":{"room":{
+      "room_id":1001,
+      "status":"FINISHED",
+      "host_user_id":42,
+      "player_count":4,
+      "startable":false,
+      "players":[
+        {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},
+        {"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},
+        {"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},
+        {"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"}
+      ],
+      "game":{
+        "game_id":5001,
+        "starting_team":"RED",
+        "current_turn":{"team":"RED","phase":"GAME_OVER","clue":{"word":"empire","number":1},"guesses_remaining":null},
+        "score":{"red":9,"blue":5},
+        "board":[
+          {"card_id":1,"word":"MOON","revealed":true,"color":"RED"},
+          {"card_id":2,"word":"APPLE","revealed":true,"color":"BLUE"},
+          {"card_id":3,"word":"TRAIN","revealed":true,"color":"RED"},
+          {"card_id":4,"word":"BRIDGE","revealed":true,"color":"BLUE"},
+          {"card_id":5,"word":"OCEAN","revealed":true,"color":"RED"},
+          {"card_id":6,"word":"KING","revealed":true,"color":"BLUE"},
+          {"card_id":7,"word":"LASER","revealed":true,"color":"RED"},
+          {"card_id":8,"word":"FOREST","revealed":true,"color":"BLUE"},
+          {"card_id":9,"word":"DOCTOR","revealed":true,"color":"RED"},
+          {"card_id":10,"word":"GLASS","revealed":true,"color":"BLUE"},
+          {"card_id":11,"word":"DRAGON","revealed":true,"color":"RED"},
+          {"card_id":12,"word":"TABLE","revealed":false,"color":"BLUE"},
+          {"card_id":13,"word":"SATURN","revealed":true,"color":"RED"},
+          {"card_id":14,"word":"SNOW","revealed":false,"color":"BLUE"},
+          {"card_id":15,"word":"PIANO","revealed":true,"color":"RED"},
+          {"card_id":16,"word":"HEART","revealed":false,"color":"BLUE"},
+          {"card_id":17,"word":"ROME","revealed":true,"color":"RED"},
+          {"card_id":18,"word":"WHALE","revealed":false,"color":"NEUTRAL"},
+          {"card_id":19,"word":"ROBOT","revealed":false,"color":"NEUTRAL"},
+          {"card_id":20,"word":"CROWN","revealed":false,"color":"NEUTRAL"},
+          {"card_id":21,"word":"DESERT","revealed":false,"color":"NEUTRAL"},
+          {"card_id":22,"word":"SCREEN","revealed":false,"color":"NEUTRAL"},
+          {"card_id":23,"word":"MOUSE","revealed":false,"color":"NEUTRAL"},
+          {"card_id":24,"word":"KNIFE","revealed":false,"color":"NEUTRAL"},
+          {"card_id":25,"word":"CLOUD","revealed":false,"color":"ASSASSIN"}
+        ],
+        "winner":"RED",
+        "end_reason":"ALL_TEAM_CARDS_REVEALED",
+        "started_at":"2026-09-10T08:43:15Z",
+        "finished_at":"2026-09-10T08:50:00Z"
+      },
+      "created_at":"2026-09-10T08:41:00Z"
+    }}
+  }
+  ```
+
+  The finished recovery snapshot is paired with the terminal `game.ended` event. Persistent wins/losses update once: users `42,43` gain one win and users `44,45` gain one loss. Team and role remain room-scoped until room lifecycle cleanup. The terminal event reveals card `17`; it never carries unrelated hidden card colors.
+
+  ## Scope boundary
+
+  There is no rematch, spectator, bot, matchmaking, room-password, capacity, kick/ban, custom-board, custom-timer, or chat event protocol in this revision.

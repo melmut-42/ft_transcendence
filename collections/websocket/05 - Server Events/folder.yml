@@ -1,0 +1,8 @@
+info:
+  name: 05 - Server Events
+  type: folder
+  seq: 5
+docs: |-
+  # Server events
+
+  Server events carry `type`, monotonic room-scoped `event_id`, integer `room_id`, UTC `sent_at`, and event-specific `payload`. Snapshot and board-bearing events are generated per recipient. Event examples here are server output references and are not client-sendable messages.

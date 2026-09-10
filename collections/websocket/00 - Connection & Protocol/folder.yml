@@ -1,0 +1,8 @@
+info:
+  name: 00 - Connection & Protocol
+  type: folder
+  seq: 0
+docs: |-
+  # Connection and protocol
+
+  Authenticate the handshake with `X-Session-Id`; the URL contains only the integer `roomId`. The user must already be a REST room member. The first frame is a role-safe `room.state`. Reconnect replaces local state from a fresh snapshot; ordinary transport disconnect does not itself remove membership.

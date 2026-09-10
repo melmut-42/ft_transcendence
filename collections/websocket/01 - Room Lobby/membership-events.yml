@@ -1,0 +1,60 @@
+info:
+  name: Membership event reference
+  type: websocket
+  seq: 1
+  tags: [server-event, room]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Membership event reference
+
+  ## Purpose and trigger
+
+  Observes membership events produced by REST join/leave. This request sends no application message. `room.player.joined` occurs only in `WAITING`; `room.player.left` may occur in `WAITING`, `COUNTDOWN`, or `FINISHED`.
+
+  ## Connection parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Observed room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active member session | no | Recipient identity | `sess_7Hk2mQ9vLc4R8pXa` |
+
+  ## Event fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `type` | string enum | yes | no | `room.player.joined`, `room.player.left` | Membership change |
+  | `event_id` | string | yes | no | room-unique | Ordered event ID |
+  | `room_id` | integer | yes | no | positive | Affected room |
+  | `sent_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Event time |
+  | `payload.player` | object | yes | no | member schema | Joined/left identity and temporary selections at change time |
+  | `payload.player.user_id` | integer | yes | no | positive | Affected member |
+  | `payload.player.username` | string | yes | no | username rule | Affected username |
+  | `payload.player.team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
+  | `payload.player.role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Temporary role |
+  | `payload.player.ready` | boolean | yes | no | `true`, `false` | Readiness at change time |
+  | `payload.host_user_id` | integer or null | yes | yes | remaining member ID or `null` | Host after change; null only when room closes empty |
+  | `payload.player_count` | integer | yes | no | `>= 0` | Membership after change |
+  | `payload.room_status` | enum | yes | no | `WAITING`, `FINISHED`, `CLOSED` | State after membership processing |
+
+  ## State behavior and ordering
+
+  Join initializes team/role to null and ready false. Leave clears the user's active room. Host leave transfers to the remaining earliest `joined_at`. Countdown leave first produces `room.countdown.cancelled`, then `room.player.left`, then `room.state`.
+
+  ## Concrete events
+
+  ```json
+  {"type":"room.player.joined","event_id":"evt_0104","room_id":1001,"sent_at":"2026-09-10T08:41:20Z","payload":{"player":{"user_id":43,"username":"red_agent","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},"host_user_id":42,"player_count":2,"room_status":"WAITING"}}
+  ```
+
+  ```json
+  {"type":"room.player.left","event_id":"evt_0110","room_id":1001,"sent_at":"2026-09-10T08:42:05Z","payload":{"player":{"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},"host_user_id":43,"player_count":3,"room_status":"WAITING"}}
+  ```
+
+  No client command error applies because the source operation is REST; consult the REST join/leave requests for errors.

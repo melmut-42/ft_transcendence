@@ -1,0 +1,80 @@
+info:
+  name: Countdown event reference
+  type: websocket
+  seq: 2
+  tags: [server-event, countdown]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Countdown event reference
+
+  ## Purpose and triggers
+
+  Passive reference for the automatic `WAITING -> COUNTDOWN -> IN_GAME` flow and its cancellation path. It sends no client message. Countdown duration is fixed to three seconds in this contract.
+
+  ## Connection parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Observed room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active member session | no | Recipient identity | `sess_7Hk2mQ9vLc4R8pXa` |
+
+  ## Event field schema
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `type` | string enum | yes | no | `room.countdown.started`, `room.countdown.tick`, `room.countdown.cancelled` | Countdown event |
+  | `event_id` | string | yes | no | room-unique | Ordered event identifier |
+  | `room_id` | integer | yes | no | positive | Room |
+  | `sent_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Event time |
+  | `payload.seconds_remaining` | integer | start/tick only | no | `0..3` | Whole seconds remaining |
+  | `payload.reason` | string enum | cancel only | no | `PLAYER_UNREADY`, `PLAYER_LEFT`, `TEAM_CHANGED`, `ROLE_CHANGED` | Invariant invalidation cause |
+  | `payload.changed_by_user_id` | integer | cancel only | no | positive | Member whose action invalidated start |
+
+  ## Complete successful sequence
+
+  ```json
+  {"type":"room.countdown.started","event_id":"evt_0132","room_id":1001,"sent_at":"2026-09-10T08:43:12Z","payload":{"seconds_remaining":3}}
+  ```
+
+  ```json
+  {"type":"room.state","event_id":"evt_0133","room_id":1001,"sent_at":"2026-09-10T08:43:12Z","payload":{"room":{"room_id":1001,"status":"COUNTDOWN","host_user_id":42,"player_count":4,"startable":true,"countdown":{"seconds_remaining":3},"players":[{"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},{"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},{"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}}
+  ```
+
+  ```json
+  {"type":"room.countdown.tick","event_id":"evt_0134","room_id":1001,"sent_at":"2026-09-10T08:43:13Z","payload":{"seconds_remaining":2}}
+  ```
+
+  ```json
+  {"type":"room.countdown.tick","event_id":"evt_0135","room_id":1001,"sent_at":"2026-09-10T08:43:14Z","payload":{"seconds_remaining":1}}
+  ```
+
+  ```json
+  {"type":"room.countdown.tick","event_id":"evt_0136","room_id":1001,"sent_at":"2026-09-10T08:43:15Z","payload":{"seconds_remaining":0}}
+  ```
+
+  The next event is `game.started` with room status `IN_GAME`, `game_id=5001`, and a recipient-safe board.
+
+  ## Complete cancellation sequence
+
+  If user `43` sets ready false at two seconds:
+
+  ```json
+  {"type":"room.countdown.cancelled","event_id":"evt_0140","room_id":1001,"sent_at":"2026-09-10T08:44:01Z","payload":{"reason":"PLAYER_UNREADY","changed_by_user_id":43}}
+  ```
+
+  ```json
+  {"type":"room.state","event_id":"evt_0141","room_id":1001,"sent_at":"2026-09-10T08:44:01Z","payload":{"room":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":4,"startable":false,"players":[{"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},{"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},{"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}}
+  ```
+
+  The cancelled snapshot omits `countdown`; remaining scheduled ticks and `game.started` MUST NOT be emitted.
+
+  ## State and errors
+
+  Events are server-generated and have no action-level errors. The server rechecks all invariants immediately before creating the board; stale timer completion cannot start an invalid room.

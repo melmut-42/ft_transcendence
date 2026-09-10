@@ -1,0 +1,154 @@
+info:
+  name: Guess card
+  type: websocket
+  seq: 2
+  tags: [action, game]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+  message:
+    - title: Own team - Continue
+      selected: true
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0030","payload":{"card_id":5}}'}
+    - title: Own team - Last guess
+      selected: false
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0031","payload":{"card_id":7}}'}
+    - title: Own team - Wins match
+      selected: false
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0032","payload":{"card_id":17}}'}
+    - title: Opponent team - Turn ends
+      selected: false
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0033","payload":{"card_id":6}}'}
+    - title: Opponent team - Opponent wins
+      selected: false
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0034","payload":{"card_id":16}}'}
+    - title: Neutral - Turn ends
+      selected: false
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0035","payload":{"card_id":18}}'}
+    - title: Assassin - Instant loss
+      selected: false
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0036","payload":{"card_id":25}}'}
+    - title: Already revealed card - Error
+      selected: false
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0037","payload":{"card_id":1}}'}
+    - title: Wrong team - Error
+      selected: false
+      message: {type: json, data: '{"type":"game.card.guess","request_id":"req_0038","payload":{"card_id":5}}'}
+docs: |-
+  # Guess card
+
+  ## Purpose and preconditions
+
+  Reveals one unrevealed card for the active team during `GUESSING`. Any active-team `OPERATIVE` may submit; Spymasters and inactive-team members may not. The client submits only `card_id`, never a color or predicted result.
+
+  ## Message and payload parameters
+
+  | Parameter | Location | Required | Type | Allowed values/range | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Actor identity | `sess_A3redAgent9Kp` |
+  | `type` | envelope | yes | string enum | `game.card.guess` | no | Operation | `game.card.guess` |
+  | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0030` |
+  | `payload.card_id` | payload | yes | integer | `1..25`, existing in game | no | Unrevealed card | `5` |
+
+  ## Common success fields and ordering
+
+  The ack includes `game_id`, card result, score, current turn, winner, and end reason. The server reveals atomically, checks both teams' completion and assassin, then emits in order: `game.card.revealed`; `game.score.updated` when a team-card score changed; either `game.turn.changed`, no turn event when continuing, or `game.ended` when terminal. Terminal outcomes never emit a later turn change.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `payload.card.card_id` | integer | yes | no | `1..25` | Revealed card |
+  | `payload.card.word` | string | yes | no | board word | Visible word |
+  | `payload.card.revealed` | boolean | yes | no | `true` | Post-action state |
+  | `payload.card.color` | enum | yes | no | `RED`, `BLUE`, `NEUTRAL`, `ASSASSIN` | Revealed color, now public |
+  | `payload.guessed_by_user_id` | integer | event only | no | active Operative ID | Actor |
+  | `payload.guessing_team` | enum | yes | no | `RED`, `BLUE` | Team taking action |
+  | `payload.score.red` | integer | yes | no | `0..9` | Revealed RED count |
+  | `payload.score.blue` | integer | yes | no | `0..8` | Revealed BLUE count |
+  | `payload.current_turn.team` | enum | yes | no | `RED`, `BLUE` | Active or terminal guessing team |
+  | `payload.current_turn.phase` | enum | yes | no | `WAITING_FOR_CLUE`, `GUESSING`, `GAME_OVER` | Result phase |
+  | `payload.current_turn.guesses_remaining` | integer or null | yes | yes | `0..10`, `null` | Remaining in `GUESSING`; null otherwise |
+  | `payload.winner` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Terminal winner |
+  | `payload.end_reason` | enum or null | yes | yes | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `null` | Terminal cause |
+
+  ## Outcome examples
+
+  These are independent branches from the canonical fixed map: RED cards are `1,3,5,7,9,11,13,15,17`; BLUE cards are `2,4,6,8,10,12,14,16`; neutral cards are `18..24`; assassin is `25`.
+
+  ### Own card — continue
+
+  Baseline is RED guessing with 3 guesses and score `2-2`. Card `5` is RED:
+
+  ```json
+  {"type":"ack","request_id":"req_0030","ok":true,"payload":{"game_id":5001,"card":{"card_id":5,"word":"OCEAN","revealed":true,"color":"RED"},"guessing_team":"RED","score":{"red":3,"blue":2},"current_turn":{"team":"RED","phase":"GUESSING","clue":{"word":"ocean","number":2},"guesses_remaining":2},"winner":null,"end_reason":null}}
+  ```
+
+  `game.card.revealed` is followed by `game.score.updated`; no turn event occurs.
+
+  ### Own card — last allowed guess
+
+  Baseline has one guess remaining. Card `7` is RED; score increases and the guess count reaches zero, so BLUE becomes active:
+
+  ```json
+  {"type":"ack","request_id":"req_0031","ok":true,"payload":{"game_id":5001,"card":{"card_id":7,"word":"LASER","revealed":true,"color":"RED"},"guessing_team":"RED","score":{"red":4,"blue":2},"current_turn":{"team":"BLUE","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},"winner":null,"end_reason":null}}
+  ```
+
+  ### Own final card — RED wins
+
+  With eight RED cards already revealed, card `17` completes RED:
+
+  ```json
+  {"type":"game.ended","event_id":"evt_0180","room_id":1001,"sent_at":"2026-09-10T08:50:00Z","payload":{"game_id":5001,"winner":"RED","loser":"BLUE","end_reason":"ALL_TEAM_CARDS_REVEALED","revealed_card":{"card_id":17,"word":"ROME","revealed":true,"color":"RED"},"score":{"red":9,"blue":5},"room_status":"FINISHED","phase":"GAME_OVER","finished_at":"2026-09-10T08:50:00Z"}}
+  ```
+
+  ### Opponent card — turn ends
+
+  RED reveals BLUE card `6`; BLUE score increases and BLUE becomes active:
+
+  ```json
+  {"type":"ack","request_id":"req_0033","ok":true,"payload":{"game_id":5001,"card":{"card_id":6,"word":"KING","revealed":true,"color":"BLUE"},"guessing_team":"RED","score":{"red":2,"blue":3},"current_turn":{"team":"BLUE","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},"winner":null,"end_reason":null}}
+  ```
+
+  ### Opponent final card — BLUE wins
+
+  With seven BLUE cards already revealed, RED reveals BLUE card `16`:
+
+  ```json
+  {"type":"game.ended","event_id":"evt_0181","room_id":1001,"sent_at":"2026-09-10T08:51:00Z","payload":{"game_id":5001,"winner":"BLUE","loser":"RED","end_reason":"ALL_TEAM_CARDS_REVEALED","revealed_card":{"card_id":16,"word":"HEART","revealed":true,"color":"BLUE"},"score":{"red":6,"blue":8},"room_status":"FINISHED","phase":"GAME_OVER","finished_at":"2026-09-10T08:51:00Z"}}
+  ```
+
+  ### Neutral — turn ends
+
+  ```json
+  {"type":"ack","request_id":"req_0035","ok":true,"payload":{"game_id":5001,"card":{"card_id":18,"word":"WHALE","revealed":true,"color":"NEUTRAL"},"guessing_team":"RED","score":{"red":2,"blue":2},"current_turn":{"team":"BLUE","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},"winner":null,"end_reason":null}}
+  ```
+
+  ### Assassin — instant loss
+
+  RED reveals card `25`, so BLUE wins regardless of score:
+
+  ```json
+  {"type":"game.ended","event_id":"evt_0182","room_id":1001,"sent_at":"2026-09-10T08:52:00Z","payload":{"game_id":5001,"winner":"BLUE","loser":"RED","end_reason":"ASSASSIN_REVEALED","revealed_card":{"card_id":25,"word":"CLOUD","revealed":true,"color":"ASSASSIN"},"score":{"red":2,"blue":2},"room_status":"FINISHED","phase":"GAME_OVER","finished_at":"2026-09-10T08:52:00Z"}}
+  ```
+
+  ## Errors and state guarantees
+
+  - `ROLE_FORBIDDEN`: Spymaster guesses.
+  - `NOT_YOUR_TURN`: inactive team member guesses.
+  - `INVALID_ROOM_STATE`: room is not `IN_GAME` or phase is not `GUESSING`.
+  - `INVALID_CARD`: ID is missing, non-integer, outside the board, or absent from this game.
+  - `CARD_ALREADY_REVEALED`: card is already public.
+  - `NO_GUESSES_REMAINING`: stale command arrives after count reached zero.
+  - `GAME_ALREADY_FINISHED`: terminal result already exists.
+
+  ```json
+  {"type":"error","request_id":"req_0037","error":{"code":"CARD_ALREADY_REVEALED","message":"Card 1 has already been revealed.","details":{"card_id":1}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0038","error":{"code":"NOT_YOUR_TURN","message":"BLUE cannot guess while RED is the active team.","details":{"active_team":"RED"}}}
+  ```
+
+  All errors preserve card, score, guesses, phase, and turn and emit no success event.

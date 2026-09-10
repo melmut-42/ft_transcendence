@@ -1,0 +1,75 @@
+info:
+  name: Pass turn
+  type: websocket
+  seq: 3
+  tags: [action, game]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+  message:
+    - title: Success - RED Operative passes
+      selected: true
+      message: {type: json, data: '{"type":"game.turn.pass","request_id":"req_0040","payload":{}}'}
+    - title: Error - Spymaster cannot pass
+      selected: false
+      message: {type: json, data: '{"type":"game.turn.pass","request_id":"req_0041","payload":{}}'}
+    - title: Error - Waiting for clue
+      selected: false
+      message: {type: json, data: '{"type":"game.turn.pass","request_id":"req_0042","payload":{}}'}
+docs: |-
+  # Pass turn
+
+  ## Purpose and preconditions
+
+  Lets an active-team Operative voluntarily stop guessing while at least one guess remains. Room must be `IN_GAME`, phase `GUESSING`, and game unfinished.
+
+  ## Message and payload parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Actor identity | `sess_A3redAgent9Kp` |
+  | `type` | envelope | yes | string enum | `game.turn.pass` | no | Operation | `game.turn.pass` |
+  | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0040` |
+  | `payload` | payload | yes | object | empty object | no | Pass has no additional inputs | `{}` |
+
+  ## Success behavior and response fields
+
+  The turn changes to the opponent in `WAITING_FOR_CLUE`; clue and guesses become null. Board and score do not change.
+
+  ```json
+  {"type":"ack","request_id":"req_0040","ok":true,"payload":{"game_id":5001,"passed_by_user_id":43,"previous_team":"RED","current_turn":{"team":"BLUE","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},"score":{"red":3,"blue":2}}}
+  ```
+
+  ```json
+  {"type":"game.turn.changed","event_id":"evt_0170","room_id":1001,"sent_at":"2026-09-10T08:47:00Z","payload":{"game_id":5001,"previous_team":"RED","reason":"PASSED","current_turn":{"team":"BLUE","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},"score":{"red":3,"blue":2}}}
+  ```
+
+  `reason` is `PASSED | GUESSES_EXHAUSTED | OPPONENT_CARD_REVEALED | NEUTRAL_CARD_REVEALED` across turn-change events.
+
+  | Result field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `payload.game_id` | integer | yes | no | positive | Match |
+  | `payload.passed_by_user_id` | integer | ack only | no | active Operative ID | Actor |
+  | `payload.previous_team` | enum | yes | no | `RED`, `BLUE` | Team that ended guessing |
+  | `payload.reason` | enum | event only | no | `PASSED` | Cause for this command |
+  | `payload.current_turn.team` | enum | yes | no | opponent team | New active team |
+  | `payload.current_turn.phase` | enum | yes | no | `WAITING_FOR_CLUE` | New phase |
+  | `payload.current_turn.clue` | null | yes | yes | `null` | Cleared previous clue |
+  | `payload.current_turn.guesses_remaining` | null | yes | yes | `null` | No guesses before next clue |
+  | `payload.score.red` | integer | yes | no | `0..9` | Unchanged revealed RED count |
+  | `payload.score.blue` | integer | yes | no | `0..8` | Unchanged revealed BLUE count |
+
+  ## Errors and invariants
+
+  `ROLE_FORBIDDEN` for a Spymaster; `NOT_YOUR_TURN` for inactive team; `INVALID_ROOM_STATE` outside `IN_GAME` or `GUESSING`; `NO_GUESSES_REMAINING` for a stale pass; `GAME_ALREADY_FINISHED` after terminal result. Errors preserve turn and socket.
+
+  ```json
+  {"type":"error","request_id":"req_0041","error":{"code":"ROLE_FORBIDDEN","message":"Only an active-team Operative may pass the guessing turn.","details":{"required_role":"OPERATIVE"}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0042","error":{"code":"INVALID_ROOM_STATE","message":"A turn can be passed only during GUESSING.","details":{"phase":"WAITING_FOR_CLUE"}}}
+  ```

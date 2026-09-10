@@ -1,0 +1,95 @@
+info:
+  name: Join room
+  type: http
+  seq: 2
+  tags: [rooms]
+http:
+  method: POST
+  url: "{{baseUrl}}/api/rooms/{{roomId}}/members"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+    - name: Accept
+      value: application/json
+docs: |-
+  # Join room
+
+  ## Purpose and preconditions
+
+  Adds the authenticated user as an unconfigured member. The room must exist and be exactly `WAITING`; the user must have no active room. No body is accepted.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | path | yes | integer | positive | no | Room to join | `1001` |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Joining user | `sess_A3redAgent9Kp` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Response fields
+
+  `201 Created` returns `{data: room_snapshot}`. The new item has `team:null`, `role:null`, `ready:false`, `is_host:false`, and a UTC `joined_at`. `player_count` increments and `startable` is recomputed.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.room_id` | integer | yes | no | positive | Joined room |
+  | `data.status` | string enum | yes | no | `WAITING` | Joinable lifecycle state |
+  | `data.host_user_id` | integer | yes | no | member ID | Current host |
+  | `data.player_count` | integer | yes | no | `>= 2` in this flow | Count after join |
+  | `data.startable` | boolean | yes | no | `false` | New member is unconfigured, so full predicate fails |
+  | `data.players[]` | array<object> | yes | no | members in join order | Membership snapshot |
+  | `data.players[].user_id` | integer | yes | no | positive | Member ID |
+  | `data.players[].username` | string | yes | no | username rule | Display name |
+  | `data.players[].team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
+  | `data.players[].role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Temporary role |
+  | `data.players[].ready` | boolean | yes | no | `true`, `false` | Current readiness |
+  | `data.players[].is_host` | boolean | yes | no | `true`, `false` | Host marker |
+  | `data.players[].joined_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Membership order |
+  | `data.game` | object or null | yes | yes | `null` on join | Game absent in `WAITING` |
+  | `data.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Room creation time |
+
+  ## State changes and emitted events
+
+  Sets `active_room_id`, emits `room.player.joined`, then emits a role-safe `room.state`. A join can never trigger countdown because the new unconfigured member makes the start predicate false.
+
+  ## Errors
+
+  | Status | Code | When | State change |
+  | --- | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session | none |
+  | `404` | `ROOM_NOT_FOUND` | room ID absent | none |
+  | `409` | `ROOM_NOT_JOINABLE` | state is `COUNTDOWN`, `IN_GAME`, `FINISHED`, or `CLOSED` | none |
+  | `409` | `ALREADY_IN_ROOM` | user already has active room, including this one | none |
+  | `422` | `VALIDATION_ERROR` | room ID is not positive integer | none |
+
+  ## Invariants
+
+  No capacity maximum is imposed. Joining is forbidden as soon as countdown begins.
+examples:
+  - name: Success - Join empty-team room
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":2,"startable":false,"players":[{"user_id":42,"username":"player_one","team":null,"role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}
+  - name: Success - Fifth player joins
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_extraRed46, enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":5,"startable":false,"players":[{"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},{"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},{"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"},{"user_id":46,"username":"extra_red","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:50Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}
+  - name: Error - Room not found
+    request: {url: "{{baseUrl}}/api/rooms/9999/members", method: POST, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
+    response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}
+  - name: Error - Countdown already started
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_extraRed46, enabled: true}], params: [], body: {mode: none}}
+    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_JOINABLE","message":"Room 1001 is not joinable while status is COUNTDOWN.","details":{"room_id":1001,"status":"COUNTDOWN"}}}'}}
+  - name: Error - Already in another room
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_extraRed46, enabled: true}], params: [], body: {mode: none}}
+    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"User 46 already belongs to active room 1002.","details":{"room_id":1002}}}'}}

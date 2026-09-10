@@ -1,0 +1,62 @@
+info:
+  name: Get own profile
+  type: http
+  seq: 1
+  tags: [profile]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/users/me"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+    - name: Accept
+      value: application/json
+docs: |-
+  # Get own profile
+
+  ## Purpose and preconditions
+
+  Returns authenticated persistent statistics plus the current room link. Requires an active session.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Authenticates the owner | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.user_id` | integer | yes | no | positive | Persistent user ID |
+  | `data.username` | string | yes | no | username rule | Display username |
+  | `data.level` | integer | yes | no | `>= 1` | Persistent progression level |
+  | `data.wins` | integer | yes | no | `>= 0` | Finished matches won |
+  | `data.losses` | integer | yes | no | `>= 0` | Finished matches lost |
+  | `data.matches_played` | integer | yes | no | `wins + losses` | Total settled matches |
+  | `data.active_room_id` | integer or null | yes | yes | positive or `null` | Temporary room membership link |
+  | `data.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Account creation time |
+
+  ## State changes, events, and errors
+
+  Read-only; no event. Invalid sessions return `401 UNAUTHORIZED`. Team, role, ready, score, and board are intentionally absent because they are room state.
+examples:
+  - name: Success - Persistent stats with active room
+    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"data":{"user_id":42,"username":"player_one","level":4,"wins":12,"losses":8,"matches_played":20,"active_room_id":1001,"created_at":"2026-08-01T10:00:00Z"}}'}
+  - name: Success - Persistent stats without room
+    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"data":{"user_id":42,"username":"player_one","level":4,"wins":12,"losses":8,"matches_played":20,"active_room_id":null,"created_at":"2026-08-01T10:00:00Z"}}'}
+  - name: Error - Unauthorized
+    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 401
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"UNAUTHORIZED","message":"A valid active session is required.","details":{}}}'}

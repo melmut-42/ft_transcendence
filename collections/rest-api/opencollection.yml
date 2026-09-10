@@ -1,8 +1,8 @@
 opencollection: 1.0.0
 
 info:
-  name: 🌐 REST API
-  version: 1.3.0
+  name: REST API
+  version: 1.0.0-draft
 config:
   proxy:
     inherit: true
@@ -17,44 +17,54 @@ config:
 
 docs:
   content: |-
-    # 🌐 ft_transcendence REST API
+    # ft_transcendence REST API
 
-    Welcome to the HTTP side of the `ft_transcendence` API. 🚀 This collection is a practical reference for onboarding, smoke testing, regression checks, and investigating the room lifecycle without guessing at undocumented endpoints.
+    ## Transport and session
 
-    ## 🎯 What this collection covers
+    Base URL: `{{baseUrl}}` (`http://localhost:3000` locally). JSON requests send `Content-Type: application/json`; JSON responses send the same media type. Protected endpoints require `X-Session-Id: {{sessionToken}}`, an opaque token created by username registration. Tokens are never URL parameters.
 
-    - 👤 Temporary username entry and session creation through `POST /users/enter`
-    - ➕ Room creation through `POST /rooms`
-    - 🔗 Room joining through `POST /rooms/join`
-    - 📊 Authoritative room snapshots through `GET /rooms/:room_id`
-    - ✅ Successful response examples and ❌ contract-level error scenarios
+    ## Response envelopes
 
-    ## 🌍 Before you send a request
+    Every non-empty success is `{ "data": value }`. `204 No Content` has no body. Every error is `{ "error": { "code": string, "message": string, "details": object } }`; `details` is always an object and may be empty.
 
-    1. Start the backend on `http://localhost:3000`.
-    2. Select the workspace-level `local` environment.
-    3. Run `Enter user` to create the host session. Set `guest_session_id` manually when testing the prepared guest join scenario.
-    4. Run `Create room as host` to populate `room_id` for the remaining smoke flow.
+    ## Endpoint matrix
 
-    The base URL comes from `{{baseUrl}}`. Protected requests send `X-Session-Id`; this is temporary session authentication, not password, JWT, or production identity management. 🔐
+    | Method | Path | Purpose | Auth | Main requirement |
+    | --- | --- | --- | --- | --- |
+    | `GET` | `/api/health` | Contract/service health | no | none |
+    | `POST` | `/api/auth/register` | Create username and session | no | valid unique username |
+    | `GET` | `/api/auth/session` | Read current session identity | yes | active session |
+    | `DELETE` | `/api/auth/session` | Revoke current session | yes | active session |
+    | `GET` | `/api/users/me` | Own persistent profile | yes | active session |
+    | `GET` | `/api/users/{user_id}` | Public persistent profile | yes | user exists |
+    | `POST` | `/api/rooms` | Create and host a room | yes | not in active room |
+    | `POST` | `/api/rooms/{room_id}/members` | Join a room | yes | `WAITING`, not in active room |
+    | `GET` | `/api/rooms/{room_id}` | Role-safe room/game snapshot | yes | room member |
+    | `DELETE` | `/api/rooms/{room_id}/members/me` | Leave room | yes | room member; not `IN_GAME` |
 
-    ## 🧭 Recommended workflow
+    ## Status conventions
 
-    `Enter user` → `Create room as host` → `Get room state` → `Join room` → `Get room state`
+    `200` reads/updates; `201` creation/join; `204` session deletion or leave; `400` malformed syntax; `401` authentication; `403` access; `404` missing entity; `409` uniqueness/lifecycle conflict; `422` field validation; `429` throttling.
 
-    Runtime scripts chain the host session and room identifier between requests. `Join room` uses the prepared `guest_session_id` and is intentionally manual. Native examples group the known success and error outcomes under each endpoint.
+    ## Domain and lifetime
 
-    ## 📤 Reading responses
+    IDs are positive integers, timestamps are ISO 8601 UTC, JSON is snake_case, and enums are UPPER_SNAKE_CASE. Profiles expose persistent wins, losses, level, and match history. Room team, role, readiness, board, clue, turn, and score are temporary. `room_id` always names the same integer domain value used by WebSocket.
 
-    Room responses are authoritative snapshots. Room states include `WAITING`, `READY`, `IN_PROGRESS`, and `FINISHED`; a room needs four players before the host can start a game through the shared WebSocket. The saved examples in this collection verify the waiting-room shape with `game: null`; no populated started or finished game schema is available in this repository. Review the native response examples on each request before exercising a manual scenario.
+    ## REST/WebSocket boundary
 
-    > ⚠️ **Prepared-state scenarios**
-    >
-    > Outsider access and in-progress/finished-room tests require IDs and sessions prepared outside the default smoke flow. Do not replace the documented placeholders with real secrets in Git.
+    REST bootstraps identity and membership and returns recoverable snapshots. Team/role/readiness and gameplay mutations are WebSocket-only. The REST room snapshot is server-authoritative and recipient-specific: an Operative never receives unrevealed card colors.
 
-    ## 🔖 Version
+    ## Example index
 
-    This collection is version `1.1.0`. The version tracks the documented workspace structure and coverage, not a new backend API release.
+    - Minimum and invalid waiting rooms: `03 - Rooms/Get room snapshot`
+    - Joinability and membership failures: `03 - Rooms/Join room`
+    - Complete started-game Operative projection: `03 - Rooms/Get room snapshot`
+    - Countdown and both role projections: WebSocket `07 - Full State Scenarios`
+    - Clue and all reveal outcomes: WebSocket `04 - Game`
+
+    ## Environment
+
+    Select `local`. Registration stores `sessionToken` and `userId`; room creation stores `roomId`. The canonical fixtures use users `42` through `47`, room `1001`, and game `5001`.
   type: text/markdown
 bundled: false
 extensions: {}

@@ -1,0 +1,47 @@
+info:
+  name: End current session
+  type: http
+  seq: 3
+  tags: [identity]
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/auth/session"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+docs: |-
+  # End current session
+
+  ## Purpose and preconditions
+
+  Revokes the current opaque token. The user and persistent statistics remain. A member must leave an active room before ending the session so room presence cannot become ownerless.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Token to revoke | `sess_7Hk2mQ9vLc4R8pXa` |
+
+  ## Success, state changes, and events
+
+  `204 No Content` has no body and makes the token unusable for REST or WebSocket. It emits no room event because active-room membership is prohibited by precondition.
+
+  ## Errors
+
+  `401 UNAUTHORIZED` covers invalid/revoked tokens. `409 ALREADY_IN_ROOM` means `active_room_id` is non-null; the token remains valid and the client must leave first.
+examples:
+  - name: Success - Session revoked
+    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    response: {status: 204, headers: [], body: {type: text, data: ""}}
+  - name: Error - Active room must be left
+    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 409
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"Leave room 1001 before ending the session.","details":{"room_id":1001}}}'}
+  - name: Error - Session already revoked
+    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: X-Session-Id, value: sess_revoked, enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 401
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"UNAUTHORIZED","message":"A valid active session is required.","details":{}}}'}

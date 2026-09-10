@@ -4,125 +4,159 @@ info:
   type: workspace
 
 collections:
-  - name: "🌐 REST API"
+  - name: "REST API"
     path: "collections/rest-api"
-  - name: "⚡ WebSocket API"
+  - name: "WebSocket"
     path: "collections/websocket"
 
 specs:
 
 docs: |-
-  # 🚀 ft_transcendence Bruno workspace
+  # ft_transcendence API Contract
 
-  This workspace is the version-controlled API testing and documentation surface for the `ft_transcendence` project. It is designed for backend development, frontend integration, QA, regression testing, debugging, onboarding, and interactive real-time protocol checks.
+  > **Contract status:** Draft product contract for frontend and backend implementation. Examples are normative fixtures; they do not claim that every operation is implemented yet.
 
-  The workspace intentionally documents only the known application contract. It does not add chat, tournaments, friends, notifications, passwords, JWT, or other unsupported modules.
+  ## Project Overview
 
-  ## 📚 Collections
+  `ft_transcendence` is a four-or-more-player, two-team word-association game inspired by Codenames. Players enter with a stable username identity, create or join one active room, select a team and temporary room role, become ready, and play through a server-authoritative realtime protocol.
 
-  ### 🌐 REST API
+  ## Source of Truth
 
-  The REST collection contains the temporary username/session bootstrap and room lifecycle endpoints:
+  Conflicts are resolved in this order: explicit product rules in the September 2026 contract brief; its game and UI flows; compatible established project naming; old Bruno material; current backend evidence; then the general school subject. This workspace specifies intended behavior even when implementation differs.
 
-  - `POST /users/enter`
-  - `POST /rooms`
-  - `POST /rooms/join`
-  - `GET /rooms/:room_id`
+  ## User Flow
 
-  It includes happy paths, validation failures, authentication failures, membership/authorization failures, missing rooms, duplicate membership, and prepared-state room errors.
+  ```mermaid
+  flowchart TD
+      A[Lobby] --> B[Create or join room]
+      B --> C[WAITING room]
+      C --> D[Choose RED or BLUE]
+      C --> E[Choose SPYMASTER or OPERATIVE]
+      D --> F[Set ready]
+      E --> F
+      F --> G{Every start invariant valid?}
+      G -->|No| C
+      G -->|Yes| H[COUNTDOWN]
+      H -->|Invariant breaks| C
+      H -->|Completes validly| I[IN_GAME]
+      I --> J[FINISHED]
+  ```
 
-  ### ⚡ WebSocket API
+  ## Room Lifecycle
 
-  The WebSocket collection documents the shared raw WebSocket connection:
+  ```mermaid
+  stateDiagram-v2
+      [*] --> WAITING
+      WAITING --> COUNTDOWN: every start invariant becomes valid
+      COUNTDOWN --> WAITING: any invariant becomes invalid
+      COUNTDOWN --> IN_GAME: countdown completes while valid
+      IN_GAME --> FINISHED: terminal game result
+      WAITING --> CLOSED: last member leaves
+      FINISHED --> CLOSED: room closes
+  ```
 
-  `{{wsUrl}}/ws?session_id={{session_id}}`
+  `WAITING` is the only joinable state. A creator joins automatically and becomes host. One user may belong to only one active room. If a host leaves during `WAITING`, the longest-present remaining member becomes host; the room becomes `CLOSED` when empty. No rematch transition is defined.
 
-  It is organized into concise connection, client action, server event, and error requests. The known client events are `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn`. The known server events are `player_joined`, `player_left`, `game_started`, `clue_given`, `card_revealed`, `turn_changed`, `player_disconnected`, `player_reconnected`, `game_finished`, and `game_action_logged`.
+  ## Game Lifecycle
 
-  ## 🌍 Local setup
+  ```mermaid
+  stateDiagram-v2
+      [*] --> WAITING_FOR_CLUE
+      WAITING_FOR_CLUE --> GUESSING: active Spymaster submits clue word and N
+      GUESSING --> GUESSING: own card and guesses remain
+      GUESSING --> WAITING_FOR_CLUE: pass, neutral, opponent card, or guesses exhausted
+      GUESSING --> GAME_OVER: assassin or either team's final card
+      GAME_OVER --> [*]
+  ```
 
-  1. Start the `ft_transcendence` backend so it listens on `http://localhost:3000`.
-  2. Open this workspace directory in Bruno.
-  3. Select the workspace-level `local` environment.
-  4. Run the REST requests in the documented order.
-  5. Open `connect` after a session exists to inspect the shared WebSocket.
-  6. Use the manual/prepared-state requests only when their documented prerequisites are satisfied.
+  `room.status` and `game.current_turn.phase` are separate. Room status uses `WAITING | COUNTDOWN | IN_GAME | FINISHED | CLOSED`; game phase uses `WAITING_FOR_CLUE | GUESSING | GAME_OVER`.
 
-  The committed environment has safe local defaults and blank session variables. It contains no real credentials or production secrets.
+  ## Identity Model
 
-  ## ⚙️ Environment and authentication
+  Registration accepts only `{ "username": "player_one" }`. The server trims the string and validates `^[A-Za-z0-9_]{3,20}$`; uniqueness is case-insensitive. There is no email or password. Successful registration creates a stable user plus an opaque session token. REST sends it as `X-Session-Id`; WebSocket sends the same token as a handshake header. A client cannot claim an existing username without that session.
 
-  The `local` environment defines `baseUrl`, `wsUrl`, temporary session variables, room chaining variables, and optional prepared-state IDs such as `guest_session_id`.
+  ## Teams and Roles
 
-  REST authentication is temporary username-based session authentication. `POST /users/enter` returns a user, a temporary session, an expiry value, and the current active room. Protected REST requests send `X-Session-Id`.
+  Teams are exactly `RED` and `BLUE`. Temporary room roles are exactly `SPYMASTER` and `OPERATIVE`. A configured member has one team and one role. A startable room has at least four players, exactly one Spymaster on each team, and at least one Operative on each team.
 
-  WebSocket authentication is separate at the transport level: the session is supplied as the `session_id` query parameter during the handshake. The socket is shared by room and game events; events are not separate HTTP routes.
+  ## Start Conditions
 
-  ## 🧭 Main workflows
+  Let `P` be all participating room members. The server enters `COUNTDOWN` exactly when all clauses are true:
 
-  ### 🌐 REST room workflow
+  ```text
+  |P| >= 4
+  AND every p in P has team in {RED, BLUE}
+  AND every p in P has role in {SPYMASTER, OPERATIVE}
+  AND count(RED, SPYMASTER) = 1
+  AND count(BLUE, SPYMASTER) = 1
+  AND count(RED, OPERATIVE) >= 1
+  AND count(BLUE, OPERATIVE) >= 1
+  AND every p in P has ready = true
+  AND room.status is WAITING or a still-valid COUNTDOWN
+  ```
 
-  Run these requests in order:
+  A member may set `ready=true` only after choosing team and role. Changing either choice sets `ready=false`. The server re-evaluates all clauses after ready, team, role, join, and leave changes. Invalidating a countdown cancels it and returns the room to `WAITING`; no host start action exists.
 
-  1. `Enter user`
-  2. `Create room as host`
-  3. `Get room state`
-  4. Set a prepared `guest_session_id` and run `Join room`
-  5. `Get room state`
+  ## Game Rules
 
-  `Enter user` generates a unique username. Runtime scripts capture the host session, user ID, and created room ID; the guest session is a manual prepared-state value.
+  The board has 25 cards. The randomly selected starting team owns 9; the other team owns 8; 7 are `NEUTRAL`; 1 is `ASSASSIN`. Only the active team's Spymaster may submit one normalized clue word plus integer `N` from `1` through `9`. This draft imposes only: trim, Unicode lowercase storage, a single non-empty whitespace-free word, length `1..30`, and the numeric range. It does not add advanced official clue restrictions.
 
-  ### 🎮 Game/WebSocket workflow
+  A clue grants `N + 1` guesses. An own-team reveal increments that color's score, consumes one guess, and may continue. An opponent reveal increments the opponent score and ends the turn unless it completes that opponent's set, which makes the opponent win immediately. A neutral reveal ends the turn. The assassin ends the match immediately and the guessing team's opponent wins. Operatives may pass during `GUESSING`. Terminal conditions are checked before any turn change.
 
-  Prepare a room with the required number of players, open `connect`, and then use the action request that matches the current role, turn, and game state. Only `give_clue` has a verified field-level payload example in the known contract. Its message is disabled by default because sending it changes game state.
+  `score.red` is the number of revealed `RED` cards; `score.blue` is the number of revealed `BLUE` cards. The first team whose full set is revealed wins. The winner is never decided by comparing scores after all 25 cards.
 
-  ## 🔗 Request chaining and testing
+  ## Data Visibility
 
-  The REST bootstrap uses before-request scripts to generate unique usernames and after-response scripts to store returned IDs in runtime variables. Tests validate HTTP status, response structure, room lifecycle status, and contract error codes.
+  The server creates a projection for each recipient. Spymasters see every card affiliation. Operatives receive `color: null` for every unrevealed card and the true color after reveal. A universal secret-bearing board payload MUST NOT be broadcast. This applies to REST snapshots, initial `game.started`, reconnect `game.state`, and reveal events.
 
-  Native response examples are grouped under the canonical endpoint requests. They cover invalid input, missing sessions, duplicate usernames/membership, missing resources, forbidden access, and room states that are not joinable.
+  ## Temporary vs Persistent State
 
-  Do not batch-run the entire WebSocket collection. WebSocket requests are interactive observers or manually enabled action references, and some require a prepared game state.
+  `username`, level, wins, losses, and supported match history are persistent user data. Team, role, ready status, room membership, board, clue, guesses, turn, and score are room/game-scoped and never become permanent account roles. Leaving or closing a room clears temporary membership data as appropriate.
 
-  ## ⚡ WebSocket rules
+  ## REST vs WebSocket Responsibility
 
-  - Every room requires exactly four players before the host can start a game.
-  - Only the host can start the game.
-  - The spymaster sends a clue while the game is waiting for a clue.
-  - Accepted clues move the game into guessing.
-  - Card reveals occur during guessing.
-  - The backend determines the reveal result. Clients must never submit `card_type`, `correct`, or a predicted result.
-  - `end_turn` is supported during guessing.
-  - The server validates identity, membership, role, turn, and state.
-  - Rejected actions must not mutate state or create a successful action log.
-  - Spymasters may receive card types; operatives receive `card_type: null` before the game ends.
+  REST owns registration/session bootstrap, profiles, room creation, membership join, snapshots, and leaving. Once a member joins the realtime channel, team, role, readiness, countdown, clue, guess, pass, and live state propagation use WebSocket. REST and WebSocket share field names and domain enums.
 
-  ## ⚠️ Known limitations
+  ## Error Philosophy
 
-  The application contract provides only one complete client payload example: `give_clue`. The other client event files therefore contain disabled reference messages rather than guessed fields. Server event files intentionally record the known event names without inventing undocumented payload shapes.
+  Malformed JSON is `400`; absent/invalid sessions are `401`; permission failures are `403`; missing resources are `404`; uniqueness or lifecycle conflicts are `409`; field validation is `422`; throttling is `429`. REST errors use `{ "error": { "code", "message", "details" } }`. WebSocket errors correlate to `request_id`, do not mutate state, and leave the socket open except handshake authentication failures or protocol-abuse closure.
 
-  Requests tagged `manual` require a valid prepared session or room state. For example, outsider access needs a session that is not a room member, and in-progress/finished-room join tests need room IDs in those states.
+  ## Common Data Types
 
-  ## 🛡️ Security guidance
+  | Concept | Contract type | Rule |
+  | --- | --- | --- |
+  | `user_id`, `room_id`, `game_id`, `card_id` | positive integer | Stable within entity lifetime |
+  | timestamps | `string<date-time>` | ISO 8601 UTC, for example `2026-09-10T08:43:12Z` |
+  | JSON fields | snake_case | Used by REST and WebSocket |
+  | enum values | UPPER_SNAKE_CASE | Closed value sets documented at each use |
+  | message types | lowercase.dot.notation | WebSocket only |
+  | booleans | JSON boolean | Never encoded as strings or integers |
 
-  Never commit production credentials, API keys, database credentials, passwords, or real session IDs. Session variables are marked secret and are blank in the committed environment. Use Bruno's local environment storage or process environment variables for sensitive values.
+  ## Example Fixture Dataset
 
-  ## 🧭 New developer checklist
+  | User ID | Username | Canonical assignment in room `1001` |
+  | ---: | --- | --- |
+  | `42` | `player_one` | `RED / SPYMASTER`, host |
+  | `43` | `red_agent` | `RED / OPERATIVE` |
+  | `44` | `blue_master` | `BLUE / SPYMASTER` |
+  | `45` | `blue_agent` | `BLUE / OPERATIVE` |
+  | `46` | `extra_red` | additional fixture |
+  | `47` | `extra_blue` | additional fixture |
 
-  - Switch to the `bruno` branch.
-  - Open the workspace directory in Bruno.
-  - Select the `local` environment.
-  - Start the backend on port 3000.
-  - Run the REST smoke workflow in order.
-  - Inspect native response examples from each request.
-  - Use the WebSocket connection after a valid session exists.
-  - Read each manual request's prerequisite documentation before sending it.
-  - Keep request names, examples, tests, and docs aligned with the backend contract.
+  The canonical match is `game_id=5001`. Related examples keep its word order and secret card map fixed.
 
-  ## 🔖 Workspace version
+  ## Environment Variables
 
-  The REST and WebSocket collections are both version `1.1.0`. This is a documentation and workspace-structure version; it does not claim a new backend API release.
+  The `local` environment defines `baseUrl=http://localhost:3000`, `wsUrl=ws://localhost:3000`, `sessionToken`, `userId`, `roomId`, and `gameId`. Registration and room creation scripts populate the first four runtime values. Secret session values remain blank in version control.
 
-  > 💡 **Contributor tip**
-  >
-  > When the backend contract changes, update the request, runtime scripts, tests, native examples, collection docs, and README together. Keep unknown payloads disabled until they are confirmed.
+  ## Chat Scope
+
+  Chat exists at product/UI level, but its permission and event contract is outside this revision because no authoritative chat rules are present in this repository or supplied brief.
+
+  ## Subject Compliance Note
+
+  > This contract intentionally models username-only identity with no email or password. That is a known product decision and conflicts with school-subject authentication expectations that may require email/password. The team must reconcile this before final evaluation; this draft does not conceal or pre-empt that decision.
+
+  ## Documentation Conventions
+
+  Request docs define preconditions, every input, response fields, state changes, emitted events, concrete errors, and invariants. Native Bruno HTTP examples and named WebSocket messages are normative examples. `null` is stated explicitly where legal; omitted fields are not implied. Examples use the fixture identities above and ISO UTC time.

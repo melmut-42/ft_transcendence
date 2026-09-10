@@ -1,0 +1,8 @@
+info:
+  name: 02 - Users & Profile
+  type: folder
+  seq: 2
+docs: |-
+  # Users and profiles
+
+  Profiles contain persistent identity and statistics: `wins`, `losses`, `level`, and supported match summaries. Temporary room team, role, readiness, score, board, clue, and turn never become account fields. The own profile may show `active_room_id`; public profiles omit session and active-room data.

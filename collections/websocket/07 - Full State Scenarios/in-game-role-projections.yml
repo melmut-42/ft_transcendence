@@ -1,0 +1,206 @@
+info:
+  name: Full IN_GAME role projections
+  type: websocket
+  seq: 1
+  tags: [scenario, game, privacy]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Full IN_GAME role projections
+
+  ## Purpose and preconditions
+
+  These two `game.started` frames are normative projections of the same logical room `1001`, game `5001`, board, timestamp, players, turn, and score immediately after a valid countdown. This request is a passive observer and sends no application message.
+
+  The request connects with required positive-integer path `room_id=1001` and required handshake header `X-Session-Id`, whose active session determines whether the returned board is the Spymaster or Operative projection.
+
+  ## Projection rule
+
+  | Viewer | Unrevealed `board[].color` | Revealed `board[].color` |
+  | --- | --- | --- |
+  | `SPYMASTER` | actual `RED`, `BLUE`, `NEUTRAL`, or `ASSASSIN` | actual color |
+  | `OPERATIVE` | `null` | actual color |
+
+  Words, IDs, order, reveal flags, score, players, and turn are identical. The server generates one payload per recipient and never sends the Spymaster version to an Operative.
+
+  ## Response field schema
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `type` | string enum | yes | no | `game.started` | Lifecycle event |
+  | `event_id` | string | yes | no | room-unique | Ordered event ID |
+  | `room_id` | integer | yes | no | positive | Envelope room |
+  | `sent_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Event time |
+  | `payload.room.room_id` | integer | yes | no | same as envelope | Domain room ID |
+  | `payload.room.status` | enum | yes | no | `IN_GAME` | Post-countdown state |
+  | `payload.room.host_user_id` | integer | yes | no | member ID | Host |
+  | `payload.room.player_count` | integer | yes | no | `>= 4` | Participants |
+  | `payload.room.startable` | boolean | yes | no | `false` | Start predicate is only actionable in `WAITING` |
+  | `payload.room.players[]` | array<object> | yes | no | configured members | Join-ordered membership |
+  | `payload.room.players[].user_id` | integer | yes | no | positive | Member |
+  | `payload.room.players[].username` | string | yes | no | username rule | Display name |
+  | `payload.room.players[].team` | enum | yes | no | `RED`, `BLUE` | Match team |
+  | `payload.room.players[].role` | enum | yes | no | `SPYMASTER`, `OPERATIVE` | Match role |
+  | `payload.room.players[].ready` | boolean | yes | no | `true` | Frozen start confirmation |
+  | `payload.room.players[].is_host` | boolean | yes | no | `true`, `false` | Exactly one true |
+  | `payload.room.players[].joined_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Join order |
+  | `payload.room.game.game_id` | integer | yes | no | positive | Match |
+  | `payload.room.game.starting_team` | enum | yes | no | `RED`, `BLUE` | Team with 9 cards and first clue |
+  | `payload.room.game.current_turn.team` | enum | yes | no | `RED`, `BLUE` | Active team |
+  | `payload.room.game.current_turn.phase` | enum | yes | no | `WAITING_FOR_CLUE` | Initial phase |
+  | `payload.room.game.current_turn.clue` | null | yes | yes | `null` | No clue yet |
+  | `payload.room.game.current_turn.guesses_remaining` | null | yes | yes | `null` | No guesses before clue |
+  | `payload.room.game.score.red` | integer | yes | no | `0..9` | Revealed RED cards |
+  | `payload.room.game.score.blue` | integer | yes | no | `0..8` | Revealed BLUE cards |
+  | `payload.room.game.board[]` | array<object> | yes | no | exactly 25 | Ordered board |
+  | `payload.room.game.board[].card_id` | integer | yes | no | unique `1..25` | Card ID |
+  | `payload.room.game.board[].word` | string | yes | no | canonical word | Public word |
+  | `payload.room.game.board[].revealed` | boolean | yes | no | `false` initially | Reveal state |
+  | `payload.room.game.board[].color` | enum or null | yes | yes | `RED`, `BLUE`, `NEUTRAL`, `ASSASSIN`, `null` | Null only for an Operative's unrevealed card |
+  | `payload.room.game.winner` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Null at start |
+  | `payload.room.game.end_reason` | enum or null | yes | yes | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `null` | Null at start |
+  | `payload.room.game.started_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Game start |
+  | `payload.room.game.finished_at` | `string<date-time>` or null | yes | yes | UTC or `null` | Null at start |
+  | `payload.room.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Room creation |
+
+  ## Complete Spymaster-visible `game.started`
+
+  ```json
+  {
+    "type": "game.started",
+    "event_id": "evt_0137",
+    "room_id": 1001,
+    "sent_at": "2026-09-10T08:43:15Z",
+    "payload": {
+      "room": {
+        "room_id": 1001,
+        "status": "IN_GAME",
+        "host_user_id": 42,
+        "player_count": 4,
+        "startable": false,
+        "players": [
+          {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},
+          {"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},
+          {"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},
+          {"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"}
+        ],
+        "game": {
+          "game_id": 5001,
+          "starting_team": "RED",
+          "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},
+          "score": {"red":0,"blue":0},
+          "board": [
+            {"card_id":1,"word":"MOON","revealed":false,"color":"RED"},
+            {"card_id":2,"word":"APPLE","revealed":false,"color":"BLUE"},
+            {"card_id":3,"word":"TRAIN","revealed":false,"color":"RED"},
+            {"card_id":4,"word":"BRIDGE","revealed":false,"color":"BLUE"},
+            {"card_id":5,"word":"OCEAN","revealed":false,"color":"RED"},
+            {"card_id":6,"word":"KING","revealed":false,"color":"BLUE"},
+            {"card_id":7,"word":"LASER","revealed":false,"color":"RED"},
+            {"card_id":8,"word":"FOREST","revealed":false,"color":"BLUE"},
+            {"card_id":9,"word":"DOCTOR","revealed":false,"color":"RED"},
+            {"card_id":10,"word":"GLASS","revealed":false,"color":"BLUE"},
+            {"card_id":11,"word":"DRAGON","revealed":false,"color":"RED"},
+            {"card_id":12,"word":"TABLE","revealed":false,"color":"BLUE"},
+            {"card_id":13,"word":"SATURN","revealed":false,"color":"RED"},
+            {"card_id":14,"word":"SNOW","revealed":false,"color":"BLUE"},
+            {"card_id":15,"word":"PIANO","revealed":false,"color":"RED"},
+            {"card_id":16,"word":"HEART","revealed":false,"color":"BLUE"},
+            {"card_id":17,"word":"ROME","revealed":false,"color":"RED"},
+            {"card_id":18,"word":"WHALE","revealed":false,"color":"NEUTRAL"},
+            {"card_id":19,"word":"ROBOT","revealed":false,"color":"NEUTRAL"},
+            {"card_id":20,"word":"CROWN","revealed":false,"color":"NEUTRAL"},
+            {"card_id":21,"word":"DESERT","revealed":false,"color":"NEUTRAL"},
+            {"card_id":22,"word":"SCREEN","revealed":false,"color":"NEUTRAL"},
+            {"card_id":23,"word":"MOUSE","revealed":false,"color":"NEUTRAL"},
+            {"card_id":24,"word":"KNIFE","revealed":false,"color":"NEUTRAL"},
+            {"card_id":25,"word":"CLOUD","revealed":false,"color":"ASSASSIN"}
+          ],
+          "winner": null,
+          "end_reason": null,
+          "started_at": "2026-09-10T08:43:15Z",
+          "finished_at": null
+        },
+        "created_at": "2026-09-10T08:41:00Z"
+      }
+    }
+  }
+  ```
+
+  ## Complete Operative-visible `game.started`
+
+  ```json
+  {
+    "type": "game.started",
+    "event_id": "evt_0137",
+    "room_id": 1001,
+    "sent_at": "2026-09-10T08:43:15Z",
+    "payload": {
+      "room": {
+        "room_id": 1001,
+        "status": "IN_GAME",
+        "host_user_id": 42,
+        "player_count": 4,
+        "startable": false,
+        "players": [
+          {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},
+          {"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},
+          {"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},
+          {"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"}
+        ],
+        "game": {
+          "game_id": 5001,
+          "starting_team": "RED",
+          "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},
+          "score": {"red":0,"blue":0},
+          "board": [
+            {"card_id":1,"word":"MOON","revealed":false,"color":null},
+            {"card_id":2,"word":"APPLE","revealed":false,"color":null},
+            {"card_id":3,"word":"TRAIN","revealed":false,"color":null},
+            {"card_id":4,"word":"BRIDGE","revealed":false,"color":null},
+            {"card_id":5,"word":"OCEAN","revealed":false,"color":null},
+            {"card_id":6,"word":"KING","revealed":false,"color":null},
+            {"card_id":7,"word":"LASER","revealed":false,"color":null},
+            {"card_id":8,"word":"FOREST","revealed":false,"color":null},
+            {"card_id":9,"word":"DOCTOR","revealed":false,"color":null},
+            {"card_id":10,"word":"GLASS","revealed":false,"color":null},
+            {"card_id":11,"word":"DRAGON","revealed":false,"color":null},
+            {"card_id":12,"word":"TABLE","revealed":false,"color":null},
+            {"card_id":13,"word":"SATURN","revealed":false,"color":null},
+            {"card_id":14,"word":"SNOW","revealed":false,"color":null},
+            {"card_id":15,"word":"PIANO","revealed":false,"color":null},
+            {"card_id":16,"word":"HEART","revealed":false,"color":null},
+            {"card_id":17,"word":"ROME","revealed":false,"color":null},
+            {"card_id":18,"word":"WHALE","revealed":false,"color":null},
+            {"card_id":19,"word":"ROBOT","revealed":false,"color":null},
+            {"card_id":20,"word":"CROWN","revealed":false,"color":null},
+            {"card_id":21,"word":"DESERT","revealed":false,"color":null},
+            {"card_id":22,"word":"SCREEN","revealed":false,"color":null},
+            {"card_id":23,"word":"MOUSE","revealed":false,"color":null},
+            {"card_id":24,"word":"KNIFE","revealed":false,"color":null},
+            {"card_id":25,"word":"CLOUD","revealed":false,"color":null}
+          ],
+          "winner": null,
+          "end_reason": null,
+          "started_at": "2026-09-10T08:43:15Z",
+          "finished_at": null
+        },
+        "created_at": "2026-09-10T08:41:00Z"
+      }
+    }
+  }
+  ```
+
+  ## Field requirements
+
+  Every nested field follows the room/game schema documented by REST `Get room snapshot`. `ready` is retained as the frozen start confirmation after game start; it has no post-start mutation semantics. `startable=false` outside `WAITING` even though the starting composition remains valid. `current_turn.clue` and `guesses_remaining` are null in `WAITING_FOR_CLUE`.
+
+  ## State changes, events, and errors
+
+  `game.started` follows the zero tick, sets room `IN_GAME`, creates the board once, and begins with the starting team waiting for clue. It is not a client action and has no action error. If an invariant breaks before board creation, the server cancels countdown instead and neither projection is emitted.

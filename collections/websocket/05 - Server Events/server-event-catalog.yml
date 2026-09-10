@@ -1,0 +1,84 @@
+info:
+  name: Server event catalog
+  type: websocket
+  seq: 1
+  tags: [server-event, reference]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Server event catalog
+
+  ## Purpose
+
+  Passive observer and schema reference for canonical server event names. It sends no application message. Command acknowledgements/errors are requester-only; domain events go to connected room members using recipient-safe projection.
+
+  ## Connection parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Observed room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active member session | no | Recipient identity | `sess_A3redAgent9Kp` |
+
+  ## Common envelope fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `type` | string enum | yes | no | event matrix below | Event discriminator |
+  | `event_id` | string | yes | no | unique, monotonically ordered in room | Resume/order marker |
+  | `room_id` | integer | yes | no | positive | Domain room ID |
+  | `sent_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Server emission time |
+  | `payload` | object | yes | no | type-specific | Event data |
+
+  ## Event payload matrix
+
+  | Type | Required payload fields | Trigger | Projection |
+  | --- | --- | --- | --- |
+  | `room.state` | `room` | connect, recovery, room mutation | per recipient when game exists |
+  | `room.player.joined` | `player`, `host_user_id`, `player_count`, `room_status` | REST join | common |
+  | `room.player.left` | same membership fields | REST leave | common |
+  | `room.player.updated` | `player`, `changed_fields`, `room_status`, `startable` | team, role, ready | common |
+  | `room.countdown.started` | `seconds_remaining=3` | full start predicate becomes true | common |
+  | `room.countdown.tick` | `seconds_remaining` | server timer | common |
+  | `room.countdown.cancelled` | `reason`, `changed_by_user_id` | predicate becomes false | common |
+  | `game.started` | `room` containing `game` | valid countdown reaches zero | role-safe board |
+  | `game.state` | `room` containing `game` | reconnect/recovery | role-safe board |
+  | `game.clue.submitted` | `game_id`, actor, team, clue, guesses, turn | accepted clue | common |
+  | `game.card.revealed` | game/card/actor/team/score/turn/result | accepted guess | role-safe board delta |
+  | `game.score.updated` | `game_id`, `score`, `changed_color` | RED or BLUE reveal | common |
+  | `game.turn.changed` | game ID, previous team, reason, current turn, score | non-terminal turn end | common |
+  | `game.ended` | winner, loser, reason, revealed card, score, status, phase, time | terminal reveal | contains only the revealed terminal card; no hidden-board disclosure |
+
+  ## Concrete game events
+
+  ```json
+  {"type":"game.score.updated","event_id":"evt_0144","room_id":1001,"sent_at":"2026-09-10T08:44:01Z","payload":{"game_id":5001,"score":{"red":3,"blue":2},"changed_color":"RED"}}
+  ```
+
+  ```json
+  {"type":"game.turn.changed","event_id":"evt_0148","room_id":1001,"sent_at":"2026-09-10T08:44:20Z","payload":{"game_id":5001,"previous_team":"RED","reason":"NEUTRAL_CARD_REVEALED","current_turn":{"team":"BLUE","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},"score":{"red":3,"blue":2}}}
+  ```
+
+  ```json
+  {"type":"game.card.revealed","event_id":"evt_0143","room_id":1001,"sent_at":"2026-09-10T08:44:01Z","payload":{"game_id":5001,"card":{"card_id":5,"word":"OCEAN","revealed":true,"color":"RED"},"guessed_by_user_id":43,"guessing_team":"RED","score":{"red":3,"blue":2},"current_turn":{"team":"RED","phase":"GUESSING","clue":{"word":"ocean","number":2},"guesses_remaining":2},"winner":null,"end_reason":null}}
+  ```
+
+  ## Acknowledgement schema
+
+  Acks are not room events and omit `event_id`, `room_id`, and `sent_at`:
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `type` | string enum | yes | no | `ack` | Response discriminator |
+  | `request_id` | string | yes | no | echoed request | Correlation/idempotency ID |
+  | `ok` | boolean | yes | no | `true` | Acceptance flag |
+  | `payload` | object | yes | no | command-specific result | Authoritative post-command values |
+
+  ## Invariants
+
+  A terminal `game.ended` is final for the match and no `game.turn.changed` follows it. An Operative event never leaks any unrelated unrevealed card color, including after `FINISHED`. Duplicate request IDs do not duplicate domain events.

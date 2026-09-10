@@ -1,0 +1,8 @@
+info:
+  name: 01 - Room Lobby
+  type: folder
+  seq: 1
+docs: |-
+  # Room lobby
+
+  This folder documents server membership events created by REST join/leave operations. Join is legal only in `WAITING`. Every join or leave causes the server to re-evaluate startability. Host transfer is deterministic by earliest `joined_at` among remaining members.

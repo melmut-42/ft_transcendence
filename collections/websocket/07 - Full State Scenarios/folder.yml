@@ -1,0 +1,8 @@
+info:
+  name: 07 - Full State Scenarios
+  type: folder
+  seq: 7
+docs: |-
+  # Full state scenarios
+
+  Normative, end-to-end snapshots for room `1001` and game `5001`: newly created, four joined, incomplete roles, valid unready, all ready, countdown, cancellation, full `IN_GAME` projections, clue, reveals, and terminal results. The same fixed 25-card secret map is used throughout.

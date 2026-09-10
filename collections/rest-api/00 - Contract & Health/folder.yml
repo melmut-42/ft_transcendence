@@ -1,0 +1,8 @@
+info:
+  name: 00 - Contract & Health
+  type: folder
+  seq: 0
+docs: |-
+  # Contract and health
+
+  Service-level metadata and a non-authenticated health check. Health confirms process availability and contract version only; it does not prove database, room, or realtime gameplay correctness.

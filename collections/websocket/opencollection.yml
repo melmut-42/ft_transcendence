@@ -1,8 +1,8 @@
 opencollection: 1.0.0
 
 info:
-  name: ⚡ WebSocket API
-  version: 1.3.0
+  name: WebSocket
+  version: 1.0.0-draft
 config:
   proxy:
     inherit: true
@@ -17,68 +17,62 @@ config:
 
 docs:
   content: |-
-    # ⚡ ft_transcendence WebSocket API
+    # ft_transcendence WebSocket Protocol
 
-    This collection documents the shared room/game WebSocket used by `ft_transcendence`.
+    ## Connection
 
-    ## Transport and authentication
+    Connect to `{{wsUrl}}/ws/rooms/{{roomId}}` with handshake header `X-Session-Id: {{sessionToken}}`. The session must be active and the user must already belong to the room through REST. Authentication is never placed in the URL. A successful connection first receives a recipient-safe `room.state` snapshot.
 
-    ```text
-    {{wsUrl}}/ws?session_id={{session_id}}
-    ```
+    Invalid session rejects the handshake with HTTP `401`; missing room uses `404`; an authenticated non-member uses `403`. An ordinary disconnect does not remove room membership immediately. Reconnect with the same session obtains a fresh role-safe snapshot. Membership removal occurs only through the REST leave endpoint or room lifecycle policy.
 
-    Select the `local` environment. REST creates the temporary session; the WebSocket sends that session in the `session_id` query parameter during the handshake. The WebSocket does not use REST's `X-Session-Id` header.
+    ## Envelopes and ordering
 
-    ## Collection layout
+    Client messages are `{ "type", "request_id", "payload" }`. `request_id` is a client-generated unique string of `1..64` visible ASCII characters. The server caches the result of a request ID per session for the room lifetime; an identical retry returns the original ack/error and does not repeat mutation. Reuse with different content returns `INVALID_EVENT`.
 
-    - **Connection** — the canonical authenticated handshake.
-    - **Client Actions** — known outbound event names; only `give_clue` has a verified payload example.
-    - **Server Events** — passive observers for known server event names.
-    - **Errors** — the error envelope, catalog guidance, and failure-testing rules.
+    Successful commands receive `{ "type": "ack", "request_id", "ok": true, "payload": object }`. Events are `{ "type", "event_id", "room_id", "sent_at", "payload" }`. `event_id` is unique and monotonically ordered within one room stream. Timestamps are ISO 8601 UTC. Clients apply events in arrival order and replace local state when a full `room.state` or `game.state` snapshot arrives.
 
-    ## Recommended workflow
+    ## Message and event matrix
 
-    1. Select `local` and run the REST `Enter user` request.
-    2. Open `connect` with the populated `session_id`.
-    3. Prepare the required room membership, role, turn, and game state.
-    4. Select one client action only when its preconditions are satisfied.
-    5. Observe the related server event or error frame in Bruno's message history.
+    | Type | Direction | Allowed room/phase | Permission | Purpose |
+    | --- | --- | --- | --- | --- |
+    | `room.team.select` | C to S | `WAITING`, `COUNTDOWN` | member | select team; countdown change cancels |
+    | `room.role.select` | C to S | `WAITING`, `COUNTDOWN` | member with team | select role; countdown change cancels |
+    | `room.ready.set` | C to S | `WAITING`, `COUNTDOWN` for false | configured member | toggle readiness |
+    | `game.clue.submit` | C to S | `IN_GAME / WAITING_FOR_CLUE` | active Spymaster | create clue and guesses |
+    | `game.card.guess` | C to S | `IN_GAME / GUESSING` | active Operative | reveal one card |
+    | `game.turn.pass` | C to S | `IN_GAME / GUESSING` | active Operative | end team turn |
+    | `room.state` | S to C | any non-closed state | recipient projection | full room snapshot |
+    | `room.player.joined` | S to C | `WAITING` | server | membership added |
+    | `room.player.left` | S to C | `WAITING`, `COUNTDOWN`, `FINISHED` | server | membership removed/host transfer |
+    | `room.player.updated` | S to C | `WAITING`, `COUNTDOWN` | server | team, role, ready change |
+    | `room.countdown.started` | S to C | `COUNTDOWN` | server | start at 3 seconds |
+    | `room.countdown.tick` | S to C | `COUNTDOWN` | server | remaining `2`, `1`, `0` |
+    | `room.countdown.cancelled` | S to C | `WAITING` | server | invariant broke |
+    | `game.started` | S to C | `IN_GAME` | recipient projection | complete role-safe game |
+    | `game.state` | S to C | `IN_GAME`, `FINISHED` | recipient projection | recovery snapshot |
+    | `game.clue.submitted` | S to C | `IN_GAME / GUESSING` | server | public clue |
+    | `game.card.revealed` | S to C | `IN_GAME`, `FINISHED` | recipient projection | reveal result |
+    | `game.score.updated` | S to C | `IN_GAME`, `FINISHED` | server | revealed team totals |
+    | `game.turn.changed` | S to C | `IN_GAME` | server | next team waits for clue |
+    | `game.ended` | S to C | `FINISHED / GAME_OVER` | server | terminal result |
+    | `ack` | S to C | command-dependent | requester | command accepted |
+    | `error` | S to C | any open connection | requester | command rejected |
 
-    Do not batch-run this collection. Some requests observe frames, while actions change live game state.
+    ## Countdown and authority
 
-    ## Known client events
+    The server rechecks the full start predicate after every join, leave, team, role, and ready change. When it first becomes true, the room enters `COUNTDOWN` and emits start plus concrete ticks. Any invalidation emits cancellation and returns to `WAITING`. Completion while still valid generates the 25-card board and enters `IN_GAME`. There is no host start command.
 
-    `leave_room`, `start_game`, `give_clue`, `reveal_card`, and `end_turn`.
+    ## Privacy projection
 
-    ## Known server events
+    Spymasters receive all 25 colors. Operatives receive `color: null` on unrevealed cards and the true color on revealed cards. The server MUST render events per recipient and MUST NOT broadcast one secret-bearing payload. The full paired examples in `07 - Full State Scenarios` differ only where authorization requires it.
 
-    `player_joined`, `player_left`, `game_started`, `clue_given`, `card_revealed`, `turn_changed`, `player_disconnected`, `player_reconnected`, `game_finished`, and `game_action_logged`.
+    ## Errors and connection policy
 
-    ## Errors and error_catalog
+    Action errors retain the connection and never mutate room/game state. `INVALID_EVENT`, `INVALID_PAYLOAD`, `NOT_ROOM_MEMBER`, `INVALID_ROOM_STATE`, `TEAM_REQUIRED`, `ROLE_REQUIRED`, `ROLE_CONFLICT`, `NOT_YOUR_TURN`, `ROLE_FORBIDDEN`, `INVALID_CLUE`, `INVALID_CLUE_NUMBER`, `INVALID_CARD`, `CARD_ALREADY_REVEALED`, `NO_GUESSES_REMAINING`, and `GAME_ALREADY_FINISHED` have concrete examples in the action/error folders. The server may close for invalid handshake auth or repeated protocol abuse only.
 
-    All WebSocket error guidance lives in this collection overview. The current repository verifies the `INVALID_ACTION` error code, but it does not contain a concrete server error body or verified message text. No fabricated error JSON is shown here.
+    ## Example index
 
-    ### Known error codes
-
-    | Code | Description | Scope |
-    | --- | --- | --- |
-    | `INVALID_ACTION` | The requested client action is not allowed in the current role, turn, or game state. | WebSocket action rejection; confirm the exact backend message in a captured frame. |
-
-    `INVALID_ACTION` is the only WebSocket error code currently named by the workspace contract. No additional WebSocket code is treated as verified until it appears in an authoritative backend response or backend documentation. REST error codes are documented in the REST collection and are intentionally not duplicated in this WebSocket catalog.
-
-    ### Error-testing procedure
-
-    1. Open `connect` when the failure scenario requires an authenticated session.
-    2. Prepare one deliberate handshake or client-action failure.
-    3. Capture the returned frame in Bruno's message history.
-    4. Record the exact `event`, `data.code`, and `data.message`.
-    5. Confirm a rejected action did not mutate state or create a successful action log.
-
-    ## Contract boundaries
-
-    The `give_clue` request contains the only complete client payload currently verified in this workspace. Other client messages stay disabled until their payloads are confirmed. Server event files document names and observation guidance without inventing payload fields.
-
-    The backend validates identity, membership, role, turn, and game state. Rejected actions must not mutate state or create a successful action log.
+    `03 - Ready & Countdown` contains minimum valid room, countdown, and cancellation. `07 - Full State Scenarios` contains full Spymaster and Operative boards. `04 - Game` contains clue, own-team continuation, last-guess turn end, own-team victory, opponent turn end, opponent final-card victory, neutral, assassin, pass, and invalid-action cases.
   type: text/markdown
 bundled: false
 extensions: {}

@@ -1,0 +1,8 @@
+info:
+  name: 02 - Team & Role
+  type: folder
+  seq: 2
+docs: |-
+  # Team and role
+
+  Members select exactly one team (`RED | BLUE`) and one room role (`SPYMASTER | OPERATIVE`) during `WAITING`. A team may have exactly one Spymaster. A selection change is also accepted during `COUNTDOWN` specifically so it can cancel the countdown. Changing team or role clears `ready`, emits `room.player.updated`, re-evaluates startability, and returns an active countdown to `WAITING`.

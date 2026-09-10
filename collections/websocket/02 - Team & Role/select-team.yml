@@ -1,0 +1,71 @@
+info:
+  name: Select team
+  type: websocket
+  seq: 1
+  tags: [action, room]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+  message:
+    - title: Success - Select RED
+      selected: true
+      message: {type: json, data: '{"type":"room.team.select","request_id":"req_0001","payload":{"team":"RED"}}'}
+    - title: Success - Select BLUE
+      selected: false
+      message: {type: json, data: '{"type":"room.team.select","request_id":"req_0002","payload":{"team":"BLUE"}}'}
+    - title: Success - Change team resets ready
+      selected: false
+      message: {type: json, data: '{"type":"room.team.select","request_id":"req_0003","payload":{"team":"BLUE"}}'}
+    - title: Error - Invalid team
+      selected: false
+      message: {type: json, data: '{"type":"room.team.select","request_id":"req_0004","payload":{"team":"GREEN"}}'}
+docs: |-
+  # Select team
+
+  ## Purpose and preconditions
+
+  Selects the authenticated member's temporary team. Allowed in `WAITING`; during `COUNTDOWN`, a change is accepted, clears readiness, cancels countdown, and returns the room to `WAITING`. No host privilege is required.
+
+  ## Message and payload parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Authenticated member | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `type` | envelope | yes | string enum | `room.team.select` | no | Operation | `room.team.select` |
+  | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique per session | no | Idempotency key | `req_0001` |
+  | `payload.team` | payload | yes | string enum | `RED`, `BLUE` | no | New temporary team | `RED` |
+
+  ## Success, state, and emitted events
+
+  The requester receives `{"type":"ack","request_id":"req_0001","ok":true,"payload":{"user_id":42,"team":"RED","role":null,"ready":false,"room_status":"WAITING"}}`. The server emits `room.player.updated` then `room.state`. If team changes, the existing role remains only if it does not create a Spymaster conflict on the destination team; otherwise the command is rejected. Every successful team change sets `ready=false` and re-evaluates startability. During `COUNTDOWN`, event order is `room.player.updated`, `room.countdown.cancelled` with reason `TEAM_CHANGED`, then `room.state`.
+
+  The BLUE selection example returns `{"type":"ack","request_id":"req_0002","ok":true,"payload":{"user_id":44,"team":"BLUE","role":null,"ready":false,"room_status":"WAITING"}}`.
+
+  The countdown team-change example returns `{"type":"ack","request_id":"req_0003","ok":true,"payload":{"user_id":46,"team":"BLUE","role":"OPERATIVE","ready":false,"room_status":"WAITING"}}` and emits cancellation reason `TEAM_CHANGED`.
+
+  Updated event:
+
+  ```json
+  {"type":"room.player.updated","event_id":"evt_0111","room_id":1001,"sent_at":"2026-09-10T08:42:10Z","payload":{"player":{"user_id":42,"username":"player_one","team":"RED","role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},"changed_fields":["team"],"room_status":"WAITING","startable":false}}
+  ```
+
+  | Result field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `ack.payload.user_id` | integer | yes | no | positive | Updated member |
+  | `ack.payload.team` | enum | yes | no | `RED`, `BLUE` | Accepted team |
+  | `ack.payload.role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Retained role when valid |
+  | `ack.payload.ready` | boolean | yes | no | `false` | Reset confirmation |
+  | `ack.payload.room_status` | enum | yes | no | `WAITING` | Post-command state, including cancelled countdown |
+  | `event.payload.changed_fields[]` | array<string enum> | yes | no | `team`, plus `ready` when it changed | Fields changed atomically |
+  | `event.payload.startable` | boolean | yes | no | `true`, `false` | Full predicate after update |
+
+  ## Errors
+
+  `INVALID_PAYLOAD` for missing/unknown team; `NOT_ROOM_MEMBER`; `INVALID_ROOM_STATE` outside `WAITING` and `COUNTDOWN`; `ROLE_CONFLICT` if moving an existing Spymaster would duplicate the destination Spymaster. Errors preserve all state and keep the socket open.
+
+  ```json
+  {"type":"error","request_id":"req_0004","error":{"code":"INVALID_PAYLOAD","message":"payload.team must be RED or BLUE.","details":{"field":"payload.team"}}}
+  ```

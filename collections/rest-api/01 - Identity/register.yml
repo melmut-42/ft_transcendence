@@ -1,0 +1,179 @@
+info:
+  name: Register username
+  type: http
+  seq: 1
+  tags: [identity, smoke]
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/register"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {"username":"player_one"}
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.data) {
+          bru.setVar("sessionToken", String(res.body.data.session_token));
+          bru.setVar("userId", String(res.body.data.user.user_id));
+        }
+    - type: tests
+      code: |-
+        test("creates a stable user and opaque session", function () {
+          expect(res.status).to.equal(201);
+          expect(res.body.data.user.username).to.equal("player_one");
+          expect(res.body.data.session_token).to.be.a("string");
+        });
+docs: |-
+  # Register username
+
+  ## Purpose
+
+  Atomically creates a persistent user and one opaque authenticated session. It accepts no email, password, OAuth assertion, or profile role.
+
+  ## Preconditions
+
+  The client has no authenticated identity. The normalized username must be unique under case-insensitive comparison.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values/range | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `Content-Type` | header | yes | string | `application/json` | no | JSON request media type | `application/json` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+  | `username` | body | yes | string | trimmed `^[A-Za-z0-9_]{3,20}$` | no | Persistent unique username | `player_one` |
+
+  The server trims leading/trailing whitespace before validation and storage. `Player_One` conflicts with `player_one`; original casing is otherwise preserved.
+
+  ## Success behavior and response fields
+
+  `201 Created` creates both records. The script stores `sessionToken` and `userId`.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.user.user_id` | integer | yes | no | positive | Stable user identifier |
+  | `data.user.username` | string | yes | no | normalized validation rule | Stored display username |
+  | `data.user.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | User creation time |
+  | `data.session_token` | string | yes | no | opaque, non-empty | Credential for REST and WebSocket |
+  | `data.session_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Session expiry |
+
+  ## State changes and events
+
+  A user and session are persisted. No room membership is created and no WebSocket event is emitted.
+
+  ## Errors
+
+  | Status | Code | When | State change |
+  | --- | --- | --- | --- |
+  | `400` | `VALIDATION_ERROR` | malformed JSON or unexpected structure | none |
+  | `422` | `INVALID_USERNAME` | missing, wrong type, length, or characters | none |
+  | `409` | `USERNAME_TAKEN` | case-insensitive username already exists | none |
+  | `429` | `RATE_LIMITED` | registration limit exceeded | none |
+
+  ## Notes/invariants
+
+  The response token is shown only at creation. A duplicate transmission cannot claim the existing username; it returns `USERNAME_TAKEN`.
+examples:
+  - name: Success - player_one
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username":"player_one"}'}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {"data":{"user":{"user_id":42,"username":"player_one","created_at":"2026-09-10T08:40:01Z"},"session_token":"sess_7Hk2mQ9vLc4R8pXa","session_expires_at":"2026-10-10T08:40:01Z"}}
+  - name: Success - BlueMaster
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username":"BlueMaster"}'}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {"data":{"user":{"user_id":48,"username":"BlueMaster","created_at":"2026-09-10T08:40:02Z"},"session_token":"sess_4Pu8Kc2wNm7Vd5Qz","session_expires_at":"2026-10-10T08:40:02Z"}}
+  - name: Success - red_agent fixture
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username":"red_agent"}'}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"data":{"user":{"user_id":43,"username":"red_agent","created_at":"2026-09-10T08:40:03Z"},"session_token":"sess_A3redAgent9Kp","session_expires_at":"2026-10-10T08:40:03Z"}}'}
+  - name: Success - blue_master fixture
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username":"blue_master"}'}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"data":{"user":{"user_id":44,"username":"blue_master","created_at":"2026-09-10T08:40:04Z"},"session_token":"sess_B4blueMaster7Q","session_expires_at":"2026-10-10T08:40:04Z"}}'}
+  - name: Success - blue_agent fixture
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username":"blue_agent"}'}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"data":{"user":{"user_id":45,"username":"blue_agent","created_at":"2026-09-10T08:40:05Z"},"session_token":"sess_C5blueAgent2Rm","session_expires_at":"2026-10-10T08:40:05Z"}}'}
+  - name: Error - Invalid characters
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username":"player-one!"}'}
+    response:
+      status: 422
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"INVALID_USERNAME","message":"Username must match ^[A-Za-z0-9_]{3,20}$.","details":{"field":"username","value":"player-one!"}}}'}
+  - name: Error - Username too short
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username":"ab"}'}
+    response:
+      status: 422
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"INVALID_USERNAME","message":"Username must contain between 3 and 20 characters.","details":{"field":"username","min_length":3,"max_length":20}}}'}
+  - name: Error - Username already exists
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username":"PLAYER_ONE"}'}
+    response:
+      status: 409
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {"error":{"code":"USERNAME_TAKEN","message":"Username 'PLAYER_ONE' is already registered.","details":{"field":"username"}}}

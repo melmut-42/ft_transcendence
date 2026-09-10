@@ -1,0 +1,61 @@
+info:
+  name: Get public profile
+  type: http
+  seq: 2
+  tags: [profile]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/users/43"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+    - name: Accept
+      value: application/json
+docs: |-
+  # Get public profile
+
+  ## Purpose and preconditions
+
+  Returns another player's public persistent profile. Authentication is required; room co-membership is not.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `user_id` | path | yes | integer | positive | no | Target user | `43` |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Requesting identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.user_id` | integer | yes | no | positive | Public user ID |
+  | `data.username` | string | yes | no | username rule | Public display name |
+  | `data.level` | integer | yes | no | `>= 1` | Persistent level |
+  | `data.wins` | integer | yes | no | `>= 0` | Wins |
+  | `data.losses` | integer | yes | no | `>= 0` | Losses |
+  | `data.matches_played` | integer | yes | no | `wins + losses` | Settled matches |
+
+  ## State changes, events, and errors
+
+  Read-only; no event. `401 UNAUTHORIZED` covers the requester session; `404 USER_NOT_FOUND` covers a valid positive ID with no user. Session tokens, active room, team, role, and ready state are never public profile fields.
+examples:
+  - name: Success - red_agent
+    request: {url: "{{baseUrl}}/api/users/43", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"data":{"user_id":43,"username":"red_agent","level":3,"wins":9,"losses":11,"matches_played":20}}'}
+  - name: Error - User not found
+    request: {url: "{{baseUrl}}/api/users/9999", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 404
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"USER_NOT_FOUND","message":"User 9999 was not found.","details":{"user_id":9999}}}'}
+  - name: Error - Invalid path ID
+    request: {url: "{{baseUrl}}/api/users/zero", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 422
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"VALIDATION_ERROR","message":"user_id must be a positive integer.","details":{"field":"user_id"}}}'}

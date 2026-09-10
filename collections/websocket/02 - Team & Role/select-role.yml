@@ -1,0 +1,87 @@
+info:
+  name: Select role
+  type: websocket
+  seq: 2
+  tags: [action, room]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+  message:
+    - title: Success - Select RED Spymaster
+      selected: true
+      message: {type: json, data: '{"type":"room.role.select","request_id":"req_0005","payload":{"role":"SPYMASTER"}}'}
+    - title: Success - Select BLUE Operative
+      selected: false
+      message: {type: json, data: '{"type":"room.role.select","request_id":"req_0006","payload":{"role":"OPERATIVE"}}'}
+    - title: Success - Change Operative to Spymaster
+      selected: false
+      message: {type: json, data: '{"type":"room.role.select","request_id":"req_0007","payload":{"role":"SPYMASTER"}}'}
+    - title: Error - Spymaster already occupied
+      selected: false
+      message: {type: json, data: '{"type":"room.role.select","request_id":"req_0008","payload":{"role":"SPYMASTER"}}'}
+    - title: Error - No team selected
+      selected: false
+      message: {type: json, data: '{"type":"room.role.select","request_id":"req_0009","payload":{"role":"OPERATIVE"}}'}
+    - title: Error - Game already started
+      selected: false
+      message: {type: json, data: '{"type":"room.role.select","request_id":"req_0010","payload":{"role":"OPERATIVE"}}'}
+docs: |-
+  # Select role
+
+  ## Purpose and preconditions
+
+  Selects the member's temporary room role. The member must first choose `RED` or `BLUE`. It is allowed in `WAITING`; during `COUNTDOWN`, a change clears readiness, cancels countdown, and returns the room to `WAITING`.
+
+  ## Message and payload parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
+  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Authenticated member | `sess_A3redAgent9Kp` |
+  | `type` | envelope | yes | string enum | `room.role.select` | no | Operation | `room.role.select` |
+  | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0005` |
+  | `payload.role` | payload | yes | string enum | `SPYMASTER`, `OPERATIVE` | no | New temporary role | `SPYMASTER` |
+
+  ## Success, state, and emitted events
+
+  A role selection sets `ready=false`, re-evaluates startability, sends an ack, emits `room.player.updated`, then `room.state`. During `COUNTDOWN`, `room.countdown.cancelled` with reason `ROLE_CHANGED` is inserted before the state snapshot. Example ack: `{"type":"ack","request_id":"req_0005","ok":true,"payload":{"user_id":42,"team":"RED","role":"SPYMASTER","ready":false,"room_status":"WAITING"}}`.
+
+  The BLUE Operative example returns `{"type":"ack","request_id":"req_0006","ok":true,"payload":{"user_id":45,"team":"BLUE","role":"OPERATIVE","ready":false,"room_status":"WAITING"}}`.
+
+  The role-change example assumes RED's Spymaster slot is vacant and returns `{"type":"ack","request_id":"req_0007","ok":true,"payload":{"user_id":43,"team":"RED","role":"SPYMASTER","ready":false,"room_status":"WAITING"}}`.
+
+  | Result field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `ack.payload.user_id` | integer | yes | no | positive | Updated member |
+  | `ack.payload.team` | enum | yes | no | `RED`, `BLUE` | Existing selected team |
+  | `ack.payload.role` | enum | yes | no | `SPYMASTER`, `OPERATIVE` | Accepted role |
+  | `ack.payload.ready` | boolean | yes | no | `false` | Reset confirmation |
+  | `ack.payload.room_status` | enum | yes | no | `WAITING` | Post-command state |
+  | `room.player.updated.payload.changed_fields[]` | array<string enum> | yes | no | `role`, plus `ready` when it changed | Atomic changes |
+
+  ## Duplicate Spymaster error
+
+  Given user `42` already occupies `RED / SPYMASTER`, user `43` attempting the same role receives:
+
+  ```json
+  {"type":"error","request_id":"req_0008","error":{"code":"ROLE_CONFLICT","message":"RED already has a Spymaster.","details":{"team":"RED","occupied_by_user_id":42}}}
+  ```
+
+  No player field changes and no update event is emitted.
+
+  ## Other errors
+
+  - `TEAM_REQUIRED`: `Select a team before selecting a role.`
+  - `INVALID_PAYLOAD`: role is absent or outside the two-value enum.
+  - `INVALID_ROOM_STATE`: room status is not `WAITING` or `COUNTDOWN`, including `IN_GAME`.
+  - `NOT_ROOM_MEMBER`: session user is outside the room.
+
+  ```json
+  {"type":"error","request_id":"req_0009","error":{"code":"TEAM_REQUIRED","message":"Select a team before selecting a role.","details":{"user_id":43}}}
+  ```
+
+  ```json
+  {"type":"error","request_id":"req_0010","error":{"code":"INVALID_ROOM_STATE","message":"Roles cannot change while room status is IN_GAME.","details":{"status":"IN_GAME"}}}
+  ```

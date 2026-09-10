@@ -3,40 +3,25 @@ variables:
   - name: baseUrl
     value: "http://localhost:3000"
     type: string
-    description: "HTTP API origin"
+    description: "Local REST API origin"
   - name: wsUrl
     value: "ws://localhost:3000"
     type: string
-    description: "WebSocket origin"
-  - name: session_id
+    description: "Local WebSocket origin"
+  - name: sessionToken
     value: ""
     secret: true
     type: string
-    description: "Current session ID; populated by the REST bootstrap request"
-  - name: user_session_id
-    value: ""
-    secret: true
-    type: string
-    description: "Primary user session ID; populated by the REST bootstrap request"
-  - name: guest_session_id
-    value: ""
-    secret: true
-    type: string
-    description: "Optional prepared guest session ID for manual room-join scenarios"
-  - name: outsider_session_id
-    value: ""
-    secret: true
-    type: string
-    description: "Optional session for the manual outsider-forbidden scenario"
-  - name: room_id
-    value: ""
+    description: "Opaque session from registration; never commit a real value"
+  - name: userId
+    value: "42"
     type: number
-    description: "Room ID; populated by room creation"
-  - name: prepared_in_progress_room_id
-    value: ""
+    description: "Current fixture user ID; registration overwrites it at runtime"
+  - name: roomId
+    value: "1001"
     type: number
-    description: "Optional manual room ID whose status is IN_PROGRESS"
-  - name: prepared_finished_room_id
-    value: ""
+    description: "Current room ID; room creation overwrites it at runtime"
+  - name: gameId
+    value: "5001"
     type: number
-    description: "Optional manual room ID whose status is FINISHED"
+    description: "Canonical match ID used by state examples"

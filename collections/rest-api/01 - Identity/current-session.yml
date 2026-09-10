@@ -1,0 +1,60 @@
+info:
+  name: Get current session
+  type: http
+  seq: 2
+  tags: [identity]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/auth/session"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+    - name: Accept
+      value: application/json
+docs: |-
+  # Get current session
+
+  ## Purpose and preconditions
+
+  Resolves the opaque session to its user and current temporary room link. A valid unexpired `X-Session-Id` is required.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Shared REST/WebSocket credential | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Success and response fields
+
+  `200 OK` returns the authenticated identity without reissuing a token.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.user.user_id` | integer | yes | no | positive | Authenticated user |
+  | `data.user.username` | string | yes | no | username rule | Stored display username |
+  | `data.active_room_id` | integer or null | yes | yes | positive or `null` | Current active room, never a permanent profile role |
+  | `data.session_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Credential expiry |
+
+  ## State changes, events, and errors
+
+  Read-only; no event. Missing, invalid, revoked, or expired tokens return `401 UNAUTHORIZED` and an empty details object.
+examples:
+  - name: Success - No active room
+    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"data":{"user":{"user_id":42,"username":"player_one"},"active_room_id":null,"session_expires_at":"2026-10-10T08:40:01Z"}}'}
+  - name: Success - Active room
+    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"data":{"user":{"user_id":42,"username":"player_one"},"active_room_id":1001,"session_expires_at":"2026-10-10T08:40:01Z"}}'}
+  - name: Error - Invalid session
+    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: X-Session-Id, value: sess_invalid, enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 401
+      headers: [{name: Content-Type, value: application/json}]
+      body: {type: json, data: '{"error":{"code":"UNAUTHORIZED","message":"A valid active session is required.","details":{}}}'}
