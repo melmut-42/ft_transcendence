@@ -14,7 +14,7 @@ specs:
 docs: |-
   # ft_transcendence API Contract
 
-  > **Contract status:** Draft product contract for frontend and backend implementation. Examples are normative fixtures; they do not claim that every operation is implemented yet.
+  > **Contract status:** Development contract for active frontend and backend implementation. Examples are normative fixtures; they do not claim that every operation is implemented yet.
 
   ## Project Overview
 
@@ -99,7 +99,7 @@ docs: |-
 
   ## Game Rules
 
-  The board has 25 cards. The randomly selected starting team owns 9; the other team owns 8; 7 are `NEUTRAL`; 1 is `ASSASSIN`. Only the active team's Spymaster may submit one normalized clue word plus integer `N` from `1` through `9`. This draft imposes only: trim, Unicode lowercase storage, a single non-empty whitespace-free word, length `1..30`, and the numeric range. It does not add advanced official clue restrictions.
+  The board has 25 cards. The randomly selected starting team owns 9; the other team owns 8; 7 are `NEUTRAL`; 1 is `ASSASSIN`. Only the active team's Spymaster may submit one normalized clue word plus integer `N` from `1` through `9`. This development contract imposes only: trim, Unicode lowercase storage, a single non-empty whitespace-free word, length `1..30`, and the numeric range. It does not add advanced official clue restrictions.
 
   A clue grants `N + 1` guesses. An own-team reveal increments that color's score, consumes one guess, and may continue. An opponent reveal increments the opponent score and ends the turn unless it completes that opponent's set, which makes the opponent win immediately. A neutral reveal ends the turn. The assassin ends the match immediately and the guessing team's opponent wins. Operatives may pass during `GUESSING`. Terminal conditions are checked before any turn change.
 
@@ -155,7 +155,7 @@ docs: |-
 
   ## Subject Compliance Note
 
-  > This contract intentionally models username-only identity with no email or password. That is a known product decision and conflicts with school-subject authentication expectations that may require email/password. The team must reconcile this before final evaluation; this draft does not conceal or pre-empt that decision.
+  > This contract intentionally models username-only identity with no email or password. That is a known product decision and conflicts with school-subject authentication expectations that may require email/password. The team must reconcile this before final evaluation; this development contract does not conceal or pre-empt that decision.
 
   ## Documentation Conventions
 

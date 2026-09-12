@@ -2,7 +2,7 @@ opencollection: 1.0.0
 
 info:
   name: REST API
-  version: 1.0.0-draft
+  version: 1.0.0-dev
 config:
   proxy:
     inherit: true
