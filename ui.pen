@@ -34,7 +34,7 @@
       "id": "yTHAt",
       "x": 2832,
       "y": 0,
-      "name": "01 — Style Guide",
+      "name": "Style Guide",
       "clip": true,
       "width": 1376,
       "height": 470,
@@ -1030,87 +1030,157 @@
     },
     {
       "type": "frame",
-      "id": "I1LYeE",
-      "x": 2832,
-      "y": 522,
-      "name": "02 — Text Inputs",
+      "id": "xuxZk",
+      "x": 0,
+      "y": 1734,
+      "name": "Frame 1",
       "clip": true,
-      "width": 720,
-      "height": 670,
-      "fill": "#faf4e6",
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "PMnhk",
+          "x": 6.5,
+          "y": 11.5,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "landing_page_ref.png",
+            "mode": "fill"
+          },
+          "width": 1907,
+          "height": 1057
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "h9egyS",
+      "x": 0,
+      "y": -1260,
+      "name": "UI COMPONENTS — INPUTS",
+      "clip": true,
+      "width": 900,
+      "height": 620,
+      "fill": "#FAF4E6",
       "layout": "none",
       "children": [
         {
           "type": "text",
-          "id": "B67ne",
-          "x": 72,
-          "y": 46,
-          "name": "Component Sections Title",
+          "id": "VFWtQ",
+          "x": 40,
+          "y": 30,
+          "name": "Library Title",
           "fill": "#1A204C",
-          "content": "2. COMPONENT SECTIONS",
+          "content": "UI COMPONENTS — INPUTS",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
           "fontSize": 24,
-          "fontWeight": "800"
+          "fontWeight": "800",
+          "letterSpacing": -0.8
         },
         {
           "type": "text",
-          "id": "h7Ms1a",
-          "x": 72,
-          "y": 93,
-          "name": "Text Inputs Heading",
+          "id": "M5hHxt",
+          "x": 40,
+          "y": 72,
+          "name": "Text Input States Section Label",
           "fill": "#1A204C",
-          "content": "TEXT INPUTS",
+          "content": "TEXT INPUT STATES",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 20,
-          "fontWeight": "800"
+          "fontSize": 16,
+          "fontWeight": "700",
+          "letterSpacing": -0.4
         },
         {
           "type": "text",
-          "id": "z1rKd",
-          "x": 72,
-          "y": 135,
-          "name": "Default State Label",
+          "id": "GVvnA",
+          "x": 40,
+          "y": 101,
+          "name": "Input / Text / Default Caption",
           "fill": "#1A204C",
-          "content": "Default",
+          "content": "Input / Text / Default",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "zXDFg",
-          "x": 274,
-          "y": 135,
-          "name": "Hover State Label",
+          "id": "sI774",
+          "x": 308,
+          "y": 101,
+          "name": "Input / Text / Hover Caption",
           "fill": "#1A204C",
-          "content": "Hover",
+          "content": "Input / Text / Hover",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "WjsvR",
-          "x": 478,
-          "y": 135,
-          "name": "Focus State Label",
+          "id": "ldiZC",
+          "x": 576,
+          "y": 101,
+          "name": "Input / Text / Focus Caption",
           "fill": "#1A204C",
-          "content": "Focus",
+          "content": "Input / Text / Focus",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "dfquO",
+          "x": 40,
+          "y": 181,
+          "name": "Input / Text / Filled Caption",
+          "fill": "#1A204C",
+          "content": "Input / Text / Filled",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "s3dJH",
+          "x": 308,
+          "y": 181,
+          "name": "Input / Text / Error Caption",
+          "fill": "#1A204C",
+          "content": "Input / Text / Error",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "II5lR",
+          "x": 576,
+          "y": 181,
+          "name": "Input / Text / Success Caption",
+          "fill": "#1A204C",
+          "content": "Input / Text / Success",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "frame",
-          "id": "s3wRHo",
-          "x": 72,
-          "y": 157,
-          "name": "Default Input State",
+          "id": "rmXap",
+          "x": 40,
+          "y": 119,
+          "name": "Input / Text / Default",
+          "reusable": true,
           "width": 184,
           "height": 37,
           "fill": "#FBFAF6",
@@ -1122,10 +1192,10 @@
           "children": [
             {
               "type": "text",
-              "id": "siQgZ",
+              "id": "r011lN",
               "x": 12,
-              "y": 8,
-              "name": "Default State Text",
+              "y": 12,
+              "name": "Placeholder",
               "fill": "#6C6A67",
               "content": "Default",
               "lineHeight": 1,
@@ -1137,10 +1207,11 @@
         },
         {
           "type": "frame",
-          "id": "d42xt",
-          "x": 274,
-          "y": 157,
-          "name": "Hover Input State",
+          "id": "p3Ka8l",
+          "x": 308,
+          "y": 119,
+          "name": "Input / Text / Hover",
+          "reusable": true,
           "width": 184,
           "height": 37,
           "fill": "#E6F1F8",
@@ -1152,10 +1223,11 @@
         },
         {
           "type": "frame",
-          "id": "dnJMB",
-          "x": 478,
-          "y": 157,
-          "name": "Focus Input State",
+          "id": "ZWbPO",
+          "x": 576,
+          "y": 119,
+          "name": "Input / Text / Focus",
+          "reusable": true,
           "width": 184,
           "height": 37,
           "fill": "#FFFDF8",
@@ -1174,10 +1246,10 @@
             {
               "type": "rectangle",
               "cornerRadius": 1,
-              "id": "T7zqyt",
+              "id": "JbsMd",
               "x": 12,
               "y": 7,
-              "name": "Focus Caret",
+              "name": "Caret",
               "fill": "#5C5B59",
               "width": 1.5,
               "height": 22
@@ -1186,10 +1258,11 @@
         },
         {
           "type": "frame",
-          "id": "Kw6mW",
-          "x": 72,
-          "y": 221,
-          "name": "Filled Input State",
+          "id": "dRb92",
+          "x": 40,
+          "y": 199,
+          "name": "Input / Text / Filled",
+          "reusable": true,
           "width": 184,
           "height": 37,
           "fill": "#E3E3E3",
@@ -1201,10 +1274,10 @@
           "children": [
             {
               "type": "text",
-              "id": "P342Wv",
+              "id": "h7ZBe",
               "x": 11,
               "y": 12,
-              "name": "Filled State Text",
+              "name": "Value",
               "fill": "#6C6A67",
               "content": "Filled",
               "lineHeight": 1,
@@ -1216,10 +1289,11 @@
         },
         {
           "type": "frame",
-          "id": "slX2x",
-          "x": 274,
-          "y": 221,
-          "name": "Error Input State",
+          "id": "d73D2",
+          "x": 308,
+          "y": 199,
+          "name": "Input / Text / Error",
+          "reusable": true,
           "width": 184,
           "height": 37,
           "fill": "#FFF0EC",
@@ -1231,33 +1305,33 @@
           "children": [
             {
               "type": "ellipse",
-              "id": "uONqY",
+              "id": "tyO4L",
               "x": 10,
               "y": 9,
-              "name": "Error State Icon Circle",
+              "name": "Error Icon Background",
               "fill": "#E94E4E",
               "width": 18,
               "height": 18
             },
             {
               "type": "icon",
-              "id": "vbh8j",
+              "id": "Jrbdo",
               "x": 14,
               "y": 13,
-              "name": "Error State X Icon",
+              "name": "Error Icon",
               "width": 10,
               "height": 10,
-              "icon": "x",
-              "library": "lucide",
+              "icon": "close",
+              "library": "Material Symbols Rounded",
               "weight": 700,
               "fill": "#FFFFFF"
             },
             {
               "type": "text",
-              "id": "psCux",
+              "id": "hJdvP",
               "x": 34,
               "y": 12,
-              "name": "Error State Text",
+              "name": "Message",
               "fill": "#D84A4A",
               "content": "Error",
               "lineHeight": 1,
@@ -1269,10 +1343,11 @@
         },
         {
           "type": "frame",
-          "id": "TLkNd",
-          "x": 478,
-          "y": 221,
-          "name": "Success Input State",
+          "id": "J8d39",
+          "x": 576,
+          "y": 199,
+          "name": "Input / Text / Success",
+          "reusable": true,
           "width": 184,
           "height": 37,
           "fill": "#F1F9EC",
@@ -1284,33 +1359,33 @@
           "children": [
             {
               "type": "ellipse",
-              "id": "h3lot",
+              "id": "I9P9sA",
               "x": 10,
               "y": 9,
-              "name": "Success State Icon Circle",
+              "name": "Success Icon Background",
               "fill": "#47BD7A",
               "width": 18,
               "height": 18
             },
             {
               "type": "icon",
-              "id": "F7KVlK",
+              "id": "Rx0QO",
               "x": 13,
               "y": 12,
-              "name": "Success State Check Icon",
+              "name": "Success Icon",
               "width": 12,
               "height": 12,
               "icon": "check",
-              "library": "lucide",
+              "library": "Material Symbols Rounded",
               "weight": 700,
               "fill": "#FFFFFF"
             },
             {
               "type": "text",
-              "id": "T9l5hT",
+              "id": "D8JXcW",
               "x": 34,
               "y": 12,
-              "name": "Success State Text",
+              "name": "Message",
               "fill": "#349A63",
               "content": "Success",
               "lineHeight": 1,
@@ -1322,127 +1397,116 @@
         },
         {
           "type": "text",
-          "id": "EAI2V",
-          "x": 72,
-          "y": 272,
-          "name": "Default Input Label",
+          "id": "DqTUk",
+          "x": 40,
+          "y": 271,
+          "name": "Specialized Inputs Section Label",
           "fill": "#1A204C",
-          "content": "Default Input",
+          "content": "SPECIALIZED INPUTS",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 16,
+          "fontWeight": "700",
+          "letterSpacing": -0.4
+        },
+        {
+          "type": "text",
+          "id": "iqlvr",
+          "x": 40,
+          "y": 302,
+          "name": "Input / Leading Icon Caption",
+          "fill": "#1A204C",
+          "content": "Input / Leading Icon",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "i0nbd",
-          "x": 274,
-          "y": 272,
-          "name": "Username Input Label",
+          "id": "cqsKE",
+          "x": 308,
+          "y": 302,
+          "name": "Input / Trailing Icon Caption",
           "fill": "#1A204C",
-          "content": "Username Input",
+          "content": "Input / Trailing Icon",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "BR4Ky",
-          "x": 478,
-          "y": 272,
-          "name": "Search Input with Icon Label",
+          "id": "Fqp8z",
+          "x": 576,
+          "y": 302,
+          "name": "Input / Search Caption",
           "fill": "#1A204C",
-          "content": "Search Input",
+          "content": "Input / Search",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "CziU3",
-          "x": 72,
-          "y": 345,
-          "name": "Search Input Plain Label",
+          "id": "LnfEM",
+          "x": 40,
+          "y": 400,
+          "name": "Input / Password Caption",
           "fill": "#1A204C",
-          "content": "Search Input",
+          "content": "Input / Password",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "ywLNi",
-          "x": 274,
-          "y": 345,
-          "name": "Leading Icon Input Label",
+          "id": "axUWI",
+          "x": 308,
+          "y": 400,
+          "name": "Input / Numeric Caption",
           "fill": "#1A204C",
-          "content": "Leading Icon Input",
+          "content": "Input / Numeric",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "yrjre",
-          "x": 478,
-          "y": 345,
-          "name": "Trailing Icon Input Label",
+          "id": "mlZUd",
+          "x": 576,
+          "y": 400,
+          "name": "Input / Room Code Caption",
           "fill": "#1A204C",
-          "content": "Trailing Icon Input",
+          "content": "Input / Room Code",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "QjkBw",
-          "x": 72,
-          "y": 416,
-          "name": "Trailing Icon Muted Label",
+          "id": "Oc9eZ",
+          "x": 40,
+          "y": 498,
+          "name": "Input / Textarea Caption",
           "fill": "#1A204C",
-          "content": "Trailing Icon Input",
+          "content": "Input / Textarea",
           "lineHeight": 1,
           "fontFamily": "Baloo 2",
-          "fontSize": 14,
-          "fontWeight": "700"
-        },
-        {
-          "type": "text",
-          "id": "jOEs1",
-          "x": 274,
-          "y": 416,
-          "name": "Password Input Label",
-          "fill": "#1A204C",
-          "content": "Password Input",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 14,
-          "fontWeight": "700"
-        },
-        {
-          "type": "text",
-          "id": "BDmRR",
-          "x": 478,
-          "y": 416,
-          "name": "Numeric Input Label",
-          "fill": "#1A204C",
-          "content": "Numeric Input",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 14,
+          "fontSize": 12,
           "fontWeight": "700"
         },
         {
           "type": "frame",
-          "id": "aeLmu",
-          "x": 72,
-          "y": 294,
-          "name": "Default Standard Input",
+          "id": "MEL51",
+          "x": 40,
+          "y": 320,
+          "name": "Input / Leading Icon",
+          "reusable": true,
           "width": 184,
           "height": 36,
           "fill": "#FFFFFF",
@@ -1464,50 +1528,10 @@
           "children": [
             {
               "type": "text",
-              "id": "X6fqG",
-              "x": 12,
-              "y": 11,
-              "name": "Default Standard Input Text",
-              "fill": "#1A204C",
-              "content": "Enter text here",
-              "lineHeight": 1,
-              "fontFamily": "Baloo 2",
-              "fontSize": 14,
-              "fontWeight": "600"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "jLdVf",
-          "x": 274,
-          "y": 294,
-          "name": "Username Standard Input",
-          "width": 184,
-          "height": 36,
-          "fill": "#FFFFFF",
-          "cornerRadius": 18,
-          "stroke": "#D9D4C9",
-          "strokeWidth": 1,
-          "strokeAlignment": "inner",
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#0000000D",
-            "offset": {
-              "x": 0,
-              "y": 1
-            },
-            "blur": 3
-          },
-          "layout": "none",
-          "children": [
-            {
-              "type": "text",
-              "id": "OKFcS",
+              "id": "spd4y",
               "x": 34,
               "y": 11,
-              "name": "Username Input Text",
+              "name": "Placeholder",
               "fill": "#1A204C",
               "content": "Your nickname",
               "lineHeight": 1,
@@ -1517,10 +1541,10 @@
             },
             {
               "type": "icon",
-              "id": "G0VDhO",
+              "id": "s2vCFM",
               "x": 10,
               "y": 9,
-              "name": "Trailing Check Icon",
+              "name": "Leading Icon",
               "width": 18,
               "height": 18,
               "icon": "person",
@@ -1532,63 +1556,11 @@
         },
         {
           "type": "frame",
-          "id": "GFIsh",
-          "x": 478,
-          "y": 294,
-          "name": "Search Input with Icon",
-          "width": 184,
-          "height": 36,
-          "fill": "#FFFFFF",
-          "cornerRadius": 18,
-          "stroke": "#D9D4C9",
-          "strokeWidth": 1,
-          "strokeAlignment": "inner",
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#0000000D",
-            "offset": {
-              "x": 0,
-              "y": 1
-            },
-            "blur": 3
-          },
-          "layout": "none",
-          "children": [
-            {
-              "type": "icon",
-              "id": "waLQR",
-              "x": 11,
-              "y": 9,
-              "name": "Search Magnifying Glass Icon",
-              "width": 18,
-              "height": 18,
-              "icon": "search",
-              "library": "Material Symbols Rounded",
-              "weight": 700,
-              "fill": "#1A204C"
-            },
-            {
-              "type": "text",
-              "id": "u3FdGR",
-              "x": 35,
-              "y": 11,
-              "name": "Search Input with Icon Text",
-              "fill": "#1A204C",
-              "content": "Search rooms",
-              "lineHeight": 1,
-              "fontFamily": "Baloo 2",
-              "fontSize": 14,
-              "fontWeight": "600"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "GTpkx",
-          "x": 72,
-          "y": 366,
-          "name": "Search Input without Icon",
+          "id": "ZHZgB",
+          "x": 308,
+          "y": 320,
+          "name": "Input / Trailing Icon",
+          "reusable": true,
           "width": 184,
           "height": 36,
           "fill": "#FFFFFF",
@@ -1610,103 +1582,10 @@
           "children": [
             {
               "type": "text",
-              "id": "MwUs8",
+              "id": "E4DjN9",
               "x": 12,
               "y": 11,
-              "name": "Search Input Plain Text",
-              "fill": "#3B3B42",
-              "content": "Search rooms",
-              "lineHeight": 1,
-              "fontFamily": "Baloo 2",
-              "fontSize": 14,
-              "fontWeight": "500"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "jvzuH",
-          "x": 274,
-          "y": 366,
-          "name": "Leading Mail Icon Input",
-          "width": 184,
-          "height": 36,
-          "fill": "#FFFFFF",
-          "cornerRadius": 18,
-          "stroke": "#D9D4C9",
-          "strokeWidth": 1,
-          "strokeAlignment": "inner",
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#0000000D",
-            "offset": {
-              "x": 0,
-              "y": 1
-            },
-            "blur": 3
-          },
-          "layout": "none",
-          "children": [
-            {
-              "type": "text",
-              "id": "Mj4fi",
-              "x": 35,
-              "y": 11,
-              "name": "Email Address Input Text",
-              "fill": "#1A204C",
-              "content": "Email address",
-              "lineHeight": 1,
-              "fontFamily": "Baloo 2",
-              "fontSize": 14,
-              "fontWeight": "600"
-            },
-            {
-              "type": "icon",
-              "id": "OhZhQ",
-              "x": 9,
-              "y": 9,
-              "name": "Trailing Check Icon",
-              "width": 18,
-              "height": 18,
-              "icon": "mail",
-              "library": "Material Symbols Rounded",
-              "weight": 700,
-              "fill": "#1A204C"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "uHRmW",
-          "x": 478,
-          "y": 366,
-          "name": "Trailing Check Icon Input",
-          "width": 184,
-          "height": 36,
-          "fill": "#FFFFFF",
-          "cornerRadius": 18,
-          "stroke": "#D9D4C9",
-          "strokeWidth": 1,
-          "strokeAlignment": "inner",
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#0000000D",
-            "offset": {
-              "x": 0,
-              "y": 1
-            },
-            "blur": 3
-          },
-          "layout": "none",
-          "children": [
-            {
-              "type": "text",
-              "id": "knE9l",
-              "x": 12,
-              "y": 11,
-              "name": "Trailing Icon Input Text",
+              "name": "Placeholder",
               "fill": "#1A204C",
               "content": "With icon",
               "lineHeight": 1,
@@ -1716,10 +1595,10 @@
             },
             {
               "type": "icon",
-              "id": "AuOTS",
+              "id": "j38m2",
               "x": 158,
               "y": 9,
-              "name": "Trailing Check Icon",
+              "name": "Trailing Icon",
               "width": 18,
               "height": 18,
               "icon": "check",
@@ -1731,40 +1610,65 @@
         },
         {
           "type": "frame",
-          "id": "mfy9P",
-          "x": 72,
-          "y": 437,
-          "name": "Muted Trailing Icon Input",
+          "id": "A29vGC",
+          "x": 576,
+          "y": 320,
+          "name": "Input / Search",
+          "reusable": true,
           "width": 184,
           "height": 36,
-          "fill": "#E1E3E5",
+          "fill": "#FFFFFF",
           "cornerRadius": 18,
-          "stroke": "#D6D3CD",
+          "stroke": "#D9D4C9",
           "strokeWidth": 1,
           "strokeAlignment": "inner",
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#0000000D",
+            "offset": {
+              "x": 0,
+              "y": 1
+            },
+            "blur": 3
+          },
           "layout": "none",
           "children": [
             {
               "type": "icon",
-              "id": "M3ZEM",
-              "x": 153,
+              "id": "N44gB",
+              "x": 11,
               "y": 9,
-              "name": "Trailing Check Icon",
+              "name": "Leading Icon",
               "width": 18,
               "height": 18,
-              "icon": "check",
+              "icon": "search",
               "library": "Material Symbols Rounded",
               "weight": 700,
-              "fill": "#b8c6d6"
+              "fill": "#1A204C"
+            },
+            {
+              "type": "text",
+              "id": "yBH2c",
+              "x": 35,
+              "y": 11,
+              "name": "Placeholder",
+              "fill": "#1A204C",
+              "content": "Search rooms",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 14,
+              "fontWeight": "600"
             }
           ]
         },
         {
           "type": "frame",
-          "id": "rbOk1",
-          "x": 274,
-          "y": 437,
-          "name": "Password Standard Input",
+          "id": "hQb1e",
+          "x": 40,
+          "y": 418,
+          "name": "Input / Password",
+          "reusable": true,
           "width": 184,
           "height": 36,
           "fill": "#FFFFFF",
@@ -1786,10 +1690,10 @@
           "children": [
             {
               "type": "text",
-              "id": "cSk6S",
+              "id": "Kdt8k",
               "x": 11,
               "y": 11,
-              "name": "Password Input Text",
+              "name": "Placeholder",
               "fill": "#1A204C",
               "content": "Password",
               "lineHeight": 1,
@@ -1799,14 +1703,14 @@
             },
             {
               "type": "icon",
-              "id": "X1zNwd",
+              "id": "lODJf",
               "x": 157,
               "y": 9,
-              "name": "Password Eye Off Icon",
+              "name": "Trailing Icon",
               "width": 18,
               "height": 18,
-              "icon": "eye-off",
-              "library": "lucide",
+              "icon": "visibility_off",
+              "library": "Material Symbols Rounded",
               "weight": 700,
               "fill": "#1A204C"
             }
@@ -1814,10 +1718,11 @@
         },
         {
           "type": "frame",
-          "id": "Nw5VA",
-          "x": 478,
-          "y": 437,
-          "name": "Numeric Segmented Input",
+          "id": "r0qS1",
+          "x": 308,
+          "y": 418,
+          "name": "Input / Numeric",
+          "reusable": true,
           "width": 184,
           "height": 36,
           "fill": "#FBFAF5",
@@ -1829,23 +1734,23 @@
           "children": [
             {
               "type": "icon",
-              "id": "SBM7v",
+              "id": "WXegw",
               "x": 10,
               "y": 9,
-              "name": "Numeric Minus Icon",
+              "name": "Left Action",
               "width": 18,
               "height": 18,
-              "icon": "minus",
-              "library": "lucide",
+              "icon": "remove",
+              "library": "Material Symbols Rounded",
               "weight": 700,
               "fill": "#1A204C"
             },
             {
               "type": "rectangle",
-              "id": "yKH3U",
+              "id": "d2vPf8",
               "x": 37,
               "y": 0,
-              "name": "Numeric Center Segment",
+              "name": "Center Segment",
               "fill": "#FFFFFF",
               "width": 110,
               "height": 36,
@@ -1855,10 +1760,10 @@
             },
             {
               "type": "text",
-              "id": "J7i5SR",
+              "id": "duWNu",
               "x": 65,
               "y": 11,
-              "name": "Numeric Input Text",
+              "name": "Value",
               "fill": "#1A204C",
               "content": "Number",
               "lineHeight": 1,
@@ -1868,51 +1773,26 @@
             },
             {
               "type": "icon",
-              "id": "M75GUB",
+              "id": "ddqpO",
               "x": 156,
               "y": 9,
-              "name": "Numeric Plus Icon",
+              "name": "Right Action",
               "width": 18,
               "height": 18,
-              "icon": "plus",
-              "library": "lucide",
+              "icon": "add",
+              "library": "Material Symbols Rounded",
               "weight": 700,
               "fill": "#1A204C"
             }
           ]
         },
         {
-          "type": "text",
-          "id": "CQgTe",
-          "x": 72,
-          "y": 488,
-          "name": "Room Code Input Label",
-          "fill": "#1A204C",
-          "content": "Room Code Input",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 14,
-          "fontWeight": "700"
-        },
-        {
-          "type": "text",
-          "id": "k4Anqs",
-          "x": 274,
-          "y": 488,
-          "name": "Multiline Textarea Label",
-          "fill": "#1A204C",
-          "content": "Multiline Textarea",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 14,
-          "fontWeight": "700"
-        },
-        {
           "type": "frame",
-          "id": "ecrBB",
-          "x": 72,
-          "y": 510,
-          "name": "Room Code Input",
+          "id": "F9GVwg",
+          "x": 576,
+          "y": 418,
+          "name": "Input / Room Code",
+          "reusable": true,
           "width": 184,
           "height": 68,
           "fill": "#FFFFFF",
@@ -1934,10 +1814,10 @@
           "children": [
             {
               "type": "text",
-              "id": "Qipu5",
+              "id": "Z0eLn",
               "x": 19,
               "y": 17,
-              "name": "Room Code Text",
+              "name": "Value",
               "fill": "#1A204C",
               "content": "1234-5678",
               "lineHeight": 1,
@@ -1949,10 +1829,11 @@
         },
         {
           "type": "frame",
-          "id": "vrbqT",
-          "x": 274,
-          "y": 510,
-          "name": "Multiline Textarea",
+          "id": "SXP1N",
+          "x": 40,
+          "y": 516,
+          "name": "Input / Textarea",
+          "reusable": true,
           "width": 388,
           "height": 68,
           "fill": "#FFFFFF",
@@ -1974,10 +1855,10 @@
           "children": [
             {
               "type": "text",
-              "id": "vyBlm",
+              "id": "XyoAo",
               "x": 12,
               "y": 9,
-              "name": "Multiline Textarea Text",
+              "name": "Placeholder",
               "fill": "#1A204C",
               "content": "Write a message...",
               "lineHeight": 1,
@@ -1987,10 +1868,10 @@
             },
             {
               "type": "path",
-              "id": "Jtm18",
+              "id": "zdLWT",
               "x": 375,
               "y": 55,
-              "name": "Textarea Resize Corner",
+              "name": "Resize Handle",
               "geometry": "M0 8l8-8m-4 8l4-4",
               "viewBox": [
                 0,
@@ -2006,174 +1887,99 @@
               "strokeLinecap": "round"
             }
           ]
-        },
-        {
-          "type": "text",
-          "id": "ZB9An",
-          "x": 72,
-          "y": 592,
-          "name": "Error State Label",
-          "fill": "#1A204C",
-          "content": "Error State",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 14,
-          "fontWeight": "700"
-        },
-        {
-          "type": "text",
-          "id": "V81c3",
-          "x": 478,
-          "y": 592,
-          "name": "Success State Label",
-          "fill": "#1A204C",
-          "content": "Success State",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 14,
-          "fontWeight": "700"
-        },
-        {
-          "type": "frame",
-          "id": "vQ8QX",
-          "x": 72,
-          "y": 614,
-          "name": "Long Error State Input",
-          "width": 386,
-          "height": 36,
-          "fill": "#FFF4EF",
-          "cornerRadius": 18,
-          "stroke": "#E06464",
-          "strokeWidth": 1.5,
-          "strokeAlignment": "inner",
-          "layout": "none",
-          "children": [
-            {
-              "type": "ellipse",
-              "id": "obQfm",
-              "x": 10,
-              "y": 9,
-              "name": "Long Error Icon Circle",
-              "fill": "#E94E4E",
-              "width": 18,
-              "height": 18
-            },
-            {
-              "type": "icon",
-              "id": "b9REX",
-              "x": 14,
-              "y": 13,
-              "name": "Long Error X Icon",
-              "width": 10,
-              "height": 10,
-              "icon": "x",
-              "library": "lucide",
-              "weight": 700,
-              "fill": "#FFFFFF"
-            },
-            {
-              "type": "text",
-              "id": "OjN3a",
-              "x": 36,
-              "y": 11,
-              "name": "Long Error Message",
-              "fill": "#1A204C",
-              "content": "Oops! Username taken.",
-              "lineHeight": 1,
-              "fontFamily": "Baloo 2",
-              "fontSize": 14,
-              "fontWeight": "700"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "CqbEv",
-          "x": 478,
-          "y": 614,
-          "name": "Final Success State Input",
-          "width": 184,
-          "height": 36,
-          "fill": "#F4FAEF",
-          "cornerRadius": 18,
-          "stroke": "#4FBC82",
-          "strokeWidth": 1.5,
-          "strokeAlignment": "inner",
-          "layout": "none",
-          "children": [
-            {
-              "type": "ellipse",
-              "id": "c36Nf",
-              "x": 10,
-              "y": 9,
-              "name": "Final Success Icon Circle",
-              "fill": "#47BD7A",
-              "width": 18,
-              "height": 18
-            },
-            {
-              "type": "icon",
-              "id": "Y6ckj0",
-              "x": 13,
-              "y": 12,
-              "name": "Final Success Check Icon",
-              "width": 12,
-              "height": 12,
-              "icon": "check",
-              "library": "lucide",
-              "weight": 700,
-              "fill": "#FFFFFF"
-            }
-          ]
         }
       ]
     },
     {
       "type": "frame",
-      "id": "YEX0E",
-      "x": 3632,
-      "y": 522,
-      "name": "03 — Buttons",
-      "clip": true,
-      "width": 676,
-      "height": 620,
-      "fill": "#F8F2E4",
+      "id": "T8C2Xd",
+      "x": 980,
+      "y": -1260,
+      "name": "UI COMPONENTS — BUTTONS",
+      "width": 1050,
+      "height": 560,
+      "fill": "#FAF4E6",
       "layout": "none",
       "children": [
         {
           "type": "text",
-          "id": "c0z5Z",
-          "x": 51,
-          "y": 43,
-          "name": "Buttons Heading",
-          "fill": "#20211F",
-          "content": "BUTTONS",
-          "lineHeight": 1,
+          "id": "q1uriD",
+          "x": 40,
+          "y": 24,
+          "name": "Library Title",
+          "fill": "#20243A",
+          "content": "UI COMPONENTS — BUTTONS",
           "fontFamily": "Baloo 2",
-          "fontSize": 22,
-          "fontWeight": "800",
-          "letterSpacing": -2
+          "fontSize": 28,
+          "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "fWf5F",
-          "x": 51,
-          "y": 90,
-          "name": "Styles and States Label",
-          "fill": "#20211F",
-          "content": "Styles & States",
-          "lineHeight": 1,
+          "id": "FzVQo",
+          "x": 40,
+          "y": 72,
+          "name": "Styles Section",
+          "fill": "#20243A",
+          "content": "BUTTON STYLES & STATES",
           "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
+          "fontSize": 14,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "HIipq",
+          "x": 40,
+          "y": 102,
+          "name": "Primary Default Caption",
+          "fill": "#6B6B72",
+          "content": "PRIMARY / DEFAULT",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "uOULF",
+          "x": 260,
+          "y": 102,
+          "name": "Primary Ready Caption",
+          "fill": "#6B6B72",
+          "content": "PRIMARY / READY",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "lxYNJ",
+          "x": 480,
+          "y": 102,
+          "name": "Primary Focus Caption",
+          "fill": "#6B6B72",
+          "content": "PRIMARY / PRESSING",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "aDdLf",
+          "x": 700,
+          "y": 102,
+          "name": "Primary Disabled Caption",
+          "fill": "#6B6B72",
+          "content": "PRIMARY / DISABLED",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
         },
         {
           "type": "frame",
-          "id": "n0vpTi",
-          "x": 51,
-          "y": 113,
-          "name": "Join Room Primary Button",
+          "id": "FSleW",
+          "x": 40,
+          "y": 124,
+          "name": "Button / Primary / Default",
+          "reusable": true,
           "width": 165,
           "height": 40,
           "fill": {
@@ -2227,7 +2033,7 @@
           "children": [
             {
               "type": "text",
-              "id": "JgWwg",
+              "id": "f1RHN",
               "layoutPosition": "absolute",
               "x": 0,
               "y": 1,
@@ -2249,168 +2055,11 @@
         },
         {
           "type": "frame",
-          "id": "xDbhf",
-          "x": 229,
-          "y": 113,
-          "name": "Create Room Primary Button",
-          "width": 165,
-          "height": 40,
-          "fill": {
-            "type": "gradient",
-            "gradientType": "linear",
-            "enabled": true,
-            "rotation": 180,
-            "size": {
-              "height": 1
-            },
-            "colors": [
-              {
-                "color": "#559CF6",
-                "position": 0
-              },
-              {
-                "color": "#4D99F7",
-                "position": 0.55
-              },
-              {
-                "color": "#539BF6",
-                "position": 1
-              }
-            ]
-          },
-          "cornerRadius": 14,
-          "effect": [
-            {
-              "type": "shadow",
-              "shadowType": "outer",
-              "color": "#2c6eab",
-              "offset": {
-                "x": 0,
-                "y": 4
-              },
-              "blur": 1
-            },
-            {
-              "type": "shadow",
-              "shadowType": "outer",
-              "color": "#00000026",
-              "offset": {
-                "x": 0,
-                "y": 5
-              },
-              "blur": 7
-            }
-          ],
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "text",
-              "id": "wpGeQ",
-              "layoutPosition": "absolute",
-              "x": 0,
-              "y": 1,
-              "name": "Create Room Primary Button Label",
-              "fill": "#FFFFFF",
-              "textGrowth": "fixed-width-height",
-              "width": 165,
-              "height": 39,
-              "content": "CREATE ROOM",
-              "lineHeight": 1,
-              "textAlign": "center",
-              "textAlignVertical": "middle",
-              "fontFamily": "Baloo 2",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "letterSpacing": -1.5
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "ocfFO",
-          "x": 51,
-          "y": 174,
-          "name": "Start Game Primary Button",
-          "width": 165,
-          "height": 40,
-          "fill": {
-            "type": "gradient",
-            "gradientType": "linear",
-            "enabled": true,
-            "rotation": 180,
-            "size": {
-              "height": 1
-            },
-            "colors": [
-              {
-                "color": "#559CF6",
-                "position": 0
-              },
-              {
-                "color": "#4D99F7",
-                "position": 0.55
-              },
-              {
-                "color": "#539BF6",
-                "position": 1
-              }
-            ]
-          },
-          "cornerRadius": 14,
-          "effect": [
-            {
-              "type": "shadow",
-              "shadowType": "outer",
-              "color": "#2c6daa",
-              "offset": {
-                "x": 0,
-                "y": 4
-              },
-              "blur": 1
-            },
-            {
-              "type": "shadow",
-              "shadowType": "outer",
-              "color": "#00000026",
-              "offset": {
-                "x": 0,
-                "y": 5
-              },
-              "blur": 7
-            }
-          ],
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "text",
-              "id": "Y4QdF",
-              "layoutPosition": "absolute",
-              "x": 0,
-              "y": 1,
-              "name": "Start Game Primary Button Label",
-              "fill": "#FFFFFF",
-              "textGrowth": "fixed-width-height",
-              "width": 165,
-              "height": 39,
-              "content": "START GAME",
-              "lineHeight": 1,
-              "textAlign": "center",
-              "textAlignVertical": "middle",
-              "fontFamily": "Baloo 2",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "letterSpacing": -1.5
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "U2Zr4",
-          "x": 229,
-          "y": 174,
-          "name": "Ready Primary Button",
+          "id": "KRxAJ",
+          "x": 260,
+          "y": 124,
+          "name": "Button / Primary / Ready",
+          "reusable": true,
           "width": 165,
           "height": 40,
           "fill": {
@@ -2464,7 +2113,7 @@
           "children": [
             {
               "type": "text",
-              "id": "oJiNh",
+              "id": "UIVmG",
               "layoutPosition": "absolute",
               "x": 0,
               "y": 1,
@@ -2486,10 +2135,11 @@
         },
         {
           "type": "frame",
-          "id": "Qcs4g",
-          "x": 51,
-          "y": 235,
-          "name": "Focused Start Game Button",
+          "id": "c3Qp7",
+          "x": 480,
+          "y": 124,
+          "name": "Button / Primary / Pressing",
+          "reusable": true,
           "width": 165,
           "height": 40,
           "fill": {
@@ -2529,6 +2179,7 @@
             {
               "type": "shadow",
               "shadowType": "outer",
+              "enabled": false,
               "color": "#397CB466",
               "offset": {
                 "x": 0,
@@ -2552,7 +2203,7 @@
           "children": [
             {
               "type": "text",
-              "id": "S4KdyU",
+              "id": "PIs1N",
               "layoutPosition": "absolute",
               "x": 0,
               "y": 1,
@@ -2574,10 +2225,11 @@
         },
         {
           "type": "frame",
-          "id": "R1gWLp",
-          "x": 229,
-          "y": 235,
-          "name": "Disabled Button",
+          "id": "D1Ghrz",
+          "x": 700,
+          "y": 124,
+          "name": "Button / Primary / Disabled",
+          "reusable": true,
           "width": 165,
           "height": 40,
           "fill": "#DEDBD4",
@@ -2609,7 +2261,7 @@
           "children": [
             {
               "type": "text",
-              "id": "gOPSN",
+              "id": "T35UHX",
               "layoutPosition": "absolute",
               "x": 0,
               "y": 1,
@@ -2631,24 +2283,59 @@
         },
         {
           "type": "text",
-          "id": "sDr2l",
-          "x": 427,
-          "y": 90,
-          "name": "Secondary Button Label",
-          "fill": "#20211F",
-          "content": "Secondary Button",
-          "lineHeight": 1,
+          "id": "sMoP1",
+          "x": 40,
+          "y": 190,
+          "name": "Secondary Filled Caption",
+          "fill": "#6B6B72",
+          "content": "SECONDARY / FILLED",
           "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "M3Ncgg",
+          "x": 280,
+          "y": 190,
+          "name": "Secondary Coral Caption",
+          "fill": "#6B6B72",
+          "content": "SECONDARY / OUTLINE CORAL",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "SDRd8",
+          "x": 520,
+          "y": 190,
+          "name": "Secondary Blue Caption",
+          "fill": "#6B6B72",
+          "content": "SECONDARY / OUTLINE BLUE",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "m5qQum",
+          "x": 760,
+          "y": 190,
+          "name": "Destructive Caption",
+          "fill": "#6B6B72",
+          "content": "DESTRUCTIVE",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
         },
         {
           "type": "frame",
-          "id": "urn3o",
-          "x": 427,
-          "y": 113,
-          "name": "Leave Room Secondary Button",
+          "id": "uqDKS",
+          "x": 40,
+          "y": 212,
+          "name": "Button / Secondary / Filled",
+          "reusable": true,
           "width": 170,
           "height": 40,
           "fill": {
@@ -2701,7 +2388,7 @@
           "children": [
             {
               "type": "text",
-              "id": "a3D7Ur",
+              "id": "tiW2z",
               "x": 0,
               "y": 1,
               "name": "Leave Room Secondary Button Label",
@@ -2722,13 +2409,13 @@
         },
         {
           "type": "frame",
-          "id": "dg2mn",
-          "x": 427,
-          "y": 174,
-          "name": "Play Again Outline Button",
+          "id": "C1d2NF",
+          "x": 280,
+          "y": 212,
+          "name": "Button / Secondary / Outline Coral",
+          "reusable": true,
           "width": 170,
           "height": 40,
-          "fill": "#F8F2E4",
           "cornerRadius": 20,
           "stroke": "#DD6A65",
           "strokeWidth": 1.5,
@@ -2737,7 +2424,7 @@
           "children": [
             {
               "type": "text",
-              "id": "JwSy3",
+              "id": "Qkcja",
               "x": 0,
               "y": 1,
               "name": "Play Again Outline Button Label",
@@ -2758,10 +2445,11 @@
         },
         {
           "type": "frame",
-          "id": "SPvxT",
-          "x": 427,
-          "y": 235,
-          "name": "Copy Code Outline Button",
+          "id": "sk6un",
+          "x": 520,
+          "y": 212,
+          "name": "Button / Secondary / Outline Blue",
+          "reusable": true,
           "width": 170,
           "height": 40,
           "fill": "#F8F2E4",
@@ -2773,7 +2461,7 @@
           "children": [
             {
               "type": "text",
-              "id": "jGF3O",
+              "id": "s9aN9",
               "x": 0,
               "y": 1,
               "name": "Copy Code Outline Button Label",
@@ -2794,60 +2482,11 @@
         },
         {
           "type": "frame",
-          "id": "y00hUf",
-          "x": 427,
-          "y": 316,
-          "name": "Settings Outline Button",
-          "width": 170,
-          "height": 40,
-          "fill": "#F8F2E4",
-          "cornerRadius": 20,
-          "stroke": "#4D94D8",
-          "strokeWidth": 1.5,
-          "strokeAlignment": "inner",
-          "layout": "none",
-          "children": [
-            {
-              "type": "text",
-              "id": "Z72UFj",
-              "x": 0,
-              "y": 1,
-              "name": "Settings Outline Button Label",
-              "fill": "#4D94DD",
-              "textGrowth": "fixed-width-height",
-              "width": 170,
-              "height": 39,
-              "content": "SETTINGS",
-              "lineHeight": 1,
-              "textAlign": "center",
-              "textAlignVertical": "middle",
-              "fontFamily": "Baloo 2",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "letterSpacing": -1.5
-            }
-          ]
-        },
-        {
-          "type": "text",
-          "id": "C3Lxtp",
-          "x": 51,
-          "y": 294,
-          "name": "Destructive Button Label",
-          "fill": "#20211F",
-          "content": "Destructive Button",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
-        },
-        {
-          "type": "frame",
-          "id": "M0jGW",
-          "x": 51,
-          "y": 316,
-          "name": "Delete Room Destructive Button",
+          "id": "DnRX2",
+          "x": 760,
+          "y": 212,
+          "name": "Button / Destructive / Default",
+          "reusable": true,
           "width": 165,
           "height": 40,
           "fill": {
@@ -2896,7 +2535,7 @@
           "children": [
             {
               "type": "text",
-              "id": "t2MXw",
+              "id": "nOlUy",
               "x": 0,
               "y": 1,
               "name": "Delete Room Destructive Button Label",
@@ -2916,98 +2555,48 @@
           ]
         },
         {
-          "type": "frame",
-          "id": "w8TE44",
-          "x": 229,
-          "y": 316,
-          "name": "Kick Player Destructive Button",
-          "width": 165,
-          "height": 40,
-          "fill": {
-            "type": "gradient",
-            "gradientType": "linear",
-            "enabled": true,
-            "rotation": 180,
-            "size": {
-              "height": 1
-            },
-            "colors": [
-              {
-                "color": "#DA443C",
-                "position": 0
-              },
-              {
-                "color": "#DA3835",
-                "position": 1
-              }
-            ]
-          },
-          "cornerRadius": 14,
-          "effect": [
-            {
-              "type": "shadow",
-              "shadowType": "outer",
-              "color": "#a81f27",
-              "offset": {
-                "x": 0,
-                "y": 4
-              },
-              "blur": 1
-            },
-            {
-              "type": "shadow",
-              "shadowType": "outer",
-              "color": "#00000026",
-              "offset": {
-                "x": 0,
-                "y": 5
-              },
-              "blur": 7
-            }
-          ],
-          "layout": "none",
-          "children": [
-            {
-              "type": "text",
-              "id": "sAnFC",
-              "x": 0,
-              "y": 1,
-              "name": "Kick Player Destructive Button Label",
-              "fill": "#FFFFFF",
-              "textGrowth": "fixed-width-height",
-              "width": 165,
-              "height": 39,
-              "content": "KICK PLAYER",
-              "lineHeight": 1,
-              "textAlign": "center",
-              "textAlignVertical": "middle",
-              "fontFamily": "Baloo 2",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "letterSpacing": -1.5
-            }
-          ]
+          "type": "text",
+          "id": "tXDf5",
+          "x": 40,
+          "y": 278,
+          "name": "Success Confirm Caption",
+          "fill": "#6B6B72",
+          "content": "SUCCESS / CONFIRM",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "Z6PnWJ",
-          "x": 51,
-          "y": 373,
-          "name": "Success Button Label",
-          "fill": "#20211F",
-          "content": "Success Button",
-          "lineHeight": 1,
+          "id": "cJjcI",
+          "x": 260,
+          "y": 278,
+          "name": "Success Accept Caption",
+          "fill": "#6B6B72",
+          "content": "SUCCESS / ACCEPT",
           "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "s0Arw3",
+          "x": 480,
+          "y": 278,
+          "name": "Large CTA Caption",
+          "fill": "#6B6B72",
+          "content": "CTA / LARGE",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
         },
         {
           "type": "frame",
-          "id": "U1Vaew",
-          "x": 51,
-          "y": 395,
-          "name": "Confirm Success Button",
+          "id": "hiFh7",
+          "x": 40,
+          "y": 300,
+          "name": "Button / Success / Confirm",
+          "reusable": true,
           "width": 165,
           "height": 40,
           "fill": {
@@ -3056,7 +2645,7 @@
           "children": [
             {
               "type": "text",
-              "id": "CTGEQ",
+              "id": "uxVNC",
               "x": 0,
               "y": 1,
               "name": "Confirm Success Button Label",
@@ -3077,10 +2666,11 @@
         },
         {
           "type": "frame",
-          "id": "KAgjK",
-          "x": 229,
-          "y": 395,
-          "name": "Accept Success Button",
+          "id": "weh14",
+          "x": 260,
+          "y": 300,
+          "name": "Button / Success / Accept",
+          "reusable": true,
           "width": 165,
           "height": 40,
           "fill": {
@@ -3129,7 +2719,7 @@
           "children": [
             {
               "type": "text",
-              "id": "gCEDw",
+              "id": "VPGvd",
               "x": 0,
               "y": 1,
               "name": "Accept Success Button Label",
@@ -3149,81 +2739,12 @@
           ]
         },
         {
-          "type": "text",
-          "id": "LmEa9",
-          "x": 51,
-          "y": 455,
-          "name": "Text Button Blue Label",
-          "fill": "#20211F",
-          "content": "Text Button (Blue)",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
-        },
-        {
-          "type": "text",
-          "id": "WhTmY",
-          "x": 51,
-          "y": 483,
-          "name": "Forgot Password Text Button",
-          "fill": "#4D94DD",
-          "content": "Forgot Password?",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 21,
-          "fontWeight": "700",
-          "letterSpacing": -1.5
-        },
-        {
-          "type": "text",
-          "id": "pZi1w",
-          "x": 220,
-          "y": 483,
-          "name": "Learn More Text Button",
-          "fill": "#4D94DD",
-          "content": "Learn More",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 21,
-          "fontWeight": "700",
-          "letterSpacing": -1.5
-        },
-        {
-          "type": "text",
-          "id": "J6i4b",
-          "x": 51,
-          "y": 523,
-          "name": "Large CTA Button Label",
-          "fill": "#20211F",
-          "content": "Large CTA Button",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
-        },
-        {
-          "type": "text",
-          "id": "telU7",
-          "x": 51,
-          "y": 549,
-          "name": "Large Party Sample Text",
-          "fill": "#F0BD31",
-          "content": "Large Party!",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 22,
-          "fontWeight": "700",
-          "letterSpacing": -1.2
-        },
-        {
           "type": "frame",
-          "id": "q1vbhd",
-          "x": 211,
-          "y": 525,
-          "name": "Start Party Large CTA Button",
+          "id": "z7uzg",
+          "x": 480,
+          "y": 300,
+          "name": "Button / CTA / Large",
+          "reusable": true,
           "width": 279,
           "height": 70,
           "fill": {
@@ -3276,7 +2797,7 @@
           "children": [
             {
               "type": "text",
-              "id": "DTBUB",
+              "id": "OcHzM",
               "x": 0,
               "y": 6.5,
               "name": "Start Party CTA Label",
@@ -3297,24 +2818,59 @@
         },
         {
           "type": "text",
-          "id": "qnLNr",
-          "x": 427,
-          "y": 373,
-          "name": "Icon Only Button Label",
-          "fill": "#20211F",
-          "content": "Icon-only Button",
-          "lineHeight": 1,
+          "id": "hUJJJ",
+          "x": 40,
+          "y": 402,
+          "name": "Types Section",
+          "fill": "#20243A",
+          "content": "BUTTON TYPES",
           "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
+          "fontSize": 14,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "qVEkH",
+          "x": 40,
+          "y": 432,
+          "name": "Icon Caption",
+          "fill": "#6B6B72",
+          "content": "ICON / CIRCULAR",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "KIor2",
+          "x": 260,
+          "y": 432,
+          "name": "Compact Caption",
+          "fill": "#6B6B72",
+          "content": "COMPACT / PRIMARY",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "c29J2U",
+          "x": 480,
+          "y": 432,
+          "name": "Text Caption",
+          "fill": "#6B6B72",
+          "content": "TEXT / BLUE",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
         },
         {
           "type": "frame",
-          "id": "Ue3lU",
-          "x": 427,
-          "y": 396,
-          "name": "Play Icon Button",
+          "id": "xXyfx",
+          "x": 40,
+          "y": 456,
+          "name": "Button / Icon / Circular",
+          "reusable": true,
           "width": 43,
           "height": 43,
           "fill": "#FFFFFF",
@@ -3333,7 +2889,7 @@
           "children": [
             {
               "type": "icon",
-              "id": "GUsKO",
+              "id": "M15bX",
               "x": 7.25,
               "y": 6.25,
               "name": "Play Icon Button Symbol",
@@ -3348,135 +2904,11 @@
         },
         {
           "type": "frame",
-          "id": "r2JqeG",
-          "x": 480,
-          "y": 396,
-          "name": "Settings Icon Button",
-          "width": 43,
-          "height": 43,
-          "fill": "#FFFFFF",
-          "cornerRadius": 22,
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#00000026",
-            "offset": {
-              "x": 0,
-              "y": 3
-            },
-            "blur": 6
-          },
-          "layout": "none",
-          "children": [
-            {
-              "type": "icon",
-              "id": "g4xJT",
-              "x": 10,
-              "y": 9,
-              "name": "Settings Icon Button Symbol",
-              "width": 23,
-              "height": 23.5,
-              "icon": "settings",
-              "library": "Material Symbols Rounded",
-              "weight": 700,
-              "fill": "#1A204C"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "XgljZ",
-          "x": 533,
-          "y": 396,
-          "name": "Close Icon Button",
-          "width": 43,
-          "height": 43,
-          "fill": "#FFFFFF",
-          "cornerRadius": 22,
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#00000026",
-            "offset": {
-              "x": 0,
-              "y": 3
-            },
-            "blur": 6
-          },
-          "layout": "none",
-          "children": [
-            {
-              "type": "icon",
-              "id": "F1JiMU",
-              "x": 7.5,
-              "y": 7.5,
-              "name": "Close Icon Button Symbol",
-              "width": 26,
-              "height": 27,
-              "icon": "close",
-              "library": "Material Symbols Rounded",
-              "weight": 700,
-              "fill": "#1A204C"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "y9jVGq",
-          "x": 586,
-          "y": 396,
-          "name": "Back Icon Button",
-          "width": 43,
-          "height": 43,
-          "fill": "#FFFFFF",
-          "cornerRadius": 22,
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#00000026",
-            "offset": {
-              "x": 0,
-              "y": 3
-            },
-            "blur": 6
-          },
-          "layout": "none",
-          "children": [
-            {
-              "type": "icon",
-              "id": "q4ANG",
-              "x": 6.5,
-              "y": 7.75,
-              "name": "Back Icon Button Symbol",
-              "width": 27,
-              "height": 25.5,
-              "icon": "arrow_back",
-              "library": "Material Symbols Rounded",
-              "weight": 700,
-              "fill": "#1A204C"
-            }
-          ]
-        },
-        {
-          "type": "text",
-          "id": "VGLgO",
-          "x": 521,
-          "y": 484,
-          "name": "Small Compact Button Label",
-          "fill": "#20211F",
-          "content": "Small Compact\nButton",
-          "lineHeight": 1.05,
-          "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.2
-        },
-        {
-          "type": "frame",
-          "id": "eY64k",
-          "x": 521,
-          "y": 525,
-          "name": "Invite Compact Button",
+          "id": "nkpL4",
+          "x": 260,
+          "y": 456,
+          "name": "Button / Compact / Primary",
+          "reusable": true,
           "width": 80,
           "height": 36,
           "fill": {
@@ -3529,7 +2961,7 @@
           "children": [
             {
               "type": "text",
-              "id": "OiN3K",
+              "id": "gA2H8",
               "x": 0,
               "y": 0,
               "name": "Invite Compact Button Label",
@@ -3549,67 +2981,124 @@
           ]
         },
         {
-          "type": "text",
-          "id": "kCyTb",
-          "x": 521,
-          "y": 574,
-          "name": "Share Text Action",
-          "fill": "#4D94DD",
-          "content": "Share",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 21,
-          "fontWeight": "700",
-          "letterSpacing": -1.5
+          "type": "frame",
+          "id": "FbqqR",
+          "x": 480,
+          "y": 456,
+          "name": "Button / Text / Blue",
+          "reusable": true,
+          "width": 146,
+          "height": 21,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "RP7WV",
+              "x": 0,
+              "y": 0,
+              "name": "Label",
+              "fill": "#4D94DD",
+              "content": "Forgot Password?",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 21,
+              "fontWeight": "700",
+              "letterSpacing": -1.5
+            }
+          ]
         }
       ]
     },
     {
       "type": "frame",
-      "id": "b8WLrd",
-      "x": 4388,
-      "y": 522,
-      "name": "04 — Feedback Components",
-      "clip": true,
-      "width": 676,
-      "height": 420,
-      "fill": "#F9F1E4",
+      "id": "Mbjdm",
+      "x": 2110,
+      "y": -1260,
+      "name": "UI COMPONENTS — FEEDBACK",
+      "width": 1050,
+      "height": 500,
+      "fill": "#FAF4E6",
       "layout": "none",
       "children": [
         {
           "type": "text",
-          "id": "kd8bS",
-          "x": 51,
-          "y": 39,
-          "name": "Feedback Components Heading",
-          "fill": "#20211F",
-          "content": "FEEDBACK COMPONENTS",
-          "lineHeight": 1,
+          "id": "JaOeu",
+          "x": 40,
+          "y": 24,
+          "name": "Library Title",
+          "fill": "#20243A",
+          "content": "UI COMPONENTS — FEEDBACK",
           "fontFamily": "Baloo 2",
-          "fontSize": 20.25,
-          "fontWeight": "800",
-          "letterSpacing": -0.8
+          "fontSize": 28,
+          "fontWeight": "700"
         },
         {
           "type": "text",
-          "id": "X6l6P1",
-          "x": 51,
-          "y": 74.5,
-          "name": "Success Alert Group Label",
-          "fill": "#20211F",
-          "content": "Success Alert",
-          "lineHeight": 1,
+          "id": "MU2m0",
+          "x": 40,
+          "y": 72,
+          "name": "Alerts Section",
+          "fill": "#20243A",
+          "content": "ALERTS",
           "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
+          "fontSize": 14,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "k7xfHr",
+          "x": 40,
+          "y": 102,
+          "name": "Success Alert Caption",
+          "fill": "#6B6B72",
+          "content": "SUCCESS",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "x1WzC",
+          "x": 286,
+          "y": 102,
+          "name": "Error Alert Caption",
+          "fill": "#6B6B72",
+          "content": "ERROR",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "jpNc8",
+          "x": 532,
+          "y": 102,
+          "name": "Warning Alert Caption",
+          "fill": "#6B6B72",
+          "content": "WARNING",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "TxjKC",
+          "x": 778,
+          "y": 102,
+          "name": "Information Alert Caption",
+          "fill": "#6B6B72",
+          "content": "INFORMATION",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
         },
         {
           "type": "frame",
-          "id": "cAEno",
-          "x": 51,
-          "y": 97,
-          "name": "Success Alert Card",
+          "id": "BSyRE",
+          "x": 40,
+          "y": 124,
+          "name": "Feedback / Alert / Success",
+          "reusable": true,
           "width": 234,
           "height": 46,
           "fill": {
@@ -3650,7 +3139,7 @@
           "children": [
             {
               "type": "text",
-              "id": "xPXwd",
+              "id": "d9YdJa",
               "x": 12,
               "y": 7,
               "name": "Success Alert Title",
@@ -3664,7 +3153,7 @@
             },
             {
               "type": "text",
-              "id": "f6F3a",
+              "id": "VyX8u",
               "x": 12.5,
               "y": 24.5,
               "name": "Success Alert Description",
@@ -3680,10 +3169,11 @@
         },
         {
           "type": "frame",
-          "id": "q6RrDF",
-          "x": 51,
-          "y": 151,
-          "name": "Error Alert Card",
+          "id": "I4ipYR",
+          "x": 286,
+          "y": 124,
+          "name": "Feedback / Alert / Error",
+          "reusable": true,
           "width": 234,
           "height": 46,
           "fill": {
@@ -3724,7 +3214,7 @@
           "children": [
             {
               "type": "text",
-              "id": "ccXWD",
+              "id": "AIMB3",
               "x": 12,
               "y": 7,
               "name": "Error Alert Title",
@@ -3738,7 +3228,7 @@
             },
             {
               "type": "text",
-              "id": "jmCrb",
+              "id": "WbtkZ",
               "x": 12.5,
               "y": 24.5,
               "name": "Error Alert Description",
@@ -3754,10 +3244,11 @@
         },
         {
           "type": "frame",
-          "id": "GH6a6",
-          "x": 51,
-          "y": 205,
-          "name": "Warning Alert Card",
+          "id": "v7Gfa",
+          "x": 532,
+          "y": 124,
+          "name": "Feedback / Alert / Warning",
+          "reusable": true,
           "width": 234,
           "height": 48,
           "fill": {
@@ -3798,7 +3289,7 @@
           "children": [
             {
               "type": "text",
-              "id": "VGhev",
+              "id": "aJ9vI",
               "x": 12,
               "y": 7,
               "name": "Warning Alert Title",
@@ -3812,7 +3303,7 @@
             },
             {
               "type": "text",
-              "id": "fXdD5",
+              "id": "WrUOr",
               "x": 12.5,
               "y": 24.5,
               "name": "Warning Alert Description",
@@ -3828,10 +3319,11 @@
         },
         {
           "type": "frame",
-          "id": "rb8hO",
-          "x": 51,
-          "y": 259,
-          "name": "Informational Alert Card",
+          "id": "PiF88",
+          "x": 778,
+          "y": 124,
+          "name": "Feedback / Alert / Information",
+          "reusable": true,
           "width": 234,
           "height": 46,
           "fill": {
@@ -3872,7 +3364,7 @@
           "children": [
             {
               "type": "text",
-              "id": "qtm1u",
+              "id": "M5LW8",
               "x": 12,
               "y": 7,
               "name": "Informational Alert Title",
@@ -3886,7 +3378,7 @@
             },
             {
               "type": "text",
-              "id": "Lj2kj",
+              "id": "tEeJt",
               "x": 12.5,
               "y": 24.5,
               "name": "Informational Alert Description",
@@ -3902,24 +3394,176 @@
         },
         {
           "type": "text",
-          "id": "UBktF",
-          "x": 51,
-          "y": 318,
-          "name": "Toast Notification Label",
-          "fill": "#20211F",
-          "content": "Toast Notification",
-          "lineHeight": 1,
+          "id": "JpqaL",
+          "x": 40,
+          "y": 204,
+          "name": "System Feedback Section",
+          "fill": "#20243A",
+          "content": "SYSTEM FEEDBACK",
           "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.55
+          "fontSize": 14,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "oHbns",
+          "x": 40,
+          "y": 234,
+          "name": "Loading Caption",
+          "fill": "#6B6B72",
+          "content": "LOADING / DOTS",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "Cop52",
+          "x": 180,
+          "y": 234,
+          "name": "Toast Caption",
+          "fill": "#6B6B72",
+          "content": "TOAST / DEFAULT",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "HXEye",
+          "x": 460,
+          "y": 234,
+          "name": "Modal Caption",
+          "fill": "#6B6B72",
+          "content": "MODAL / CONFIRMATION",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "udZpi",
+          "x": 720,
+          "y": 234,
+          "name": "Skeleton Caption",
+          "fill": "#6B6B72",
+          "content": "SKELETON / DEFAULT",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "tk4ij",
+          "x": 720,
+          "y": 350,
+          "name": "Progress Caption",
+          "fill": "#6B6B72",
+          "content": "PROGRESS / DEFAULT",
+          "fontFamily": "Baloo 2",
+          "fontSize": 12,
+          "fontWeight": "700"
         },
         {
           "type": "frame",
-          "id": "kFUfZ",
-          "x": 51,
-          "y": 341,
-          "name": "Player Joined Toast",
+          "id": "mlfhg",
+          "x": 40,
+          "y": 258,
+          "name": "Feedback / Loading / Dots",
+          "reusable": true,
+          "width": 68,
+          "height": 68,
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "BDMca",
+              "x": 28,
+              "y": 0,
+              "name": "Loading Dot Blue",
+              "fill": "#5EA7F4",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "F5XUoY",
+              "x": 47.5,
+              "y": 7.5,
+              "name": "Loading Dot Gray",
+              "fill": "#D9DCEB",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "daduB",
+              "x": 56,
+              "y": 28,
+              "name": "Loading Dot Pale Coral",
+              "fill": "#F7D3CB",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "h2uyR",
+              "x": 48,
+              "y": 47.5,
+              "name": "Loading Dot Yellow",
+              "fill": "#FED643",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "R5QhuV",
+              "x": 28,
+              "y": 56,
+              "name": "Loading Dot Mint",
+              "fill": "#5CD8A2",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "g7clm",
+              "x": 8,
+              "y": 47.5,
+              "name": "Loading Dot Green",
+              "fill": "#5DD8A1",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "j86gV9",
+              "x": 0,
+              "y": 27.5,
+              "name": "Loading Dot Coral",
+              "fill": "#FC796E",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "qenEO",
+              "x": 8,
+              "y": 8,
+              "name": "Loading Dot Soft Red",
+              "fill": "#FA7F75",
+              "width": 12,
+              "height": 12
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "k2WFIc",
+          "x": 180,
+          "y": 258,
+          "name": "Feedback / Toast / Default",
+          "reusable": true,
           "width": 234,
           "height": 34,
           "fill": "#FAFAFA",
@@ -3938,7 +3582,7 @@
           "children": [
             {
               "type": "text",
-              "id": "csDKy",
+              "id": "WHBlZ",
               "x": 11,
               "y": 9,
               "name": "Player Joined Toast Text",
@@ -3953,105 +3597,12 @@
           ]
         },
         {
-          "type": "ellipse",
-          "id": "Z8KTGa",
-          "x": 344.5,
-          "y": 96,
-          "name": "Loading Dot Blue",
-          "fill": "#5EA7F4",
-          "width": 12,
-          "height": 12
-        },
-        {
-          "type": "ellipse",
-          "id": "QpSeC",
-          "x": 364,
-          "y": 103.5,
-          "name": "Loading Dot Gray",
-          "fill": "#D9DCEB",
-          "width": 12,
-          "height": 12
-        },
-        {
-          "type": "ellipse",
-          "id": "JzJuu",
-          "x": 372.5,
-          "y": 124,
-          "name": "Loading Dot Pale Coral",
-          "fill": "#F7D3CB",
-          "width": 12,
-          "height": 12
-        },
-        {
-          "type": "ellipse",
-          "id": "WBU13",
-          "x": 364.5,
-          "y": 143.5,
-          "name": "Loading Dot Yellow",
-          "fill": "#FED643",
-          "width": 12,
-          "height": 12
-        },
-        {
-          "type": "ellipse",
-          "id": "Zw9az",
-          "x": 344.5,
-          "y": 152,
-          "name": "Loading Dot Mint",
-          "fill": "#5CD8A2",
-          "width": 12,
-          "height": 12
-        },
-        {
-          "type": "ellipse",
-          "id": "ny9K9",
-          "x": 324.5,
-          "y": 143.5,
-          "name": "Loading Dot Green",
-          "fill": "#5DD8A1",
-          "width": 12,
-          "height": 12
-        },
-        {
-          "type": "ellipse",
-          "id": "bzc8m",
-          "x": 316.5,
-          "y": 123.5,
-          "name": "Loading Dot Coral",
-          "fill": "#FC796E",
-          "width": 12,
-          "height": 12
-        },
-        {
-          "type": "ellipse",
-          "id": "fjglZ",
-          "x": 324.5,
-          "y": 104,
-          "name": "Loading Dot Soft Red",
-          "fill": "#FA7F75",
-          "width": 12,
-          "height": 12
-        },
-        {
-          "type": "text",
-          "id": "owMhZ",
-          "x": 417,
-          "y": 74.5,
-          "name": "Confirmation Modal Label",
-          "fill": "#20211F",
-          "content": "Confirmation Modal",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.6
-        },
-        {
           "type": "frame",
-          "id": "t47A0",
-          "x": 417,
-          "y": 97,
-          "name": "Confirmation Modal Card",
+          "id": "UbgoY",
+          "x": 460,
+          "y": 258,
+          "name": "Feedback / Modal / Confirmation",
+          "reusable": true,
           "width": 220,
           "height": 128,
           "fill": "#FFFFFF",
@@ -4070,7 +3621,7 @@
           "children": [
             {
               "type": "text",
-              "id": "lYmfv",
+              "id": "O5KiId",
               "x": 0,
               "y": 11,
               "name": "Leave Game Modal Title",
@@ -4089,7 +3640,7 @@
             },
             {
               "type": "text",
-              "id": "MObOQ",
+              "id": "AcnrE",
               "x": 0,
               "y": 28,
               "name": "Leave Game Modal Body",
@@ -4108,7 +3659,7 @@
             },
             {
               "type": "frame",
-              "id": "DyYgo",
+              "id": "bhpll",
               "x": 14,
               "y": 82,
               "name": "Stay Modal Button",
@@ -4142,7 +3693,7 @@
               "children": [
                 {
                   "type": "text",
-                  "id": "g01FEZ",
+                  "id": "s4bZjP",
                   "x": 0,
                   "y": 0,
                   "name": "Stay Modal Button Label",
@@ -4163,7 +3714,7 @@
             },
             {
               "type": "frame",
-              "id": "FwJIf",
+              "id": "tZSZA",
               "x": 114,
               "y": 82,
               "name": "Leave Modal Button",
@@ -4215,7 +3766,7 @@
               "children": [
                 {
                   "type": "text",
-                  "id": "Wm35F",
+                  "id": "QTODT",
                   "x": 0,
                   "y": 0,
                   "name": "Leave Modal Button Label",
@@ -4237,161 +3788,159 @@
           ]
         },
         {
-          "type": "text",
-          "id": "JoBaB",
-          "x": 417,
-          "y": 247.5,
-          "name": "Skeleton Loading State Label",
-          "fill": "#20211F",
-          "content": "Skeleton Loading State",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.55
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 8,
-          "id": "wy8sO",
-          "x": 417,
-          "y": 271,
-          "name": "Skeleton Block One",
-          "fill": "#E8E0D2",
-          "width": 66,
-          "height": 47
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 8,
-          "id": "y3ZHqH",
-          "x": 493,
-          "y": 271,
-          "name": "Skeleton Block Two",
-          "fill": "#E8DFD1",
-          "width": 66,
-          "height": 47
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 8,
-          "id": "Meajd",
-          "x": 569,
-          "y": 271,
-          "name": "Skeleton Block Three",
-          "fill": "#E9E2D7",
-          "width": 66,
-          "height": 47
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 5,
-          "id": "njoFQ",
-          "x": 417,
-          "y": 328,
-          "name": "Skeleton Line One",
-          "fill": "#E6DED0",
-          "width": 65,
-          "height": 10
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 5,
-          "id": "gJVRL",
-          "x": 493,
-          "y": 328,
-          "name": "Skeleton Line Two",
-          "fill": "#E4DCCF",
-          "width": 65,
-          "height": 10
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 5,
-          "id": "LoUQY",
-          "x": 569,
-          "y": 328,
-          "name": "Skeleton Line Three",
-          "fill": "#E7DFD2",
-          "width": 37,
-          "height": 10
-        },
-        {
-          "type": "text",
-          "id": "h41rA",
-          "x": 417,
-          "y": 363,
-          "name": "Progress Bar Label",
-          "fill": "#20211F",
-          "content": "Progress Bar",
-          "lineHeight": 1,
-          "fontFamily": "Baloo 2",
-          "fontSize": 15,
-          "fontWeight": "700",
-          "letterSpacing": -0.5
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 9,
-          "id": "ZMolZ",
-          "x": 417,
-          "y": 386.5,
-          "name": "Progress Track",
-          "fill": "#E8E0D3",
+          "type": "frame",
+          "id": "mVktW",
+          "x": 720,
+          "y": 258,
+          "name": "Feedback / Skeleton / Default",
+          "reusable": true,
           "width": 218,
-          "height": 18
-        },
-        {
-          "type": "rectangle",
-          "cornerRadius": 9,
-          "id": "Y1TLdH",
-          "x": 417,
-          "y": 386.5,
-          "name": "Progress Fill",
-          "fill": {
-            "type": "gradient",
-            "gradientType": "linear",
-            "enabled": true,
-            "rotation": 90,
-            "size": {
-              "height": 1
+          "height": 67,
+          "layout": "none",
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "H1ONcb",
+              "x": 0,
+              "y": 0,
+              "name": "Skeleton Block 1",
+              "fill": "#E8E0D2",
+              "width": 66,
+              "height": 47
             },
-            "colors": [
-              {
-                "color": "#529CF3",
-                "position": 0
-              },
-              {
-                "color": "#4E9AFA",
-                "position": 1
-              }
-            ]
-          },
-          "width": 147,
-          "height": 18,
-          "stroke": "#00000032",
-          "strokeWidth": {
-            "bottom": 3,
-            "left": 3
-          },
-          "strokeAlignment": "inner",
-          "strokeLinejoin": "round"
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "p9GKZl",
+              "x": 76,
+              "y": 0,
+              "name": "Skeleton Block 2",
+              "fill": "#E8DFD1",
+              "width": 66,
+              "height": 47
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "SpOrc",
+              "x": 152,
+              "y": 0,
+              "name": "Skeleton Block 3",
+              "fill": "#E9E2D7",
+              "width": 66,
+              "height": 47
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "zcT2h",
+              "x": 0,
+              "y": 57,
+              "name": "Skeleton Line 1",
+              "fill": "#E6DED0",
+              "width": 65,
+              "height": 10
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "xTe90",
+              "x": 76,
+              "y": 57,
+              "name": "Skeleton Line 2",
+              "fill": "#E4DCCF",
+              "width": 65,
+              "height": 10
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "IiXpX",
+              "x": 152,
+              "y": 57,
+              "name": "Skeleton Line 3",
+              "fill": "#E7DFD2",
+              "width": 37,
+              "height": 10
+            }
+          ]
         },
         {
-          "type": "ellipse",
-          "id": "DE7qF",
-          "x": 549,
-          "y": 380.5,
-          "name": "Progress Handle",
-          "fill": "#4E9AFA",
-          "width": 28,
+          "type": "frame",
+          "id": "WqX82",
+          "x": 720,
+          "y": 374,
+          "name": "Feedback / Progress / Default",
+          "reusable": true,
+          "width": 218,
           "height": 28,
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#2365C244",
-            "blur": 4
-          }
+          "layout": "none",
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 9,
+              "id": "Hu7yn",
+              "x": 0,
+              "y": 6,
+              "name": "Progress Track",
+              "fill": "#E8E0D3",
+              "width": 218,
+              "height": 18
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 9,
+              "id": "hS7pt",
+              "x": 0,
+              "y": 6,
+              "name": "Progress Fill",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 90,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#529CF3",
+                    "position": 0
+                  },
+                  {
+                    "color": "#4E9AFA",
+                    "position": 1
+                  }
+                ]
+              },
+              "width": 147,
+              "height": 18,
+              "stroke": "#00000032",
+              "strokeWidth": {
+                "bottom": 3,
+                "left": 3
+              },
+              "strokeAlignment": "inner",
+              "strokeLinejoin": "round"
+            },
+            {
+              "type": "ellipse",
+              "id": "HOFD2",
+              "x": 132,
+              "y": 0,
+              "name": "Progress Handle",
+              "fill": "#4E9AFA",
+              "width": 28,
+              "height": 28,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#2365C244",
+                "blur": 4
+              }
+            }
+          ]
         }
       ]
     }
