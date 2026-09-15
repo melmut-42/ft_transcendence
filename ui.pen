@@ -16618,6 +16618,2753 @@
           "fontWeight": "500"
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "KtDdJ",
+      "x": 4357,
+      "y": -1372,
+      "name": "Navigation & Additional UI Elements",
+      "clip": true,
+      "width": 936,
+      "height": 998,
+      "fill": "#FFF9EA",
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "tdJ47",
+          "x": 20,
+          "y": 20,
+          "name": "Navigation Heading",
+          "fill": "#171A32",
+          "content": "NAVIGATION",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 27,
+          "fontWeight": "800"
+        },
+        {
+          "type": "text",
+          "id": "pJ9jQ",
+          "x": 20,
+          "y": 70,
+          "name": "Top Nav Label",
+          "fill": "#171A32",
+          "content": "Top Nav Bar",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "qbwq2",
+          "x": 20,
+          "y": 101,
+          "name": "Top Nav Bar",
+          "width": 449,
+          "height": 62,
+          "fill": "#FFFFFF",
+          "cornerRadius": 31,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2827",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "id": "Uz8uP",
+              "type": "ref",
+              "ref": "g0s6q7",
+              "name": "Back Button",
+              "x": 7,
+              "y": 3,
+              "descendants": {
+                "LySfq": {
+                  "icon": "arrow_back"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "ARUNG",
+              "x": 177,
+              "y": 21,
+              "name": "Page Title",
+              "fill": "#171A32",
+              "content": "Page Title",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 22,
+              "fontWeight": "800"
+            },
+            {
+              "id": "likNK",
+              "type": "ref",
+              "ref": "g0s6q7",
+              "name": "Settings Button",
+              "x": 384,
+              "y": 3,
+              "descendants": {
+                "LySfq": {
+                  "icon": "settings"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "QkdCi",
+          "x": 520,
+          "y": 70,
+          "name": "Buttons Label",
+          "fill": "#171A32",
+          "content": "Buttons",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "id": "mA6Rq",
+          "type": "ref",
+          "ref": "g0s6q7",
+          "name": "Back Icon Button",
+          "x": 520,
+          "y": 101,
+          "descendants": {
+            "LySfq": {
+              "icon": "arrow_back"
+            }
+          }
+        },
+        {
+          "id": "e9jFI",
+          "type": "ref",
+          "ref": "g0s6q7",
+          "name": "Settings Icon Button",
+          "x": 735,
+          "y": 101,
+          "descendants": {
+            "LySfq": {
+              "icon": "settings"
+            }
+          }
+        },
+        {
+          "id": "NjOkT",
+          "type": "ref",
+          "ref": "g0s6q7",
+          "name": "Close Icon Button",
+          "x": 835,
+          "y": 101,
+          "descendants": {
+            "LySfq": {
+              "icon": "close"
+            }
+          }
+        },
+        {
+          "type": "text",
+          "id": "wooTF",
+          "x": 20,
+          "y": 187,
+          "name": "Mobile Nav Label",
+          "fill": "#171A32",
+          "content": "Mobile Bottom Nav",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "bA23N",
+          "x": 20,
+          "y": 219,
+          "name": "Mobile Bottom Nav",
+          "width": 449,
+          "height": 65,
+          "fill": "#FFFFFF",
+          "cornerRadius": 33,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2827",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "icon",
+              "id": "f4SY3D",
+              "x": 37,
+              "y": 17,
+              "name": "Home",
+              "width": 32,
+              "height": 32,
+              "icon": "home",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#111936"
+            },
+            {
+              "type": "icon",
+              "id": "r9WcZ",
+              "x": 146,
+              "y": 17,
+              "name": "Games",
+              "width": 32,
+              "height": 32,
+              "icon": "sports_esports",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#111936"
+            },
+            {
+              "type": "icon",
+              "id": "f6f5mA",
+              "x": 257,
+              "y": 17,
+              "name": "Teams",
+              "width": 32,
+              "height": 32,
+              "icon": "groups",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#111936"
+            },
+            {
+              "type": "icon",
+              "id": "OY255",
+              "x": 368,
+              "y": 17,
+              "name": "Profile",
+              "width": 32,
+              "height": 32,
+              "icon": "person",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#111936"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 3,
+              "id": "PRtnM",
+              "x": 138,
+              "y": 60,
+              "name": "Active Indicator",
+              "fill": "#4C99E4",
+              "width": 50,
+              "height": 5
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "HlMUn",
+          "x": 520,
+          "y": 196,
+          "name": "Breadcrumb Label",
+          "fill": "#171A32",
+          "content": "Breadcrumb",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "ruyUr",
+          "x": 520,
+          "y": 228,
+          "name": "Breadcrumb",
+          "width": 380,
+          "height": 52,
+          "fill": "#EEE8DD",
+          "cornerRadius": 12,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "pIsHd",
+              "x": 15,
+              "y": 16,
+              "name": "Lobby",
+              "fill": "#171A32",
+              "content": "Lobby",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 18,
+              "fontWeight": "700"
+            },
+            {
+              "type": "icon",
+              "id": "zvwc4",
+              "x": 87,
+              "y": 14,
+              "name": "Chevron 1",
+              "width": 24,
+              "height": 24,
+              "icon": "chevron_right",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#171A32"
+            },
+            {
+              "type": "text",
+              "id": "Y2s412",
+              "x": 118,
+              "y": 16,
+              "name": "Game Room",
+              "fill": "#171A32",
+              "content": "Game Room",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 18,
+              "fontWeight": "700"
+            },
+            {
+              "type": "icon",
+              "id": "v7buh",
+              "x": 237,
+              "y": 14,
+              "name": "Chevron 2",
+              "width": 24,
+              "height": 24,
+              "icon": "chevron_right",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#171A32"
+            },
+            {
+              "type": "text",
+              "id": "B5ohL",
+              "x": 267,
+              "y": 16,
+              "name": "Round 1",
+              "fill": "#171A32",
+              "content": "Round 1",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 18,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "mWZtt",
+          "x": 20,
+          "y": 348,
+          "name": "Additional UI Heading",
+          "fill": "#171A32",
+          "content": "ADDITIONAL UI ELEMENTS",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 27,
+          "fontWeight": "800"
+        },
+        {
+          "type": "text",
+          "id": "d0Kt0",
+          "x": 20,
+          "y": 397,
+          "name": "Tooltip Label",
+          "fill": "#171A32",
+          "content": "Tooltip",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "YTkLj",
+          "x": 280,
+          "y": 397,
+          "name": "Badge Label",
+          "fill": "#171A32",
+          "content": "Badge",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "Z3mPm",
+          "x": 393,
+          "y": 397,
+          "name": "Tag Label",
+          "fill": "#171A32",
+          "content": "Tag / Chip",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "G4WWg6",
+          "x": 630,
+          "y": 397,
+          "name": "Divider Label",
+          "fill": "#171A32",
+          "content": "Divider",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "evxKb",
+          "x": 20,
+          "y": 526,
+          "name": "Card Container Label",
+          "fill": "#171A32",
+          "content": "Card Container",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "Lfx6q",
+          "x": 320,
+          "y": 526,
+          "name": "Modal Label",
+          "fill": "#171A32",
+          "content": "Modal / Popover",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "f87STs",
+          "x": 630,
+          "y": 526,
+          "name": "Tabs Label",
+          "fill": "#171A32",
+          "content": "Tabs",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "iDEaq",
+          "x": 20,
+          "y": 762,
+          "name": "Avatar Group Label",
+          "fill": "#171A32",
+          "content": "Avatar Group",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "HAJhA",
+          "x": 320,
+          "y": 762,
+          "name": "Timer Label",
+          "fill": "#171A32",
+          "content": "Game Timer",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "t2zKIB",
+          "x": 20,
+          "y": 429,
+          "name": "Tooltip",
+          "width": 226,
+          "height": 72,
+          "fill": "#FFFFFF",
+          "cornerRadius": 14,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2820",
+            "offset": {
+              "x": 0,
+              "y": 5
+            },
+            "blur": 9
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "bzod8",
+              "x": 15,
+              "y": 16,
+              "name": "Tooltip Text",
+              "fill": "#171A32",
+              "textGrowth": "fixed-width",
+              "width": 196,
+              "content": "This component uses\nhelp helper text.",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 17,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "id": "wDnSk",
+          "type": "ref",
+          "ref": "o0UFBm",
+          "name": "New Badge",
+          "x": 280,
+          "y": 428,
+          "width": 80,
+          "height": 36,
+          "fill": "#F3776F",
+          "descendants": {
+            "vY8EP": {
+              "content": "3 New",
+              "width": 80
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "ZF4PN",
+          "x": 393,
+          "y": 428,
+          "name": "Fun Chip",
+          "width": 56,
+          "height": 36,
+          "fill": "#EEE9E0",
+          "cornerRadius": 18,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "cTUFJ",
+              "x": 0,
+              "y": 9,
+              "name": "Label",
+              "fill": "#34333A",
+              "textGrowth": "fixed-width",
+              "width": 56,
+              "content": "Fun",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 17,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vfxYb",
+          "x": 457,
+          "y": 428,
+          "name": "Fast Chip",
+          "width": 56,
+          "height": 36,
+          "fill": "#EEE9E0",
+          "cornerRadius": 18,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "OW6aC",
+              "x": 0,
+              "y": 9,
+              "name": "Label",
+              "fill": "#34333A",
+              "textGrowth": "fixed-width",
+              "width": 56,
+              "content": "Fast",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 17,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "XWTnm",
+          "x": 526,
+          "y": 428,
+          "name": "Easy Chip",
+          "width": 56,
+          "height": 36,
+          "fill": "#EEE9E0",
+          "cornerRadius": 18,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "bUT92",
+              "x": 0,
+              "y": 9,
+              "name": "Label",
+              "fill": "#34333A",
+              "textGrowth": "fixed-width",
+              "width": 56,
+              "content": "Easy",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 17,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 4,
+          "id": "E6jwVc",
+          "x": 630,
+          "y": 445,
+          "name": "Divider",
+          "fill": "#E1DCD3",
+          "width": 270,
+          "height": 8
+        },
+        {
+          "type": "frame",
+          "id": "yr5tT",
+          "x": 20,
+          "y": 558,
+          "name": "Card Container",
+          "width": 270,
+          "height": 176,
+          "fill": "#FFFFFF",
+          "cornerRadius": 17,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2824",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "h1tqk1",
+          "x": 320,
+          "y": 558,
+          "name": "Modal Backdrop",
+          "width": 270,
+          "height": 176,
+          "fill": "#C8C8C8",
+          "cornerRadius": 17,
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "RUATY",
+              "x": 37,
+              "y": 38,
+              "name": "Popover Back",
+              "width": 210,
+              "height": 140,
+              "fill": "#F2F2F2",
+              "cornerRadius": 11,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#25252526",
+                "offset": {
+                  "x": 0,
+                  "y": 4
+                },
+                "blur": 8
+              }
+            },
+            {
+              "type": "frame",
+              "id": "fUb9s",
+              "x": 20,
+              "y": 20,
+              "name": "Popover Front",
+              "width": 225,
+              "height": 119,
+              "fill": "#FFFFFF",
+              "cornerRadius": 11,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#25252526",
+                "offset": {
+                  "x": 0,
+                  "y": 4
+                },
+                "blur": 8
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "zjN4X",
+          "x": 630,
+          "y": 558,
+          "name": "Tabs",
+          "width": 270,
+          "height": 44,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "bhkM5",
+              "x": 20,
+              "y": 8,
+              "name": "All Games",
+              "fill": "#171A32",
+              "content": "All Games",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 18,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "FB5uF",
+              "x": 150,
+              "y": 8,
+              "name": "My Games",
+              "fill": "#171A32",
+              "content": "My Games",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 18,
+              "fontWeight": "700"
+            },
+            {
+              "type": "rectangle",
+              "id": "kTujb",
+              "x": 5,
+              "y": 40,
+              "name": "Active Tab",
+              "fill": "#171A32",
+              "width": 120,
+              "height": 3
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "jO9AH",
+          "x": 650,
+          "y": 613,
+          "name": "Friends Games Label",
+          "fill": "#171A32",
+          "content": "Friends' Games",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "O5ENWM",
+          "x": 630,
+          "y": 648,
+          "name": "Accordion",
+          "width": 270,
+          "height": 52,
+          "fill": "#FFFFFF",
+          "cornerRadius": [
+            12,
+            12,
+            0,
+            0
+          ],
+          "stroke": "#E3DDD3",
+          "strokeWidth": 1,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "vOeDw",
+              "x": 17,
+              "y": 16,
+              "name": "Accordion Label",
+              "fill": "#171A32",
+              "content": "Accordion",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 18,
+              "fontWeight": "700"
+            },
+            {
+              "type": "icon",
+              "id": "bCis8",
+              "x": 229,
+              "y": 14,
+              "name": "Chevron",
+              "width": 24,
+              "height": 24,
+              "icon": "keyboard_arrow_down",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#171A32"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "bWtyL",
+          "x": 630,
+          "y": 699,
+          "name": "Accordion",
+          "width": 270,
+          "height": 52,
+          "fill": "#FFFFFF",
+          "cornerRadius": [
+            0,
+            0,
+            12,
+            12
+          ],
+          "stroke": "#E3DDD3",
+          "strokeWidth": 1,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "WuDTa",
+              "x": 17,
+              "y": 16,
+              "name": "Accordion Label",
+              "fill": "#171A32",
+              "content": "Accordion",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 18,
+              "fontWeight": "700"
+            },
+            {
+              "type": "icon",
+              "id": "o2s4k",
+              "x": 229,
+              "y": 14,
+              "name": "Chevron",
+              "width": 24,
+              "height": 24,
+              "icon": "keyboard_arrow_down",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#171A32"
+            }
+          ]
+        },
+        {
+          "id": "RDK6e",
+          "type": "ref",
+          "ref": "UlTWe",
+          "name": "Avatar 1",
+          "x": 20,
+          "y": 800,
+          "width": 54,
+          "height": 54,
+          "descendants": {
+            "DdAMe": {
+              "x": 10,
+              "y": 12,
+              "width": 32,
+              "height": 32
+            },
+            "j0RhE": {
+              "x": 12,
+              "y": 10,
+              "width": 29,
+              "height": 29
+            },
+            "e6ipbo": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "id": "IzR9A",
+          "type": "ref",
+          "ref": "UlTWe",
+          "name": "Avatar 2",
+          "x": 38,
+          "y": 840,
+          "width": 54,
+          "height": 54,
+          "descendants": {
+            "DdAMe": {
+              "x": 10,
+              "y": 12,
+              "width": 32,
+              "height": 32
+            },
+            "j0RhE": {
+              "x": 12,
+              "y": 10,
+              "width": 29,
+              "height": 29
+            },
+            "e6ipbo": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "id": "kMeo0",
+          "type": "ref",
+          "ref": "UlTWe",
+          "name": "Avatar 3",
+          "x": 56,
+          "y": 880,
+          "width": 54,
+          "height": 54,
+          "descendants": {
+            "DdAMe": {
+              "x": 10,
+              "y": 12,
+              "width": 32,
+              "height": 32
+            },
+            "j0RhE": {
+              "x": 12,
+              "y": 10,
+              "width": 29,
+              "height": 29
+            },
+            "e6ipbo": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "Uc9vQ",
+          "x": 106,
+          "y": 800,
+          "name": "Empty State",
+          "width": 185,
+          "height": 132,
+          "cornerRadius": 16,
+          "stroke": "#DDD6CB",
+          "strokeWidth": 2,
+          "layout": "none",
+          "children": [
+            {
+              "type": "icon",
+              "id": "KC3WQ",
+              "x": 65,
+              "y": 20,
+              "name": "Empty Illustration",
+              "width": 55,
+              "height": 55,
+              "icon": "image",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#C9CECC"
+            },
+            {
+              "type": "text",
+              "id": "N3ZHdj",
+              "x": 18,
+              "y": 91,
+              "name": "Empty Message",
+              "fill": "#171A32",
+              "textGrowth": "fixed-width",
+              "width": 149,
+              "content": "No games found",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 18,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "UI8hp",
+          "x": 320,
+          "y": 799,
+          "name": "Game Timer",
+          "width": 270,
+          "height": 137,
+          "fill": "#FFFFFF",
+          "cornerRadius": 16,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2824",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "oD2I3",
+              "x": 17,
+              "y": 17,
+              "name": "Timer Display",
+              "width": 236,
+              "height": 65,
+              "fill": "#F3F0E9",
+              "cornerRadius": 9,
+              "layout": "none"
+            },
+            {
+              "type": "icon",
+              "id": "pRaAM",
+              "x": 29,
+              "y": 33,
+              "name": "Clock Icon",
+              "width": 30,
+              "height": 30,
+              "icon": "schedule",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#171A32"
+            },
+            {
+              "type": "text",
+              "id": "BqSOw",
+              "x": 75,
+              "y": 27,
+              "name": "Time",
+              "fill": "#171A32",
+              "content": "0:38:18",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 36,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "dgySc",
+              "x": 27,
+              "y": 98,
+              "name": "Score",
+              "fill": "#171A32",
+              "content": "Team A: 10  |  Team B: 8",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 19,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vowzT",
+          "x": 630,
+          "y": 798,
+          "name": "Team A",
+          "width": 270,
+          "height": 61,
+          "layout": "none",
+          "children": [
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "RmZeo",
+              "x": 0,
+              "y": 8,
+              "name": "Left Tail",
+              "rotation": 90,
+              "fill": "#4C9CE8",
+              "width": 55,
+              "height": 52
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "a05QH",
+              "x": 215,
+              "y": 8,
+              "name": "Right Tail",
+              "rotation": -90,
+              "fill": "#4C9CE8",
+              "width": 55,
+              "height": 52
+            },
+            {
+              "type": "frame",
+              "id": "mGCUK",
+              "x": 25,
+              "y": 0,
+              "name": "Ribbon",
+              "width": 220,
+              "height": 55,
+              "fill": "#4C9CE8",
+              "cornerRadius": 6,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#342E2828",
+                "offset": {
+                  "x": 0,
+                  "y": 5
+                },
+                "blur": 8
+              },
+              "layout": "none"
+            },
+            {
+              "type": "text",
+              "id": "lqxwR",
+              "x": 25,
+              "y": 13,
+              "name": "Label",
+              "fill": "#FFFFFF",
+              "textGrowth": "fixed-width",
+              "width": 220,
+              "content": "Team A",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 31,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "BzLX1",
+          "x": 630,
+          "y": 872,
+          "name": "Team B",
+          "width": 270,
+          "height": 61,
+          "layout": "none",
+          "children": [
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "B6Q9U8",
+              "x": 0,
+              "y": 8,
+              "name": "Left Tail",
+              "rotation": 90,
+              "fill": "#F16661",
+              "width": 55,
+              "height": 52
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "mW824",
+              "x": 215,
+              "y": 8,
+              "name": "Right Tail",
+              "rotation": -90,
+              "fill": "#F16661",
+              "width": 55,
+              "height": 52
+            },
+            {
+              "type": "frame",
+              "id": "Os3hh",
+              "x": 25,
+              "y": 0,
+              "name": "Ribbon",
+              "width": 220,
+              "height": 55,
+              "fill": "#F16661",
+              "cornerRadius": 6,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#342E2828",
+                "offset": {
+                  "x": 0,
+                  "y": 5
+                },
+                "blur": 8
+              },
+              "layout": "none"
+            },
+            {
+              "type": "text",
+              "id": "JhPep",
+              "x": 25,
+              "y": 13,
+              "name": "Label",
+              "fill": "#FFFFFF",
+              "textGrowth": "fixed-width",
+              "width": 220,
+              "content": "Team B",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 31,
+              "fontWeight": "700"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "BQHms",
+      "x": 5413,
+      "y": -1372,
+      "name": "Word Game Components",
+      "clip": true,
+      "width": 928,
+      "height": 666,
+      "fill": "#FFF9EA",
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "qr409",
+          "x": 28,
+          "y": 28,
+          "name": "Heading",
+          "fill": "#171A32",
+          "content": "WORD GAME COMPONENTS",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 27,
+          "fontWeight": "800"
+        },
+        {
+          "type": "text",
+          "id": "j49o9",
+          "x": 28,
+          "y": 90,
+          "name": "Neutral Label",
+          "fill": "#171A32",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "Word Card\n(Neutral)",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "F0xYoW",
+          "x": 251,
+          "y": 90,
+          "name": "Team A Label",
+          "fill": "#171A32",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "Team A Word\nCard",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "OEZaz",
+          "x": 473,
+          "y": 90,
+          "name": "Team B Label",
+          "fill": "#171A32",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "Team B Word\nCard",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "aCTPJ",
+          "x": 695,
+          "y": 90,
+          "name": "Danger Label",
+          "fill": "#171A32",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "Special Danger\nCard",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "id": "Bi4es",
+          "type": "ref",
+          "ref": "j8HMm3",
+          "name": "Neutral Word Card",
+          "x": 28,
+          "y": 149,
+          "descendants": {
+            "MPmeR": {
+              "content": "APPLE"
+            }
+          }
+        },
+        {
+          "id": "GVD0A",
+          "type": "ref",
+          "ref": "j8HMm3",
+          "name": "Team A Word Card",
+          "x": 251,
+          "y": 149,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#65AEF1",
+                "position": 0
+              },
+              {
+                "color": "#4C96E6",
+                "position": 1
+              }
+            ]
+          },
+          "stroke": "#3787CF",
+          "descendants": {
+            "MPmeR": {
+              "content": "OCEAN",
+              "fill": "#FFFFFF"
+            }
+          }
+        },
+        {
+          "id": "aZlwX",
+          "type": "ref",
+          "ref": "j8HMm3",
+          "name": "Team B Word Card",
+          "x": 473,
+          "y": 149,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#FF7D74",
+                "position": 0
+              },
+              {
+                "color": "#F26660",
+                "position": 1
+              }
+            ]
+          },
+          "stroke": "#DC554F",
+          "descendants": {
+            "MPmeR": {
+              "content": "FIRE",
+              "fill": "#FFFFFF"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "vbxAL",
+          "x": 695,
+          "y": 149,
+          "name": "Danger Word Card",
+          "width": 190,
+          "height": 210,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#643064",
+                "position": 0
+              },
+              {
+                "color": "#452046",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": 18,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2825",
+            "offset": {
+              "x": 0,
+              "y": 7
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "icon",
+              "id": "OkEfv",
+              "x": 63,
+              "y": 48,
+              "name": "Skull Icon",
+              "width": 64,
+              "height": 64,
+              "icon": "skull",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#EEE4EC"
+            },
+            {
+              "type": "text",
+              "id": "M2QLd",
+              "x": 0,
+              "y": 132,
+              "name": "Danger Label",
+              "fill": "#F36E67",
+              "textGrowth": "fixed-width",
+              "width": 190,
+              "content": "DANGER",
+              "lineHeight": 1,
+              "textAlign": "center",
+              "fontFamily": "Baloo 2",
+              "fontSize": 31,
+              "fontWeight": "800"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "xglEc",
+          "x": 28,
+          "y": 620,
+          "name": "Revealed Card Label",
+          "fill": "#171A32",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "Revealed Card",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "KNpE1",
+          "x": 251,
+          "y": 620,
+          "name": "Hidden Card Label",
+          "fill": "#171A32",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "Hidden Card",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "UrGtC",
+          "x": 473,
+          "y": 620,
+          "name": "Selected Card Label",
+          "fill": "#171A32",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "Selected Card",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "z6R1N",
+          "x": 695,
+          "y": 620,
+          "name": "Disabled Card Label",
+          "fill": "#AAA49D",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "Disabled Card",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 20,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "a8iD0",
+          "x": 28,
+          "y": 394,
+          "name": "Revealed Card Base",
+          "width": 190,
+          "height": 210,
+          "fill": "#E9E3D8",
+          "cornerRadius": 18,
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "P5SjO",
+              "x": 20,
+              "y": 7,
+              "name": "Revealed Card",
+              "rotation": -11,
+              "width": 166,
+              "height": 197,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#579FEA",
+                    "position": 0
+                  },
+                  {
+                    "color": "#579FEA",
+                    "position": 0.49
+                  },
+                  {
+                    "color": "#FFFFFF",
+                    "position": 0.5
+                  },
+                  {
+                    "color": "#F36B64",
+                    "position": 0.51
+                  },
+                  {
+                    "color": "#F36B64",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 13,
+              "stroke": "#FFFFFF",
+              "strokeWidth": 5,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#342E2825",
+                "offset": {
+                  "x": 0,
+                  "y": 6
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "y82xd",
+                  "x": 0,
+                  "y": 45,
+                  "name": "Ocean",
+                  "fill": "#FFFFFF",
+                  "textGrowth": "fixed-width",
+                  "width": 166,
+                  "content": "OCEAN",
+                  "lineHeight": 1,
+                  "textAlign": "center",
+                  "fontFamily": "Baloo 2",
+                  "fontSize": 23,
+                  "fontWeight": "800"
+                },
+                {
+                  "type": "text",
+                  "id": "gIKY3",
+                  "x": 0,
+                  "y": 133,
+                  "name": "Fire",
+                  "fill": "#FFFFFF",
+                  "textGrowth": "fixed-width",
+                  "width": 166,
+                  "content": "FIRE",
+                  "lineHeight": 1,
+                  "textAlign": "center",
+                  "fontFamily": "Baloo 2",
+                  "fontSize": 23,
+                  "fontWeight": "800"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "W9gHx",
+          "type": "ref",
+          "ref": "j8HMm3",
+          "name": "Hidden Card",
+          "x": 251,
+          "y": 394,
+          "descendants": {
+            "MPmeR": {
+              "content": "?",
+              "fontSize": 62,
+              "fill": "#C9C3B9"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "dAp47",
+          "x": 473,
+          "y": 394,
+          "name": "Selected Card",
+          "width": 190,
+          "height": 210,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 135,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#62B6F8",
+                "position": 0
+              },
+              {
+                "color": "#6C7FE7",
+                "position": 0.55
+              },
+              {
+                "color": "#CE7AD5",
+                "position": 1
+              }
+            ]
+          },
+          "cornerRadius": 18,
+          "stroke": "#FFFFFF",
+          "strokeWidth": 7,
+          "effect": [
+            {
+              "type": "shadow",
+              "shadowType": "outer",
+              "color": "#4B9CDD66",
+              "blur": 13
+            },
+            {
+              "type": "shadow",
+              "shadowType": "outer",
+              "color": "#352F2825",
+              "offset": {
+                "x": 0,
+                "y": 7
+              },
+              "blur": 10
+            }
+          ],
+          "layout": "none",
+          "children": [
+            {
+              "type": "icon",
+              "id": "Tp4qM",
+              "x": 62,
+              "y": 73,
+              "name": "Selected Check",
+              "width": 66,
+              "height": 66,
+              "icon": "check",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#FFFFFF"
+            }
+          ]
+        },
+        {
+          "id": "S8tzd",
+          "type": "ref",
+          "ref": "j8HMm3",
+          "name": "Disabled Card",
+          "x": 695,
+          "y": 394,
+          "fill": "#DEDBD5",
+          "stroke": "#B9B5AF",
+          "descendants": {
+            "MPmeR": {
+              "content": "DISABLED\nCARD",
+              "fontSize": 25,
+              "fill": "#AAA6A1"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "AxfjI",
+      "x": 6461,
+      "y": -1372,
+      "name": "Game-Specific Components",
+      "clip": true,
+      "width": 890,
+      "height": 678,
+      "fill": "#FFF9EA",
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "k5PlI",
+          "x": 18,
+          "y": 22,
+          "name": "Heading",
+          "fill": "#171A32",
+          "content": "GAME-SPECIFIC COMPONENTS",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 27,
+          "fontWeight": "800"
+        },
+        {
+          "type": "text",
+          "id": "S0DuCw",
+          "x": 18,
+          "y": 73,
+          "name": "Avatar Label",
+          "fill": "#171A32",
+          "content": "Player Avatar",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "g6LRve",
+          "x": 155,
+          "y": 73,
+          "name": "Player List Label",
+          "fill": "#171A32",
+          "content": "Player List Item",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "YeQWB",
+          "x": 500,
+          "y": 73,
+          "name": "Status Label",
+          "fill": "#171A32",
+          "content": "Status Badges",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "ZJHCr",
+          "x": 18,
+          "y": 237,
+          "name": "Compact Label",
+          "fill": "#171A32",
+          "content": "Compact Player Card",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "gk87d",
+          "x": 344,
+          "y": 237,
+          "name": "Room Code Label",
+          "fill": "#171A32",
+          "content": "Room Code Card",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "RY5Lm",
+          "x": 618,
+          "y": 237,
+          "name": "Lobby Label",
+          "fill": "#171A32",
+          "content": "Lobby Info Card",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "SqWd6",
+          "x": 18,
+          "y": 411,
+          "name": "Option Label",
+          "fill": "#171A32",
+          "content": "Custom 9ption Selector",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "I6mHez",
+          "x": 430,
+          "y": 411,
+          "name": "Waiting Label",
+          "fill": "#171A32",
+          "content": "Waiting for Players",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "cd0oR",
+          "x": 665,
+          "y": 411,
+          "name": "Empty Label",
+          "fill": "#171A32",
+          "content": "Empty Player Slot",
+          "lineHeight": 1,
+          "fontFamily": "Baloo 2",
+          "fontSize": 19,
+          "fontWeight": "700"
+        },
+        {
+          "id": "RhNqG",
+          "type": "ref",
+          "ref": "UlTWe",
+          "name": "Player Avatar",
+          "x": 18,
+          "y": 106,
+          "width": 88,
+          "height": 88,
+          "descendants": {
+            "DdAMe": {
+              "x": 18,
+              "y": 22,
+              "width": 50,
+              "height": 50
+            },
+            "j0RhE": {
+              "x": 22,
+              "y": 19,
+              "width": 44,
+              "height": 44
+            },
+            "e6ipbo": {
+              "x": 67,
+              "y": 67,
+              "width": 23,
+              "height": 23
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "GyTKO",
+          "x": 155,
+          "y": 106,
+          "name": "Player List Item",
+          "width": 302,
+          "height": 94,
+          "fill": "#FFFFFF",
+          "cornerRadius": 16,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2824",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "id": "qMINf",
+              "type": "ref",
+              "ref": "UlTWe",
+              "name": "Avatar",
+              "x": 14,
+              "y": 10,
+              "width": 74,
+              "height": 74
+            },
+            {
+              "type": "text",
+              "id": "zaCHP",
+              "x": 106,
+              "y": 23,
+              "name": "Username",
+              "fill": "#171A32",
+              "content": "username",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 23,
+              "fontWeight": "800"
+            },
+            {
+              "id": "L63QGR",
+              "type": "ref",
+              "ref": "o0UFBm",
+              "name": "Ready Badge",
+              "x": 106,
+              "y": 53,
+              "width": 71,
+              "height": 29,
+              "fill": "#63D69B",
+              "descendants": {
+                "vY8EP": {
+                  "content": "Ready",
+                  "width": 71,
+                  "fontSize": 15
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m8Htd",
+          "type": "ref",
+          "ref": "o0UFBm",
+          "name": "HOST Badge",
+          "x": 500,
+          "y": 106,
+          "width": 90,
+          "height": 35,
+          "fill": "#579FEA",
+          "descendants": {
+            "vY8EP": {
+              "content": "HOST",
+              "width": 90,
+              "fill": "#FFFFFF"
+            }
+          }
+        },
+        {
+          "id": "Opwrl",
+          "type": "ref",
+          "ref": "o0UFBm",
+          "name": "READY Badge",
+          "x": 599,
+          "y": 106,
+          "width": 104,
+          "height": 35,
+          "fill": "#62D69A",
+          "descendants": {
+            "vY8EP": {
+              "content": "READY",
+              "width": 104,
+              "fill": "#FFFFFF"
+            }
+          }
+        },
+        {
+          "id": "X1myrP",
+          "type": "ref",
+          "ref": "o0UFBm",
+          "name": "WAITING Badge",
+          "x": 710,
+          "y": 106,
+          "width": 132,
+          "height": 35,
+          "fill": "#F87971",
+          "descendants": {
+            "vY8EP": {
+              "content": "WAITING",
+              "width": 132,
+              "fill": "#FFFFFF"
+            }
+          }
+        },
+        {
+          "id": "Mf5oy",
+          "type": "ref",
+          "ref": "o0UFBm",
+          "name": "ONLINE Badge",
+          "x": 500,
+          "y": 155,
+          "width": 118,
+          "height": 35,
+          "fill": "#EAE5DC",
+          "descendants": {
+            "vY8EP": {
+              "content": "ONLINE",
+              "width": 118,
+              "fill": "#272632"
+            }
+          }
+        },
+        {
+          "id": "j58Lir",
+          "type": "ref",
+          "ref": "o0UFBm",
+          "name": "OFFLINE Badge",
+          "x": 620,
+          "y": 155,
+          "width": 132,
+          "height": 35,
+          "fill": "#EAE5DC",
+          "descendants": {
+            "vY8EP": {
+              "content": "OFFLINE",
+              "width": 132,
+              "fill": "#272632"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "dJkmV",
+          "x": 18,
+          "y": 270,
+          "name": "Compact Player Card",
+          "width": 286,
+          "height": 102,
+          "fill": "#FFFFFF",
+          "cornerRadius": 17,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2824",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "id": "pT4rs",
+              "type": "ref",
+              "ref": "UlTWe",
+              "name": "Avatar",
+              "x": 12,
+              "y": 13,
+              "width": 75,
+              "height": 75
+            },
+            {
+              "type": "text",
+              "id": "j1eA2X",
+              "x": 102,
+              "y": 17,
+              "name": "Username",
+              "fill": "#171A32",
+              "content": "username",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 22,
+              "fontWeight": "800"
+            },
+            {
+              "type": "ellipse",
+              "id": "i8uEp",
+              "x": 102,
+              "y": 50,
+              "name": "Player Dot",
+              "fill": "#53CA83",
+              "width": 11,
+              "height": 11
+            },
+            {
+              "type": "text",
+              "id": "vNDs2",
+              "x": 120,
+              "y": 47,
+              "name": "Player Name",
+              "fill": "#171A32",
+              "content": "Dalive",
+              "lineHeight": 1,
+              "fontFamily": "Baloo 2",
+              "fontSize": 16,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "c0CCZ",
+              "x": 102,
+              "y": 69,
+              "name": "Role Badge",
+              "width": 74,
+              "height": 26,
+              "fill": "#17203D",
+              "cornerRadius": 13,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "X7xKi",
+                  "x": 0,
+                  "y": 6,
+                  "name": "Role",
+                  "fill": "#FFFFFF",
+                  "textGrowth": "fixed-width",
+                  "width": 74,
+                  "content": "Hoot",
+                  "lineHeight": 1,
+                  "textAlign": "center",
+                  "fontFamily": "Baloo 2",
+                  "fontSize": 15,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "icon",
+              "id": "IoUWU",
+              "x": 250,
+              "y": 41,
+              "name": "Confirmed",
+              "width": 28,
+              "height": 28,
+              "icon": "check_circle",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#63D69A"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "QeGu6",
+          "x": 344,
+          "y": 270,
+          "name": "Room Code Card",
+          "width": 233,
+          "height": 102,
+          "fill": "#FFFFFF",
+          "cornerRadius": 17,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2824",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "A2h37T",
+              "x": 0,
+              "y": 22,
+              "name": "Code",
+              "fill": "#171A32",
+              "textGrowth": "fixed-width",
+              "width": 233,
+              "content": "ABCD-1234",
+              "lineHeight": 1,
+              "textAlign": "center",
+              "fontFamily": "Baloo 2",
+              "fontSize": 29,
+              "fontWeight": "800"
+            },
+            {
+              "type": "frame",
+              "id": "Lu1Rm",
+              "x": 55,
+              "y": 61,
+              "name": "Copy Code Button",
+              "width": 123,
+              "height": 31,
+              "fill": "#559FE8",
+              "cornerRadius": 16,
+              "layout": "none"
+            },
+            {
+              "type": "text",
+              "id": "s76zC",
+              "x": 55,
+              "y": 69,
+              "name": "Copy Code",
+              "fill": "#FFFFFF",
+              "textGrowth": "fixed-width",
+              "width": 123,
+              "content": "COPY CODE",
+              "lineHeight": 1,
+              "textAlign": "center",
+              "fontFamily": "Baloo 2",
+              "fontSize": 16,
+              "fontWeight": "800"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "e1dfu6",
+          "x": 618,
+          "y": 270,
+          "name": "Lobby Info Card",
+          "width": 254,
+          "height": 102,
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "fjwTq",
+              "x": 0,
+              "y": 0,
+              "name": "Players Info",
+              "width": 254,
+              "height": 42,
+              "fill": "#FFFFFF",
+              "cornerRadius": 16,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#352F2820",
+                "offset": {
+                  "x": 0,
+                  "y": 4
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "v4AFe",
+                  "x": 0,
+                  "y": 12,
+                  "name": "Label",
+                  "fill": "#171A32",
+                  "textGrowth": "fixed-width",
+                  "width": 254,
+                  "content": "Party Room: 4 / 8 Players",
+                  "lineHeight": 1,
+                  "textAlign": "center",
+                  "fontFamily": "Baloo 2",
+                  "fontSize": 17,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "zAzi2",
+              "x": 0,
+              "y": 57,
+              "name": "Game In Progress",
+              "width": 254,
+              "height": 43,
+              "fill": "#559FE8",
+              "cornerRadius": 22,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#352F2820",
+                "offset": {
+                  "x": 0,
+                  "y": 4
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "G1iPLn",
+                  "x": 0,
+                  "y": 12,
+                  "name": "Label",
+                  "fill": "#FFFFFF",
+                  "textGrowth": "fixed-width",
+                  "width": 254,
+                  "content": "Game in Progress",
+                  "lineHeight": 1,
+                  "textAlign": "center",
+                  "fontFamily": "Baloo 2",
+                  "fontSize": 20,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "gp9bO",
+          "x": 18,
+          "y": 444,
+          "name": "Classic Mode Selector",
+          "width": 179,
+          "height": 191,
+          "fill": "#FFFFFF",
+          "cornerRadius": 17,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2824",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "emY3t",
+              "x": 51,
+              "y": 25,
+              "name": "Artwork Tile",
+              "width": 78,
+              "height": 78,
+              "fill": "#8EC3F2",
+              "cornerRadius": 12,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "TlLnV",
+                  "x": 17,
+                  "y": 17,
+                  "name": "Icon",
+                  "width": 44,
+                  "height": 44,
+                  "icon": "stylus",
+                  "library": "Material Symbols Rounded",
+                  "weight": 700,
+                  "fill": "#FFFFFF"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "tmcB4",
+              "x": 0,
+              "y": 120,
+              "name": "Label",
+              "fill": "#171A32",
+              "textGrowth": "fixed-width",
+              "width": 179,
+              "content": "Classic Mode\n",
+              "lineHeight": 1,
+              "textAlign": "center",
+              "fontFamily": "Baloo 2",
+              "fontSize": 27,
+              "fontWeight": "800"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "M9bS3n",
+          "x": 213,
+          "y": 444,
+          "name": "Blitz Mode Selector",
+          "width": 179,
+          "height": 191,
+          "fill": "#FFFFFF",
+          "cornerRadius": 17,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#352F2824",
+            "offset": {
+              "x": 0,
+              "y": 6
+            },
+            "blur": 10
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "lkZEW",
+              "x": 51,
+              "y": 25,
+              "name": "Artwork Tile",
+              "width": 78,
+              "height": 78,
+              "fill": "#FFF4D2",
+              "cornerRadius": 12,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "uZCJ1",
+                  "x": 17,
+                  "y": 17,
+                  "name": "Icon",
+                  "width": 44,
+                  "height": 44,
+                  "icon": "bolt",
+                  "library": "Material Symbols Rounded",
+                  "weight": 700,
+                  "fill": "#F4B828"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "Np3IF",
+              "x": 0,
+              "y": 120,
+              "name": "Label",
+              "fill": "#171A32",
+              "textGrowth": "fixed-width",
+              "width": 179,
+              "content": "Blitz Mode\n",
+              "lineHeight": 1,
+              "textAlign": "center",
+              "fontFamily": "Baloo 2",
+              "fontSize": 27,
+              "fontWeight": "800"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "hbFuY",
+          "x": 430,
+          "y": 444,
+          "name": "Waiting for Players",
+          "width": 200,
+          "height": 191,
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "qLOQ9",
+              "x": 56,
+              "y": 54,
+              "name": "Player",
+              "fill": "#F5C53C",
+              "width": 55,
+              "height": 55
+            },
+            {
+              "type": "ellipse",
+              "id": "O2NCl",
+              "x": 91,
+              "y": 34,
+              "name": "Player",
+              "fill": "#F47B6E",
+              "width": 55,
+              "height": 55
+            },
+            {
+              "type": "ellipse",
+              "id": "S2sud",
+              "x": 126,
+              "y": 59,
+              "name": "Player",
+              "fill": "#9B7BE1",
+              "width": 55,
+              "height": 55
+            },
+            {
+              "type": "icon",
+              "id": "swBNh",
+              "x": 72,
+              "y": 47,
+              "name": "Waiting Icon",
+              "width": 60,
+              "height": 60,
+              "icon": "groups",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#F4A66A"
+            },
+            {
+              "type": "text",
+              "id": "aru16",
+              "x": 0,
+              "y": 124,
+              "name": "Label",
+              "fill": "#171A32",
+              "textGrowth": "fixed-width",
+              "width": 200,
+              "content": "Waiting for\nfriends...",
+              "lineHeight": 1,
+              "textAlign": "center",
+              "fontFamily": "Baloo 2",
+              "fontSize": 27,
+              "fontWeight": "800"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "I0wL1",
+          "x": 665,
+          "y": 444,
+          "name": "Empty Player Slot",
+          "width": 195,
+          "height": 191,
+          "cornerRadius": 18,
+          "stroke": "#DDD6CB",
+          "strokeWidth": 2,
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "NjB2h",
+              "x": 70,
+              "y": 70,
+              "name": "Add Background",
+              "fill": "#E3DED5",
+              "width": 55,
+              "height": 55
+            },
+            {
+              "type": "icon",
+              "id": "e6k8Tz",
+              "x": 85,
+              "y": 85,
+              "name": "Add Icon",
+              "width": 25,
+              "height": 25,
+              "icon": "add",
+              "library": "Material Symbols Rounded",
+              "weight": 700,
+              "fill": "#AAA59E"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "g0s6q7",
+      "x": 0,
+      "y": -4010,
+      "name": "Library / Icon Button",
+      "reusable": true,
+      "width": 58,
+      "height": 58,
+      "fill": "#FFFFFF",
+      "cornerRadius": 29,
+      "effect": {
+        "type": "shadow",
+        "shadowType": "outer",
+        "color": "#342E2826",
+        "offset": {
+          "x": 0,
+          "y": 5
+        },
+        "blur": 8
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "icon",
+          "id": "LySfq",
+          "x": 14,
+          "y": 14,
+          "name": "Icon",
+          "width": 30,
+          "height": 30,
+          "icon": "settings",
+          "library": "Material Symbols Rounded",
+          "weight": 700,
+          "fill": "#111936"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "o0UFBm",
+      "x": 90,
+      "y": -4010,
+      "name": "Library / Status Badge",
+      "reusable": true,
+      "width": 92,
+      "height": 34,
+      "fill": "#56A1EB",
+      "cornerRadius": 17,
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "vY8EP",
+          "x": 0,
+          "y": 7,
+          "name": "Label",
+          "fill": "#FFFFFF",
+          "textGrowth": "fixed-width",
+          "width": 92,
+          "content": "HOST",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 17,
+          "fontWeight": "800"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "UlTWe",
+      "x": 220,
+      "y": -4010,
+      "name": "Library / Player Avatar",
+      "reusable": true,
+      "width": 76,
+      "height": 76,
+      "fill": "#F7C83E",
+      "cornerRadius": 38,
+      "stroke": "#4B9CE4",
+      "strokeWidth": 4,
+      "layout": "none",
+      "children": [
+        {
+          "type": "ellipse",
+          "id": "DdAMe",
+          "x": 16,
+          "y": 19,
+          "name": "Face",
+          "fill": "#C8785D",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "type": "icon",
+          "id": "j0RhE",
+          "x": 19,
+          "y": 17,
+          "name": "Person",
+          "width": 38,
+          "height": 38,
+          "icon": "face",
+          "library": "Material Symbols Rounded",
+          "weight": 700,
+          "fill": "#17213E"
+        },
+        {
+          "type": "ellipse",
+          "id": "e6ipbo",
+          "x": 58,
+          "y": 57,
+          "name": "Online Dot",
+          "fill": "#51CD85",
+          "width": 20,
+          "height": 20,
+          "stroke": "#FFFFFF",
+          "strokeWidth": 3
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "j8HMm3",
+      "x": 340,
+      "y": -4010,
+      "name": "Library / Word Card",
+      "reusable": true,
+      "width": 190,
+      "height": 210,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 90,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#FFFDF5",
+            "position": 0
+          },
+          {
+            "color": "#F4EDDD",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 18,
+      "stroke": "#DED4C5",
+      "strokeWidth": 2,
+      "effect": {
+        "type": "shadow",
+        "shadowType": "outer",
+        "color": "#352F2824",
+        "offset": {
+          "x": 0,
+          "y": 7
+        },
+        "blur": 10
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "MPmeR",
+          "x": 0,
+          "y": 86,
+          "name": "Word",
+          "fill": "#171A34",
+          "textGrowth": "fixed-width",
+          "width": 190,
+          "content": "APPLE",
+          "lineHeight": 1,
+          "textAlign": "center",
+          "fontFamily": "Baloo 2",
+          "fontSize": 34,
+          "fontWeight": "800"
+        }
+      ]
     }
   ],
   "fileToken": "5480b576-fff0-4269-b04b-62917f30cf27"
