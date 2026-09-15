@@ -1033,7 +1033,7 @@
       "id": "xuxZk",
       "x": 0,
       "y": 1734,
-      "name": "Frame 1",
+      "name": "Reference - Landing Page",
       "clip": true,
       "width": 1920,
       "height": 1080,
@@ -1053,6 +1053,258 @@
           },
           "width": 1907,
           "height": 1057
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "WpHCD",
+      "x": 2110,
+      "y": 1734,
+      "name": "Reference - Login",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "xvj9i",
+          "x": -72,
+          "y": -67,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "Authentication_popup_for_game_20260915142113.jpeg",
+            "mode": "fill"
+          },
+          "width": 2063,
+          "height": 1214
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "F50zH",
+      "x": 4208,
+      "y": 1734,
+      "name": "Reference - Lobby",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "hQ04D",
+          "x": -7.5,
+          "y": 0,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "Multiplayer_game_lobby_UI_design_20260915142715.jpeg",
+            "mode": "fill"
+          },
+          "width": 1935,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "lcTeQ",
+      "x": 6391,
+      "y": 1734,
+      "name": "Reference - Create Room Popup",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "gpP4J",
+          "x": -117.6875,
+          "y": -61.5,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "Create_room_popup_design_20260915145839.jpeg",
+            "mode": "fill"
+          },
+          "width": 2155,
+          "height": 1203
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "r7IizN",
+      "x": 8544,
+      "y": 1734,
+      "name": "Reference - Join Room Popup",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "y6z79",
+          "x": -130.22916666666606,
+          "y": -68.5,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "Create_join_room_popup_20260915145954.jpeg",
+            "mode": "fill"
+          },
+          "width": 2180,
+          "height": 1217
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "iDPvi",
+      "x": 10643,
+      "y": 1734,
+      "name": "Reference - Room Wait Screen",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "Xaihc",
+          "x": -7.5,
+          "y": 0,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "Codenames_game_room_lobby_design_20260915150251.jpeg",
+            "mode": "fill"
+          },
+          "width": 1935,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "BEKcF",
+      "x": 12746,
+      "y": 1734,
+      "name": "Reference - Game Board - Operative States - Guessing",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "GacMf",
+          "x": -7.5,
+          "y": 0,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "Operative_choosing_game_card_20260915151343.jpeg",
+            "mode": "fill"
+          },
+          "width": 1935,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "jkJjK",
+      "x": 14821,
+      "y": 1734,
+      "name": "Reference - Game Board - Operative States - Waiting For Clue",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "esuzs",
+          "x": -7.5,
+          "y": 0,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "UI_design_for_game_waiting_20260915150640.jpeg",
+            "mode": "fill"
+          },
+          "width": 1935,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "tJjXU",
+      "x": 16970,
+      "y": 1734,
+      "name": "Reference - Game Board - Spymaster States - Giving Clue",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "ssp6s",
+          "x": -7.5,
+          "y": 0,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "Spymaster_give_clue_game_interface_20260915151012.jpeg",
+            "mode": "fill"
+          },
+          "width": 1935,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "LuQbL",
+      "x": 19148,
+      "y": 1734,
+      "name": "Reference - Game Board - Spymaster States - Clue Sent",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "tNwkc",
+          "x": 0,
+          "y": 4.186046511627865,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "Spymaster_waiting_for_operatives_20260915151214.jpeg",
+            "mode": "fill"
+          },
+          "width": 1920,
+          "height": 1072
         }
       ]
     },
