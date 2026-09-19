@@ -5,4 +5,8 @@ info:
 docs: |-
   # Identity
 
-  Identity is username-only. Usernames are trimmed, case-insensitively unique strings matching `^[A-Za-z0-9_]{3,20}$`. Registration atomically creates the persistent user and opaque session. `X-Session-Id` authenticates subsequent REST calls. Session deletion revokes the token without deleting the user or statistics.
+  Registered-account identity: email + username + password (subject Ch. III–IV, mandatory). Guest-first is cancelled — there is no anonymous identity. Email is the login identifier; username is the public display name. Both are trimmed and case-insensitively unique; password is hashed + salted server-side and never returned or logged.
+
+  Registration and login each issue a session pair: a short-lived JWT `access_token` and a long-lived opaque `refresh_token` (Decision 6 — closed: JWT + refresh tokens). The server also sets an HttpOnly `Secure` session cookie carrying the same session identity, so a browser client authenticates REST calls and the WebSocket upgrade without ever reading the token in JS (Decision 11 — closed: cookie transport). `X-Session-Id: {{sessionToken}}` remains available as an explicit header for non-browser tooling (Bruno, scripts, curl); a request may present either the cookie or the header, and the cookie is what makes the WebSocket handshake work from a real browser.
+
+  `POST /api/auth/refresh` exchanges a valid refresh token for a new access token without forcing the user to log in again. Session deletion revokes both tokens and clears the cookie without deleting the user or statistics.

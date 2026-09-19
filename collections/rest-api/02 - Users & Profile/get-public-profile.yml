@@ -46,16 +46,50 @@ examples:
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"data":{"user_id":43,"username":"red_agent","level":3,"wins":9,"losses":11,"matches_played":20}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "user_id": 43,
+              "username": "red_agent",
+              "level": 3,
+              "wins": 9,
+              "losses": 11,
+              "matches_played": 20
+            }
+          }
   - name: Error - User not found
     request: {url: "{{baseUrl}}/api/users/9999", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
     response:
       status: 404
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"error":{"code":"USER_NOT_FOUND","message":"User 9999 was not found.","details":{"user_id":9999}}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "USER_NOT_FOUND",
+              "message": "User 9999 was not found.",
+              "details": {
+                "user_id": 9999
+              }
+            }
+          }
   - name: Error - Invalid path ID
     request: {url: "{{baseUrl}}/api/users/zero", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
     response:
       status: 422
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"error":{"code":"VALIDATION_ERROR","message":"user_id must be a positive integer.","details":{"field":"user_id"}}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "user_id must be a positive integer.",
+              "details": {
+                "field": "user_id"
+              }
+            }
+          }

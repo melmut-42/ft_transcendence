@@ -1,0 +1,12 @@
+info:
+  name: 08 - Chat
+  type: folder
+  seq: 8
+docs: |-
+  # Chat (basic)
+
+  Minimum contract for the mandatory User Interaction module's basic chat (subject: chat/profile/friends). Basic chat only — Advanced Chat is a separate bonus module, not implemented here, and MUST remain distinguishable from this contract if/when added.
+
+  Per User Flow §6, permission is not room-only: a friend can be messaged from anywhere, and any room co-member can be messaged without a friend requirement while a match is active. Chat is therefore a per-user connection (`/ws/chat`), not a room-scoped one, and the server checks permission (friend OR shared active room) per message.
+
+  Authenticated the same way as the room socket (`ft_session` cookie, `X-Session-Id` fallback) — see `00 - Connection & Protocol/connect.yml`.

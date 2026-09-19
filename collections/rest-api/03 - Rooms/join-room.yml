@@ -74,7 +74,37 @@ examples:
       body:
         type: json
         data: |-
-          {"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":2,"startable":false,"players":[{"user_id":42,"username":"player_one","team":null,"role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 2,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
   - name: Success - Fifth player joins
     request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_extraRed46, enabled: true}], params: [], body: {mode: none}}
     response:
@@ -83,7 +113,64 @@ examples:
       body:
         type: json
         data: |-
-          {"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":5,"startable":false,"players":[{"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},{"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},{"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"},{"user_id":46,"username":"extra_red","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:50Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 5,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": "RED",
+                  "role": "SPYMASTER",
+                  "ready": false,
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": "RED",
+                  "role": "OPERATIVE",
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "team": "BLUE",
+                  "role": "SPYMASTER",
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:30Z"
+                },
+                {
+                  "user_id": 45,
+                  "username": "blue_agent",
+                  "team": "BLUE",
+                  "role": "OPERATIVE",
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:40Z"
+                },
+                {
+                  "user_id": 46,
+                  "username": "extra_red",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:50Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
   - name: Error - Room not found
     request: {url: "{{baseUrl}}/api/rooms/9999/members", method: POST, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}

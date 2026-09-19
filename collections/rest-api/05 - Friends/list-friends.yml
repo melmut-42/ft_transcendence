@@ -1,0 +1,65 @@
+info:
+  name: List friends
+  type: http
+  seq: 1
+  tags: [friends]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/friends"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+    - name: Accept
+      value: application/json
+docs: |-
+  # List friends
+
+  ## Purpose
+
+  Returns the authenticated user's friend list with a snapshot online/offline status, for the Profile popup (User Flow §4: friend count, friend list, online/offline).
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Requesting identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.friend_count` | integer | yes | no | `>= 0` | Total friends |
+  | `data.friends[].user_id` | integer | yes | no | positive | Friend's user ID |
+  | `data.friends[].username` | string | yes | no | username rule | Friend's display name |
+  | `data.friends[].online` | boolean | yes | no | `true`, `false` | Snapshot presence at request time |
+
+  ## Errors
+
+  `401 UNAUTHORIZED` for an invalid session. Read-only; no event.
+examples:
+  - name: Success - Two friends
+    request: {url: "{{baseUrl}}/api/friends", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "friend_count": 2,
+              "friends": [
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "online": true
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "online": false
+                }
+              ]
+            }
+          }

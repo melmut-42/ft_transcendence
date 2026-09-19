@@ -57,15 +57,79 @@ docs: |-
   ## Concrete game events
 
   ```json
-  {"type":"game.score.updated","event_id":"evt_0144","room_id":1001,"sent_at":"2026-09-10T08:44:01Z","payload":{"game_id":5001,"score":{"red":3,"blue":2},"changed_color":"RED"}}
+    {
+      "type": "game.score.updated",
+      "event_id": "evt_0144",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:44:01Z",
+      "payload": {
+        "game_id": 5001,
+        "score": {
+          "red": 3,
+          "blue": 2
+        },
+        "changed_color": "RED"
+      }
+    }
   ```
 
   ```json
-  {"type":"game.turn.changed","event_id":"evt_0148","room_id":1001,"sent_at":"2026-09-10T08:44:20Z","payload":{"game_id":5001,"previous_team":"RED","reason":"NEUTRAL_CARD_REVEALED","current_turn":{"team":"BLUE","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},"score":{"red":3,"blue":2}}}
+    {
+      "type": "game.turn.changed",
+      "event_id": "evt_0148",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:44:20Z",
+      "payload": {
+        "game_id": 5001,
+        "previous_team": "RED",
+        "reason": "NEUTRAL_CARD_REVEALED",
+        "current_turn": {
+          "team": "BLUE",
+          "phase": "WAITING_FOR_CLUE",
+          "clue": null,
+          "guesses_remaining": null
+        },
+        "score": {
+          "red": 3,
+          "blue": 2
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"game.card.revealed","event_id":"evt_0143","room_id":1001,"sent_at":"2026-09-10T08:44:01Z","payload":{"game_id":5001,"card":{"card_id":5,"word":"OCEAN","revealed":true,"color":"RED"},"guessed_by_user_id":43,"guessing_team":"RED","score":{"red":3,"blue":2},"current_turn":{"team":"RED","phase":"GUESSING","clue":{"word":"ocean","number":2},"guesses_remaining":2},"winner":null,"end_reason":null}}
+    {
+      "type": "game.card.revealed",
+      "event_id": "evt_0143",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:44:01Z",
+      "payload": {
+        "game_id": 5001,
+        "card": {
+          "card_id": 5,
+          "word": "OCEAN",
+          "revealed": true,
+          "color": "RED"
+        },
+        "guessed_by_user_id": 43,
+        "guessing_team": "RED",
+        "score": {
+          "red": 3,
+          "blue": 2
+        },
+        "current_turn": {
+          "team": "RED",
+          "phase": "GUESSING",
+          "clue": {
+            "word": "ocean",
+            "number": 2
+          },
+          "guesses_remaining": 2
+        },
+        "winner": null,
+        "end_reason": null
+      }
+    }
   ```
 
   ## Acknowledgement schema

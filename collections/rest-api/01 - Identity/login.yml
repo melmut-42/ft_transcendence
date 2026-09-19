@@ -1,0 +1,170 @@
+info:
+  name: Login
+  type: http
+  seq: 2
+  tags: [identity, smoke]
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/login"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "email": "player.one@example.com",
+        "password": "Correct-Horse-1"
+      }
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && res.body && res.body.data) {
+          bru.setVar("sessionToken", String(res.body.data.access_token));
+          bru.setVar("refreshToken", String(res.body.data.refresh_token));
+          bru.setVar("userId", String(res.body.data.user.user_id));
+        }
+    - type: tests
+      code: |-
+        test("logs in a registered user", function () {
+          expect(res.status).to.equal(200);
+          expect(res.body.data.access_token).to.be.a("string");
+          expect(res.body.data.refresh_token).to.be.a("string");
+        });
+docs: |-
+  # Login
+
+  ## Purpose
+
+  Mandatory authentication entry point for an existing registered account (subject Ch. III–IV). Verifies email + password and issues a new session. Not related to OAuth, which is a separate, deferred contract.
+
+  ## Preconditions
+
+  The client has no authenticated identity. The account referenced by `email` must exist.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `Content-Type` | header | yes | string | `application/json` | no | JSON request media type | `application/json` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+  | `email` | body | yes | string | valid email | no | Login identifier | `player.one@example.com` |
+  | `password` | body | yes | string | non-empty | no | Verified against stored hash | `Correct-Horse-1` |
+
+  ## Success behavior and response fields
+
+  `200 OK` issues a new session pair for the matched account and sets the same HttpOnly `Secure` `ft_session` cookie as Register (Decision 11), so the WebSocket upgrade authenticates without a custom header.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.user.user_id` | integer | yes | no | positive | Authenticated user |
+  | `data.user.username` | string | yes | no | username rule | Display username |
+  | `data.user.email` | string | yes | no | valid email | Login identifier |
+  | `data.access_token` | string | yes | no | JWT | Short-lived credential for REST (`X-Session-Id`) and the cookie identity (Decision 6) |
+  | `data.access_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Access token expiry |
+  | `data.refresh_token` | string | yes | no | opaque, non-empty | Long-lived credential accepted only by `POST /api/auth/refresh` |
+  | `data.refresh_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Refresh token expiry |
+
+  ## State changes and events
+
+  A new session pair is persisted. No room membership is implied and no WebSocket event is emitted.
+
+  ## Errors
+
+  | Status | Code | When | State change |
+  | --- | --- | --- | --- |
+  | `400` | `VALIDATION_ERROR` | malformed JSON or unexpected structure | none |
+  | `401` | `INVALID_CREDENTIALS` | email not found, or password does not match | none |
+  | `429` | `RATE_LIMITED` | login attempt limit exceeded | none |
+
+  ## Notes/invariants
+
+  `INVALID_CREDENTIALS` is returned identically for "email not found" and "wrong password" so the response never discloses whether an email is registered. Multiple concurrent sessions per user are permitted; login does not revoke prior sessions.
+examples:
+  - name: Success - player_one
+    request:
+      url: "{{baseUrl}}/api/auth/login"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "email": "player.one@example.com",
+            "password": "Correct-Horse-1"
+          }
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "user": {
+                "user_id": 42,
+                "username": "player_one",
+                "email": "player.one@example.com"
+              },
+              "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MiJ9.9NqK2vLc4R8pXaZ",
+              "access_token_expires_at": "2026-09-11T09:30:00Z",
+              "refresh_token": "rtok_9NqK2vLc4R8pXaZm",
+              "refresh_token_expires_at": "2026-10-11T09:00:00Z"
+            }
+          }
+  - name: Error - Wrong password
+    request:
+      url: "{{baseUrl}}/api/auth/login"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "email": "player.one@example.com",
+            "password": "wrong-password"
+          }
+    response:
+      status: 401
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "INVALID_CREDENTIALS",
+              "message": "Email or password is incorrect.",
+              "details": {}
+            }
+          }
+  - name: Error - Unknown email
+    request:
+      url: "{{baseUrl}}/api/auth/login"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "email": "nobody@example.com",
+            "password": "whatever123"
+          }
+    response:
+      status: 401
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "INVALID_CREDENTIALS",
+              "message": "Email or password is incorrect.",
+              "details": {}
+            }
+          }

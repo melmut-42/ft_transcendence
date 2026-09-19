@@ -1,7 +1,7 @@
 info:
   name: End current session
   type: http
-  seq: 3
+  seq: 5
   tags: [identity]
 http:
   method: DELETE
@@ -14,17 +14,17 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Revokes the current opaque token. The user and persistent statistics remain. A member must leave an active room before ending the session so room presence cannot become ownerless.
+  Revokes the current session (access token and its paired refresh token, from Register/Login/Refresh) and clears the `ft_session` cookie. The user account and persistent statistics remain. A member must leave an active room before ending the session so room presence cannot become ownerless — this is deliberate room-lifecycle architecture, not a leftover guest-era artifact.
 
   ## Request parameters
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Token to revoke | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `X-Session-Id` | header or `ft_session` cookie | yes | string | active JWT access token | no | Session to revoke | `sess_7Hk2mQ9vLc4R8pXa` |
 
   ## Success, state changes, and events
 
-  `204 No Content` has no body and makes the token unusable for REST or WebSocket. It emits no room event because active-room membership is prohibited by precondition.
+  `204 No Content` has no body, revokes both the access token and its paired refresh token, and clears the `ft_session` cookie. It emits no room event because active-room membership is prohibited by precondition.
 
   ## Errors
 
@@ -38,10 +38,30 @@ examples:
     response:
       status: 409
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"Leave room 1001 before ending the session.","details":{"room_id":1001}}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "ALREADY_IN_ROOM",
+              "message": "Leave room 1001 before ending the session.",
+              "details": {
+                "room_id": 1001
+              }
+            }
+          }
   - name: Error - Session already revoked
     request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: X-Session-Id, value: sess_revoked, enabled: true}], params: [], body: {mode: none}}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"error":{"code":"UNAUTHORIZED","message":"A valid active session is required.","details":{}}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "UNAUTHORIZED",
+              "message": "A valid active session is required.",
+              "details": {}
+            }
+          }

@@ -69,7 +69,13 @@ examples:
       body:
         type: json
         data: |-
-          {"data":{"status":"OK","contract_version":"1.0.0-dev","server_time":"2026-09-10T08:40:00Z"}}
+          {
+            "data": {
+              "status": "OK",
+              "contract_version": "1.0.0-dev",
+              "server_time": "2026-09-10T08:40:00Z"
+            }
+          }
   - name: Error - Service unavailable
     request:
       url: "{{baseUrl}}/api/health"
@@ -88,4 +94,10 @@ examples:
       body:
         type: json
         data: |-
-          {"error":{"code":"SERVICE_UNAVAILABLE","message":"The API is temporarily unavailable.","details":{}}}
+          {
+            "error": {
+              "code": "SERVICE_UNAVAILABLE",
+              "message": "The API is temporarily unavailable.",
+              "details": {}
+            }
+          }

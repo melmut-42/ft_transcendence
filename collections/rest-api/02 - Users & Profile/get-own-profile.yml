@@ -47,16 +47,53 @@ examples:
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"data":{"user_id":42,"username":"player_one","level":4,"wins":12,"losses":8,"matches_played":20,"active_room_id":1001,"created_at":"2026-08-01T10:00:00Z"}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "user_id": 42,
+              "username": "player_one",
+              "level": 4,
+              "wins": 12,
+              "losses": 8,
+              "matches_played": 20,
+              "active_room_id": 1001,
+              "created_at": "2026-08-01T10:00:00Z"
+            }
+          }
   - name: Success - Persistent stats without room
     request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"data":{"user_id":42,"username":"player_one","level":4,"wins":12,"losses":8,"matches_played":20,"active_room_id":null,"created_at":"2026-08-01T10:00:00Z"}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "user_id": 42,
+              "username": "player_one",
+              "level": 4,
+              "wins": 12,
+              "losses": 8,
+              "matches_played": 20,
+              "active_room_id": null,
+              "created_at": "2026-08-01T10:00:00Z"
+            }
+          }
   - name: Error - Unauthorized
     request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"error":{"code":"UNAUTHORIZED","message":"A valid active session is required.","details":{}}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "UNAUTHORIZED",
+              "message": "A valid active session is required.",
+              "details": {}
+            }
+          }

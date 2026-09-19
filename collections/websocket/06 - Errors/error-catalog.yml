@@ -11,10 +11,25 @@ websocket:
   message:
     - title: Error trigger - Unknown event
       selected: false
-      message: {type: json, data: '{"type":"room.start","request_id":"req_0090","payload":{}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.start",
+            "request_id": "req_0090",
+            "payload": {}
+          }
     - title: Error trigger - Missing request ID
       selected: false
-      message: {type: json, data: '{"type":"room.ready.set","payload":{"ready":true}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.ready.set",
+            "payload": {
+              "ready": true
+            }
+          }
 docs: |-
   # WebSocket error catalog
 
@@ -65,75 +80,260 @@ docs: |-
   ## Concrete examples
 
   ```json
-  {"type":"error","request_id":"req_0090","error":{"code":"INVALID_EVENT","message":"Message type 'room.start' is not supported.","details":{"type":"room.start"}}}
+    {
+      "type": "error",
+      "request_id": "req_0090",
+      "error": {
+        "code": "INVALID_EVENT",
+        "message": "Message type 'room.start' is not supported.",
+        "details": {
+          "type": "room.start"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":null,"error":{"code":"INVALID_EVENT","message":"request_id is required for every client message.","details":{"field":"request_id"}}}
+    {
+      "type": "error",
+      "request_id": null,
+      "error": {
+        "code": "INVALID_EVENT",
+        "message": "request_id is required for every client message.",
+        "details": {
+          "field": "request_id"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0018","error":{"code":"ROLE_CONFLICT","message":"RED already has a Spymaster.","details":{"team":"RED","occupied_by_user_id":42}}}
+    {
+      "type": "error",
+      "request_id": "req_0018",
+      "error": {
+        "code": "ROLE_CONFLICT",
+        "message": "RED already has a Spymaster.",
+        "details": {
+          "team": "RED",
+          "occupied_by_user_id": 42
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0041","error":{"code":"NOT_YOUR_TURN","message":"BLUE cannot guess while RED is the active team.","details":{"active_team":"RED"}}}
+    {
+      "type": "error",
+      "request_id": "req_0041",
+      "error": {
+        "code": "NOT_YOUR_TURN",
+        "message": "BLUE cannot guess while RED is the active team.",
+        "details": {
+          "active_team": "RED"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0045","error":{"code":"GAME_ALREADY_FINISHED","message":"Game 5001 has already finished.","details":{"game_id":5001,"winner":"RED"}}}
+    {
+      "type": "error",
+      "request_id": "req_0045",
+      "error": {
+        "code": "GAME_ALREADY_FINISHED",
+        "message": "Game 5001 has already finished.",
+        "details": {
+          "game_id": 5001,
+          "winner": "RED"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0091","error":{"code":"INVALID_PAYLOAD","message":"payload.ready must be a boolean.","details":{"field":"payload.ready"}}}
+    {
+      "type": "error",
+      "request_id": "req_0091",
+      "error": {
+        "code": "INVALID_PAYLOAD",
+        "message": "payload.ready must be a boolean.",
+        "details": {
+          "field": "payload.ready"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0092","error":{"code":"UNAUTHORIZED","message":"The session is no longer active.","details":{}}}
+    {
+      "type": "error",
+      "request_id": "req_0092",
+      "error": {
+        "code": "UNAUTHORIZED",
+        "message": "The session is no longer active.",
+        "details": {}
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0093","error":{"code":"ROOM_NOT_FOUND","message":"Room 1001 was not found.","details":{"room_id":1001}}}
+    {
+      "type": "error",
+      "request_id": "req_0093",
+      "error": {
+        "code": "ROOM_NOT_FOUND",
+        "message": "Room 1001 was not found.",
+        "details": {
+          "room_id": 1001
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0094","error":{"code":"NOT_ROOM_MEMBER","message":"User 47 is not a member of room 1001.","details":{"room_id":1001,"user_id":47}}}
+    {
+      "type": "error",
+      "request_id": "req_0094",
+      "error": {
+        "code": "NOT_ROOM_MEMBER",
+        "message": "User 47 is not a member of room 1001.",
+        "details": {
+          "room_id": 1001,
+          "user_id": 47
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0095","error":{"code":"INVALID_ROOM_STATE","message":"This action is not allowed while room status is FINISHED.","details":{"status":"FINISHED"}}}
+    {
+      "type": "error",
+      "request_id": "req_0095",
+      "error": {
+        "code": "INVALID_ROOM_STATE",
+        "message": "This action is not allowed while room status is FINISHED.",
+        "details": {
+          "status": "FINISHED"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0096","error":{"code":"TEAM_REQUIRED","message":"Select a team before becoming ready.","details":{"user_id":43}}}
+    {
+      "type": "error",
+      "request_id": "req_0096",
+      "error": {
+        "code": "TEAM_REQUIRED",
+        "message": "Select a team before becoming ready.",
+        "details": {
+          "user_id": 43
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0097","error":{"code":"ROLE_REQUIRED","message":"Select a role before becoming ready.","details":{"user_id":43}}}
+    {
+      "type": "error",
+      "request_id": "req_0097",
+      "error": {
+        "code": "ROLE_REQUIRED",
+        "message": "Select a role before becoming ready.",
+        "details": {
+          "user_id": 43
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0098","error":{"code":"ROLE_FORBIDDEN","message":"Only an active-team Operative may guess a card.","details":{"required_role":"OPERATIVE"}}}
+    {
+      "type": "error",
+      "request_id": "req_0098",
+      "error": {
+        "code": "ROLE_FORBIDDEN",
+        "message": "Only an active-team Operative may guess a card.",
+        "details": {
+          "required_role": "OPERATIVE"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0099","error":{"code":"INVALID_CLUE","message":"payload.word must contain exactly one non-whitespace word.","details":{"field":"payload.word"}}}
+    {
+      "type": "error",
+      "request_id": "req_0099",
+      "error": {
+        "code": "INVALID_CLUE",
+        "message": "payload.word must contain exactly one non-whitespace word.",
+        "details": {
+          "field": "payload.word"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0100","error":{"code":"INVALID_CLUE_NUMBER","message":"payload.number must be an integer from 1 through 9.","details":{"field":"payload.number","min":1,"max":9}}}
+    {
+      "type": "error",
+      "request_id": "req_0100",
+      "error": {
+        "code": "INVALID_CLUE_NUMBER",
+        "message": "payload.number must be an integer from 1 through 9.",
+        "details": {
+          "field": "payload.number",
+          "min": 1,
+          "max": 9
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0101","error":{"code":"INVALID_CARD","message":"Card 30 does not exist in game 5001.","details":{"card_id":30,"game_id":5001}}}
+    {
+      "type": "error",
+      "request_id": "req_0101",
+      "error": {
+        "code": "INVALID_CARD",
+        "message": "Card 30 does not exist in game 5001.",
+        "details": {
+          "card_id": 30,
+          "game_id": 5001
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0102","error":{"code":"CARD_ALREADY_REVEALED","message":"Card 1 has already been revealed.","details":{"card_id":1}}}
+    {
+      "type": "error",
+      "request_id": "req_0102",
+      "error": {
+        "code": "CARD_ALREADY_REVEALED",
+        "message": "Card 1 has already been revealed.",
+        "details": {
+          "card_id": 1
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0103","error":{"code":"NO_GUESSES_REMAINING","message":"RED has no guesses remaining in the current turn.","details":{"team":"RED","guesses_remaining":0}}}
+    {
+      "type": "error",
+      "request_id": "req_0103",
+      "error": {
+        "code": "NO_GUESSES_REMAINING",
+        "message": "RED has no guesses remaining in the current turn.",
+        "details": {
+          "team": "RED",
+          "guesses_remaining": 0
+        }
+      }
+    }
   ```
 
   ## Validation invariant

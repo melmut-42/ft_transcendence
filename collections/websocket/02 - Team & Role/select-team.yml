@@ -11,16 +11,52 @@ websocket:
   message:
     - title: Success - Select RED
       selected: true
-      message: {type: json, data: '{"type":"room.team.select","request_id":"req_0001","payload":{"team":"RED"}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.team.select",
+            "request_id": "req_0001",
+            "payload": {
+              "team": "RED"
+            }
+          }
     - title: Success - Select BLUE
       selected: false
-      message: {type: json, data: '{"type":"room.team.select","request_id":"req_0002","payload":{"team":"BLUE"}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.team.select",
+            "request_id": "req_0002",
+            "payload": {
+              "team": "BLUE"
+            }
+          }
     - title: Success - Change team resets ready
       selected: false
-      message: {type: json, data: '{"type":"room.team.select","request_id":"req_0003","payload":{"team":"BLUE"}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.team.select",
+            "request_id": "req_0003",
+            "payload": {
+              "team": "BLUE"
+            }
+          }
     - title: Error - Invalid team
       selected: false
-      message: {type: json, data: '{"type":"room.team.select","request_id":"req_0004","payload":{"team":"GREEN"}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.team.select",
+            "request_id": "req_0004",
+            "payload": {
+              "team": "GREEN"
+            }
+          }
 docs: |-
   # Select team
 
@@ -49,7 +85,28 @@ docs: |-
   Updated event:
 
   ```json
-  {"type":"room.player.updated","event_id":"evt_0111","room_id":1001,"sent_at":"2026-09-10T08:42:10Z","payload":{"player":{"user_id":42,"username":"player_one","team":"RED","role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},"changed_fields":["team"],"room_status":"WAITING","startable":false}}
+    {
+      "type": "room.player.updated",
+      "event_id": "evt_0111",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:42:10Z",
+      "payload": {
+        "player": {
+          "user_id": 42,
+          "username": "player_one",
+          "team": "RED",
+          "role": null,
+          "ready": false,
+          "is_host": true,
+          "joined_at": "2026-09-10T08:41:00Z"
+        },
+        "changed_fields": [
+          "team"
+        ],
+        "room_status": "WAITING",
+        "startable": false
+      }
+    }
   ```
 
   | Result field | Type | Required | Nullable | Allowed values | Description |
@@ -67,5 +124,15 @@ docs: |-
   `INVALID_PAYLOAD` for missing/unknown team; `NOT_ROOM_MEMBER`; `INVALID_ROOM_STATE` outside `WAITING` and `COUNTDOWN`; `ROLE_CONFLICT` if moving an existing Spymaster would duplicate the destination Spymaster. Errors preserve all state and keep the socket open.
 
   ```json
-  {"type":"error","request_id":"req_0004","error":{"code":"INVALID_PAYLOAD","message":"payload.team must be RED or BLUE.","details":{"field":"payload.team"}}}
+    {
+      "type": "error",
+      "request_id": "req_0004",
+      "error": {
+        "code": "INVALID_PAYLOAD",
+        "message": "payload.team must be RED or BLUE.",
+        "details": {
+          "field": "payload.team"
+        }
+      }
+    }
   ```

@@ -11,25 +11,95 @@ websocket:
   message:
     - title: Success - Ocean 2
       selected: true
-      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0020","payload":{"word":"ocean","number":2}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0020",
+            "payload": {
+              "word": "ocean",
+              "number": 2
+            }
+          }
     - title: Success - Space 3
       selected: false
-      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0021","payload":{"word":" SPACE ","number":3}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0021",
+            "payload": {
+              "word": " SPACE ",
+              "number": 3
+            }
+          }
     - title: Error - Operative cannot submit
       selected: false
-      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0022","payload":{"word":"ocean","number":2}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0022",
+            "payload": {
+              "word": "ocean",
+              "number": 2
+            }
+          }
     - title: Error - Wrong team
       selected: false
-      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0023","payload":{"word":"space","number":3}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0023",
+            "payload": {
+              "word": "space",
+              "number": 3
+            }
+          }
     - title: Error - Wrong phase
       selected: false
-      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0024","payload":{"word":"ocean","number":2}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0024",
+            "payload": {
+              "word": "ocean",
+              "number": 2
+            }
+          }
     - title: Error - Invalid number
       selected: false
-      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0025","payload":{"word":"ocean","number":0}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0025",
+            "payload": {
+              "word": "ocean",
+              "number": 0
+            }
+          }
     - title: Error - Multiple words
       selected: false
-      message: {type: json, data: '{"type":"game.clue.submit","request_id":"req_0026","payload":{"word":"deep ocean","number":2}}'}
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0026",
+            "payload": {
+              "word": "deep ocean",
+              "number": 2
+            }
+          }
 docs: |-
   # Submit clue
 
@@ -55,13 +125,48 @@ docs: |-
   Request `req_0020` returns:
 
   ```json
-  {"type":"ack","request_id":"req_0020","ok":true,"payload":{"game_id":5001,"current_turn":{"team":"RED","phase":"GUESSING","clue":{"word":"ocean","number":2},"guesses_remaining":3}}}
+    {
+      "type": "ack",
+      "request_id": "req_0020",
+      "ok": true,
+      "payload": {
+        "game_id": 5001,
+        "current_turn": {
+          "team": "RED",
+          "phase": "GUESSING",
+          "clue": {
+            "word": "ocean",
+            "number": 2
+          },
+          "guesses_remaining": 3
+        }
+      }
+    }
   ```
 
   The server emits exactly one event for a unique request:
 
   ```json
-  {"type":"game.clue.submitted","event_id":"evt_0142","room_id":1001,"sent_at":"2026-09-10T08:43:30Z","payload":{"game_id":5001,"submitted_by_user_id":42,"team":"RED","clue":{"word":"ocean","number":2},"guesses_remaining":3,"current_turn":{"team":"RED","phase":"GUESSING"}}}
+    {
+      "type": "game.clue.submitted",
+      "event_id": "evt_0142",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:43:30Z",
+      "payload": {
+        "game_id": 5001,
+        "submitted_by_user_id": 42,
+        "team": "RED",
+        "clue": {
+          "word": "ocean",
+          "number": 2
+        },
+        "guesses_remaining": 3,
+        "current_turn": {
+          "team": "RED",
+          "phase": "GUESSING"
+        }
+      }
+    }
   ```
 
   Retrying identical `req_0020` returns the original ack without a second event or new turn.
@@ -69,7 +174,23 @@ docs: |-
   The normalized Space example returns:
 
   ```json
-  {"type":"ack","request_id":"req_0021","ok":true,"payload":{"game_id":5001,"current_turn":{"team":"RED","phase":"GUESSING","clue":{"word":"space","number":3},"guesses_remaining":4}}}
+    {
+      "type": "ack",
+      "request_id": "req_0021",
+      "ok": true,
+      "payload": {
+        "game_id": 5001,
+        "current_turn": {
+          "team": "RED",
+          "phase": "GUESSING",
+          "clue": {
+            "word": "space",
+            "number": 3
+          },
+          "guesses_remaining": 4
+        }
+      }
+    }
   ```
 
   It emits `game.clue.submitted` once with `clue.word="space"`, `clue.number=3`, and `guesses_remaining=4`.
@@ -98,21 +219,73 @@ docs: |-
   Errors keep `WAITING_FOR_CLUE`, create no clue, and keep the socket open.
 
   ```json
-  {"type":"error","request_id":"req_0022","error":{"code":"ROLE_FORBIDDEN","message":"Only the active team's Spymaster may submit a clue.","details":{"required_role":"SPYMASTER"}}}
+    {
+      "type": "error",
+      "request_id": "req_0022",
+      "error": {
+        "code": "ROLE_FORBIDDEN",
+        "message": "Only the active team's Spymaster may submit a clue.",
+        "details": {
+          "required_role": "SPYMASTER"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0023","error":{"code":"NOT_YOUR_TURN","message":"BLUE cannot submit a clue while RED is the active team.","details":{"active_team":"RED"}}}
+    {
+      "type": "error",
+      "request_id": "req_0023",
+      "error": {
+        "code": "NOT_YOUR_TURN",
+        "message": "BLUE cannot submit a clue while RED is the active team.",
+        "details": {
+          "active_team": "RED"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0024","error":{"code":"INVALID_ROOM_STATE","message":"A clue can be submitted only during WAITING_FOR_CLUE.","details":{"phase":"GUESSING"}}}
+    {
+      "type": "error",
+      "request_id": "req_0024",
+      "error": {
+        "code": "INVALID_ROOM_STATE",
+        "message": "A clue can be submitted only during WAITING_FOR_CLUE.",
+        "details": {
+          "phase": "GUESSING"
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0025","error":{"code":"INVALID_CLUE_NUMBER","message":"payload.number must be an integer from 1 through 9.","details":{"field":"payload.number","min":1,"max":9}}}
+    {
+      "type": "error",
+      "request_id": "req_0025",
+      "error": {
+        "code": "INVALID_CLUE_NUMBER",
+        "message": "payload.number must be an integer from 1 through 9.",
+        "details": {
+          "field": "payload.number",
+          "min": 1,
+          "max": 9
+        }
+      }
+    }
   ```
 
   ```json
-  {"type":"error","request_id":"req_0026","error":{"code":"INVALID_CLUE","message":"payload.word must contain exactly one non-whitespace word.","details":{"field":"payload.word"}}}
+    {
+      "type": "error",
+      "request_id": "req_0026",
+      "error": {
+        "code": "INVALID_CLUE",
+        "message": "payload.word must contain exactly one non-whitespace word.",
+        "details": {
+          "field": "payload.word"
+        }
+      }
+    }
   ```

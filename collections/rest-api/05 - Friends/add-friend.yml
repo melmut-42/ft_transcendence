@@ -1,0 +1,72 @@
+info:
+  name: Add friend
+  type: http
+  seq: 2
+  tags: [friends]
+http:
+  method: POST
+  url: "{{baseUrl}}/api/friends"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "user_id": 43
+      }
+docs: |-
+  # Add friend
+
+  ## Purpose
+
+  Adds another user to the authenticated user's friend list. Immediate and mutual — no pending/accept state (see folder docs).
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Requesting identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `user_id` | body | yes | integer | positive, existing user, not self | no | Target user | `43` |
+
+  ## Success behavior
+
+  `201 Created` adds the friendship both ways.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.user_id` | integer | yes | no | positive | New friend |
+  | `data.username` | string | yes | no | username rule | New friend's display name |
+  | `data.online` | boolean | yes | no | `true`, `false` | Snapshot presence |
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `404` | `USER_NOT_FOUND` | `user_id` does not exist |
+  | `409` | `ALREADY_FRIENDS` | friendship already exists |
+  | `422` | `VALIDATION_ERROR` | `user_id` missing/non-integer, or equals the requester |
+examples:
+  - name: Success - Add red_agent
+    request: {url: "{{baseUrl}}/api/friends", method: POST, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}, {name: Content-Type, value: application/json, enabled: true}], params: [], body: {mode: json, json: '{"user_id":43}'}}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "user_id": 43,
+              "username": "red_agent",
+              "online": true
+            }
+          }
+  - name: Error - Already friends
+    request: {url: "{{baseUrl}}/api/friends", method: POST, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: json, json: '{"user_id":43}'}}
+    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_FRIENDS","message":"User 43 is already a friend.","details":{"user_id":43}}}'}}

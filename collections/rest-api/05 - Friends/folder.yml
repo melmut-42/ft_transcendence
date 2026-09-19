@@ -1,0 +1,8 @@
+info:
+  name: 05 - Friends
+  type: folder
+  seq: 5
+docs: |-
+  # Friends
+
+  Minimum contract for the mandatory User Interaction module's friends feature (subject: chat/profile/friends). No friend-request/accept workflow — User Flow §4 shows a single "Add Friend" action with no pending state, so add is immediate and mutual. Online status here is a snapshot at request time; live status changes are not pushed over REST.

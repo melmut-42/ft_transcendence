@@ -73,7 +73,9 @@ docs: |-
 
   ## Identity Model
 
-  Registration accepts only `{ "username": "player_one" }`. The server trims the string and validates `^[A-Za-z0-9_]{3,20}$`; uniqueness is case-insensitive. There is no email or password. Successful registration creates a stable user plus an opaque session token. REST sends it as `X-Session-Id`; WebSocket sends the same token as a handshake header. A client cannot claim an existing username without that session.
+  Registration requires `{ "email", "username", "password" }` (subject Ch. III–IV, mandatory). Email is the login identifier; username is the public display name; password is hashed + salted server-side. Both email and username are trimmed and case-insensitively unique. Guest-first is cancelled — there is no anonymous identity.
+
+  Successful registration or login issues a session pair: a short-lived JWT `access_token` and a long-lived opaque `refresh_token` (Decision 6 — closed). `POST /api/auth/refresh` exchanges a valid refresh token for a new access token. The server also sets an HttpOnly, `Secure` session cookie (`ft_session`) carrying the same identity (Decision 11 — closed), so a browser authenticates REST calls and the WebSocket upgrade automatically, same-origin, with no client-side header code. `X-Session-Id` remains an accepted header for non-browser tooling (Bruno, scripts); a request may present either the cookie or the header.
 
   ## Teams and Roles
 
@@ -115,11 +117,11 @@ docs: |-
 
   ## REST vs WebSocket Responsibility
 
-  REST owns registration/session bootstrap, profiles, room creation, membership join, snapshots, and leaving. Once a member joins the realtime channel, team, role, readiness, countdown, clue, guess, pass, and live state propagation use WebSocket. REST and WebSocket share field names and domain enums.
+  REST owns registration/session bootstrap (including refresh), profiles, friends, room creation, membership join, snapshots, and leaving. Once a member joins the realtime channel, team, role, readiness, countdown, clue, guess, pass, and live state propagation use WebSocket. Basic chat is a separate per-user WebSocket channel (`/ws/chat`), independent of any room. REST and WebSocket share field names, domain enums, and the same session credential (cookie or `X-Session-Id`).
 
   ## Error Philosophy
 
-  Malformed JSON is `400`; absent/invalid sessions are `401`; permission failures are `403`; missing resources are `404`; uniqueness or lifecycle conflicts are `409`; field validation is `422`; throttling is `429`. REST errors use `{ "error": { "code", "message", "details" } }`. WebSocket errors correlate to `request_id`, do not mutate state, and leave the socket open except handshake authentication failures or protocol-abuse closure.
+  Malformed JSON is `400`; absent/invalid access tokens are `401 UNAUTHORIZED`; an expired/invalid/used refresh token is `401 SESSION_EXPIRED` (refresh endpoint only — distinct from `UNAUTHORIZED` because it means "log in again," not "retry with a refreshed token"); permission failures are `403`; missing resources are `404`; uniqueness or lifecycle conflicts are `409`; field validation is `422`; throttling is `429`. REST errors use `{ "error": { "code", "message", "details" } }`. WebSocket errors correlate to `request_id`, do not mutate state, and leave the socket open except handshake authentication failures or protocol-abuse closure.
 
   ## Common Data Types
 
@@ -147,15 +149,11 @@ docs: |-
 
   ## Environment Variables
 
-  The `local` environment defines `baseUrl=http://localhost:3000`, `wsUrl=ws://localhost:3000`, `sessionToken`, `userId`, `roomId`, and `gameId`. Registration and room creation scripts populate the first four runtime values. Secret session values remain blank in version control.
+  The `local` environment defines `baseUrl=http://localhost:3000`, `wsUrl=ws://localhost:3000`, `sessionToken`, `refreshToken`, `userId`, `roomId`, and `gameId`. Registration, login, and refresh scripts populate `sessionToken`/`refreshToken`/`userId`; room creation populates `roomId`. Secret session values remain blank in version control.
 
-  ## Chat Scope
+  ## Friends and Chat Scope
 
-  Chat exists at product/UI level, but its permission and event contract is outside this revision because no authoritative chat rules are present in this repository or supplied brief.
-
-  ## Subject Compliance Note
-
-  > This contract intentionally models username-only identity with no email or password. That is a known product decision and conflicts with school-subject authentication expectations that may require email/password. The team must reconcile this before final evaluation; this development contract does not conceal or pre-empt that decision.
+  Friends (REST, immediate/mutual, no request-accept workflow) and basic Chat (per-user WebSocket, friend-or-shared-active-room permission) implement the mandatory User Interaction module per User Flow §4 and §6. Advanced Chat (bonus module: read receipts, typing indicators, blocking, persistent history, game invites) is out of scope for this revision and must stay distinguishable from basic Chat if added later.
 
   ## Documentation Conventions
 

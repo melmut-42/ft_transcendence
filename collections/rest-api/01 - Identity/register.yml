@@ -1,5 +1,5 @@
 info:
-  name: Register username
+  name: Register account
   type: http
   seq: 1
   tags: [identity, smoke]
@@ -14,32 +14,38 @@ http:
   body:
     type: json
     data: |-
-      {"username":"player_one"}
+      {
+        "email": "player.one@example.com",
+        "username": "player_one",
+        "password": "Correct-Horse-1"
+      }
 runtime:
   scripts:
     - type: after-response
       code: |-
         if (res.status === 201 && res.body && res.body.data) {
-          bru.setVar("sessionToken", String(res.body.data.session_token));
+          bru.setVar("sessionToken", String(res.body.data.access_token));
+          bru.setVar("refreshToken", String(res.body.data.refresh_token));
           bru.setVar("userId", String(res.body.data.user.user_id));
         }
     - type: tests
       code: |-
-        test("creates a stable user and opaque session", function () {
+        test("creates a registered user and session pair", function () {
           expect(res.status).to.equal(201);
-          expect(res.body.data.user.username).to.equal("player_one");
-          expect(res.body.data.session_token).to.be.a("string");
+          expect(res.body.data.user.email).to.equal("player.one@example.com");
+          expect(res.body.data.access_token).to.be.a("string");
+          expect(res.body.data.refresh_token).to.be.a("string");
         });
 docs: |-
-  # Register username
+  # Register account
 
   ## Purpose
 
-  Atomically creates a persistent user and one opaque authenticated session. It accepts no email, password, OAuth assertion, or profile role.
+  Mandatory registered-account creation (subject Ch. III–IV: email + password auth, hashed + salted at rest). Creates one persistent user and one authenticated session pair. This is the only account-creation path — there is no separate guest/anonymous identity in this contract.
 
   ## Preconditions
 
-  The client has no authenticated identity. The normalized username must be unique under case-insensitive comparison.
+  The client has no authenticated identity. Email must be unique (case-insensitive). Username must be unique (case-insensitive).
 
   ## Request parameters
 
@@ -47,38 +53,44 @@ docs: |-
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `Content-Type` | header | yes | string | `application/json` | no | JSON request media type | `application/json` |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
-  | `username` | body | yes | string | trimmed `^[A-Za-z0-9_]{3,20}$` | no | Persistent unique username | `player_one` |
-
-  The server trims leading/trailing whitespace before validation and storage. `Player_One` conflicts with `player_one`; original casing is otherwise preserved.
+  | `email` | body | yes | string | valid email, trimmed, case-insensitive uniqueness | no | Login identifier | `player.one@example.com` |
+  | `username` | body | yes | string | trimmed `^[A-Za-z0-9_]{3,20}$`, case-insensitive uniqueness | no | Public display name | `player_one` |
+  | `password` | body | yes | string | `>= 8` chars | no | Hashed + salted server-side, never returned | `Correct-Horse-1` |
 
   ## Success behavior and response fields
 
-  `201 Created` creates both records. The script stores `sessionToken` and `userId`.
+  `201 Created` creates the user and one session pair in the same transaction. The response also sets an HttpOnly, `Secure`, `SameSite=Lax` cookie (`ft_session`) carrying the same session identity — this is what a browser sends automatically on subsequent REST calls and the WebSocket upgrade (Decision 11). Non-browser clients may instead send the returned `access_token` as `X-Session-Id`.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
   | `data.user.user_id` | integer | yes | no | positive | Stable user identifier |
-  | `data.user.username` | string | yes | no | normalized validation rule | Stored display username |
-  | `data.user.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | User creation time |
-  | `data.session_token` | string | yes | no | opaque, non-empty | Credential for REST and WebSocket |
-  | `data.session_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Session expiry |
+  | `data.user.username` | string | yes | no | username rule | Display username |
+  | `data.user.email` | string | yes | no | valid email | Login identifier |
+  | `data.user.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Account creation time |
+  | `data.access_token` | string | yes | no | JWT | Short-lived credential for REST (`X-Session-Id`) and the identity encoded in the `ft_session` cookie (Decision 6) |
+  | `data.access_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Access token expiry |
+  | `data.refresh_token` | string | yes | no | opaque, non-empty | Long-lived credential accepted only by `POST /api/auth/refresh` |
+  | `data.refresh_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Refresh token expiry |
 
   ## State changes and events
 
-  A user and session are persisted. No room membership is created and no WebSocket event is emitted.
+  A user and session pair are persisted. No room membership is created and no WebSocket event is emitted.
 
   ## Errors
 
   | Status | Code | When | State change |
   | --- | --- | --- | --- |
   | `400` | `VALIDATION_ERROR` | malformed JSON or unexpected structure | none |
+  | `422` | `INVALID_EMAIL` | missing or malformed email | none |
   | `422` | `INVALID_USERNAME` | missing, wrong type, length, or characters | none |
+  | `422` | `INVALID_PASSWORD` | missing or under minimum length | none |
+  | `409` | `EMAIL_TAKEN` | case-insensitive email already exists | none |
   | `409` | `USERNAME_TAKEN` | case-insensitive username already exists | none |
   | `429` | `RATE_LIMITED` | registration limit exceeded | none |
 
   ## Notes/invariants
 
-  The response token is shown only at creation. A duplicate transmission cannot claim the existing username; it returns `USERNAME_TAKEN`.
+  The refresh token is shown only at creation and at refresh. The password is never returned or logged. A duplicate transmission cannot claim an existing email or username.
 examples:
   - name: Success - player_one
     request:
@@ -86,94 +98,148 @@ examples:
       method: POST
       headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
       params: []
-      body: {mode: json, json: '{"username":"player_one"}'}
+      body:
+        mode: json
+        json: |-
+          {
+            "email": "player.one@example.com",
+            "username": "player_one",
+            "password": "Correct-Horse-1"
+          }
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
       body:
         type: json
         data: |-
-          {"data":{"user":{"user_id":42,"username":"player_one","created_at":"2026-09-10T08:40:01Z"},"session_token":"sess_7Hk2mQ9vLc4R8pXa","session_expires_at":"2026-10-10T08:40:01Z"}}
-  - name: Success - BlueMaster
+          {
+            "data": {
+              "user": {
+                "user_id": 42,
+                "username": "player_one",
+                "email": "player.one@example.com",
+                "created_at": "2026-09-10T08:40:01Z"
+              },
+              "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MiJ9.7Hk2mQ9vLc4R8pXa",
+              "access_token_expires_at": "2026-09-10T09:10:01Z",
+              "refresh_token": "rtok_7Hk2mQ9vLc4R8pXaZq",
+              "refresh_token_expires_at": "2026-10-10T08:40:01Z"
+            }
+          }
+  - name: Error - Invalid email
     request:
       url: "{{baseUrl}}/api/auth/register"
       method: POST
-      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []
-      body: {mode: json, json: '{"username":"BlueMaster"}'}
+      body:
+        mode: json
+        json: |-
+          {
+            "email": "not-an-email",
+            "username": "player_one",
+            "password": "Correct-Horse-1"
+          }
     response:
-      status: 201
+      status: 422
       headers: [{name: Content-Type, value: application/json}]
       body:
         type: json
         data: |-
-          {"data":{"user":{"user_id":48,"username":"BlueMaster","created_at":"2026-09-10T08:40:02Z"},"session_token":"sess_4Pu8Kc2wNm7Vd5Qz","session_expires_at":"2026-10-10T08:40:02Z"}}
-  - name: Success - red_agent fixture
-    request:
-      url: "{{baseUrl}}/api/auth/register"
-      method: POST
-      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
-      params: []
-      body: {mode: json, json: '{"username":"red_agent"}'}
-    response:
-      status: 201
-      headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"data":{"user":{"user_id":43,"username":"red_agent","created_at":"2026-09-10T08:40:03Z"},"session_token":"sess_A3redAgent9Kp","session_expires_at":"2026-10-10T08:40:03Z"}}'}
-  - name: Success - blue_master fixture
-    request:
-      url: "{{baseUrl}}/api/auth/register"
-      method: POST
-      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
-      params: []
-      body: {mode: json, json: '{"username":"blue_master"}'}
-    response:
-      status: 201
-      headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"data":{"user":{"user_id":44,"username":"blue_master","created_at":"2026-09-10T08:40:04Z"},"session_token":"sess_B4blueMaster7Q","session_expires_at":"2026-10-10T08:40:04Z"}}'}
-  - name: Success - blue_agent fixture
-    request:
-      url: "{{baseUrl}}/api/auth/register"
-      method: POST
-      headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
-      params: []
-      body: {mode: json, json: '{"username":"blue_agent"}'}
-    response:
-      status: 201
-      headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"data":{"user":{"user_id":45,"username":"blue_agent","created_at":"2026-09-10T08:40:05Z"},"session_token":"sess_C5blueAgent2Rm","session_expires_at":"2026-10-10T08:40:05Z"}}'}
-  - name: Error - Invalid characters
+          {
+            "error": {
+              "code": "INVALID_EMAIL",
+              "message": "email must be a valid email address.",
+              "details": {
+                "field": "email"
+              }
+            }
+          }
+  - name: Error - Password too short
     request:
       url: "{{baseUrl}}/api/auth/register"
       method: POST
       headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []
-      body: {mode: json, json: '{"username":"player-one!"}'}
+      body:
+        mode: json
+        json: |-
+          {
+            "email": "player.one@example.com",
+            "username": "player_one",
+            "password": "short"
+          }
     response:
       status: 422
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"error":{"code":"INVALID_USERNAME","message":"Username must match ^[A-Za-z0-9_]{3,20}$.","details":{"field":"username","value":"player-one!"}}}'}
-  - name: Error - Username too short
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "INVALID_PASSWORD",
+              "message": "password must be at least 8 characters.",
+              "details": {
+                "field": "password",
+                "min_length": 8
+              }
+            }
+          }
+  - name: Error - Email already exists
     request:
       url: "{{baseUrl}}/api/auth/register"
       method: POST
       headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []
-      body: {mode: json, json: '{"username":"ab"}'}
-    response:
-      status: 422
-      headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"error":{"code":"INVALID_USERNAME","message":"Username must contain between 3 and 20 characters.","details":{"field":"username","min_length":3,"max_length":20}}}'}
-  - name: Error - Username already exists
-    request:
-      url: "{{baseUrl}}/api/auth/register"
-      method: POST
-      headers: [{name: Content-Type, value: application/json, enabled: true}]
-      params: []
-      body: {mode: json, json: '{"username":"PLAYER_ONE"}'}
+      body:
+        mode: json
+        json: |-
+          {
+            "email": "PLAYER.ONE@example.com",
+            "username": "someone_else",
+            "password": "Correct-Horse-1"
+          }
     response:
       status: 409
       headers: [{name: Content-Type, value: application/json}]
       body:
         type: json
         data: |-
-          {"error":{"code":"USERNAME_TAKEN","message":"Username 'PLAYER_ONE' is already registered.","details":{"field":"username"}}}
+          {
+            "error": {
+              "code": "EMAIL_TAKEN",
+              "message": "Email 'PLAYER.ONE@example.com' is already registered.",
+              "details": {
+                "field": "email"
+              }
+            }
+          }
+  - name: Error - Username already exists
+    request:
+      url: "{{baseUrl}}/api/auth/register"
+      method: POST
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      params: []
+      body:
+        mode: json
+        json: |-
+          {
+            "email": "someone.else@example.com",
+            "username": "PLAYER_ONE",
+            "password": "Correct-Horse-1"
+          }
+    response:
+      status: 409
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "code": "USERNAME_TAKEN",
+              "message": "Username 'PLAYER_ONE' is already registered.",
+              "details": {
+                "field": "username"
+              }
+            }
+          }

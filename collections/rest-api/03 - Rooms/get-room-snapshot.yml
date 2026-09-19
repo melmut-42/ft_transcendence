@@ -94,7 +94,31 @@ examples:
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
-      body: {type: json, data: '{"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":1,"startable":false,"players":[{"user_id":42,"username":"player_one","team":null,"role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}'}
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 1,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
   - name: Four joined - Not configured
     request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
     response:
@@ -103,7 +127,55 @@ examples:
       body:
         type: json
         data: |-
-          {"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":4,"startable":false,"players":[{"user_id":42,"username":"player_one","team":null,"role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},{"user_id":44,"username":"blue_master","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},{"user_id":45,"username":"blue_agent","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 4,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:30Z"
+                },
+                {
+                  "user_id": 45,
+                  "username": "blue_agent",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:40Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
   - name: Teams selected - Roles incomplete
     request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
     response:
@@ -112,7 +184,55 @@ examples:
       body:
         type: json
         data: |-
-          {"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":4,"startable":false,"players":[{"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":"RED","role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},{"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},{"user_id":45,"username":"blue_agent","team":"BLUE","role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 4,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": "RED",
+                  "role": "SPYMASTER",
+                  "ready": false,
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": "RED",
+                  "role": null,
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "team": "BLUE",
+                  "role": "SPYMASTER",
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:30Z"
+                },
+                {
+                  "user_id": 45,
+                  "username": "blue_agent",
+                  "team": "BLUE",
+                  "role": null,
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:40Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
   - name: Roles valid - Players not ready
     request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
     response:
@@ -121,7 +241,55 @@ examples:
       body:
         type: json
         data: |-
-          {"data":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":4,"startable":false,"players":[{"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},{"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},{"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":true,"is_host":false,"joined_at":"2026-09-10T08:41:30Z"},{"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:40Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 4,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": "RED",
+                  "role": "SPYMASTER",
+                  "ready": true,
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": "RED",
+                  "role": "OPERATIVE",
+                  "ready": true,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "team": "BLUE",
+                  "role": "SPYMASTER",
+                  "ready": true,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:30Z"
+                },
+                {
+                  "user_id": 45,
+                  "username": "blue_agent",
+                  "team": "BLUE",
+                  "role": "OPERATIVE",
+                  "ready": false,
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:40Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
   - name: In game - Operative projection
     request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
     response:

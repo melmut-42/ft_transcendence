@@ -1,0 +1,77 @@
+info:
+  name: Lookup room by code
+  type: http
+  seq: 5
+  tags: [rooms]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/rooms/lookup/ABCD12"
+  headers:
+    - name: X-Session-Id
+      value: "{{sessionToken}}"
+    - name: Accept
+      value: application/json
+docs: |-
+  # Lookup room by code
+
+  ## Purpose
+
+  Resolves the human-shareable `room_code` shown in the Join Room UI to the internal `room_id` used by `Join room` and by the WebSocket path. Closes the contract gap between the prepared UI (room-code entry, e.g. `ABCD12`) and the existing `room_id`-keyed join/snapshot/WebSocket endpoints — no separate room-browsing/list endpoint exists or is required.
+
+  ## Preconditions and request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_code` | path | yes | string | `^[A-Z0-9]{6}$`, case-insensitive on input | no | Code shown to the user | `ABCD12` |
+  | `X-Session-Id` | header | yes | string | active opaque token | no | Requesting identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Success behavior and response fields
+
+  `200 OK` returns enough for a Join Room preview card without exposing full room contents. The caller does not need to be a member.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.room_id` | integer | yes | no | positive | Resolved internal ID, pass to `Join room` |
+  | `data.room_code` | string | yes | no | normalized uppercase | Echoed input |
+  | `data.status` | string enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME`, `FINISHED`, `CLOSED` | Lifecycle state, used to grey out Join when not `WAITING` |
+  | `data.player_count` | integer | yes | no | `>= 1` | Current membership count |
+
+  ## State changes and events
+
+  Read-only; no event.
+
+  ## Errors
+
+  | Status | Code | When | State change |
+  | --- | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session | none |
+  | `404` | `ROOM_NOT_FOUND` | no active room has this code | none |
+  | `422` | `VALIDATION_ERROR` | code does not match `^[A-Za-z0-9]{6}$` | none |
+
+  ## Notes/invariants
+
+  This endpoint never returns `players[]`, `game`, or `host_user_id` — those require membership, via `Get room snapshot` after joining. Lookup does not create membership; the client still calls `Join room` with the resolved `room_id`.
+examples:
+  - name: Success - Resolves to waiting room
+    request: {url: "{{baseUrl}}/api/rooms/lookup/ABCD12", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "room_code": "ABCD12",
+              "status": "WAITING",
+              "player_count": 1
+            }
+          }
+  - name: Error - Unknown code
+    request: {url: "{{baseUrl}}/api/rooms/lookup/ZZZZZZ", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"No active room matches code ZZZZZZ.","details":{"room_code":"ZZZZZZ"}}}'}}
+  - name: Error - Malformed code
+    request: {url: "{{baseUrl}}/api/rooms/lookup/ab", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    response: {status: 422, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"VALIDATION_ERROR","message":"room_code must match ^[A-Za-z0-9]{6}$.","details":{"field":"room_code"}}}'}}

@@ -14,6 +14,10 @@ settings:
 docs: |-
   # Connect to room stream
 
+  ## Authentication (Decision 11 — closed: secure session cookie)
+
+  A real browser `WebSocket` client cannot set a custom handshake header, so the handshake authenticates via the HttpOnly `Secure` `ft_session` cookie set by Register/Login/Refresh — the browser attaches it automatically on the upgrade request, same-origin, no client code needed. The `X-Session-Id` handshake header shown in this Bruno request is a fallback for tooling that cannot rely on cookies (Bruno itself, scripts); the server accepts either.
+
   ## Purpose
 
   Opens the sole realtime channel for one REST-joined room. No subscription message is needed because `room_id` is in the path.
@@ -23,7 +27,10 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | path | yes | integer | positive | no | Existing room already joined by user | `1001` |
-  | `X-Session-Id` | handshake header | yes | string | active opaque session | no | Same credential used by REST | `sess_A3redAgent9Kp` |
+  | `ft_session` cookie | handshake (browser) | yes* | string | HttpOnly, Secure, active session | no | Primary browser credential; automatic on same-origin upgrade | set by Register/Login |
+  | `X-Session-Id` | handshake header (non-browser fallback) | yes* | string | active JWT access token | no | Same credential used by REST | `sess_A3redAgent9Kp` |
+
+  \* Exactly one of the two must be present; the cookie takes precedence if both are sent.
 
   ## Success behavior
 
@@ -48,18 +55,51 @@ docs: |-
   | `403` | `NOT_ROOM_MEMBER` | authenticated user is not a member | no |
   | `409` | `INVALID_ROOM_STATE` | room is `CLOSED` | no |
 
-  A successful transport disconnect changes no membership state. Reconnect with the same session yields a current snapshot; missed incremental events need not be replayed.
+  A successful transport disconnect changes no membership state. Reconnect with the same session yields a current snapshot; missed incremental events need not be replayed. If the access token expired, the client refreshes over REST (`POST /api/auth/refresh`) first, then reconnects — the refreshed cookie authenticates the new handshake automatically.
 
   ## Concrete frames
 
   First frame for the newly created fixture room:
 
   ```json
-  {"type":"room.state","event_id":"evt_0100","room_id":1001,"sent_at":"2026-09-10T08:41:01Z","payload":{"room":{"room_id":1001,"status":"WAITING","host_user_id":42,"player_count":1,"startable":false,"players":[{"user_id":42,"username":"player_one","team":null,"role":null,"ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"}],"game":null,"created_at":"2026-09-10T08:41:00Z"}}}
+    {
+      "type": "room.state",
+      "event_id": "evt_0100",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:41:01Z",
+      "payload": {
+        "room": {
+          "room_id": 1001,
+          "status": "WAITING",
+          "host_user_id": 42,
+          "player_count": 1,
+          "startable": false,
+          "players": [
+            {
+              "user_id": 42,
+              "username": "player_one",
+              "team": null,
+              "role": null,
+              "ready": false,
+              "is_host": true,
+              "joined_at": "2026-09-10T08:41:00Z"
+            }
+          ],
+          "game": null,
+          "created_at": "2026-09-10T08:41:00Z"
+        }
+      }
+    }
   ```
 
   Failed authentication body before upgrade:
 
   ```json
-  {"error":{"code":"UNAUTHORIZED","message":"A valid active session is required.","details":{}}}
+    {
+      "error": {
+        "code": "UNAUTHORIZED",
+        "message": "A valid active session is required.",
+        "details": {}
+      }
+    }
   ```

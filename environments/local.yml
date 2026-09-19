@@ -12,7 +12,12 @@ variables:
     value: ""
     secret: true
     type: string
-    description: "Opaque session from registration; never commit a real value"
+    description: "JWT access token from register/login/refresh; never commit a real value"
+  - name: refreshToken
+    value: ""
+    secret: true
+    type: string
+    description: "Opaque refresh token from register/login/refresh; never commit a real value"
   - name: userId
     value: "42"
     type: number

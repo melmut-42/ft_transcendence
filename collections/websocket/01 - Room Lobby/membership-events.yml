@@ -50,11 +50,49 @@ docs: |-
   ## Concrete events
 
   ```json
-  {"type":"room.player.joined","event_id":"evt_0104","room_id":1001,"sent_at":"2026-09-10T08:41:20Z","payload":{"player":{"user_id":43,"username":"red_agent","team":null,"role":null,"ready":false,"is_host":false,"joined_at":"2026-09-10T08:41:20Z"},"host_user_id":42,"player_count":2,"room_status":"WAITING"}}
+    {
+      "type": "room.player.joined",
+      "event_id": "evt_0104",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:41:20Z",
+      "payload": {
+        "player": {
+          "user_id": 43,
+          "username": "red_agent",
+          "team": null,
+          "role": null,
+          "ready": false,
+          "is_host": false,
+          "joined_at": "2026-09-10T08:41:20Z"
+        },
+        "host_user_id": 42,
+        "player_count": 2,
+        "room_status": "WAITING"
+      }
+    }
   ```
 
   ```json
-  {"type":"room.player.left","event_id":"evt_0110","room_id":1001,"sent_at":"2026-09-10T08:42:05Z","payload":{"player":{"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":false,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},"host_user_id":43,"player_count":3,"room_status":"WAITING"}}
+    {
+      "type": "room.player.left",
+      "event_id": "evt_0110",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:42:05Z",
+      "payload": {
+        "player": {
+          "user_id": 42,
+          "username": "player_one",
+          "team": "RED",
+          "role": "SPYMASTER",
+          "ready": false,
+          "is_host": true,
+          "joined_at": "2026-09-10T08:41:00Z"
+        },
+        "host_user_id": 43,
+        "player_count": 3,
+        "room_status": "WAITING"
+      }
+    }
   ```
 
   No client command error applies because the source operation is REST; consult the REST join/leave requests for errors.
