@@ -7,8 +7,6 @@ http:
   method: POST
   url: "{{baseUrl}}/api/friends"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
     - name: Content-Type
       value: application/json
     - name: Accept
@@ -30,7 +28,7 @@ docs: |-
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Requesting identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
   | `user_id` | body | yes | integer | positive, existing user, not self | no | Target user | `43` |
 
   ## Success behavior
@@ -41,7 +39,8 @@ docs: |-
   | --- | --- | ---: | ---: | --- | --- |
   | `data.user_id` | integer | yes | no | positive | New friend |
   | `data.username` | string | yes | no | username rule | New friend's display name |
-  | `data.online` | boolean | yes | no | `true`, `false` | Snapshot presence |
+  | `data.avatar_url` | string | yes | no | URL | New friend's avatar |
+  | `data.is_online` | boolean | yes | no | `true`, `false` | Live presence |
 
   ## Errors
 
@@ -53,7 +52,7 @@ docs: |-
   | `422` | `VALIDATION_ERROR` | `user_id` missing/non-integer, or equals the requester |
 examples:
   - name: Success - Add red_agent
-    request: {url: "{{baseUrl}}/api/friends", method: POST, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}, {name: Content-Type, value: application/json, enabled: true}], params: [], body: {mode: json, json: '{"user_id":43}'}}
+    request: {url: "{{baseUrl}}/api/friends", method: POST, headers: [{name: Content-Type, value: application/json, enabled: true}], params: [], body: {mode: json, json: '{"user_id":43}'}}
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
@@ -64,9 +63,10 @@ examples:
             "data": {
               "user_id": 43,
               "username": "red_agent",
-              "online": true
+              "avatar_url": "https://{{baseUrl}}/static/avatars/default/43.svg",
+              "is_online": true
             }
           }
   - name: Error - Already friends
-    request: {url: "{{baseUrl}}/api/friends", method: POST, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: json, json: '{"user_id":43}'}}
+    request: {url: "{{baseUrl}}/api/friends", method: POST, headers: [], params: [], body: {mode: json, json: '{"user_id":43}'}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_FRIENDS","message":"User 43 is already a friend.","details":{"user_id":43}}}'}}

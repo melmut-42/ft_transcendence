@@ -5,6 +5,8 @@ info:
 docs: |-
   # Rooms
 
-  Creating joins the creator and assigns host. Only `WAITING` rooms accept joins, and a user may have one active room. The host transfers to the longest-present member after a host leaves `WAITING`; an empty room closes. Team, role, ready, countdown, and gameplay mutations use WebSocket.
+  Creating joins the creator and assigns host. Only `WAITING` rooms accept joins, and a user may have one active room (`active_room_id` is derived live from Game Session's membership index, not a durable field that can orphan an account — `workspace.yml`, State Ownership). The host transfers to the longest-present member after a host leaves `WAITING`; an empty room closes; a `FINISHED` room closes once its last member leaves. Team, role, ready, countdown, and gameplay mutations use WebSocket.
 
   A game can start only with at least four configured, ready members; exactly one Spymaster and at least one Operative per `RED` and `BLUE`. REST room snapshots use the same enums and privacy projections as realtime state.
+
+  `Leave room` and logout (`DELETE /api/auth/session`) are legal in every room status, including `IN_GAME`: leaving mid-game forfeits the match for that member's team (Room Abandonment, `workspace.yml`) rather than being rejected. A transport disconnect alone is never an immediate leave — it starts a reconnect grace period first, and only resolves to a leave/forfeit if that period expires without reconnect.

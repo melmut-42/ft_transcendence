@@ -55,7 +55,19 @@ docs: |-
       FINISHED --> CLOSED: room closes
   ```
 
-  `WAITING` is the only joinable state. A creator joins automatically and becomes host. One user may belong to only one active room. If a host leaves during `WAITING`, the longest-present remaining member becomes host; the room becomes `CLOSED` when empty. No rematch transition is defined.
+  `WAITING` is the only joinable state. A creator joins automatically and becomes host. One user may belong to only one active room. If a host leaves during `WAITING`, the longest-present remaining member becomes host; the room becomes `CLOSED` when empty. `FINISHED` results stay visible to every member until each one leaves individually (`DELETE .../members/me`, now legal in `FINISHED`); when the last member leaves a `FINISHED` room it becomes `CLOSED`. There is no rematch transition — a new match means creating or joining a new room.
+
+  ## Reconnect Grace Period and Abandonment (forfeit)
+
+  A transport disconnect (closed socket, no REST leave call) is never treated as an immediate leave, in any room state. It starts a reconnect grace period (configurable server-side; example default 30s in `WAITING`/`COUNTDOWN`, 60s `IN_GAME`) during which the member's seat, team, role, ready state, and turn rights are reserved exactly as they were. Reconnecting inside the grace period (same authenticated session opening a new socket to the same room) restores the member with no state loss and no event beyond the normal reconnect snapshot.
+
+  If the grace period expires without reconnect, behavior depends on room status:
+  - **`WAITING` or `COUNTDOWN`:** the member is removed exactly as an explicit leave — `room.player.left`, host transfer if needed, countdown cancellation if the departure breaks a start invariant.
+  - **`IN_GAME`:** the member is marked permanently abandoned and the match ends immediately by **forfeit** — the abandoning member's team loses, the opposite team wins, regardless of score. This is the same terminal outcome as an explicit `Leave room` call during `IN_GAME` (which is now accepted, not rejected — see below) and the same outcome as logout during `IN_GAME` (which revokes the session immediately per the Session and Credential Model above, and runs this same forfeit path for room-lifecycle purposes rather than blocking on `ALREADY_IN_ROOM`).
+
+  `Leave room` (`DELETE /api/rooms/{room_id}/members/me`) is now legal in every room status, including `IN_GAME`; during `IN_GAME` it triggers the same forfeit path as an abandonment timeout, without waiting out the grace period — an explicit leave is an immediate, deliberate signal. `End session` (logout) is likewise legal regardless of `active_room_id`; if the user is in an `IN_GAME` room, forfeit resolves first, synchronously with the session revocation, then the cookies clear and any open sockets close.
+
+  The terminal `game.ended` event for a forfeit carries `end_reason: "PLAYER_FORFEIT"` alongside the usual `winner`, `loser`, `score`, `room_status: "FINISHED"`, and `phase: "GAME_OVER"` fields; `revealed_card` is `null` because no card triggered it. Stats records the match exactly once, with the same win/loss bookkeeping as any other terminal result, keyed off this single `game.ended` emission (never off the grace-period timeout directly, which only decides *whether* forfeit fires, not the stats write).
 
   ## Game Lifecycle
 
@@ -73,9 +85,22 @@ docs: |-
 
   ## Identity Model
 
-  Registration requires `{ "email", "username", "password" }` (subject Ch. III–IV, mandatory). Email is the login identifier; username is the public display name; password is hashed + salted server-side. Both email and username are trimmed and case-insensitively unique. Guest-first is cancelled — there is no anonymous identity.
+  Registration requires `{ "email", "username", "password" }` (subject Ch. III–IV, mandatory). Email is the login identifier; username is the public display name; password is hashed + salted server-side (`>= 8`, `<= 72` bytes — bcrypt's input limit). Both email and username are trimmed and case-insensitively unique. Guest-first is cancelled — there is no anonymous identity.
 
-  Successful registration or login issues a session pair: a short-lived JWT `access_token` and a long-lived opaque `refresh_token` (Decision 6 — closed). `POST /api/auth/refresh` exchanges a valid refresh token for a new access token. The server also sets an HttpOnly, `Secure` session cookie (`ft_session`) carrying the same identity (Decision 11 — closed), so a browser authenticates REST calls and the WebSocket upgrade automatically, same-origin, with no client-side header code. `X-Session-Id` remains an accepted header for non-browser tooling (Bruno, scripts); a request may present either the cookie or the header.
+  ## Session and Credential Model (Decision 6 + Decision 11 — both closed)
+
+  Every session has two credentials, each with its own cookie. Neither credential is ever placed in a JSON response body, a query string, or a custom header. There is no `X-Session-Id` anywhere in this contract — not for browsers, not for Bruno, curl, or scripts. Bruno authenticates exactly like a browser, through its cookie jar.
+
+  | Cookie | Carries | Attributes | Lifetime |
+  | --- | --- | --- | --- |
+  | `ft_session` | short-lived JWT access credential | HttpOnly, `Secure`, `SameSite=Lax`, `Path=/` | short (example: 30 min) |
+  | `ft_refresh` | long-lived opaque refresh credential | HttpOnly, `Secure`, `SameSite=Lax`, `Path=/api/auth/refresh` | long (example: 30 days) |
+
+  Register and Login set both cookies and return no token value in the response body — only `access_token_expires_at` (for client-side UX timers) and profile fields. `GET /api/auth/session` and every other protected REST endpoint read `ft_session` only. `POST /api/auth/refresh` reads `ft_refresh` only (scoped to that one path by `Path=/api/auth/refresh`, so it is never sent on other requests), validates it, rotates it (single-use — the previous `ft_refresh` is revoked the instant a new one is issued), and reissues both cookies. Reuse of an already-rotated `ft_refresh` revokes the entire token family and forces re-login — this is the theft-detection behavior for a stolen refresh credential. The WebSocket upgrade (both the room socket and the chat socket) reads `ft_session` only, attached automatically by the browser on the same-origin request; there is no WebSocket-level refresh — an expired access token means the client calls `POST /api/auth/refresh` over REST first, which reissues `ft_session`, then reconnects.
+
+  `DELETE /api/auth/session` (logout) revokes both credentials server-side and clears both cookies, unconditionally — logout is never blocked by active room membership (see Room Abandonment below, which logout during `IN_GAME` now triggers instead of rejecting). Logout also closes every open, authenticated WebSocket connection for that session (room and chat).
+
+  Concrete states: `UNAUTHORIZED` (401) — the `ft_session` credential is missing, malformed, expired, or revoked; the client retries after `POST /api/auth/refresh`. `SESSION_EXPIRED` (401, refresh endpoint only) — the `ft_refresh` credential is missing, expired, already rotated, or revoked; the client must log in again. A WebSocket handshake with a missing/invalid `ft_session` is rejected before the `101` upgrade; an already-open socket whose session is explicitly revoked (logout, or refresh-token-family revocation) is closed server-side with policy code `4401`. Ordinary access-token expiry does not by itself tear down an already-open game socket — refresh happens on the next REST call or on reconnect.
 
   ## Teams and Roles
 
@@ -101,15 +126,15 @@ docs: |-
 
   ## Game Rules
 
-  The board has 25 cards. The randomly selected starting team owns 9; the other team owns 8; 7 are `NEUTRAL`; 1 is `ASSASSIN`. Only the active team's Spymaster may submit one normalized clue word plus integer `N` from `1` through `9`. This development contract imposes only: trim, Unicode lowercase storage, a single non-empty whitespace-free word, length `1..30`, and the numeric range. It does not add advanced official clue restrictions.
+  The board has 25 cards. The randomly selected starting team owns 9; the other team owns 8; 7 are `NEUTRAL`; 1 is `ASSASSIN`. Either `RED` or `BLUE` can be the starting team, chosen at random per game, so `score.red` and `score.blue` each independently range `0..9` (whichever color started that game owns 9; the ranges are not fixed per color). Only the active team's Spymaster may submit one normalized clue word plus integer `N` from `1` through `9`. This development contract imposes only: trim, Unicode lowercase storage, a single non-empty whitespace-free word, length `1..30`, and the numeric range. It does not add advanced official clue restrictions.
 
-  A clue grants `N + 1` guesses. An own-team reveal increments that color's score, consumes one guess, and may continue. An opponent reveal increments the opponent score and ends the turn unless it completes that opponent's set, which makes the opponent win immediately. A neutral reveal ends the turn. The assassin ends the match immediately and the guessing team's opponent wins. Operatives may pass during `GUESSING`. Terminal conditions are checked before any turn change.
-
-  `score.red` is the number of revealed `RED` cards; `score.blue` is the number of revealed `BLUE` cards. The first team whose full set is revealed wins. The winner is never decided by comparing scores after all 25 cards.
+  A clue grants `N + 1` guesses. An own-team reveal increments that color's score, consumes one guess, and may continue; revealing a team's own final card wins the game for that team immediately. An opponent reveal increments the opponent's score and ends the turn, unless it completes the opponent's full set, which makes the opponent win immediately. A neutral reveal ends the turn. The assassin ends the match immediately: the guessing team loses and the opponent wins, regardless of score. Operatives may pass during `GUESSING`, which ends the turn without revealing a card. Terminal conditions (assassin, either team's full set revealed) are checked before any turn change or score update is finalized. **The winner is never determined by comparing `score.red` to `score.blue` at any point — a full board can never end in a compare-score tiebreak, because the game always ends by a terminal reveal (a full set or the assassin) before the last card would need one.** Frontend never computes the winner locally; only the terminal `game.ended` event (or a `FINISHED` snapshot) is authoritative.
 
   ## Data Visibility
 
-  The server creates a projection for each recipient. Spymasters see every card affiliation. Operatives receive `color: null` for every unrevealed card and the true color after reveal. A universal secret-bearing board payload MUST NOT be broadcast. This applies to REST snapshots, initial `game.started`, reconnect `game.state`, and reveal events.
+  The server creates a projection for each recipient. Spymasters see every card affiliation. Operatives receive `color: null` for every unrevealed card and the true color after reveal. A universal secret-bearing board payload MUST NOT be broadcast. This applies to REST snapshots, initial `game.started`, reconnect `room.state`/`game.state`, and reveal events. Per-recipient projection happens inside the authoritative game-state owner (Game Session, see Backend Architecture) before a payload reaches any generic fan-out/broadcast layer — a full 25-color board is never handed to transport infrastructure for client-side filtering.
+
+  **Card ID invariant:** `card_id` (`1..25`) is a stable per-game slot identifier and carries zero information about affiliation. Board generation independently randomizes (a) which 25 words appear, (b) which slot gets which word, and (c) which slot gets which affiliation (9/8/7/1). Nothing may assume `card_id` parity, range, or position correlates with color — that would leak the key through IDs alone even with correct `color:null` masking. The fixture examples in this workspace and in `07 - Full State Scenarios` use a fixed illustrative map (`RED` = odd IDs, `BLUE` = even IDs, etc.) purely so examples stay reproducible across files; this fixed pattern is a documentation convenience only and MUST NOT be treated as a rule the backend replicates.
 
   ## Temporary vs Persistent State
 
@@ -117,11 +142,47 @@ docs: |-
 
   ## REST vs WebSocket Responsibility
 
-  REST owns registration/session bootstrap (including refresh), profiles, friends, room creation, membership join, snapshots, and leaving. Once a member joins the realtime channel, team, role, readiness, countdown, clue, guess, pass, and live state propagation use WebSocket. Basic chat is a separate per-user WebSocket channel (`/ws/chat`), independent of any room. REST and WebSocket share field names, domain enums, and the same session credential (cookie or `X-Session-Id`).
+  REST owns registration/session bootstrap (including refresh and logout), profile read/update, avatar, friends (list/add/remove/search), room creation, membership join/leave, snapshots, and match history. Once a member joins the realtime channel, team, role, readiness, countdown, clue, guess, pass, and live state propagation use WebSocket. Basic chat is a separate per-user WebSocket channel (`/ws/chat`), independent of any room. REST and WebSocket share field names and domain enums, and identify the same session; both accept only the `ft_session` cookie — there is no header-based credential on either transport.
+
+  ## Multi-Tab / Multi-Socket
+
+  One authenticated user has exactly one logical room membership at a time (`active_room_id` is a single value), but may hold several simultaneous authenticated connections to it — for example two browser tabs each opening `{{wsUrl}}/ws/rooms/{{roomId}}`. All sockets belonging to that user represent the same membership, not separate players; a second tab never creates a second seat. Every command from any of the user's sockets is validated against the same role/turn/team rules as if only one socket existed. Every server-generated room/game event is delivered to all of that user's currently open sockets for that room. The reconnect grace period (above) is keyed to the membership, not to a specific socket: as long as at least one authenticated socket for that membership is open, the member is not "disconnected"; the grace period starts only when the last of that user's sockets for the room closes.
 
   ## Error Philosophy
 
   Malformed JSON is `400`; absent/invalid access tokens are `401 UNAUTHORIZED`; an expired/invalid/used refresh token is `401 SESSION_EXPIRED` (refresh endpoint only — distinct from `UNAUTHORIZED` because it means "log in again," not "retry with a refreshed token"); permission failures are `403`; missing resources are `404`; uniqueness or lifecycle conflicts are `409`; field validation is `422`; throttling is `429`. REST errors use `{ "error": { "code", "message", "details" } }`. WebSocket errors correlate to `request_id`, do not mutate state, and leave the socket open except handshake authentication failures or protocol-abuse closure.
+
+  **Frontend error-handling classes** (documented once here, not repeated per component): `INLINE_VALIDATION` (422 field errors — show next to the input: register/login/room-code/clue/chat/avatar fields), `TOAST` (transient failures with no dedicated UI state — 429, 5xx, `NOT_PERMITTED`, `USER_NOT_FOUND`), `AUTH_REDIRECT` (`401 UNAUTHORIZED` after a failed silent refresh, or `401 SESSION_EXPIRED` — send to Login), `ROOM_RECOVERY` (`404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`, `409 ROOM_NOT_JOINABLE`/`ALREADY_IN_ROOM` — return to Lobby with an explanatory toast), `RECONNECT` (WebSocket close with policy code `4401`, or any transport drop — show the Reconnecting overlay and retry within the grace period), `FATAL_GAME_STATE` (a room/game action error that implies local state is stale relative to the server, e.g. `CARD_ALREADY_REVEALED`, `GAME_ALREADY_FINISHED`, `INVALID_ROOM_STATE` — discard local state and re-fetch/re-apply the next `room.state`/`game.state` snapshot rather than patching around it). Bruno's error codes (above and in `06 - Errors/error-catalog.yml`) stay the single authoritative code list; this is only the UI-handling bucket each one falls into.
+
+  ## Backend Architecture (Decision 3 — closed: modular Go backend; Modules & Scope — closed: Backend as microservices)
+
+  Decision 3's "modular Go backend, separate packages" describes internal code organization within each service, not a single deployable — it does not contradict running as microservices. Five independently deployable services, communicating over REST and Redis pub/sub:
+
+  | Service | Owns | Talks to |
+  | --- | --- | --- |
+  | **Gateway** | Public HTTPS/WSS entry point; REST reverse-proxy routing to the other services; WebSocket connection lifecycle (accept, `ft_session` validation at handshake, per-user multi-socket fan-out, close codes); TLS termination boundary. Holds **no** domain/game state and makes **no** authorization decisions beyond "is `ft_session` valid" — role/turn/membership authorization is each domain service's job. | User/Auth (session validation), Game Session (routes room/game REST + WS traffic), all others (routes their REST traffic) |
+  | **User/Auth** | Users, credentials, `ft_session`/`ft_refresh` issuance and rotation, profiles, avatars, friends, presence | Postgres (users, credentials, refresh-token metadata, profiles, friends); called by Gateway for session validation and by Game Session for room-membership authorization checks (does this user exist / is this user this user) |
+  | **Game Session** | Rooms, membership, team/role/ready, countdown, authoritative Codenames state (board, turn, clue, guesses, score), reconnect snapshots, abandonment/forfeit lifecycle, chat permission check + delivery (chat is small enough not to warrant its own service; Game Session already owns "is this user in an active room with that user") | Redis (all room/game ephemeral state, see State Ownership); Board Generator (requests a new board at game start); publishes `game.ended` to Stats on every terminal result (including forfeit) |
+  | **Board Generator** | Stateless: given a word-pack, returns 25 words each independently assigned a randomized affiliation (9/9-owning-team-varies/8/7/1) and a randomized `card_id` ↔ slot mapping satisfying the Card ID invariant above. No database, no session, no per-game memory. | Called synchronously by Game Session at game start only |
+  | **Stats** | Finalized match results, wins/losses, match history, level (see Match History & Stats below) | Postgres (match_results, user_stats); consumes `game.ended` events from Game Session (REST callback or the same Redis pub/sub bus, at implementer's discretion — payload is the `game.ended` event) |
+
+  Game Session remains the sole authoritative source for room/game state; User/Auth remains the sole authoritative source for identity/social state; Stats remains the sole authoritative source for finalized results. No service re-derives another's authoritative data locally beyond what it's told through these calls/events.
+
+  ## State Ownership and Storage
+
+  **PostgreSQL** (durable, survives restart): users, credentials, refresh-token metadata (for rotation/reuse detection), profiles, avatars, friends, finalized match results, user stats/match history.
+
+  **Redis** (ephemeral, room/game coordination): active room state (membership, team/role/ready, host), `active_room_id` lookup per user (a live index into Redis room membership, not a durable Postgres user column — so it can never permanently orphan an account; see below), countdown deadlines, in-progress board/turn/clue/score, per-socket presence, WebSocket `request_id` idempotency cache (room-lifetime scoped), and the pub/sub channel Game Session uses to fan events to Gateway.
+
+  `GET /api/auth/session`'s `active_room_id` is always derived live from Game Session's current Redis membership index at request time — it is never a stored, independently-mutable Postgres field that could drift out of sync with actual membership or survive a Redis flush as a dangling pointer. If Redis state is lost (restart, flush), the derived `active_room_id` becomes `null` for affected users automatically — there is no stale value to get permanently stuck behind `409 ALREADY_IN_ROOM`; a Game Session restart is expected to reload any room state Redis still holds (Redis persistence/AOF at the infra level) and treat anything genuinely gone as if those rooms closed.
+
+  ## Deployment / Same-Origin Model
+
+  One public origin: `Browser → HTTPS/WSS reverse proxy → { SPA static assets, /api/* → Gateway, /ws/* → Gateway }`. This is what makes "cookie attaches automatically on WS upgrade" true without cross-origin cookie configuration. Every browser-facing connection uses HTTPS/WSS (subject requirement); connections between containers on the backend's own network (service-to-service, service-to-Postgres, service-to-Redis) are not required to be encrypted. Local development mirrors this with a dev-server proxy (e.g. Vite proxying `/api` and `/ws` to the local Gateway) rather than separate origins with CORS — this is why the `local` environment's `baseUrl`/`wsUrl` already share `localhost:3000`. Secrets (DB credentials, JWT signing key) live in a gitignored `.env`, with a committed `.env.example` listing the required keys with placeholder values. Single-command startup via Docker Compose brings up the SPA, all five services, Postgres, and Redis together.
+
+  ## Backend Framework
+
+  Decision 1 fixes Go for the backend but names no HTTP framework, which the subject's Web module needs ("comprehensive tool... routing, middleware, ecosystem" — plain `net/http` does not qualify). Standardized choice: **Gin** (`gin-gonic/gin`) — routing, middleware chain, and request binding/validation cover the layered request pipeline already scoped in the repo's GitHub issues (context/request-ID middleware, access-control middleware, request handling, service layer, response handling), and it integrates cleanly with `gorilla/websocket` (Decision 4) by upgrading inside a Gin handler. Applies to every service above.
 
   ## Common Data Types
 
@@ -149,11 +210,39 @@ docs: |-
 
   ## Environment Variables
 
-  The `local` environment defines `baseUrl=http://localhost:3000`, `wsUrl=ws://localhost:3000`, `sessionToken`, `refreshToken`, `userId`, `roomId`, and `gameId`. Registration, login, and refresh scripts populate `sessionToken`/`refreshToken`/`userId`; room creation populates `roomId`. Secret session values remain blank in version control.
+  The `local` environment defines `baseUrl=http://localhost:3000`, `wsUrl=ws://localhost:3000`, `userId`, `roomId`, and `gameId`. Bruno authenticates via its cookie jar, exactly like a browser: Register/Login/Refresh set `ft_session`/`ft_refresh` on Bruno's cookie jar automatically, and every subsequent request in the same run reuses them with no header/variable wiring. `userId` is populated from the register response body for use in path/body fixtures (e.g. `Get public profile`, `Add friend`); `roomId` is populated by room creation. There is no `sessionToken`/`refreshToken` environment variable — no script ever needs to read a token value, because the token never appears in a response body (see Session and Credential Model above).
 
-  ## Friends and Chat Scope
+  ## Friends, Presence, and Chat Scope
 
-  Friends (REST, immediate/mutual, no request-accept workflow) and basic Chat (per-user WebSocket, friend-or-shared-active-room permission) implement the mandatory User Interaction module per User Flow §4 and §6. Advanced Chat (bonus module: read receipts, typing indicators, blocking, persistent history, game invites) is out of scope for this revision and must stay distinguishable from basic Chat if added later.
+  Friends (REST: list/add/remove, plus username search for discovery — see `05 - Friends/search-users.yml`; immediate/mutual, no request-accept workflow) and basic Chat (per-user WebSocket, friend-or-shared-active-room permission) implement the mandatory User Interaction module per User Flow §4 and §6. Advanced Chat (bonus module: read receipts, typing indicators, blocking, persistent history, game invites) is out of scope for this revision and must stay distinguishable from basic Chat if added later.
+
+  **Chat permission:** allowed if the sender and recipient are friends, **or** both are current members of the same room while that room is `WAITING`, `COUNTDOWN`, or `IN_GAME` (any state where the chat widget is actually mounted per User Flow §6 — not `IN_GAME` only, and not `FINISHED`/`CLOSED`, since co-membership ends when either leaves). A message to a recipient with no currently open `/ws/chat` socket is not silently accepted as delivered: the sender's ack reports `delivery_status: "RECIPIENT_OFFLINE"` instead of `"DELIVERED"` (there is still no persisted history — the message is not stored or redelivered later, the sender is just told the truth about delivery).
+
+  **Presence:** a user is `online` while they hold at least one currently open authenticated WebSocket connection (room or chat socket) — tracked ephemerally in Redis, no separate heartbeat protocol needed beyond the socket's own lifetime. `is_online` is exposed consistently everywhere the UI shows presence: the friends list, the public profile, and room member lists.
+
+  ## Room Identifier Consistency
+
+  `room_id` (positive integer) is the internal stable identifier: the WebSocket/REST path key, never shown to users as a "code to share." `room_code` (`^[A-Z0-9]{6}$`, generated at creation, unique among active rooms) is the human-shareable string shown in the UI for another player to type into Join Room, resolved back to `room_id` by `Lookup room by code`. Every UI reference to a room-sharing string uses this one format; other formats (dashed 4+4 codes, 4-digit codes) seen in earlier UI mockups are stale and superseded by this regex.
+
+  ## Styling Solution
+
+  No CSS framework is finalized by any Closed Decision. Standardized choice, compatible with the existing `ui-design/` token system (CSS custom properties for color/type/spacing already defined in `styles.css`): CSS custom properties (design tokens) plus component-scoped CSS files per component, colocated in `shared/ui` and each feature's `components/`. No large UI framework (Tailwind, MUI, Bootstrap) replaces the existing hand-built visual system.
+
+  ## Profile Completion (Standard User Management — subject-mandatory)
+
+  Beyond the existing read-only profile, the contract now includes: `PATCH /api/users/me` (editable fields: `username`, within the same uniqueness/format rule as registration) and `POST /api/users/me/avatar` (multipart upload — `image/jpeg`, `image/png`, `image/webp` only; max 2 MiB; server validates MIME type and dimensions server-side regardless of client-declared type; replacing an avatar deletes the previous stored file; a user with no uploaded avatar gets a deterministic default derived from `user_id`). `avatar_url` is added to own-profile, public-profile, room member, and friend list payloads so every player list in the UI can render it consistently. See `02 - Users & Profile/update-own-profile.yml` and `upload-avatar.yml`.
+
+  ## OAuth — deferred
+
+  OAuth (listed as a possible minor module) is **out of current implementation scope**. There is no OAuth endpoint, provider integration, or account-linking contract in this revision — registration and login are email/password only (see Identity Model above). If/when OAuth is picked up, it must end in the same `ft_session`/`ft_refresh` session model as password login, with no separate session type; the provider is not yet chosen.
+
+  ## Match History and Stats (Decision-selected minor module: Game Statistics)
+
+  Every terminal `game.ended` (normal win, assassin, or `PLAYER_FORFEIT`) writes exactly one match record to Stats: `game_id`, `room_id`, both teams' final rosters (`user_id`, `username`, `team`), `winner`, `end_reason`, `score`, `started_at`, `finished_at`. `GET /api/users/me/matches` (own match history, paginated) and the existing `wins`/`losses`/`matches_played` on both own and public profile read from this table. `level` stays in scope and is defined as a simple deterministic function of `wins` (`level = 1 + floor(wins / 5)`) — enough to satisfy "level" as a persistent stat without inventing an XP/points economy nothing else in scope requires. No leaderboard endpoint is added — it isn't part of the currently selected bonus set (Decision 9 is still open; add one only if/when a leaderboard-requiring module is actually chosen). See `07 - Stats/get-match-history.yml`.
+
+  ## Privacy Policy and Terms of Service
+
+  Subject-mandatory, and their absence is an automatic-rejection risk, not a style note. Two static frontend routes, `/privacy` and `/terms`, reachable without authentication and linked from a footer present on every public and authenticated layout. No Bruno contract is needed — they are static content, not API-backed — but their existence is recorded here so Frontend Structure and User Flow route planning include them from the start.
 
   ## Documentation Conventions
 

@@ -5,9 +5,6 @@ info:
   tags: [server-event, reference]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
 settings:
   timeout: 30000
   keepAliveInterval: 20000
@@ -23,7 +20,7 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | WebSocket path | yes | integer | positive | no | Observed room | `1001` |
-  | `X-Session-Id` | handshake header | yes | string | active member session | no | Recipient identity | `sess_A3redAgent9Kp` |
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
 
   ## Common envelope fields
 
@@ -47,12 +44,12 @@ docs: |-
   | `room.countdown.tick` | `seconds_remaining` | server timer | common |
   | `room.countdown.cancelled` | `reason`, `changed_by_user_id` | predicate becomes false | common |
   | `game.started` | `room` containing `game` | valid countdown reaches zero | role-safe board |
-  | `game.state` | `room` containing `game` | reconnect/recovery | role-safe board |
+  | `game.state` | `room` containing `game` | internal shape reused inside `room.state.payload.room.game` when `IN_GAME`/`FINISHED` — not a separate client-requested recovery event; `room.state` is the one canonical reconnect snapshot (`opencollection.yml`, Reconnect) | role-safe board |
   | `game.clue.submitted` | `game_id`, actor, team, clue, guesses, turn | accepted clue | common |
   | `game.card.revealed` | game/card/actor/team/score/turn/result | accepted guess | role-safe board delta |
   | `game.score.updated` | `game_id`, `score`, `changed_color` | RED or BLUE reveal | common |
   | `game.turn.changed` | game ID, previous team, reason, current turn, score | non-terminal turn end | common |
-  | `game.ended` | winner, loser, reason, revealed card, score, status, phase, time | terminal reveal | contains only the revealed terminal card; no hidden-board disclosure |
+  | `game.ended` | winner, loser, reason, revealed card, score, status, phase, time | terminal reveal, or `PLAYER_FORFEIT` (abandonment-timeout, explicit `Leave room`, or logout during `IN_GAME` — `workspace.yml`, Room Abandonment) | contains only the revealed terminal card (`null` for `PLAYER_FORFEIT`); no hidden-board disclosure |
 
   ## Concrete game events
 
@@ -146,3 +143,31 @@ docs: |-
   ## Invariants
 
   A terminal `game.ended` is final for the match and no `game.turn.changed` follows it. An Operative event never leaks any unrelated unrevealed card color, including after `FINISHED`. Duplicate request IDs do not duplicate domain events.
+
+  ## Forfeit example
+
+  Abandonment (grace period expiry), explicit `Leave room`, or logout during `IN_GAME` all produce this same event shape — RED's Spymaster (user `42`) abandons mid-match:
+
+  ```json
+    {
+      "type": "game.ended",
+      "event_id": "evt_0190",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:46:30Z",
+      "payload": {
+        "game_id": 5001,
+        "winner": "BLUE",
+        "loser": "RED",
+        "end_reason": "PLAYER_FORFEIT",
+        "abandoned_by_user_id": 42,
+        "revealed_card": null,
+        "score": {
+          "red": 2,
+          "blue": 2
+        },
+        "room_status": "FINISHED",
+        "phase": "GAME_OVER",
+        "finished_at": "2026-09-10T08:46:30Z"
+      }
+    }
+  ```

@@ -5,4 +5,4 @@ info:
 docs: |-
   # Full state scenarios
 
-  Normative, end-to-end snapshots for room `1001` and game `5001`: newly created, four joined, incomplete roles, valid unready, all ready, countdown, cancellation, full `IN_GAME` projections, clue, reveals, and terminal results. The same fixed 25-card secret map is used throughout.
+  Normative, end-to-end snapshots for room `1001` and game `5001`: newly created, four joined, incomplete roles, valid unready, all ready, countdown, cancellation, full `IN_GAME` projections, clue, reveals, and terminal results. The same fixed 25-card secret map is used throughout, purely so examples stay reproducible and cross-reference each other. **This fixed map (`RED`=odd `card_id`, `BLUE`=even, etc.) is a documentation convenience only — it is not a rule the backend replicates.** `card_id` carries zero affiliation information in the real system; board generation randomizes word placement and affiliation independently of `card_id` (`workspace.yml`, Card ID invariant).

@@ -5,9 +5,6 @@ info:
   tags: [action, room, countdown]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
   message:
     - title: Success - Ready true
       selected: true
@@ -93,7 +90,7 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
-  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Authenticated member | `sess_C5blueAgent2Rm` |
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
   | `type` | envelope | yes | string enum | `room.ready.set` | no | Operation | `room.ready.set` |
   | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0011` |
   | `payload.ready` | payload | yes | boolean | `true`, `false` | no | Desired readiness | `true` |
@@ -124,7 +121,21 @@ docs: |-
   | `ack.payload.startable` | boolean | yes | no | `true`, `false` | Full predicate result |
   | `room.player.updated.payload.changed_fields[]` | array<string enum> | yes | no | `ready` | Updated field |
 
-  The ordinary unready example in `WAITING` returns `{"type":"ack","request_id":"req_0012","ok":true,"payload":{"user_id":42,"ready":false,"room_status":"WAITING","startable":false}}` and emits no countdown event.
+  The ordinary unready example in `WAITING` emits no countdown event:
+
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0012",
+      "ok": true,
+      "payload": {
+        "user_id": 42,
+        "ready": false,
+        "room_status": "WAITING",
+        "startable": false
+      }
+    }
+  ```
 
   ### Last readiness and automatic countdown
 

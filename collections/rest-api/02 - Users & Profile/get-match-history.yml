@@ -1,0 +1,85 @@
+info:
+  name: Get own match history
+  type: http
+  seq: 5
+  tags: [profile, stats]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/users/me/matches?limit=20"
+  headers:
+    - name: Accept
+      value: application/json
+  params:
+    - name: limit
+      value: "20"
+docs: |-
+  # Get own match history
+
+  ## Purpose and preconditions
+
+  Completes the Game Statistics minor module (requires a game — satisfied). Requires an active session. Reads from the Stats service's finalized match records (`workspace.yml`, Match History and Stats), one row per terminal `game.ended`.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Authenticates the owner | set by Register/Login |
+  | `limit` | query | no | integer | `1..50`, default `20` | no | Page size | `20` |
+  | `before` | query | no | `string<date-time>` | ISO 8601 UTC | no | Return matches finished before this time (pagination cursor) | `2026-09-10T08:50:00Z` |
+
+  ## Response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.matches[].game_id` | integer | yes | no | positive | Match ID |
+  | `data.matches[].room_id` | integer | yes | no | positive | Room the match was played in |
+  | `data.matches[].team` | enum | yes | no | `RED`, `BLUE` | This user's team in the match |
+  | `data.matches[].opponents[]` | array<object> | yes | no | `user_id`, `username` | Opposing team's roster |
+  | `data.matches[].result` | enum | yes | no | `WIN`, `LOSS` | Outcome for this user |
+  | `data.matches[].end_reason` | enum | yes | no | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `PLAYER_FORFEIT` | Terminal cause |
+  | `data.matches[].score` | object | yes | no | `{red, blue}` | Final score |
+  | `data.matches[].finished_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Match end time |
+
+  ## Errors
+
+  `401 UNAUTHORIZED` for an invalid session. Read-only; no event.
+examples:
+  - name: Success - Two recent matches
+    request: {url: "{{baseUrl}}/api/users/me/matches?limit=20", method: GET, headers: [], params: [{name: limit, value: "20", enabled: true}], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "matches": [
+                {
+                  "game_id": 5001,
+                  "room_id": 1001,
+                  "team": "RED",
+                  "opponents": [
+                    {"user_id": 44, "username": "blue_master"},
+                    {"user_id": 45, "username": "blue_agent"}
+                  ],
+                  "result": "WIN",
+                  "end_reason": "ALL_TEAM_CARDS_REVEALED",
+                  "score": {"red": 9, "blue": 5},
+                  "finished_at": "2026-09-10T08:50:00Z"
+                },
+                {
+                  "game_id": 4998,
+                  "room_id": 998,
+                  "team": "BLUE",
+                  "opponents": [
+                    {"user_id": 46, "username": "extra_red"}
+                  ],
+                  "result": "LOSS",
+                  "end_reason": "PLAYER_FORFEIT",
+                  "score": {"red": 3, "blue": 2},
+                  "finished_at": "2026-09-09T20:10:00Z"
+                }
+              ]
+            }
+          }

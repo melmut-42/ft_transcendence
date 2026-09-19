@@ -7,8 +7,6 @@ http:
   method: GET
   url: "{{baseUrl}}/api/rooms/{{roomId}}"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
     - name: Accept
       value: application/json
 runtime:
@@ -34,7 +32,7 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | path | yes | integer | positive | no | Requested room | `1001` |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Determines access and projection | `sess_A3redAgent9Kp` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Determines access and projection | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
 
   ## Room response fields
@@ -69,10 +67,10 @@ docs: |-
   | `data.game.current_turn.clue.word` | string | conditional | no | normalized one word, `1..30` chars | Present in `GUESSING`; final clue may remain in `GAME_OVER` |
   | `data.game.current_turn.clue.number` | integer | conditional | no | `1..9` | Clue number `N` |
   | `data.game.current_turn.guesses_remaining` | integer or null | yes | yes | `0..10`, or `null` | `N+1` at clue acceptance; null while waiting for clue |
-  | `data.game.score.red` | integer | yes | no | `0..9` | Revealed RED cards |
-  | `data.game.score.blue` | integer | yes | no | `0..8` | Revealed BLUE cards |
+  | `data.game.score.red` | integer | yes | no | `0..9` | Revealed RED cards (either team may start with 9 — see workspace.yml Game Rules) |
+  | `data.game.score.blue` | integer | yes | no | `0..9` | Revealed BLUE cards (either team may start with 9 — see workspace.yml Game Rules) |
   | `data.game.board[]` | array<object> | yes | no | exactly 25 unique cards | Fixed board order |
-  | `data.game.board[].card_id` | integer | yes | no | `1..25` unique | Card identifier |
+  | `data.game.board[].card_id` | integer | yes | no | `1..25` unique | Slot identifier; carries zero affiliation information (`workspace.yml`, Card ID invariant) — the fixture example's `card_id`↔color pattern is illustrative only, not a rule |
   | `data.game.board[].word` | string | yes | no | fixture word | Visible to both roles |
   | `data.game.board[].revealed` | boolean | yes | no | `true`, `false` | Reveal state |
   | `data.game.board[].color` | enum or null | yes | yes | `RED`, `BLUE`, `NEUTRAL`, `ASSASSIN`, `null` | Null only for unrevealed cards hidden from an Operative; Spymasters always receive color |
@@ -90,7 +88,7 @@ docs: |-
   `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`, `422 VALIDATION_ERROR`. Errors reveal no room state. The server projects every card for the authenticated viewer; an Operative never receives an unrevealed affiliation.
 examples:
   - name: Newly created room
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -120,7 +118,7 @@ examples:
             }
           }
   - name: Four joined - Not configured
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -177,7 +175,7 @@ examples:
             }
           }
   - name: Teams selected - Roles incomplete
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -234,7 +232,7 @@ examples:
             }
           }
   - name: Roles valid - Players not ready
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -291,7 +289,7 @@ examples:
             }
           }
   - name: In game - Operative projection
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -352,8 +350,8 @@ examples:
             }
           }
   - name: Error - Room not found
-    request: {url: "{{baseUrl}}/api/rooms/9999", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/9999", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}
   - name: Error - Not a member
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [{name: X-Session-Id, value: sess_outsider47, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 403, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"NOT_ROOM_MEMBER","message":"User 47 is not a member of room 1001.","details":{"room_id":1001,"user_id":47}}}'}}

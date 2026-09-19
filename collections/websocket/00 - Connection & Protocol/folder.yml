@@ -5,4 +5,4 @@ info:
 docs: |-
   # Connection and protocol
 
-  Authenticate the handshake with the HttpOnly `ft_session` cookie (browser default, Decision 11) or the `X-Session-Id` header (non-browser fallback); the URL contains only the integer `roomId`. The user must already be a REST room member. The first frame is a role-safe `room.state`. Reconnect replaces local state from a fresh snapshot; ordinary transport disconnect does not itself remove membership.
+  Authenticate the handshake with the HttpOnly `ft_session` cookie only (Decision 11), attached automatically on upgrade, with `Origin` validated against the deployment's single public origin before the cookie is even checked. The URL contains only the integer `roomId`. The user must already be a REST room member. The first frame is a role-safe `room.state`. Reconnect replaces local state from a fresh snapshot; a transport disconnect starts a reconnect grace period rather than immediately changing membership (`workspace.yml`, Reconnect Grace Period and Abandonment). A user may hold several simultaneous sockets to the same room (multi-tab) without creating a second seat.

@@ -5,9 +5,6 @@ info:
   tags: [scenario, game, privacy]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
 settings:
   timeout: 30000
   keepAliveInterval: 20000
@@ -18,7 +15,7 @@ docs: |-
 
   These two `game.started` frames are normative projections of the same logical room `1001`, game `5001`, board, timestamp, players, turn, and score immediately after a valid countdown. This request is a passive observer and sends no application message.
 
-  The request connects with required positive-integer path `room_id=1001` and required handshake header `X-Session-Id`, whose active session determines whether the returned board is the Spymaster or Operative projection.
+  The request connects with required positive-integer path `room_id=1001`, authenticated via the `ft_session` cookie alone — see `00 - Connection & Protocol/connect.yml`. The connecting session's identity determines whether the returned board is the Spymaster or Operative projection.
 
   ## Projection rule
 

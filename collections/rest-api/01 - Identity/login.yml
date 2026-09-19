@@ -23,23 +23,22 @@ runtime:
     - type: after-response
       code: |-
         if (res.status === 200 && res.body && res.body.data) {
-          bru.setVar("sessionToken", String(res.body.data.access_token));
-          bru.setVar("refreshToken", String(res.body.data.refresh_token));
           bru.setVar("userId", String(res.body.data.user.user_id));
         }
     - type: tests
       code: |-
-        test("logs in a registered user", function () {
+        test("logs in a registered user and sets session cookies", function () {
           expect(res.status).to.equal(200);
-          expect(res.body.data.access_token).to.be.a("string");
-          expect(res.body.data.refresh_token).to.be.a("string");
+          expect(res.body.data.access_token_expires_at).to.be.a("string");
+          expect(res.body.data).to.not.have.property("access_token");
+          expect(res.body.data).to.not.have.property("refresh_token");
         });
 docs: |-
   # Login
 
   ## Purpose
 
-  Mandatory authentication entry point for an existing registered account (subject Ch. III–IV). Verifies email + password and issues a new session. Not related to OAuth, which is a separate, deferred contract.
+  Mandatory authentication entry point for an existing registered account (subject Ch. III–IV). Verifies email + password and issues a new session. OAuth is a deferred module and not part of this contract for now.
 
   ## Preconditions
 
@@ -56,17 +55,14 @@ docs: |-
 
   ## Success behavior and response fields
 
-  `200 OK` issues a new session pair for the matched account and sets the same HttpOnly `Secure` `ft_session` cookie as Register (Decision 11), so the WebSocket upgrade authenticates without a custom header.
+  `200 OK` issues a new session pair for the matched account and sets the same two cookies as Register (`ft_session`, `ft_refresh` — Decision 11), so the WebSocket upgrade and every following REST call authenticate without a custom header. No token value is returned in the body, on either client type.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
   | `data.user.user_id` | integer | yes | no | positive | Authenticated user |
   | `data.user.username` | string | yes | no | username rule | Display username |
   | `data.user.email` | string | yes | no | valid email | Login identifier |
-  | `data.access_token` | string | yes | no | JWT | Short-lived credential for REST (`X-Session-Id`) and the cookie identity (Decision 6) |
-  | `data.access_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Access token expiry |
-  | `data.refresh_token` | string | yes | no | opaque, non-empty | Long-lived credential accepted only by `POST /api/auth/refresh` |
-  | `data.refresh_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Refresh token expiry |
+  | `data.access_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | `ft_session` expiry, for client-side UX timers only |
 
   ## State changes and events
 
@@ -99,7 +95,10 @@ examples:
           }
     response:
       status: 200
-      headers: [{name: Content-Type, value: application/json}]
+      headers:
+        - {name: Content-Type, value: application/json}
+        - {name: Set-Cookie, value: "ft_session=eyJhbGciOiJIUzI1NiJ9...; HttpOnly; Secure; SameSite=Lax; Path=/"}
+        - {name: Set-Cookie, value: "ft_refresh=rtok_9NqK2vLc4R8pXaZm; HttpOnly; Secure; SameSite=Lax; Path=/api/auth/refresh"}
       body:
         type: json
         data: |-
@@ -110,10 +109,7 @@ examples:
                 "username": "player_one",
                 "email": "player.one@example.com"
               },
-              "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MiJ9.9NqK2vLc4R8pXaZ",
-              "access_token_expires_at": "2026-09-11T09:30:00Z",
-              "refresh_token": "rtok_9NqK2vLc4R8pXaZm",
-              "refresh_token_expires_at": "2026-10-11T09:00:00Z"
+              "access_token_expires_at": "2026-09-11T09:30:00Z"
             }
           }
   - name: Error - Wrong password

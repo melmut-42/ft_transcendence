@@ -5,9 +5,6 @@ info:
   tags: [connection, chat]
 websocket:
   url: "{{wsUrl}}/ws/chat"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
 settings:
   timeout: 30000
   keepAliveInterval: 20000
@@ -16,20 +13,17 @@ docs: |-
 
   ## Authentication (Decision 11 — closed: secure session cookie)
 
-  Same mechanism as the room socket: the browser attaches the HttpOnly `Secure` `ft_session` cookie automatically on the upgrade request; no client-side header code is needed. `X-Session-Id` remains an accepted fallback for non-browser tooling. See `00 - Connection & Protocol/connect.yml` for the full explanation.
+  Same mechanism as the room socket: the client attaches the HttpOnly `Secure` `ft_session` cookie automatically on the upgrade request; no client-side header code is needed, no header exists. `Origin` is validated the same way as the room socket. See `00 - Connection & Protocol/connect.yml` for the full explanation.
 
   ## Purpose
 
-  One per-user realtime channel for basic chat (User Flow §6), separate from the per-room game socket. Delivers direct messages to/from friends and current room co-members.
+  One per-user realtime channel for basic chat (User Flow §6), separate from the per-room game socket. Delivers direct messages to/from friends and current room co-members while the shared room is `WAITING`, `COUNTDOWN`, or `IN_GAME`. Opening multiple `/ws/chat` sockets for the same user (multi-tab) is supported — see `08 - Chat/folder.yml`.
 
   ## Preconditions and handshake parameters
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `ft_session` cookie | handshake (browser) | yes* | string | HttpOnly, Secure, active session | no | Primary browser credential | set by Register/Login |
-  | `X-Session-Id` | handshake header (non-browser fallback) | yes* | string | active JWT access token | no | Same credential used by REST | `sess_A3redAgent9Kp` |
-
-  \* Exactly one of the two must be present; the cookie takes precedence if both are sent.
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential | set by Register/Login |
 
   ## Success behavior
 

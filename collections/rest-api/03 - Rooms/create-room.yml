@@ -7,8 +7,6 @@ http:
   method: POST
   url: "{{baseUrl}}/api/rooms"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
     - name: Accept
       value: application/json
 runtime:
@@ -40,7 +38,7 @@ docs: |-
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Creating user | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Creating user | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
 
   There is no body: room capacity, passwords, timers, and custom boards are not contract features.
@@ -77,7 +75,7 @@ docs: |-
   `401 UNAUTHORIZED`; `409 ALREADY_IN_ROOM`. Neither creates a room.
 examples:
   - name: Success - Newly created room
-    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
@@ -108,7 +106,7 @@ examples:
             }
           }
   - name: Error - Already in room
-    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 409
       headers: [{name: Content-Type, value: application/json}]

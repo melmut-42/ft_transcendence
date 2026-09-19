@@ -5,9 +5,6 @@ info:
   tags: [action, room]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
   message:
     - title: Success - Select RED Spymaster
       selected: true
@@ -93,18 +90,65 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
-  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Authenticated member | `sess_A3redAgent9Kp` |
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
   | `type` | envelope | yes | string enum | `room.role.select` | no | Operation | `room.role.select` |
   | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0005` |
   | `payload.role` | payload | yes | string enum | `SPYMASTER`, `OPERATIVE` | no | New temporary role | `SPYMASTER` |
 
   ## Success, state, and emitted events
 
-  A role selection sets `ready=false`, re-evaluates startability, sends an ack, emits `room.player.updated`, then `room.state`. During `COUNTDOWN`, `room.countdown.cancelled` with reason `ROLE_CHANGED` is inserted before the state snapshot. Example ack: `{"type":"ack","request_id":"req_0005","ok":true,"payload":{"user_id":42,"team":"RED","role":"SPYMASTER","ready":false,"room_status":"WAITING"}}`.
+  A role selection sets `ready=false`, re-evaluates startability, sends an ack, emits `room.player.updated`, then `room.state`. During `COUNTDOWN`, `room.countdown.cancelled` with reason `ROLE_CHANGED` is inserted before the state snapshot.
 
-  The BLUE Operative example returns `{"type":"ack","request_id":"req_0006","ok":true,"payload":{"user_id":45,"team":"BLUE","role":"OPERATIVE","ready":false,"room_status":"WAITING"}}`.
+  **Select RED Spymaster:**
 
-  The role-change example assumes RED's Spymaster slot is vacant and returns `{"type":"ack","request_id":"req_0007","ok":true,"payload":{"user_id":43,"team":"RED","role":"SPYMASTER","ready":false,"room_status":"WAITING"}}`.
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0005",
+      "ok": true,
+      "payload": {
+        "user_id": 42,
+        "team": "RED",
+        "role": "SPYMASTER",
+        "ready": false,
+        "room_status": "WAITING"
+      }
+    }
+  ```
+
+  **Select BLUE Operative:**
+
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0006",
+      "ok": true,
+      "payload": {
+        "user_id": 45,
+        "team": "BLUE",
+        "role": "OPERATIVE",
+        "ready": false,
+        "room_status": "WAITING"
+      }
+    }
+  ```
+
+  **Change Operative to Spymaster** (RED's Spymaster slot is vacant):
+
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0007",
+      "ok": true,
+      "payload": {
+        "user_id": 43,
+        "team": "RED",
+        "role": "SPYMASTER",
+        "ready": false,
+        "room_status": "WAITING"
+      }
+    }
+  ```
 
   | Result field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |

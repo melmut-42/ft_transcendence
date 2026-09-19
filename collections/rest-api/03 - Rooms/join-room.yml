@@ -7,8 +7,6 @@ http:
   method: POST
   url: "{{baseUrl}}/api/rooms/{{roomId}}/members"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
     - name: Accept
       value: application/json
 docs: |-
@@ -23,7 +21,7 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | path | yes | integer | positive | no | Room to join | `1001` |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Joining user | `sess_A3redAgent9Kp` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Joining user | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
 
   ## Response fields
@@ -67,7 +65,7 @@ docs: |-
   No capacity maximum is imposed. Joining is forbidden as soon as countdown begins.
 examples:
   - name: Success - Join empty-team room
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
@@ -106,7 +104,7 @@ examples:
             }
           }
   - name: Success - Fifth player joins
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_extraRed46, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
@@ -172,11 +170,11 @@ examples:
             }
           }
   - name: Error - Room not found
-    request: {url: "{{baseUrl}}/api/rooms/9999/members", method: POST, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/9999/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}
   - name: Error - Countdown already started
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_extraRed46, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_JOINABLE","message":"Room 1001 is not joinable while status is COUNTDOWN.","details":{"room_id":1001,"status":"COUNTDOWN"}}}'}}
   - name: Error - Already in another room
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [{name: X-Session-Id, value: sess_extraRed46, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"User 46 already belongs to active room 1002.","details":{"room_id":1002}}}'}}

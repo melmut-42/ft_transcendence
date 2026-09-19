@@ -8,16 +8,6 @@ variables:
     value: "ws://localhost:3000"
     type: string
     description: "Local WebSocket origin"
-  - name: sessionToken
-    value: ""
-    secret: true
-    type: string
-    description: "JWT access token from register/login/refresh; never commit a real value"
-  - name: refreshToken
-    value: ""
-    secret: true
-    type: string
-    description: "Opaque refresh token from register/login/refresh; never commit a real value"
   - name: userId
     value: "42"
     type: number

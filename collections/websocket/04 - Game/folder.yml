@@ -5,6 +5,8 @@ info:
 docs: |-
   # Game
 
-  Game phase is `WAITING_FOR_CLUE | GUESSING | GAME_OVER`, separate from room status. The active Spymaster submits a clue and integer `N`; the active Operatives receive `N+1` guesses. Own cards may continue, opponent and neutral cards end the turn, assassin ends the game, and any team's last card wins immediately. Passing is voluntary during `GUESSING`.
+  Game phase is `WAITING_FOR_CLUE | GUESSING | GAME_OVER`, separate from room status. The active Spymaster submits a clue and integer `N`; the active Operatives receive `N+1` guesses. Own cards may continue, opponent and neutral cards end the turn, assassin ends the game, and any team's last card wins immediately. Passing is voluntary during `GUESSING`. Winner is always decided by a terminal reveal (a full set, the assassin) or a forfeit — never by comparing `score.red` to `score.blue` (`workspace.yml`, Game Rules).
 
-  Scores count revealed team cards, regardless of which team guessed them. Every reveal checks terminal conditions before emitting a turn change.
+  Scores count revealed team cards, regardless of which team guessed them; either color's starting-team score ranges `0..9` (either color can start — `workspace.yml`). Every reveal checks terminal conditions before emitting a turn change.
+
+  A match can also end by `game.ended` with `end_reason: "PLAYER_FORFEIT"` — triggered by the abandonment grace-period timer, an explicit `Leave room` during `IN_GAME`, or logout during `IN_GAME` (`workspace.yml`, Room Abandonment; see `05 - Server Events/server-event-catalog.yml` for the concrete event). No client message causes this directly.

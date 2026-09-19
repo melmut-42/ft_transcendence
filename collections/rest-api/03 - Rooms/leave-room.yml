@@ -6,40 +6,41 @@ info:
 http:
   method: DELETE
   url: "{{baseUrl}}/api/rooms/{{roomId}}/members/me"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
+  headers: []
 docs: |-
   # Leave room
 
   ## Purpose and preconditions
 
-  Removes the authenticated member during `WAITING`, `COUNTDOWN`, or `FINISHED`. Leaving an active `IN_GAME` match is rejected; transport disconnect is not a leave.
+  Removes the authenticated member. Legal in every room status, including `IN_GAME` (Room Abandonment, `workspace.yml`) — an explicit leave during `IN_GAME` immediately triggers `PLAYER_FORFEIT` for that member's team rather than being rejected. Transport disconnect alone is not a leave; it starts the reconnect grace period instead, and only becomes this same effect if the grace period expires without reconnect.
 
   ## Request parameters
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | path | yes | integer | positive | no | Room to leave | `1001` |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Departing member | `sess_A3redAgent9Kp` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Departing member | set by Register/Login |
 
   ## Success and state changes
 
-  `204 No Content` clears the user's active room. It emits `room.player.left` and a new `room.state` to remaining members. During `COUNTDOWN`, removal first cancels countdown and returns to `WAITING`. If the host leaves, host becomes the remaining member with the earliest `joined_at`; if none remain, status becomes `CLOSED`.
+  `204 No Content` clears the user's active room.
+
+  - **`WAITING` / `COUNTDOWN` / `FINISHED`:** emits `room.player.left` and a new `room.state` to remaining members. During `COUNTDOWN`, removal first cancels countdown and returns to `WAITING`. If the host leaves, host becomes the remaining member with the earliest `joined_at`; if none remain, status becomes `CLOSED`. Leaving a `FINISHED` room when the last member leaves also closes it.
+  - **`IN_GAME`:** triggers forfeit — the departing member's team loses, the opposite team wins. The room emits `game.ended` with `end_reason: "PLAYER_FORFEIT"`, `winner`/`loser`, current `score`, `room_status: "FINISHED"`, `phase: "GAME_OVER"`, and `revealed_card: null` (see WebSocket `04 - Game/guess-card.yml` for the sibling terminal-event shape). The room then behaves like any other `FINISHED` room.
 
   ## Errors
 
-  `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`, and `409 INVALID_ROOM_STATE` for `IN_GAME`. Errors do not change membership.
+  `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`. There is no `409 INVALID_ROOM_STATE` for `IN_GAME` anymore — that state now resolves to a forfeit instead of being rejected. Errors do not change membership.
 examples:
   - name: Success - Member leaves waiting room
-    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Success - Host leaves and ownership transfers
-    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
+    response: {status: 204, headers: [], body: {type: text, data: ""}}
+  - name: Success - Leave during IN_GAME triggers forfeit
+    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Error - Not a room member
-    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [{name: X-Session-Id, value: sess_outsider47, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 403, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"NOT_ROOM_MEMBER","message":"User 47 is not a member of room 1001.","details":{"room_id":1001,"user_id":47}}}'}}
-  - name: Error - Game in progress
-    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [{name: X-Session-Id, value: sess_A3redAgent9Kp, enabled: true}], params: [], body: {mode: none}}
-    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"INVALID_ROOM_STATE","message":"Room 1001 cannot be left while status is IN_GAME.","details":{"room_id":1001,"status":"IN_GAME"}}}'}}

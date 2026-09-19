@@ -7,8 +7,6 @@ http:
   method: GET
   url: "{{baseUrl}}/api/users/me"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
     - name: Accept
       value: application/json
 docs: |-
@@ -22,7 +20,7 @@ docs: |-
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Authenticates the owner | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Authenticates the owner | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
 
   ## Response fields
@@ -31,6 +29,7 @@ docs: |-
   | --- | --- | ---: | ---: | --- | --- |
   | `data.user_id` | integer | yes | no | positive | Persistent user ID |
   | `data.username` | string | yes | no | username rule | Display username |
+  | `data.avatar_url` | string | yes | no | URL | Uploaded avatar, or the deterministic default if none uploaded |
   | `data.level` | integer | yes | no | `>= 1` | Persistent progression level |
   | `data.wins` | integer | yes | no | `>= 0` | Finished matches won |
   | `data.losses` | integer | yes | no | `>= 0` | Finished matches lost |
@@ -43,7 +42,7 @@ docs: |-
   Read-only; no event. Invalid sessions return `401 UNAUTHORIZED`. Team, role, ready, score, and board are intentionally absent because they are room state.
 examples:
   - name: Success - Persistent stats with active room
-    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -54,6 +53,7 @@ examples:
             "data": {
               "user_id": 42,
               "username": "player_one",
+              "avatar_url": "https://{{baseUrl}}/static/avatars/default/42.svg",
               "level": 4,
               "wins": 12,
               "losses": 8,
@@ -63,7 +63,7 @@ examples:
             }
           }
   - name: Success - Persistent stats without room
-    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -74,6 +74,7 @@ examples:
             "data": {
               "user_id": 42,
               "username": "player_one",
+              "avatar_url": "https://{{baseUrl}}/static/avatars/default/42.svg",
               "level": 4,
               "wins": 12,
               "losses": 8,

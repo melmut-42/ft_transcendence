@@ -7,108 +7,81 @@ http:
   method: POST
   url: "{{baseUrl}}/api/auth/refresh"
   headers:
-    - name: Content-Type
-      value: application/json
     - name: Accept
       value: application/json
   body:
-    type: json
-    data: |-
-      {
-        "refresh_token": "{{refreshToken}}"
-      }
+    type: none
 runtime:
   scripts:
-    - type: after-response
-      code: |-
-        if (res.status === 200 && res.body && res.body.data) {
-          bru.setVar("sessionToken", String(res.body.data.access_token));
-          bru.setVar("refreshToken", String(res.body.data.refresh_token));
-        }
     - type: tests
       code: |-
         test("issues a new access token", function () {
           expect(res.status).to.equal(200);
-          expect(res.body.data.access_token).to.be.a("string");
+          expect(res.body.data.access_token_expires_at).to.be.a("string");
         });
 docs: |-
   # Refresh session
 
   ## Purpose
 
-  Implements Decision 6 (JWT + refresh tokens): exchanges a valid, unexpired `refresh_token` for a new short-lived `access_token`, without forcing the user through Login again. This is the only way to renew an expired access token.
+  Implements Decision 6 (JWT + refresh tokens): exchanges a valid, unexpired `ft_refresh` credential for a new `ft_session`/`ft_refresh` pair, without forcing the user through Login again. This is the only way to renew an expired access token, and it is the step a client takes before reconnecting a WebSocket whose `ft_session` has expired.
 
   ## Preconditions and request parameters
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `Content-Type` | header | yes | string | `application/json` | no | JSON request media type | `application/json` |
-  | `refresh_token` | body or `ft_session` cookie | yes | string | active, unexpired, unrevoked | no | Long-lived credential from Register/Login/a prior Refresh | `rtok_7Hk2mQ9vLc4R8pXaZq` |
+  | `ft_refresh` cookie | request cookie | yes | string | active, unexpired, unrevoked, not previously rotated | no | Long-lived credential from Register/Login/a prior Refresh | set by Register/Login |
 
-  A browser client relies on the `ft_session` cookie and sends no body; the `refresh_token` body field exists for non-browser tooling.
+  There is no request body and no other credential path. `ft_refresh` is scoped `Path=/api/auth/refresh`, so a browser sends it here and nowhere else. Bruno relies on the same cookie via its cookie jar — there is no `refresh_token` body field for "non-browser tooling"; Bruno authenticates exactly like a browser.
 
   ## Success behavior and response fields
 
-  `200 OK` rotates the refresh token (single-use) and issues a new access token. It also reissues the `ft_session` cookie.
+  `200 OK` rotates the refresh credential (single-use — the presented `ft_refresh` is revoked the instant the new one is issued) and reissues both `ft_session` and `ft_refresh` cookies. No token value is returned in the body.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
-  | `data.access_token` | string | yes | no | JWT | New short-lived REST/WebSocket credential |
-  | `data.access_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | New access token expiry |
-  | `data.refresh_token` | string | yes | no | opaque, non-empty | New refresh token; the previous one is revoked |
-  | `data.refresh_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | New refresh token expiry |
+  | `data.access_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | New `ft_session` expiry, for client-side UX timers only |
 
   ## State changes and events
 
-  The presented refresh token is revoked and replaced (rotation). No room membership or WebSocket event is affected — an existing room WebSocket connection keeps its handshake-time authorization until it disconnects and reconnects.
+  The presented refresh credential is revoked and replaced (rotation). No room membership or WebSocket event is affected — an existing room WebSocket connection keeps its handshake-time authorization until it disconnects and reconnects; ordinary access-token expiry does not by itself tear down an already-open socket (`workspace.yml`, Session and Credential Model).
 
   ## Errors
 
   | Status | Code | When | State change |
   | --- | --- | --- | --- |
-  | `400` | `VALIDATION_ERROR` | malformed JSON or unexpected structure | none |
-  | `401` | `SESSION_EXPIRED` | refresh token missing, expired, already used, or revoked | none |
+  | `401` | `SESSION_EXPIRED` | `ft_refresh` missing, expired, already rotated, or revoked | none, unless reuse-of-rotated is detected |
 
-  `SESSION_EXPIRED` here means the frontend must send the user back through Login; it is distinct from `UNAUTHORIZED`, which means a REST/WebSocket request presented no valid access token.
+  `SESSION_EXPIRED` here means the frontend must send the user back through Login; it is distinct from `UNAUTHORIZED`, which means a REST/WebSocket request presented no valid `ft_session`. Presenting an already-rotated `ft_refresh` (reuse of a stolen/replayed refresh credential) is also reported as `SESSION_EXPIRED`, but additionally revokes every credential in that token's rotation family server-side — the account-wide theft-detection response required by the Session and Credential Model.
 examples:
   - name: Success - New access token
     request:
       url: "{{baseUrl}}/api/auth/refresh"
       method: POST
-      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      headers: [{name: Accept, value: application/json, enabled: true}]
       params: []
-      body:
-        mode: json
-        json: |-
-          {
-            "refresh_token": "rtok_7Hk2mQ9vLc4R8pXaZq"
-          }
+      body: {mode: none}
     response:
       status: 200
-      headers: [{name: Content-Type, value: application/json}]
+      headers:
+        - {name: Content-Type, value: application/json}
+        - {name: Set-Cookie, value: "ft_session=eyJhbGciOiJIUzI1NiJ9...; HttpOnly; Secure; SameSite=Lax; Path=/"}
+        - {name: Set-Cookie, value: "ft_refresh=rtok_newRotated123; HttpOnly; Secure; SameSite=Lax; Path=/api/auth/refresh"}
       body:
         type: json
         data: |-
           {
             "data": {
-              "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MiJ9.newtoken",
-              "access_token_expires_at": "2026-09-10T09:40:01Z",
-              "refresh_token": "rtok_newRotated123",
-              "refresh_token_expires_at": "2026-10-10T08:40:01Z"
+              "access_token_expires_at": "2026-09-10T09:40:01Z"
             }
           }
   - name: Error - Expired or revoked refresh token
     request:
       url: "{{baseUrl}}/api/auth/refresh"
       method: POST
-      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      headers: [{name: Accept, value: application/json, enabled: true}, {name: Cookie, value: "ft_refresh=rtok_expiredOrUsed", enabled: true}]
       params: []
-      body:
-        mode: json
-        json: |-
-          {
-            "refresh_token": "rtok_expiredOrUsed"
-          }
+      body: {mode: none}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]

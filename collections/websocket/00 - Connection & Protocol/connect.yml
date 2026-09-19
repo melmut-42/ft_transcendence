@@ -5,9 +5,6 @@ info:
   tags: [connection, smoke]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
 settings:
   timeout: 30000
   keepAliveInterval: 20000
@@ -16,21 +13,22 @@ docs: |-
 
   ## Authentication (Decision 11 — closed: secure session cookie)
 
-  A real browser `WebSocket` client cannot set a custom handshake header, so the handshake authenticates via the HttpOnly `Secure` `ft_session` cookie set by Register/Login/Refresh — the browser attaches it automatically on the upgrade request, same-origin, no client code needed. The `X-Session-Id` handshake header shown in this Bruno request is a fallback for tooling that cannot rely on cookies (Bruno itself, scripts); the server accepts either.
+  Authentication is cookie-only. The handshake authenticates via the HttpOnly, `Secure`, `SameSite=Lax` `ft_session` cookie set by Register/Login/Refresh — the client attaches it automatically on the upgrade request, same-origin, no client code needed. There is no handshake header and no `X-Session-Id`; the server validates the cookie alone.
+
+  **Origin policy:** the server validates the upgrade request's `Origin` header against the deployment's own origin (the single public origin from `workspace.yml`'s Deployment / Same-Origin Model) and rejects the handshake with `403` before checking the cookie if it doesn't match. This is the WebSocket-specific cross-site protection that complements `SameSite=Lax` (which alone does not fully cover WebSocket upgrades in every browser).
+
+  **Multi-tab:** a user may open several authenticated sockets to the same room (e.g. two tabs) without creating a second seat — see `workspace.yml`, Multi-Tab / Multi-Socket. All of that user's sockets receive the same events; a disconnect only starts the reconnect grace period once the *last* of that user's sockets for this room closes.
 
   ## Purpose
 
-  Opens the sole realtime channel for one REST-joined room. No subscription message is needed because `room_id` is in the path.
+  Opens the realtime channel for one REST-joined room. No subscription message is needed because `room_id` is in the path.
 
   ## Preconditions and handshake parameters
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | path | yes | integer | positive | no | Existing room already joined by user | `1001` |
-  | `ft_session` cookie | handshake (browser) | yes* | string | HttpOnly, Secure, active session | no | Primary browser credential; automatic on same-origin upgrade | set by Register/Login |
-  | `X-Session-Id` | handshake header (non-browser fallback) | yes* | string | active JWT access token | no | Same credential used by REST | `sess_A3redAgent9Kp` |
-
-  \* Exactly one of the two must be present; the cookie takes precedence if both are sent.
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
 
   ## Success behavior
 
@@ -50,12 +48,13 @@ docs: |-
 
   | HTTP status | Code | Condition | Socket opens |
   | --- | --- | --- | --- |
+  | `403` | (handshake rejected, no code) | `Origin` does not match the deployment's own origin | no |
   | `401` | `UNAUTHORIZED` | missing, invalid, revoked, or expired token | no |
   | `404` | `ROOM_NOT_FOUND` | path room does not exist | no |
   | `403` | `NOT_ROOM_MEMBER` | authenticated user is not a member | no |
   | `409` | `INVALID_ROOM_STATE` | room is `CLOSED` | no |
 
-  A successful transport disconnect changes no membership state. Reconnect with the same session yields a current snapshot; missed incremental events need not be replayed. If the access token expired, the client refreshes over REST (`POST /api/auth/refresh`) first, then reconnects — the refreshed cookie authenticates the new handshake automatically.
+  A transport disconnect never changes membership immediately — it starts the reconnect grace period (`workspace.yml`, Reconnect Grace Period and Abandonment): 30s by default in `WAITING`/`COUNTDOWN`, 60s `IN_GAME`. Reconnecting within that window (same session, new socket) yields a current snapshot with no state loss; missed incremental events need not be replayed, since the snapshot is authoritative. If the grace period expires, the member is removed (`WAITING`/`COUNTDOWN`) or the match ends by `PLAYER_FORFEIT` (`IN_GAME`) — see `04 - Game` and `workspace.yml`. If the access token expired, the client refreshes over REST (`POST /api/auth/refresh`) first, then reconnects — the refreshed cookie authenticates the new handshake automatically; this does not consume grace-period time any faster than a normal drop.
 
   ## Concrete frames
 

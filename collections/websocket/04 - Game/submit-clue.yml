@@ -5,9 +5,6 @@ info:
   tags: [action, game]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
   message:
     - title: Success - Ocean 2
       selected: true
@@ -112,7 +109,7 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values/range | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
-  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Actor identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
   | `type` | envelope | yes | string enum | `game.clue.submit` | no | Operation | `game.clue.submit` |
   | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0020` |
   | `payload.word` | payload | yes | string | trim; one non-whitespace word; `1..30` Unicode characters | no | Clue stored in Unicode lowercase | `ocean` |

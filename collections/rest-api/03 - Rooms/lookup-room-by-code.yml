@@ -7,8 +7,6 @@ http:
   method: GET
   url: "{{baseUrl}}/api/rooms/lookup/ABCD12"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
     - name: Accept
       value: application/json
 docs: |-
@@ -23,7 +21,7 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_code` | path | yes | string | `^[A-Z0-9]{6}$`, case-insensitive on input | no | Code shown to the user | `ABCD12` |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Requesting identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
 
   ## Success behavior and response fields
@@ -54,7 +52,7 @@ docs: |-
   This endpoint never returns `players[]`, `game`, or `host_user_id` — those require membership, via `Get room snapshot` after joining. Lookup does not create membership; the client still calls `Join room` with the resolved `room_id`.
 examples:
   - name: Success - Resolves to waiting room
-    request: {url: "{{baseUrl}}/api/rooms/lookup/ABCD12", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/lookup/ABCD12", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -70,8 +68,8 @@ examples:
             }
           }
   - name: Error - Unknown code
-    request: {url: "{{baseUrl}}/api/rooms/lookup/ZZZZZZ", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/lookup/ZZZZZZ", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"No active room matches code ZZZZZZ.","details":{"room_code":"ZZZZZZ"}}}'}}
   - name: Error - Malformed code
-    request: {url: "{{baseUrl}}/api/rooms/lookup/ab", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/rooms/lookup/ab", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 422, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"VALIDATION_ERROR","message":"room_code must match ^[A-Za-z0-9]{6}$.","details":{"field":"room_code"}}}'}}

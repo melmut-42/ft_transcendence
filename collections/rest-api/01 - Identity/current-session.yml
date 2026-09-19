@@ -7,8 +7,6 @@ http:
   method: GET
   url: "{{baseUrl}}/api/auth/session"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
     - name: Accept
       value: application/json
 docs: |-
@@ -16,13 +14,13 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Resolves the access token (from Register, Login, or Refresh) to its user and current temporary room link. A valid unexpired access token is required, presented either as the `X-Session-Id` header or the `ft_session` cookie.
+  Resolves the `ft_session` credential (from Register, Login, or Refresh) to its user and current room membership, derived live from Game Session's authoritative membership index (`workspace.yml`, State Ownership) — never a stale cached value. A valid unexpired `ft_session` cookie is required; this is also the endpoint frontend route recovery calls on bootstrap to decide which screen to show (Routing Recovery).
 
   ## Request parameters
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `X-Session-Id` | header or `ft_session` cookie | yes | string | active JWT access token | no | Shared REST/WebSocket credential | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Shared REST/WebSocket credential | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
 
   ## Success and response fields
@@ -33,15 +31,15 @@ docs: |-
   | --- | --- | ---: | ---: | --- | --- |
   | `data.user.user_id` | integer | yes | no | positive | Authenticated user |
   | `data.user.username` | string | yes | no | username rule | Stored display username |
-  | `data.active_room_id` | integer or null | yes | yes | positive or `null` | Current active room, never a permanent profile role |
-  | `data.session_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Credential expiry |
+  | `data.active_room_id` | integer or null | yes | yes | positive or `null` | Current live room membership (from Game Session's membership index), never a permanent profile field |
+  | `data.session_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | `ft_session` expiry |
 
   ## State changes, events, and errors
 
-  Read-only; no event. Missing, invalid, revoked, or expired access tokens return `401 UNAUTHORIZED` and an empty details object — the frontend should attempt `POST /api/auth/refresh` before treating this as a full logout.
+  Read-only; no event. Missing, invalid, revoked, or expired `ft_session` returns `401 UNAUTHORIZED` and an empty details object — the frontend should attempt `POST /api/auth/refresh` before treating this as a full logout.
 examples:
   - name: Success - No active room
-    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -55,11 +53,11 @@ examples:
                 "username": "player_one"
               },
               "active_room_id": null,
-              "session_expires_at": "2026-10-10T08:40:01Z"
+              "session_expires_at": "2026-09-10T09:10:01Z"
             }
           }
   - name: Success - Active room
-    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -73,11 +71,11 @@ examples:
                 "username": "player_one"
               },
               "active_room_id": 1001,
-              "session_expires_at": "2026-10-10T08:40:01Z"
+              "session_expires_at": "2026-09-10T09:10:01Z"
             }
           }
   - name: Error - Invalid session
-    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: X-Session-Id, value: sess_invalid, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}, {name: Cookie, value: "ft_session=invalid", enabled: true}], params: [], body: {mode: none}}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]

@@ -7,51 +7,37 @@ http:
   method: DELETE
   url: "{{baseUrl}}/api/auth/session"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
+    - name: Accept
+      value: application/json
 docs: |-
   # End current session
 
   ## Purpose and preconditions
 
-  Revokes the current session (access token and its paired refresh token, from Register/Login/Refresh) and clears the `ft_session` cookie. The user account and persistent statistics remain. A member must leave an active room before ending the session so room presence cannot become ownerless — this is deliberate room-lifecycle architecture, not a leftover guest-era artifact.
+  Revokes the current session (`ft_session` and `ft_refresh`, from Register, Login, or Refresh) and clears both cookies. The user account and persistent statistics remain. Logout is legal regardless of room membership (`workspace.yml`, Session and Credential Model / Room Abandonment): if the user currently has `active_room_id` set and that room is `IN_GAME`, logout triggers the same `PLAYER_FORFEIT` lifecycle as an explicit `Leave room` call or an abandonment-timeout, synchronously, before the session is revoked — there is no `409 ALREADY_IN_ROOM` block here anymore. Logout also closes every open, authenticated WebSocket connection (room and chat) belonging to this session.
 
   ## Request parameters
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `X-Session-Id` | header or `ft_session` cookie | yes | string | active JWT access token | no | Session to revoke | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Session to revoke | set by Register/Login |
 
   ## Success, state changes, and events
 
-  `204 No Content` has no body, revokes both the access token and its paired refresh token, and clears the `ft_session` cookie. It emits no room event because active-room membership is prohibited by precondition.
+  `204 No Content` has no body. It revokes both `ft_session` and `ft_refresh`, clears both cookies, and closes open sockets for this session. If the user was `IN_GAME`, the room's `game.ended` event (`end_reason: "PLAYER_FORFEIT"`) is emitted to the remaining room members as part of the same operation, before the response returns.
 
   ## Errors
 
-  `401 UNAUTHORIZED` covers invalid/revoked tokens. `409 ALREADY_IN_ROOM` means `active_room_id` is non-null; the token remains valid and the client must leave first.
+  `401 UNAUTHORIZED` covers invalid/revoked tokens. There is no room-membership error on this endpoint.
 examples:
-  - name: Success - Session revoked
-    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
+  - name: Success - Session revoked, no active room
+    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
-  - name: Error - Active room must be left
-    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: X-Session-Id, value: sess_7Hk2mQ9vLc4R8pXa, enabled: true}], params: [], body: {mode: none}}
-    response:
-      status: 409
-      headers: [{name: Content-Type, value: application/json}]
-      body:
-        type: json
-        data: |-
-          {
-            "error": {
-              "code": "ALREADY_IN_ROOM",
-              "message": "Leave room 1001 before ending the session.",
-              "details": {
-                "room_id": 1001
-              }
-            }
-          }
-  - name: Error - Session already revoked
-    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: X-Session-Id, value: sess_revoked, enabled: true}], params: [], body: {mode: none}}
+  - name: Success - Session revoked, forfeits active game
+    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
+    response: {status: 204, headers: [], body: {type: text, data: ""}}
+  - name: Error - Already revoked
+    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}, {name: Cookie, value: "ft_session=alreadyRevoked", enabled: true}], params: [], body: {mode: none}}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]

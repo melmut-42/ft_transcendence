@@ -5,9 +5,6 @@ info:
   tags: [scenario, reference]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
 settings:
   timeout: 30000
   keepAliveInterval: 20000
@@ -18,7 +15,7 @@ docs: |-
 
   This passive reference maps each required state to its normative example. It sends no message.
 
-  It connects with required positive-integer path `room_id=1001` and required handshake header `X-Session-Id` containing an active opaque member session.
+  It connects with required positive-integer path `room_id=1001`, authenticated via the `ft_session` cookie alone — see `00 - Connection & Protocol/connect.yml`.
 
   | Scenario | Fixture transition | Contract location |
   | --- | --- | --- |

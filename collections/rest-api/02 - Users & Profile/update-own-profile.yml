@@ -1,0 +1,86 @@
+info:
+  name: Update own profile
+  type: http
+  seq: 3
+  tags: [profile]
+http:
+  method: PATCH
+  url: "{{baseUrl}}/api/users/me"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "username": "player_one_updated"
+      }
+docs: |-
+  # Update own profile
+
+  ## Purpose and preconditions
+
+  Completes the Standard User Management contract (subject Ch. III–IV, Major module): lets a user edit their own profile. Requires an active session.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Authenticates the owner | set by Register/Login |
+  | `username` | body | no | string | trimmed `^[A-Za-z0-9_]{3,20}$`, case-insensitive uniqueness | no | New display name; omit to leave unchanged | `player_one_updated` |
+
+  `email` and `password` are intentionally not editable here — email is the login identifier (changing it is an account-recovery-sensitive flow out of this contract's scope) and password change belongs to a dedicated re-auth-gated flow, also out of scope for this revision. Avatar has its own endpoint (`upload-avatar.yml`).
+
+  ## Success behavior and response fields
+
+  `200 OK` returns the updated profile, same shape as `Get own profile`.
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `422` | `INVALID_USERNAME` | present but malformed |
+  | `409` | `USERNAME_TAKEN` | case-insensitive collision with another account |
+examples:
+  - name: Success - Username updated
+    request:
+      url: "{{baseUrl}}/api/users/me"
+      method: PATCH
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username": "player_one_updated"}'}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "user_id": 42,
+              "username": "player_one_updated",
+              "avatar_url": "https://{{baseUrl}}/static/avatars/default/42.svg",
+              "level": 4,
+              "wins": 12,
+              "losses": 8,
+              "matches_played": 20,
+              "active_room_id": null,
+              "created_at": "2026-08-01T10:00:00Z"
+            }
+          }
+  - name: Error - Username taken
+    request:
+      url: "{{baseUrl}}/api/users/me"
+      method: PATCH
+      headers: [{name: Content-Type, value: application/json, enabled: true}]
+      params: []
+      body: {mode: json, json: '{"username": "red_agent"}'}
+    response:
+      status: 409
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: '{"error":{"code":"USERNAME_TAKEN","message":"Username ''red_agent'' is already registered.","details":{"field":"username"}}}'

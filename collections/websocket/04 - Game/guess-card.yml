@@ -5,9 +5,6 @@ info:
   tags: [action, game]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
   message:
     - title: Own team - Continue
       selected: true
@@ -129,7 +126,7 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values/range | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
-  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Actor identity | `sess_A3redAgent9Kp` |
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
   | `type` | envelope | yes | string enum | `game.card.guess` | no | Operation | `game.card.guess` |
   | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0030` |
   | `payload.card_id` | payload | yes | integer | `1..25`, existing in game | no | Unrevealed card | `5` |
@@ -146,8 +143,8 @@ docs: |-
   | `payload.card.color` | enum | yes | no | `RED`, `BLUE`, `NEUTRAL`, `ASSASSIN` | Revealed color, now public |
   | `payload.guessed_by_user_id` | integer | event only | no | active Operative ID | Actor |
   | `payload.guessing_team` | enum | yes | no | `RED`, `BLUE` | Team taking action |
-  | `payload.score.red` | integer | yes | no | `0..9` | Revealed RED count |
-  | `payload.score.blue` | integer | yes | no | `0..8` | Revealed BLUE count |
+  | `payload.score.red` | integer | yes | no | `0..9` | Revealed RED count (starting team owns 9; either color can start) |
+  | `payload.score.blue` | integer | yes | no | `0..9` | Revealed BLUE count (starting team owns 9; either color can start) |
   | `payload.current_turn.team` | enum | yes | no | `RED`, `BLUE` | Active or terminal guessing team |
   | `payload.current_turn.phase` | enum | yes | no | `WAITING_FOR_CLUE`, `GUESSING`, `GAME_OVER` | Result phase |
   | `payload.current_turn.guesses_remaining` | integer or null | yes | yes | `0..10`, `null` | Remaining in `GUESSING`; null otherwise |

@@ -38,12 +38,12 @@ docs: |-
   | `409` | `ROOM_NOT_JOINABLE` | `Room 1001 is not joinable while status is COUNTDOWN.` | join |
   | `409` | `ALREADY_IN_ROOM` | `User 46 already belongs to active room 1002.` | create, join |
   | `403` | `NOT_ROOM_MEMBER` | `User 47 is not a member of room 1001.` | get, leave |
-  | `409` | `INVALID_ROOM_STATE` | `Room 1001 cannot be left while status is IN_GAME.` | leave |
+  | `422` | `INVALID_IMAGE` | `Avatar must be image/jpeg, image/png, or image/webp under 2 MiB.` | upload avatar |
   | `400` or `422` | `VALIDATION_ERROR` | `user_id must be a positive integer.` | malformed JSON or field/path validation |
   | `429` | `RATE_LIMITED` | `Too many registration attempts; retry after 60 seconds.` | throttled operation |
 
-  Malformed JSON uses `400 VALIDATION_ERROR`; syntactically valid values that fail field constraints use `422 VALIDATION_ERROR`, except the more specific `INVALID_EMAIL`/`INVALID_USERNAME`/`INVALID_PASSWORD`. `SESSION_EXPIRED` is distinct from `UNAUTHORIZED`: it means the refresh token itself is dead and the user must log in again, not merely that a request needs to retry after refreshing. Every error keeps state unchanged.
+  Malformed JSON uses `400 VALIDATION_ERROR`; syntactically valid values that fail field constraints use `422 VALIDATION_ERROR`, except the more specific `INVALID_EMAIL`/`INVALID_USERNAME`/`INVALID_PASSWORD`/`INVALID_IMAGE`. `SESSION_EXPIRED` is distinct from `UNAUTHORIZED`: it means the refresh credential itself is dead and the user must log in again, not merely that a request needs to retry after refreshing. Every error keeps state unchanged. **`Leave room` no longer returns `409 INVALID_ROOM_STATE` for `IN_GAME`** — leaving (or logging out) during `IN_GAME` now succeeds and triggers forfeit (`workspace.yml`, Room Abandonment); `INVALID_ROOM_STATE` is still used for the WebSocket room/game action errors documented in `06 - Errors/error-catalog.yml`.
 
   ## State example index
 
-  `Get room snapshot` contains new, four-player unconfigured, incomplete-role, valid-role/unready, full `IN_GAME` Operative, missing-room, and forbidden-access examples. WebSocket scenario docs contain all-ready, countdown, cancellation, Spymaster `IN_GAME`, every reveal branch, and finished state.
+  `Get room snapshot` contains new, four-player unconfigured, incomplete-role, valid-role/unready, full `IN_GAME` Operative, missing-room, and forbidden-access examples. WebSocket scenario docs contain all-ready, countdown, cancellation, Spymaster `IN_GAME`, every reveal branch (including `PLAYER_FORFEIT`), and finished state.

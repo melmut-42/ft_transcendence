@@ -7,8 +7,6 @@ http:
   method: GET
   url: "{{baseUrl}}/api/friends"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
     - name: Accept
       value: application/json
 docs: |-
@@ -16,13 +14,13 @@ docs: |-
 
   ## Purpose
 
-  Returns the authenticated user's friend list with a snapshot online/offline status, for the Profile popup (User Flow §4: friend count, friend list, online/offline).
+  Returns the authenticated user's friend list with live online/offline presence, for the Profile popup (User Flow §4: friend count, friend list, online/offline).
 
   ## Request parameters
 
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Requesting identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
 
   ## Response fields
@@ -32,14 +30,15 @@ docs: |-
   | `data.friend_count` | integer | yes | no | `>= 0` | Total friends |
   | `data.friends[].user_id` | integer | yes | no | positive | Friend's user ID |
   | `data.friends[].username` | string | yes | no | username rule | Friend's display name |
-  | `data.friends[].online` | boolean | yes | no | `true`, `false` | Snapshot presence at request time |
+  | `data.friends[].avatar_url` | string | yes | no | URL | Friend's avatar |
+  | `data.friends[].is_online` | boolean | yes | no | `true`, `false` | Live presence — at least one open authenticated connection (`workspace.yml`, Presence), not merely a request-time snapshot |
 
   ## Errors
 
   `401 UNAUTHORIZED` for an invalid session. Read-only; no event.
 examples:
   - name: Success - Two friends
-    request: {url: "{{baseUrl}}/api/friends", method: GET, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/friends", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -53,12 +52,14 @@ examples:
                 {
                   "user_id": 43,
                   "username": "red_agent",
-                  "online": true
+                  "avatar_url": "https://{{baseUrl}}/static/avatars/default/43.svg",
+                  "is_online": true
                 },
                 {
                   "user_id": 44,
                   "username": "blue_master",
-                  "online": false
+                  "avatar_url": "https://{{baseUrl}}/static/avatars/default/44.svg",
+                  "is_online": false
                 }
               ]
             }

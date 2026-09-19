@@ -24,17 +24,16 @@ runtime:
     - type: after-response
       code: |-
         if (res.status === 201 && res.body && res.body.data) {
-          bru.setVar("sessionToken", String(res.body.data.access_token));
-          bru.setVar("refreshToken", String(res.body.data.refresh_token));
           bru.setVar("userId", String(res.body.data.user.user_id));
         }
     - type: tests
       code: |-
-        test("creates a registered user and session pair", function () {
+        test("creates a registered user and sets session cookies", function () {
           expect(res.status).to.equal(201);
           expect(res.body.data.user.email).to.equal("player.one@example.com");
-          expect(res.body.data.access_token).to.be.a("string");
-          expect(res.body.data.refresh_token).to.be.a("string");
+          expect(res.body.data.access_token_expires_at).to.be.a("string");
+          expect(res.body.data).to.not.have.property("access_token");
+          expect(res.body.data).to.not.have.property("refresh_token");
         });
 docs: |-
   # Register account
@@ -55,11 +54,11 @@ docs: |-
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
   | `email` | body | yes | string | valid email, trimmed, case-insensitive uniqueness | no | Login identifier | `player.one@example.com` |
   | `username` | body | yes | string | trimmed `^[A-Za-z0-9_]{3,20}$`, case-insensitive uniqueness | no | Public display name | `player_one` |
-  | `password` | body | yes | string | `>= 8` chars | no | Hashed + salted server-side, never returned | `Correct-Horse-1` |
+  | `password` | body | yes | string | `>= 8` and `<= 72` bytes (bcrypt input limit) | no | Hashed + salted server-side, never returned | `Correct-Horse-1` |
 
   ## Success behavior and response fields
 
-  `201 Created` creates the user and one session pair in the same transaction. The response also sets an HttpOnly, `Secure`, `SameSite=Lax` cookie (`ft_session`) carrying the same session identity — this is what a browser sends automatically on subsequent REST calls and the WebSocket upgrade (Decision 11). Non-browser clients may instead send the returned `access_token` as `X-Session-Id`.
+  `201 Created` creates the user and one session pair in the same transaction. The response sets two cookies and returns no token value in the body (Session and Credential Model, `workspace.yml`): `ft_session` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/`, short-lived JWT access credential) and `ft_refresh` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/api/auth/refresh`, long-lived opaque refresh credential). Both are sent automatically by a browser on subsequent REST calls and the WebSocket upgrade (Decision 11) — there is no `X-Session-Id` header and no token value in JSON for any client, browser or non-browser; Bruno authenticates through its cookie jar exactly like a browser.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
@@ -67,10 +66,7 @@ docs: |-
   | `data.user.username` | string | yes | no | username rule | Display username |
   | `data.user.email` | string | yes | no | valid email | Login identifier |
   | `data.user.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Account creation time |
-  | `data.access_token` | string | yes | no | JWT | Short-lived credential for REST (`X-Session-Id`) and the identity encoded in the `ft_session` cookie (Decision 6) |
-  | `data.access_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Access token expiry |
-  | `data.refresh_token` | string | yes | no | opaque, non-empty | Long-lived credential accepted only by `POST /api/auth/refresh` |
-  | `data.refresh_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Refresh token expiry |
+  | `data.access_token_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | `ft_session` expiry, for client-side UX timers only — the token itself is never in this body |
 
   ## State changes and events
 
@@ -83,14 +79,14 @@ docs: |-
   | `400` | `VALIDATION_ERROR` | malformed JSON or unexpected structure | none |
   | `422` | `INVALID_EMAIL` | missing or malformed email | none |
   | `422` | `INVALID_USERNAME` | missing, wrong type, length, or characters | none |
-  | `422` | `INVALID_PASSWORD` | missing or under minimum length | none |
+  | `422` | `INVALID_PASSWORD` | missing, under minimum length, or over the 72-byte hashing limit | none |
   | `409` | `EMAIL_TAKEN` | case-insensitive email already exists | none |
   | `409` | `USERNAME_TAKEN` | case-insensitive username already exists | none |
   | `429` | `RATE_LIMITED` | registration limit exceeded | none |
 
   ## Notes/invariants
 
-  The refresh token is shown only at creation and at refresh. The password is never returned or logged. A duplicate transmission cannot claim an existing email or username.
+  The password is never returned or logged. A duplicate transmission cannot claim an existing email or username. `ft_refresh` is scoped to `Path=/api/auth/refresh`, so the browser never sends it on any other request — it exists solely for the Refresh endpoint to read.
 examples:
   - name: Success - player_one
     request:
@@ -108,7 +104,10 @@ examples:
           }
     response:
       status: 201
-      headers: [{name: Content-Type, value: application/json}]
+      headers:
+        - {name: Content-Type, value: application/json}
+        - {name: Set-Cookie, value: "ft_session=eyJhbGciOiJIUzI1NiJ9...; HttpOnly; Secure; SameSite=Lax; Path=/"}
+        - {name: Set-Cookie, value: "ft_refresh=rtok_7Hk2mQ9vLc4R8pXaZq; HttpOnly; Secure; SameSite=Lax; Path=/api/auth/refresh"}
       body:
         type: json
         data: |-
@@ -120,10 +119,7 @@ examples:
                 "email": "player.one@example.com",
                 "created_at": "2026-09-10T08:40:01Z"
               },
-              "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MiJ9.7Hk2mQ9vLc4R8pXa",
-              "access_token_expires_at": "2026-09-10T09:10:01Z",
-              "refresh_token": "rtok_7Hk2mQ9vLc4R8pXaZq",
-              "refresh_token_expires_at": "2026-10-10T08:40:01Z"
+              "access_token_expires_at": "2026-09-10T09:10:01Z"
             }
           }
   - name: Error - Invalid email

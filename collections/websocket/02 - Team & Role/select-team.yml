@@ -5,9 +5,6 @@ info:
   tags: [action, room]
 websocket:
   url: "{{wsUrl}}/ws/rooms/{{roomId}}"
-  headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
   message:
     - title: Success - Select RED
       selected: true
@@ -69,18 +66,65 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
-  | `X-Session-Id` | handshake header | yes | string | active opaque token | no | Authenticated member | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
   | `type` | envelope | yes | string enum | `room.team.select` | no | Operation | `room.team.select` |
   | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique per session | no | Idempotency key | `req_0001` |
   | `payload.team` | payload | yes | string enum | `RED`, `BLUE` | no | New temporary team | `RED` |
 
   ## Success, state, and emitted events
 
-  The requester receives `{"type":"ack","request_id":"req_0001","ok":true,"payload":{"user_id":42,"team":"RED","role":null,"ready":false,"room_status":"WAITING"}}`. The server emits `room.player.updated` then `room.state`. If team changes, the existing role remains only if it does not create a Spymaster conflict on the destination team; otherwise the command is rejected. Every successful team change sets `ready=false` and re-evaluates startability. During `COUNTDOWN`, event order is `room.player.updated`, `room.countdown.cancelled` with reason `TEAM_CHANGED`, then `room.state`.
+  The server emits `room.player.updated` then `room.state`. If team changes, the existing role remains only if it does not create a Spymaster conflict on the destination team; otherwise the command is rejected. Every successful team change sets `ready=false` and re-evaluates startability. During `COUNTDOWN`, event order is `room.player.updated`, `room.countdown.cancelled` with reason `TEAM_CHANGED`, then `room.state`.
 
-  The BLUE selection example returns `{"type":"ack","request_id":"req_0002","ok":true,"payload":{"user_id":44,"team":"BLUE","role":null,"ready":false,"room_status":"WAITING"}}`.
+  **Select RED:**
 
-  The countdown team-change example returns `{"type":"ack","request_id":"req_0003","ok":true,"payload":{"user_id":46,"team":"BLUE","role":"OPERATIVE","ready":false,"room_status":"WAITING"}}` and emits cancellation reason `TEAM_CHANGED`.
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0001",
+      "ok": true,
+      "payload": {
+        "user_id": 42,
+        "team": "RED",
+        "role": null,
+        "ready": false,
+        "room_status": "WAITING"
+      }
+    }
+  ```
+
+  **Select BLUE:**
+
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0002",
+      "ok": true,
+      "payload": {
+        "user_id": 44,
+        "team": "BLUE",
+        "role": null,
+        "ready": false,
+        "room_status": "WAITING"
+      }
+    }
+  ```
+
+  **Change team during `COUNTDOWN`** (cancels it, reason `TEAM_CHANGED`):
+
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0003",
+      "ok": true,
+      "payload": {
+        "user_id": 46,
+        "team": "BLUE",
+        "role": "OPERATIVE",
+        "ready": false,
+        "room_status": "WAITING"
+      }
+    }
+  ```
 
   Updated event:
 

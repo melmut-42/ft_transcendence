@@ -7,8 +7,6 @@ http:
   method: DELETE
   url: "{{baseUrl}}/api/friends/43"
   headers:
-    - name: X-Session-Id
-      value: "{{sessionToken}}"
 docs: |-
   # Remove friend
 
@@ -21,15 +19,15 @@ docs: |-
   | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `user_id` | path | yes | integer | positive | no | Friend to remove | `43` |
-  | `X-Session-Id` | header | yes | string | active opaque token | no | Requesting identity | `sess_7Hk2mQ9vLc4R8pXa` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
 
   ## Success and errors
 
   `204 No Content` on success. `401 UNAUTHORIZED` for invalid session; `404 NOT_FRIENDS` when no friendship exists.
 examples:
   - name: Success - Remove red_agent
-    request: {url: "{{baseUrl}}/api/friends/43", method: DELETE, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/friends/43", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Error - Not friends
-    request: {url: "{{baseUrl}}/api/friends/9999", method: DELETE, headers: [{name: X-Session-Id, value: "{{sessionToken}}", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/friends/9999", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"NOT_FRIENDS","message":"User 9999 is not a friend.","details":{"user_id":9999}}}'}}

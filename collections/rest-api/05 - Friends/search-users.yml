@@ -1,0 +1,63 @@
+info:
+  name: Search users
+  type: http
+  seq: 4
+  tags: [friends]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/users/search?q=red"
+  headers:
+    - name: Accept
+      value: application/json
+  params:
+    - name: q
+      value: red
+docs: |-
+  # Search users
+
+  ## Purpose and preconditions
+
+  Friend discovery (`workspace.yml`, Friends, Presence, and Chat Scope): add-by-`user_id`-only is too hard for normal use, so this adds a minimal authenticated username search. Requires an active session.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
+  | `q` | query | yes | string | trimmed, `1..20` chars | no | Case-insensitive username substring | `red` |
+
+  ## Response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.results[]` | array<object> | yes | no | up to 20 matches | Ranked by prefix match, then alphabetically |
+  | `data.results[].user_id` | integer | yes | no | positive | Matched user |
+  | `data.results[].username` | string | yes | no | username rule | Matched username |
+  | `data.results[].avatar_url` | string | yes | no | URL | Avatar |
+  | `data.results[].is_friend` | boolean | yes | no | `true`, `false` | Whether already a friend of the requester |
+
+  No email, credentials, or session data is ever exposed by this endpoint — same privacy boundary as `Get public profile`.
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `422` | `VALIDATION_ERROR` | `q` missing or empty |
+examples:
+  - name: Success - Matches for "red"
+    request: {url: "{{baseUrl}}/api/users/search?q=red", method: GET, headers: [], params: [{name: q, value: red, enabled: true}], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "results": [
+                {"user_id": 43, "username": "red_agent", "avatar_url": "https://{{baseUrl}}/static/avatars/default/43.svg", "is_friend": false},
+                {"user_id": 46, "username": "extra_red", "avatar_url": "https://{{baseUrl}}/static/avatars/default/46.svg", "is_friend": false}
+              ]
+            }
+          }
