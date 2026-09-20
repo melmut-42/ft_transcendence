@@ -1,6 +1,6 @@
 # ft_transcendence Bruno API contract
 
-This repository is the development, Git-native API contract for the `ft_transcendence` Codenames-style game. Accounts are email + username + password (Decision 6). Open the repository root as a Bruno workspace.
+This repository is the development, Git-native API contract for the `ft_transcendence` Codenames-style game. Accounts are email + username + password. Open the repository root as a Bruno workspace.
 
 ## Collections
 

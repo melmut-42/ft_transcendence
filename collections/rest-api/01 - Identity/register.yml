@@ -58,7 +58,7 @@ docs: |-
 
   ## Success behavior and response fields
 
-  `201 Created` creates the user and one session pair in the same transaction. The response sets two cookies and returns no token value in the body (Session and Credential Model, `workspace.yml`): `ft_session` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/`, short-lived JWT access credential) and `ft_refresh` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/api/auth/refresh`, long-lived opaque refresh credential). Both are sent automatically by a browser on subsequent REST calls and the WebSocket upgrade (Decision 11) — there is no `X-Session-Id` header and no token value in JSON for any client, browser or non-browser; Bruno authenticates through its cookie jar exactly like a browser.
+  `201 Created` creates the user and one session pair in the same transaction. The response sets two cookies and returns no token value in the body (Session and Credential Model, `workspace.yml`): `ft_session` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/`, short-lived JWT access credential) and `ft_refresh` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/api/auth/refresh`, long-lived opaque refresh credential). Both are sent automatically by a browser on subsequent REST calls and the WebSocket upgrade — there is no `X-Session-Id` header and no token value in JSON for any client, browser or non-browser; Bruno authenticates through its cookie jar exactly like a browser.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |

@@ -38,7 +38,7 @@ docs: |-
 
   ## Purpose
 
-  Mandatory authentication entry point for an existing registered account (subject Ch. III–IV). Verifies email + password and issues a new session. OAuth is a deferred module and not part of this contract for now.
+  Mandatory authentication entry point for an existing registered account (subject Ch. III–IV). Verifies email + password and issues a new session.
 
   ## Preconditions
 
@@ -55,7 +55,7 @@ docs: |-
 
   ## Success behavior and response fields
 
-  `200 OK` issues a new session pair for the matched account and sets the same two cookies as Register (`ft_session`, `ft_refresh` — Decision 11), so the WebSocket upgrade and every following REST call authenticate without a custom header. No token value is returned in the body, on either client type.
+  `200 OK` issues a new session pair for the matched account and sets the same two cookies as Register (`ft_session`, `ft_refresh`), so the WebSocket upgrade and every following REST call authenticate without a custom header. No token value is returned in the body, on either client type.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |

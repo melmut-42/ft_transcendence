@@ -5,4 +5,4 @@ info:
 docs: |-
   # Friends
 
-  Minimum contract for the mandatory User Interaction module's friends feature (subject: chat/profile/friends). No friend-request/accept workflow — User Flow §4 shows a single "Add Friend" action with no pending state, so add is immediate and mutual. Online status is live presence (workspace.yml, Presence): at least one open authenticated connection, read fresh on every REST call (not push-updated over REST, but never a stale request-time-only snapshot either). Friend discovery beyond add-by-user_id uses `Search users`.
+  Minimum contract for the mandatory User Interaction module's friends feature (subject: chat/profile/friends). No friend-request/accept workflow — "Add Friend" is a single action with no pending state, so add is immediate and mutual. Online status is live presence (workspace.yml, Presence): at least one open authenticated connection, read fresh on every REST call (not push-updated over REST, but never a stale request-time-only snapshot either). Friend discovery beyond add-by-user_id uses `Search users`.

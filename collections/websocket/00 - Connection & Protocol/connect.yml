@@ -11,7 +11,7 @@ settings:
 docs: |-
   # Connect to room stream
 
-  ## Authentication (Decision 11 — closed: secure session cookie)
+  ## Authentication (secure session cookie)
 
   Authentication is cookie-only. The handshake authenticates via the HttpOnly, `Secure`, `SameSite=Lax` `ft_session` cookie set by Register/Login/Refresh — the client attaches it automatically on the upgrade request, same-origin, no client code needed. There is no handshake header and no `X-Session-Id`; the server validates the cookie alone.
 

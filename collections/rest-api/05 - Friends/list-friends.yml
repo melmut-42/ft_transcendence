@@ -14,7 +14,7 @@ docs: |-
 
   ## Purpose
 
-  Returns the authenticated user's friend list with live online/offline presence, for the Profile popup (User Flow §4: friend count, friend list, online/offline).
+  Returns the authenticated user's friend list with live online/offline presence, for the Profile popup, which shows friend count, friend list and online/offline state.
 
   ## Request parameters
 

@@ -23,7 +23,7 @@ docs:
 
     Connect to `{{wsUrl}}/ws/rooms/{{roomId}}` (room socket) or `{{wsUrl}}/ws/chat` (per-user chat socket, see `08 - Chat`). The session must be active; for the room socket the user must already belong to the room through REST. Authentication is never placed in the URL.
 
-    ## Authentication (Decision 11 — closed)
+    ## Authentication
 
     Authentication is cookie-only: the HttpOnly, `Secure`, `SameSite=Lax` `ft_session` cookie set by Register/Login/Refresh is attached automatically on the WebSocket upgrade request, same-origin, by browser and Bruno alike. There is no handshake header and no `X-Session-Id`. The upgrade request's `Origin` is validated against the deployment's single public origin before the cookie is even checked. The backend then validates the cookie and accepts or rejects (`401`) the upgrade. This applies identically to both sockets. A user may hold several simultaneous sockets for the same room/chat (multi-tab); they share one logical membership, not one seat per socket. See `00 - Connection & Protocol/connect.yml` for the full parameter table.
 

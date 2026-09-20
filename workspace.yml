@@ -85,9 +85,9 @@ docs: |-
 
   ## Identity Model
 
-  Registration requires `{ "email", "username", "password" }` (subject Ch. III–IV, mandatory). Email is the login identifier; username is the public display name; password is hashed + salted server-side (`>= 8`, `<= 72` bytes — bcrypt's input limit). Both email and username are trimmed and case-insensitively unique. Guest-first is cancelled — there is no anonymous identity.
+  Registration requires `{ "email", "username", "password" }` (subject Ch. III–IV, mandatory). Email is the login identifier; username is the public display name; password is hashed + salted server-side (`>= 8`, `<= 72` bytes — bcrypt's input limit). Both email and username are trimmed and case-insensitively unique. Every identity is a registered account; there is no anonymous identity.
 
-  ## Session and Credential Model (Decision 6 + Decision 11 — both closed)
+  ## Session and Credential Model
 
   Every session has two credentials, each with its own cookie. Neither credential is ever placed in a JSON response body, a query string, or a custom header. There is no `X-Session-Id` anywhere in this contract — not for browsers, not for Bruno, curl, or scripts. Bruno authenticates exactly like a browser, through its cookie jar.
 
@@ -154,9 +154,9 @@ docs: |-
 
   **Frontend error-handling classes** (documented once here, not repeated per component): `INLINE_VALIDATION` (422 field errors — show next to the input: register/login/room-code/clue/chat/avatar fields), `TOAST` (transient failures with no dedicated UI state — 429, 5xx, `NOT_PERMITTED`, `USER_NOT_FOUND`), `AUTH_REDIRECT` (`401 UNAUTHORIZED` after a failed silent refresh, or `401 SESSION_EXPIRED` — send to Login), `ROOM_RECOVERY` (`404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`, `409 ROOM_NOT_JOINABLE`/`ALREADY_IN_ROOM` — return to Lobby with an explanatory toast), `RECONNECT` (WebSocket close with policy code `4401`, or any transport drop — show the Reconnecting overlay and retry within the grace period), `FATAL_GAME_STATE` (a room/game action error that implies local state is stale relative to the server, e.g. `CARD_ALREADY_REVEALED`, `GAME_ALREADY_FINISHED`, `INVALID_ROOM_STATE` — discard local state and re-fetch/re-apply the next `room.state`/`game.state` snapshot rather than patching around it). Bruno's error codes (above and in `06 - Errors/error-catalog.yml`) stay the single authoritative code list; this is only the UI-handling bucket each one falls into.
 
-  ## Backend Architecture (Decision 3 — closed: modular Go backend; Modules & Scope — closed: Backend as microservices)
+  ## Backend Architecture
 
-  Decision 3's "modular Go backend, separate packages" describes internal code organization within each service, not a single deployable — it does not contradict running as microservices. Five independently deployable services, communicating over REST and Redis pub/sub:
+  The backend runs as five independently deployable Go services, communicating over REST and Redis pub/sub. Each service is internally organized into separate packages:
 
   | Service | Owns | Talks to |
   | --- | --- | --- |
@@ -182,7 +182,7 @@ docs: |-
 
   ## Backend Framework
 
-  Decision 1 fixes Go for the backend but names no HTTP framework, which the subject's Web module needs ("comprehensive tool... routing, middleware, ecosystem" — plain `net/http` does not qualify). Standardized choice: **Gin** (`gin-gonic/gin`) — routing, middleware chain, and request binding/validation cover the layered request pipeline already scoped in the repo's GitHub issues (context/request-ID middleware, access-control middleware, request handling, service layer, response handling), and it integrates cleanly with `gorilla/websocket` (Decision 4) by upgrading inside a Gin handler. Applies to every service above.
+  Every service is written in Go and uses **Gin** (`gin-gonic/gin`) as its HTTP framework. Gin's routing, middleware chain and request binding/validation cover the layered request pipeline each service implements (context/request-ID middleware, access-control middleware, request handling, service layer, response handling). WebSocket upgrades use `gorilla/websocket` inside a Gin handler.
 
   ## Common Data Types
 
@@ -214,9 +214,9 @@ docs: |-
 
   ## Friends, Presence, and Chat Scope
 
-  Friends (REST: list/add/remove, plus username search for discovery — see `05 - Friends/search-users.yml`; immediate/mutual, no request-accept workflow) and basic Chat (per-user WebSocket, friend-or-shared-active-room permission) implement the mandatory User Interaction module per User Flow §4 and §6. Advanced Chat (bonus module: read receipts, typing indicators, blocking, persistent history, game invites) is out of scope for this revision and must stay distinguishable from basic Chat if added later.
+  Friends (REST: list/add/remove, plus username search for discovery — see `05 - Friends/search-users.yml`; immediate/mutual, no request-accept workflow) and basic Chat (per-user WebSocket, friend-or-shared-active-room permission) implement the mandatory User Interaction module. Advanced Chat (bonus module: read receipts, typing indicators, blocking, persistent history, game invites) is out of scope for this revision and must stay distinguishable from basic Chat if added later.
 
-  **Chat permission:** allowed if the sender and recipient are friends, **or** both are current members of the same room while that room is `WAITING`, `COUNTDOWN`, or `IN_GAME` (any state where the chat widget is actually mounted per User Flow §6 — not `IN_GAME` only, and not `FINISHED`/`CLOSED`, since co-membership ends when either leaves). A message to a recipient with no currently open `/ws/chat` socket is not silently accepted as delivered: the sender's ack reports `delivery_status: "RECIPIENT_OFFLINE"` instead of `"DELIVERED"` (there is still no persisted history — the message is not stored or redelivered later, the sender is just told the truth about delivery).
+  **Chat permission:** allowed if the sender and recipient are friends, **or** both are current members of the same room while that room is `WAITING`, `COUNTDOWN`, or `IN_GAME` (any state where the chat widget is actually mounted — not `IN_GAME` only, and not `FINISHED`/`CLOSED`, since co-membership ends when either leaves). A message to a recipient with no currently open `/ws/chat` socket is not silently accepted as delivered: the sender's ack reports `delivery_status: "RECIPIENT_OFFLINE"` instead of `"DELIVERED"` (there is still no persisted history — the message is not stored or redelivered later, the sender is just told the truth about delivery).
 
   **Presence:** a user is `online` while they hold at least one currently open authenticated WebSocket connection (room or chat socket) — tracked ephemerally in Redis, no separate heartbeat protocol needed beyond the socket's own lifetime. `is_online` is exposed consistently everywhere the UI shows presence: the friends list, the public profile, and room member lists.
 
@@ -226,19 +226,19 @@ docs: |-
 
   ## Styling Solution
 
-  No CSS framework is finalized by any Closed Decision. Standardized choice, compatible with the existing `ui-design/` token system (CSS custom properties for color/type/spacing already defined in `styles.css`): CSS custom properties (design tokens) plus component-scoped CSS files per component, colocated in `shared/ui` and each feature's `components/`. No large UI framework (Tailwind, MUI, Bootstrap) replaces the existing hand-built visual system.
+  The frontend styles with CSS custom properties (design tokens) plus component-scoped CSS files, colocated in `shared/ui` and in each feature's `components/`. The tokens match the `ui-design/` system, whose color, type and spacing custom properties are defined in `styles.css`. The visual system is hand-built; no CSS or UI framework (Tailwind, MUI, Bootstrap) is used.
 
   ## Profile Completion (Standard User Management — subject-mandatory)
 
-  Beyond the existing read-only profile, the contract now includes: `PATCH /api/users/me` (editable fields: `username`, within the same uniqueness/format rule as registration) and `POST /api/users/me/avatar` (multipart upload — `image/jpeg`, `image/png`, `image/webp` only; max 2 MiB; server validates MIME type and dimensions server-side regardless of client-declared type; replacing an avatar deletes the previous stored file; a user with no uploaded avatar gets a deterministic default derived from `user_id`). `avatar_url` is added to own-profile, public-profile, room member, and friend list payloads so every player list in the UI can render it consistently. See `02 - Users & Profile/update-own-profile.yml` and `upload-avatar.yml`.
+  Beyond the read-only profile, the contract defines `PATCH /api/users/me` (editable fields: `username`, within the same uniqueness/format rule as registration) and `POST /api/users/me/avatar` (multipart upload — `image/jpeg`, `image/png`, `image/webp` only; max 2 MiB; server validates MIME type and dimensions server-side regardless of client-declared type; replacing an avatar deletes the previous stored file; a user with no uploaded avatar gets a deterministic default derived from `user_id`). `avatar_url` is added to own-profile, public-profile, room member, and friend list payloads so every player list in the UI can render it consistently. See `02 - Users & Profile/update-own-profile.yml` and `upload-avatar.yml`.
 
-  ## OAuth — deferred
+  ## OAuth
 
-  OAuth (listed as a possible minor module) is **out of current implementation scope**. There is no OAuth endpoint, provider integration, or account-linking contract in this revision — registration and login are email/password only (see Identity Model above). If/when OAuth is picked up, it must end in the same `ft_session`/`ft_refresh` session model as password login, with no separate session type; the provider is not yet chosen.
+  OAuth is **out of scope**. This contract defines no OAuth endpoint, provider integration or account-linking payload — registration and login are email/password only (see Identity Model above). Any provider integration added later must end in the same `ft_session`/`ft_refresh` session model as password login, with no separate session type.
 
-  ## Match History and Stats (Decision-selected minor module: Game Statistics)
+  ## Match History and Stats (minor module: Game Statistics)
 
-  Every terminal `game.ended` (normal win, assassin, or `PLAYER_FORFEIT`) writes exactly one match record to Stats: `game_id`, `room_id`, both teams' final rosters (`user_id`, `username`, `team`), `winner`, `end_reason`, `score`, `started_at`, `finished_at`. `GET /api/users/me/matches` (own match history, paginated) and the existing `wins`/`losses`/`matches_played` on both own and public profile read from this table. `level` stays in scope and is defined as a simple deterministic function of `wins` (`level = 1 + floor(wins / 5)`) — enough to satisfy "level" as a persistent stat without inventing an XP/points economy nothing else in scope requires. No leaderboard endpoint is added — it isn't part of the currently selected bonus set (Decision 9 is still open; add one only if/when a leaderboard-requiring module is actually chosen). See `07 - Stats/get-match-history.yml`.
+  Every terminal `game.ended` (normal win, assassin, or `PLAYER_FORFEIT`) writes exactly one match record to Stats: `game_id`, `room_id`, both teams' final rosters (`user_id`, `username`, `team`), `winner`, `end_reason`, `score`, `started_at`, `finished_at`. `GET /api/users/me/matches` (own match history, paginated) and the existing `wins`/`losses`/`matches_played` on both own and public profile read from this table. `level` stays in scope and is defined as a simple deterministic function of `wins` (`level = 1 + floor(wins / 5)`) — enough to satisfy "level" as a persistent stat without inventing an XP/points economy nothing else in scope requires. The contract defines no leaderboard endpoint; the selected module set does not require one. See `07 - Stats/get-match-history.yml`.
 
   ## Privacy Policy and Terms of Service
 

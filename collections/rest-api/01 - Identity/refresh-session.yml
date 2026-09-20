@@ -24,7 +24,7 @@ docs: |-
 
   ## Purpose
 
-  Implements Decision 6 (JWT + refresh tokens): exchanges a valid, unexpired `ft_refresh` credential for a new `ft_session`/`ft_refresh` pair, without forcing the user through Login again. This is the only way to renew an expired access token, and it is the step a client takes before reconnecting a WebSocket whose `ft_session` has expired.
+  Exchanges a valid, unexpired `ft_refresh` credential for a new `ft_session`/`ft_refresh` pair, without forcing the user through Login again. This is the only way to renew an expired access token, and it is the step a client takes before reconnecting a WebSocket whose `ft_session` has expired.
 
   ## Preconditions and request parameters
 

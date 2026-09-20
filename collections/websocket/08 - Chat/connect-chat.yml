@@ -11,13 +11,13 @@ settings:
 docs: |-
   # Connect to chat stream
 
-  ## Authentication (Decision 11 — closed: secure session cookie)
+  ## Authentication (secure session cookie)
 
   Same mechanism as the room socket: the client attaches the HttpOnly `Secure` `ft_session` cookie automatically on the upgrade request; no client-side header code is needed, no header exists. `Origin` is validated the same way as the room socket. See `00 - Connection & Protocol/connect.yml` for the full explanation.
 
   ## Purpose
 
-  One per-user realtime channel for basic chat (User Flow §6), separate from the per-room game socket. Delivers direct messages to/from friends and current room co-members while the shared room is `WAITING`, `COUNTDOWN`, or `IN_GAME`. Opening multiple `/ws/chat` sockets for the same user (multi-tab) is supported — see `08 - Chat/folder.yml`.
+  One per-user realtime channel for basic chat, separate from the per-room game socket. Delivers direct messages to/from friends and current room co-members while the shared room is `WAITING`, `COUNTDOWN`, or `IN_GAME`. Opening multiple `/ws/chat` sockets for the same user (multi-tab) is supported — see `08 - Chat/folder.yml`.
 
   ## Preconditions and handshake parameters
 

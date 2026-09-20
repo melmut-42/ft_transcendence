@@ -37,7 +37,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Sends one basic-chat message to another user. Server checks permission per User Flow §6 and `workspace.yml` (Friends, Presence, and Chat Scope): allowed if the sender and `to_user_id` are friends, OR are current members of the same room while that room is `WAITING`, `COUNTDOWN`, or `IN_GAME` (any state where the chat widget is mounted — not `IN_GAME` only). Otherwise rejected. No message history/persistence is defined by this contract — basic chat is live-delivery only, and the ack reports honestly whether the recipient actually received it.
+  Sends one basic-chat message to another user. Server checks permission per `workspace.yml` (Friends, Presence, and Chat Scope): allowed if the sender and `to_user_id` are friends, OR are current members of the same room while that room is `WAITING`, `COUNTDOWN`, or `IN_GAME` (any state where the chat widget is mounted — not `IN_GAME` only). Otherwise rejected. No message history/persistence is defined by this contract — basic chat is live-delivery only, and the ack reports honestly whether the recipient actually received it.
 
   ## Message and payload parameters
 
