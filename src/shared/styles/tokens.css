@@ -1,0 +1,84 @@
+/*
+ * Design tokens.
+ *
+ * The palette, radius and shadow are carried over unchanged from the approved
+ * `ui-design/styles.css` so the built UI and the reference kit stay one system.
+ * Everything else (spacing, typography, semantic state) formalizes values the kit
+ * already used inline. Components consume these variables and never redefine colors.
+ */
+
+:root {
+  /* ---- Surface & ink (from ui-design) ---- */
+  --bg: #fffaf0;
+  --surface: #fff;
+  --surface-muted: #eee9df;
+  --ink: #171b3b;
+  --muted: #77777f;
+  --line: #ded7cb;
+
+  /* ---- Brand & team (from ui-design) ---- */
+  --blue: #559eea;
+  --blue-dark: #367fc9;
+  --coral: #f56f67;
+  --coral-dark: #cf4e4a;
+  --mint: #66d6a0;
+  --yellow: #f8cb3c;
+
+  /* Teams are exactly RED and BLUE; map them once so no component hardcodes a hex. */
+  --team-red: var(--coral);
+  --team-red-strong: var(--coral-dark);
+  --team-blue: var(--blue);
+  --team-blue-strong: var(--blue-dark);
+
+  /* ---- Card affiliations (RED | BLUE | NEUTRAL | ASSASSIN) ---- */
+  --card-neutral: #dedbd5;
+  --card-assassin: #412142;
+  --card-hidden: #f4ecdc;
+
+  /* ---- Semantic state ---- */
+  --success: var(--mint);
+  --warning: var(--yellow);
+  --danger: var(--coral-dark);
+  --info: var(--blue);
+  --focus-ring: #76b6ef;
+
+  /* ---- Typography ---- */
+  --font-family-base: 'Baloo 2', system-ui, sans-serif;
+  --font-weight-regular: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 800;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 15px;
+  --font-size-lg: 18px;
+  --font-size-xl: 23px;
+  --font-size-2xl: 34px;
+  --line-height-tight: 1;
+  --line-height-base: 1.4;
+
+  /* ---- Spacing ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* ---- Radius (from ui-design) ---- */
+  --r: 16px;
+  --radius-sm: 8px;
+  --radius-md: var(--r);
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* ---- Elevation (from ui-design) ---- */
+  --shadow: 0 7px 14px #342e2625, 0 2px 3px #342e2612;
+  --shadow-sm: 0 3px 10px #342e2612;
+
+  /* ---- Layering ---- */
+  --z-chat: 100;
+  --z-modal: 200;
+  --z-overlay: 300;
+  --z-toast: 400;
+}

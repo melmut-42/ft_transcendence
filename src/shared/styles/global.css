@@ -1,0 +1,59 @@
+/*
+ * Global base layer. Everything beyond this is component-scoped CSS colocated with the
+ * component that owns it (`shared/ui/*` and each feature's `components/`).
+ */
+
+@import './tokens.css';
+@import './reset.css';
+
+body {
+  background: radial-gradient(circle at 50% 0, #fffdf5, var(--bg) 70%);
+  color: var(--ink);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: var(--font-weight-black);
+  line-height: var(--line-height-tight);
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: var(--font-size-2xl);
+}
+
+h2 {
+  font-size: var(--font-size-xl);
+}
+
+h3 {
+  font-size: var(--font-size-lg);
+}
+
+a {
+  color: var(--blue-dark);
+}
+
+/* Visible keyboard focus is a hard requirement, not a style preference. */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* Only for content that must stay available to assistive technology. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
