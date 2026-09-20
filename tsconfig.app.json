@@ -22,14 +22,13 @@
     "noUncheckedSideEffectImports": true,
     "exactOptionalPropertyTypes": true,
 
-    "baseUrl": ".",
     "paths": {
-      "@app/*": ["src/app/*"],
-      "@features/*": ["src/features/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@shared/*": ["src/shared/*"],
-      "@assets/*": ["src/assets/*"]
-    }
+		"@app/*": ["./src/app/*"],
+		"@features/*": ["./src/features/*"],
+		"@layouts/*": ["./src/layouts/*"],
+		"@shared/*": ["./src/shared/*"],
+		"@assets/*": ["./src/assets/*"]
+	}
   },
   "include": ["src"]
 }
