@@ -5,8 +5,8 @@
  *   - requests go to the same-origin `/api` prefix, so the browser attaches the
  *     HttpOnly `ft_session` cookie by itself;
  *   - `credentials: 'include'` keeps that true for every call;
- *   - there is no `X-Session-Id` header, no `Authorization: Bearer`, and no
- *     JS-readable auth token anywhere — the frontend cannot read either cookie.
+ *   - no authentication header, bearer token or JS-readable credential is attached
+ *     anywhere — the frontend cannot read either cookie.
  *
  * Feature-level REST calls live in each feature's `api/` folder and use `apiRequest`;
  * this module intentionally implements no endpoint of its own.

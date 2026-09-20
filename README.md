@@ -1,7 +1,7 @@
 # ft_transcendence — Frontend
 
 React SPA for Codenames Online. This repository currently holds the **foundation only**:
-the structure, clients, stores, types and tokens the team writes features on top of.
+the structure, clients, stores, types and tokens that features are built on top of.
 Feature behavior is tracked in GitHub Issues.
 
 ## Stack
@@ -61,8 +61,8 @@ updated first.
 
 ## Non-negotiables
 
-- Authentication is cookie-only. Never read, store or attach a session token; there is
-  no `X-Session-Id` header and no query-string credential on either socket.
+- Authentication is cookie-only. Never read, store or attach a session token; the
+  session cookie is the only credential, on REST and on both sockets.
 - The backend is authoritative for every game rule. The frontend never computes a
   winner — only `game.ended` or a `FINISHED` snapshot is terminal.
 - Room and Game share one WebSocket, owned by `app/connection/RoomConnectionProvider`.

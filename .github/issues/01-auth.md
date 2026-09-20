@@ -20,7 +20,7 @@ Bruno `rest-api/01 - Identity/` (`register.yml`, `login.yml`, `refresh-session.y
 ## Acceptance Criteria
 
 * Authentication in the browser is **cookie-only**. `ft_session` and `ft_refresh` are HttpOnly and never read by JS.
-* No `X-Session-Id` header is sent anywhere, on REST or on either WebSocket.
+* No authentication header is sent anywhere, on REST or on either WebSocket — the session cookie is the only credential.
 * No token, session identifier or credential is written to `localStorage`, `sessionStorage`, IndexedDB or a non-HttpOnly cookie.
 * No `Authorization: Bearer` header is attached to any request.
 * Reloading the page while logged in restores the session without a re-login, including when `ft_session` has expired but `ft_refresh` is still valid.
