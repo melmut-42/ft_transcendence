@@ -89,7 +89,7 @@ docs: |-
 
   ## Session and Credential Model
 
-  Every session has two credentials, each with its own cookie. Neither credential is ever placed in a JSON response body, a query string, or a custom header. There is no `X-Session-Id` anywhere in this contract — not for browsers, not for Bruno, curl, or scripts. Bruno authenticates exactly like a browser, through its cookie jar.
+  Every session has two credentials, each with its own cookie. Neither credential is ever placed in a JSON response body, a query string, or a custom header. The two cookies are the only credential path in this contract, for browsers and for Bruno, curl or scripts alike. Bruno authenticates exactly like a browser, through its cookie jar.
 
   | Cookie | Carries | Attributes | Lifetime |
   | --- | --- | --- | --- |

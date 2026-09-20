@@ -30,7 +30,7 @@ docs: |-
 
   ## Errors
 
-  `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`. There is no `409 INVALID_ROOM_STATE` for `IN_GAME` anymore — that state now resolves to a forfeit instead of being rejected. Errors do not change membership.
+  `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`. `IN_GAME` is not an error case for this endpoint: leaving mid-game resolves to a forfeit rather than a rejection. Errors do not change membership.
 examples:
   - name: Success - Member leaves waiting room
     request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}

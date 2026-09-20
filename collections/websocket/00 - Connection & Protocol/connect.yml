@@ -13,7 +13,7 @@ docs: |-
 
   ## Authentication (secure session cookie)
 
-  Authentication is cookie-only. The handshake authenticates via the HttpOnly, `Secure`, `SameSite=Lax` `ft_session` cookie set by Register/Login/Refresh — the client attaches it automatically on the upgrade request, same-origin, no client code needed. There is no handshake header and no `X-Session-Id`; the server validates the cookie alone.
+  Authentication is cookie-only. The handshake authenticates via the HttpOnly, `Secure`, `SameSite=Lax` `ft_session` cookie set by Register/Login/Refresh — the client attaches it automatically on the upgrade request, same-origin, no client code needed. No authentication header is sent; the server validates the cookie alone.
 
   **Origin policy:** the server validates the upgrade request's `Origin` header against the deployment's own origin (the single public origin from `workspace.yml`'s Deployment / Same-Origin Model) and rejects the handshake with `403` before checking the cookie if it doesn't match. This is the WebSocket-specific cross-site protection that complements `SameSite=Lax` (which alone does not fully cover WebSocket upgrades in every browser).
 

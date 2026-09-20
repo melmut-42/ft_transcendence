@@ -17,7 +17,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Completes the Game Statistics minor module (requires a game — satisfied). Requires an active session. Reads from the Stats service's finalized match records (`workspace.yml`, Match History and Stats), one row per terminal `game.ended`.
+  Serves the Game Statistics module. Requires an active session. Reads from the Stats service's finalized match records (`workspace.yml`, Match History and Stats), one row per terminal `game.ended`.
 
   ## Request parameters
 
