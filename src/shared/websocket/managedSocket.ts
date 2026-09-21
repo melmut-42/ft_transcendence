@@ -19,6 +19,7 @@ import {
 } from '@shared/types';
 
 import type { ConnectionCloseReason, ConnectionStatus } from './connectionState';
+import type { SocketTransport } from './transport';
 
 export interface ManagedSocketHandlers<TInbound> {
   onStatusChange?: (status: ConnectionStatus, reason?: ConnectionCloseReason) => void;
@@ -53,7 +54,7 @@ function isRetryable(reason: ConnectionCloseReason): boolean {
   return reason === 'TRANSPORT_DROP' || reason === 'UNKNOWN';
 }
 
-export class ManagedSocket<TInbound, TOutbound> {
+export class ManagedSocket<TInbound, TOutbound> implements SocketTransport<TOutbound> {
   private socket: WebSocket | null = null;
   private status: ConnectionStatus = 'IDLE';
   private attempt = 0;

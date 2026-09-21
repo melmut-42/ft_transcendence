@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 
+import { useGameStore } from '@features/game/store/gameStore';
+import { useRoomStore } from '@features/room/store/roomStore';
 import { useConnectionStore } from '@shared/stores';
 import { RoomConnection } from '@shared/websocket';
 
@@ -13,9 +15,9 @@ import { RoomConnectionContext } from './roomConnectionContext';
  * exists per room and both features read from it. Room and Game must never open their
  * own socket — two sockets would mean two competing views of authoritative state.
  *
- * This provider owns transport lifecycle and publishes connection status. Applying
- * events to domain state belongs to `features/room` and `features/game`, which
- * subscribe through `useRoomConnection()`.
+ * This provider owns transport lifecycle, publishes connection status, and forwards
+ * every event to the room and game stores. Leaving the room unmounts it, which closes
+ * the socket and clears both stores so no stale member state survives the exit.
  */
 export function RoomConnectionProvider() {
   const { roomId: roomIdParam } = useParams<{ roomId: string }>();
@@ -30,10 +32,15 @@ export function RoomConnectionProvider() {
 
     const instance = new RoomConnection(roomId, {
       onStatusChange: (status, reason) => setRoomStatus(status, reason),
-      // TODO(room): forward events to the room store.
-      // TODO(game): forward `game.*` events to the game store.
-      // TODO(room): on `onSnapshotRequired`, discard local state and reconnect for a
-      // fresh `room.state` — never replay missed events.
+      onEvent: (event) => {
+        useRoomStore.getState().applyEvent(event);
+        useGameStore.getState().applyEvent(event);
+      },
+      // A suspected gap: drop local state and reconnect for a fresh `room.state`.
+      onSnapshotRequired: () => {
+        instance.disconnect();
+        instance.connect();
+      },
     });
 
     setConnection(instance);
@@ -41,6 +48,8 @@ export function RoomConnectionProvider() {
 
     return () => {
       instance.disconnect();
+      useRoomStore.getState().clear();
+      useGameStore.getState().clear();
       setConnection(null);
     };
   }, [isValidRoomId, roomId, setRoomStatus]);

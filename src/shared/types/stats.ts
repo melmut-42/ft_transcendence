@@ -7,6 +7,7 @@
 
 import type { Score, Team } from './common';
 import type { GameEndReason } from './game';
+import type { RoomRole } from './room';
 
 export type MatchResult = 'WIN' | 'LOSS';
 
@@ -20,6 +21,8 @@ export interface MatchHistoryEntry {
   room_id: number;
   /** This user's team in the match. */
   team: Team;
+  /** This user's role in the match. */
+  role: RoomRole;
   opponents: MatchOpponent[];
   result: MatchResult;
   end_reason: GameEndReason;

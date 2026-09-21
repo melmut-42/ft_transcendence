@@ -4,14 +4,19 @@
  * REST owns room creation, membership and snapshots. Team, role, readiness and every
  * gameplay mutation are WebSocket-only and must not appear here.
  *
- * `POST /api/rooms` takes no body: the current contract has no room-name field.
+ * `POST /api/rooms` takes an optional `max_players`; the contract has no room-name field.
  */
 
 import { apiRequest } from '@shared/api';
-import type { CreateRoomResponse, Room, RoomLookupResponse } from '@shared/types';
+import type {
+  CreateRoomRequest,
+  CreateRoomResponse,
+  Room,
+  RoomLookupResponse,
+} from '@shared/types';
 
-export const createRoom = (): Promise<CreateRoomResponse> =>
-  apiRequest('/rooms', { method: 'POST' });
+export const createRoom = (body: CreateRoomRequest = {}): Promise<CreateRoomResponse> =>
+  apiRequest('/rooms', { method: 'POST', body });
 
 /** Resolve a shareable `^[A-Z0-9]{6}$` code to a `room_id` before joining. */
 export const lookupRoomByCode = (roomCode: string): Promise<RoomLookupResponse> =>

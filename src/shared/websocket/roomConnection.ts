@@ -22,7 +22,8 @@ import type {
 
 import type { ConnectionCloseReason, ConnectionStatus } from './connectionState';
 import { EventOrderTracker } from './eventOrdering';
-import { ManagedSocket } from './managedSocket';
+import { createTransport } from './transport';
+import type { SocketTransport } from './transport';
 
 export interface RoomConnectionHandlers {
   onStatusChange?: (status: ConnectionStatus, reason?: ConnectionCloseReason) => void;
@@ -39,7 +40,7 @@ export interface RoomConnectionHandlers {
 }
 
 export class RoomConnection {
-  private readonly socket: ManagedSocket<RoomServerMessage, RoomCommand>;
+  private readonly socket: SocketTransport<RoomCommand>;
   private readonly ordering = new EventOrderTracker();
 
   readonly roomId: number;
@@ -48,7 +49,7 @@ export class RoomConnection {
   constructor(roomId: number, handlers: RoomConnectionHandlers = {}) {
     this.roomId = roomId;
     this.handlers = handlers;
-    this.socket = new ManagedSocket<RoomServerMessage, RoomCommand>({
+    this.socket = createTransport<RoomServerMessage, RoomCommand>({
       name: `room:${roomId}`,
       path: wsRoomPath(roomId),
       onStatusChange: (status, reason) => {

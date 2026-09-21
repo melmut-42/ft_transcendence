@@ -78,6 +78,7 @@ export function classifyApiError(error: ApiError): ErrorHandlingClass {
     case 'INVALID_USERNAME':
     case 'INVALID_PASSWORD':
     case 'INVALID_IMAGE':
+    case 'INVALID_AVATAR_PRESET':
     case 'EMAIL_TAKEN':
     case 'USERNAME_TAKEN':
     case 'INVALID_CREDENTIALS':
@@ -88,6 +89,7 @@ export function classifyApiError(error: ApiError): ErrorHandlingClass {
     case 'ROOM_NOT_FOUND':
     case 'NOT_ROOM_MEMBER':
     case 'ROOM_NOT_JOINABLE':
+    case 'ROOM_FULL':
     case 'ALREADY_IN_ROOM':
       return 'ROOM_RECOVERY';
     case 'VALIDATION_ERROR':

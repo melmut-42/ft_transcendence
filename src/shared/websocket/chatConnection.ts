@@ -14,28 +14,32 @@ import type {
   ChatSendAck,
   ChatSendPayload,
   ChatServerMessage,
+  RoomInviteReceivedEvent,
   WsErrorMessage,
 } from '@shared/types';
 
 import type { ConnectionCloseReason, ConnectionStatus } from './connectionState';
-import { ManagedSocket } from './managedSocket';
+import { createTransport } from './transport';
+import type { SocketTransport } from './transport';
 
 export interface ChatConnectionHandlers {
   onStatusChange?: (status: ConnectionStatus, reason?: ConnectionCloseReason) => void;
   onMessage?: (event: ChatMessageNewEvent) => void;
+  /** Live room invitation from a friend. Accepting it is an ordinary REST join. */
+  onInvite?: (event: RoomInviteReceivedEvent) => void;
   /** Carries `delivery_status`: `DELIVERED` or `RECIPIENT_OFFLINE`. */
   onAck?: (ack: AckMessage<ChatSendAck>) => void;
   onError?: (error: WsErrorMessage) => void;
 }
 
 export class ChatConnection {
-  private readonly socket: ManagedSocket<ChatServerMessage, ChatCommand>;
+  private readonly socket: SocketTransport<ChatCommand>;
 
   private readonly handlers: ChatConnectionHandlers;
 
   constructor(handlers: ChatConnectionHandlers = {}) {
     this.handlers = handlers;
-    this.socket = new ManagedSocket<ChatServerMessage, ChatCommand>({
+    this.socket = createTransport<ChatServerMessage, ChatCommand>({
       name: 'chat',
       path: WS_CHAT_PATH,
       onStatusChange: (status, reason) => this.handlers.onStatusChange?.(status, reason),
@@ -73,6 +77,9 @@ export class ChatConnection {
         return;
       case 'chat.message.new':
         this.handlers.onMessage?.(message);
+        return;
+      case 'room.invite.received':
+        this.handlers.onInvite?.(message);
     }
   }
 }

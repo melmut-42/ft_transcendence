@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
+import { useInviteStore } from '@features/lobby/store/inviteStore';
 import { useConnectionStore } from '@shared/stores';
 import { ChatConnection } from '@shared/websocket';
 
@@ -20,6 +21,7 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const instance = new ChatConnection({
       onStatusChange: (status, reason) => setChatStatus(status, reason),
+      onInvite: (event) => useInviteStore.getState().receive(event),
       // TODO(chat): forward `chat.message.new` and send-acks to the chat store.
     });
 

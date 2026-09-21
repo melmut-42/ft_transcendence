@@ -13,20 +13,78 @@
 
 import { create } from 'zustand';
 
-import type { Game } from '@shared/types';
+import type { Game, RoomServerEvent } from '@shared/types';
 
 interface GameState {
   game: Game | null;
 
   applyGame: (game: Game | null) => void;
+  /** Apply one room-stream event; non-game events are ignored. */
+  applyEvent: (event: RoomServerEvent) => void;
   clear: () => void;
 }
 
-export const useGameStore = create<GameState>((set) => ({
+export const useGameStore = create<GameState>((set, get) => ({
   game: null,
 
-  // TODO(game): add the per-event reducers (clue submitted, card revealed, turn
-  // changed, score updated, game ended).
   applyGame: (game) => set({ game }),
+
+  applyEvent: (event) => {
+    const { game } = get();
+    switch (event.type) {
+      case 'room.state':
+      case 'game.started':
+      case 'game.state':
+        set({ game: event.payload.room.game });
+        return;
+      case 'game.clue.submitted':
+        if (game) set({ game: { ...game, current_turn: event.payload.current_turn } });
+        return;
+      case 'game.card.revealed': {
+        if (!game) return;
+        const { card } = event.payload;
+        set({
+          game: {
+            ...game,
+            score: event.payload.score,
+            current_turn: event.payload.current_turn,
+            board: game.board.map((c) => (c.card_id === card.card_id ? card : c)),
+          },
+        });
+        return;
+      }
+      case 'game.score.updated':
+        if (game) set({ game: { ...game, score: event.payload.score } });
+        return;
+      case 'game.turn.changed':
+        if (game) {
+          set({
+            game: { ...game, current_turn: event.payload.current_turn, score: event.payload.score },
+          });
+        }
+        return;
+      case 'game.ended': {
+        if (!game) return;
+        const { revealed_card: revealed } = event.payload;
+        set({
+          game: {
+            ...game,
+            winner: event.payload.winner,
+            end_reason: event.payload.end_reason,
+            score: event.payload.score,
+            finished_at: event.payload.finished_at,
+            current_turn: { ...game.current_turn, phase: 'GAME_OVER' },
+            board: revealed
+              ? game.board.map((c) => (c.card_id === revealed.card_id ? revealed : c))
+              : game.board,
+          },
+        });
+        return;
+      }
+      default:
+        return;
+    }
+  },
+
   clear: () => set({ game: null }),
 }));

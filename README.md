@@ -70,6 +70,33 @@ updated first.
 - Reconnect recovery is a fresh `room.state` snapshot, never an event replay.
 - Zero console errors or warnings in the supported evaluation flow.
 
+## Mock sockets
+
+`src/shared/websocket/mock` is an in-memory stand-in for the room and chat sockets. It
+plugs in at the transport seam (`shared/websocket/transport.ts`), speaks the same Bruno
+envelopes and event types, and enforces the same room rules, so stores and components
+run unchanged against it.
+
+Enable it for `npm run dev` with `VITE_MOCK_SOCKETS=true` in `.env`. It loads only
+through a dynamic import guarded by `import.meta.env.DEV`, so production builds never
+contain it. Once a room page connects, drive other players from the browser console:
+
+```js
+mockSockets.room().playerJoin({ user_id: 7, username: 'red_agent' });
+mockSockets.room().selectTeam(7, 'BLUE');
+mockSockets.room().updateSettings(6);             // host capacity change
+mockSockets.room().configureStartable('SPYMASTER'); // fill both teams, start countdown
+mockSockets.room().submitClue('ocean', 2);
+mockSockets.room().guessCard(5);
+mockSockets.room().playerLeave(7);                // IN_GAME: PLAYER_FORFEIT
+mockSockets.room().dropConnection();              // reconnect + fresh room.state
+mockSockets.chat.inviteReceived({ user_id: 7, username: 'red_agent' }, 1002, 'QWER12');
+```
+
+Each method throws a `MockActionError` carrying the contract error code when the action
+breaks a rule (`ROOM_FULL`, `ROLE_CONFLICT`, `NOT_YOUR_TURN`, …). REST calls are not
+mocked.
+
 ## Commands
 
 ```bash

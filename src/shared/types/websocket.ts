@@ -16,6 +16,7 @@ import type { Room, RoomMember, RoomRole, RoomStatus } from './room';
 /* -------------------------------------------------------------------------- */
 
 export type RoomCommandType =
+  | 'room.settings.update'
   | 'room.team.select'
   | 'room.role.select'
   | 'room.ready.set'
@@ -36,6 +37,10 @@ export interface ClientEnvelope<TType extends string, TPayload> {
   payload: TPayload;
 }
 
+export type UpdateRoomSettingsCommand = ClientEnvelope<
+  'room.settings.update',
+  { max_players: number }
+>;
 export type SelectTeamCommand = ClientEnvelope<'room.team.select', { team: Team }>;
 export type SelectRoleCommand = ClientEnvelope<'room.role.select', { role: RoomRole }>;
 export type SetReadyCommand = ClientEnvelope<'room.ready.set', { ready: boolean }>;
@@ -47,6 +52,7 @@ export type GuessCardCommand = ClientEnvelope<'game.card.guess', { card_id: numb
 export type PassTurnCommand = ClientEnvelope<'game.turn.pass', Record<string, never>>;
 
 export type RoomCommand =
+  | UpdateRoomSettingsCommand
   | SelectTeamCommand
   | SelectRoleCommand
   | SetReadyCommand
@@ -91,6 +97,7 @@ export type WsErrorCode =
   | 'UNAUTHORIZED'
   | 'ROOM_NOT_FOUND'
   | 'NOT_ROOM_MEMBER'
+  | 'NOT_HOST'
   | 'INVALID_ROOM_STATE'
   | 'TEAM_REQUIRED'
   | 'ROLE_REQUIRED'
@@ -149,6 +156,11 @@ export type RoomPlayerUpdatedEvent = ServerEventEnvelope<
     room_status: RoomStatus;
     startable: boolean;
   }
+>;
+
+export type RoomSettingsUpdatedEvent = ServerEventEnvelope<
+  'room.settings.updated',
+  { max_players: number; player_count: number; changed_by_user_id: number }
 >;
 
 export type RoomCountdownStartedEvent = ServerEventEnvelope<
@@ -245,6 +257,7 @@ export type RoomServerEvent =
   | RoomPlayerJoinedEvent
   | RoomPlayerLeftEvent
   | RoomPlayerUpdatedEvent
+  | RoomSettingsUpdatedEvent
   | RoomCountdownStartedEvent
   | RoomCountdownTickEvent
   | RoomCountdownCancelledEvent
@@ -271,7 +284,14 @@ export interface ChatEventEnvelope<TType extends string, TPayload> {
 
 export type ChatMessageNewEvent = ChatEventEnvelope<'chat.message.new', ChatMessageNewPayload>;
 
-export type ChatServerMessage = ChatMessageNewEvent | AckMessage<ChatSendAck> | WsErrorMessage;
+/** Live invitation from a friend, delivered on the chat socket and never stored. */
+export type RoomInviteReceivedEvent = ChatEventEnvelope<
+  'room.invite.received',
+  { room_id: number; room_code: string; from_user: { user_id: number; username: string } }
+>;
+
+export type ChatServerMessage =
+  ChatMessageNewEvent | RoomInviteReceivedEvent | AckMessage<ChatSendAck> | WsErrorMessage;
 
 /**
  * Close codes the Gateway uses. `4401` means the session became explicitly invalid

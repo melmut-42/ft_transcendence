@@ -38,6 +38,21 @@ export interface UploadAvatarResponse {
   avatar_url: string;
 }
 
+/** `GET /api/avatars/presets` entry — a ready-made avatar. */
+export interface AvatarPreset {
+  preset_id: string;
+  avatar_url: string;
+}
+
+export interface AvatarPresetListResponse {
+  presets: AvatarPreset[];
+}
+
+/** `PUT /api/users/me/avatar` body; the response is `UploadAvatarResponse`. */
+export interface SelectAvatarPresetRequest {
+  preset_id: string;
+}
+
 /** `GET /api/friends` entry, and the `POST /api/friends` response body. */
 export interface Friend {
   user_id: number;
