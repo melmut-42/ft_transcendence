@@ -1,0 +1,39 @@
+info:
+  name: List avatar presets
+  type: http
+  seq: 6
+  tags: [profile]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/avatars/presets"
+  headers:
+    - name: Accept
+      value: application/json
+docs: |-
+  # List avatar presets
+
+  ## Purpose and preconditions
+
+  Returns the fixed catalog of ready-made avatars a user can pick in Settings instead of uploading a photo. Requires an active session. The catalog is static and the same for every user.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Authenticates the caller | set by Register/Login |
+
+  ## Response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.presets[]` | array<object> | yes | no | 11 entries, fixed order | Catalog |
+  | `data.presets[].preset_id` | string | yes | no | `^[a-z0-9-]{1,40}$` | Stable identifier |
+  | `data.presets[].avatar_url` | string | yes | no | URL | Square image of the preset |
+
+  ## Errors
+
+  `401 UNAUTHORIZED` for an invalid session. Read-only; no event.
+examples:
+  - name: Success - Preset catalog
+    request: {url: "{{baseUrl}}/api/avatars/presets", method: GET, headers: [], params: [], body: {mode: none}}
+    response: {status: 200, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"data":{"presets":[{"preset_id":"alien astronaut aviator-fox blond-sunglasses brain-robot cyborg-cat glasses-boy headphones-girl orc punk scholar-owl","avatar_url":"/avatars/presets/alien astronaut aviator-fox blond-sunglasses brain-robot cyborg-cat glasses-boy headphones-girl orc punk scholar-owl.png"}]}}'}}

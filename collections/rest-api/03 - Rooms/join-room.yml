@@ -34,6 +34,7 @@ docs: |-
   | `data.status` | string enum | yes | no | `WAITING` | Joinable lifecycle state |
   | `data.host_user_id` | integer | yes | no | member ID | Current host |
   | `data.player_count` | integer | yes | no | `>= 2` in this flow | Count after join |
+  | `data.max_players` | integer | yes | no | `4..8` | Room capacity; joins are rejected once `player_count` reaches it |
   | `data.startable` | boolean | yes | no | `false` | New member is unconfigured, so full predicate fails |
   | `data.players[]` | array<object> | yes | no | members in join order | Membership snapshot |
   | `data.players[].user_id` | integer | yes | no | positive | Member ID |
@@ -57,12 +58,13 @@ docs: |-
   | `401` | `UNAUTHORIZED` | invalid session | none |
   | `404` | `ROOM_NOT_FOUND` | room ID absent | none |
   | `409` | `ROOM_NOT_JOINABLE` | state is `COUNTDOWN`, `IN_GAME`, `FINISHED`, or `CLOSED` | none |
+  | `409` | `ROOM_FULL` | `player_count` already equals `max_players` | none |
   | `409` | `ALREADY_IN_ROOM` | user already has active room, including this one | none |
   | `422` | `VALIDATION_ERROR` | room ID is not positive integer | none |
 
   ## Invariants
 
-  No capacity maximum is imposed. Joining is forbidden as soon as countdown begins.
+  `player_count` never exceeds `max_players`; the capacity check and the insert are atomic, so two simultaneous joins cannot both take the last seat. Joining is forbidden as soon as countdown begins.
 examples:
   - name: Success - Join empty-team room
     request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
@@ -78,6 +80,7 @@ examples:
               "status": "WAITING",
               "host_user_id": 42,
               "player_count": 2,
+              "max_players": 8,
               "startable": false,
               "players": [
                 {
@@ -117,6 +120,7 @@ examples:
               "status": "WAITING",
               "host_user_id": 42,
               "player_count": 5,
+              "max_players": 8,
               "startable": false,
               "players": [
                 {
@@ -178,3 +182,6 @@ examples:
   - name: Error - Already in another room
     request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"User 46 already belongs to active room 1002.","details":{"room_id":1002}}}'}}
+  - name: Error - Room full
+    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_FULL","message":"Room 1001 is full (8 of 8 players).","details":{"room_id":1001,"player_count":8,"max_players":8}}}'}}

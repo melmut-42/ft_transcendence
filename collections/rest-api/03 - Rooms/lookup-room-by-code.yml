@@ -34,6 +34,7 @@ docs: |-
   | `data.room_code` | string | yes | no | normalized uppercase | Echoed input |
   | `data.status` | string enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME`, `FINISHED`, `CLOSED` | Lifecycle state, used to grey out Join when not `WAITING` |
   | `data.player_count` | integer | yes | no | `>= 1` | Current membership count |
+  | `data.max_players` | integer | yes | no | `4..8` | Room capacity; the Join Room UI shows a full room before calling Join |
 
   ## State changes and events
 
@@ -64,7 +65,8 @@ examples:
               "room_id": 1001,
               "room_code": "ABCD12",
               "status": "WAITING",
-              "player_count": 1
+              "player_count": 1,
+              "max_players": 8
             }
           }
   - name: Error - Unknown code

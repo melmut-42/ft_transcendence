@@ -62,6 +62,7 @@ docs: |-
   | `ROOM_NOT_FOUND` | room removed after connection race | unchanged; server closes with `4404` |
   | `NOT_ROOM_MEMBER` | user no longer belongs to room | unchanged; server closes with `4403` |
   | `INVALID_ROOM_STATE` | operation not legal in room status/phase | unchanged; open |
+  | `NOT_HOST` | non-host sends `room.settings.update` | unchanged; open |
   | `TEAM_REQUIRED` | ready/role before team | unchanged; open |
   | `ROLE_REQUIRED` | ready before role | unchanged; open |
   | `ROLE_CONFLICT` | second Spymaster on one team | unchanged; open |

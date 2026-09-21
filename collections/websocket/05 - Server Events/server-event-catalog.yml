@@ -39,6 +39,7 @@ docs: |-
   | `room.state` | `room` | connect, recovery, room mutation | per recipient when game exists |
   | `room.player.joined` | `player`, `host_user_id`, `player_count`, `room_status` | REST join | common |
   | `room.player.left` | same membership fields | REST leave | common |
+  | `room.settings.updated` | `max_players`, `player_count`, `changed_by_user_id` | host `room.settings.update` | common |
   | `room.player.updated` | `player`, `changed_fields`, `room_status`, `startable` | team, role, ready | common |
   | `room.countdown.started` | `seconds_remaining=3` | full start predicate becomes true | common |
   | `room.countdown.tick` | `seconds_remaining` | server timer | common |

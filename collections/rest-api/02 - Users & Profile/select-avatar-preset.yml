@@ -1,0 +1,54 @@
+info:
+  name: Select avatar preset
+  type: http
+  seq: 7
+  tags: [profile]
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/users/me/avatar"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Accept
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "preset_id": "scholar-owl"
+      }
+docs: |-
+  # Select avatar preset
+
+  ## Purpose and preconditions
+
+  Sets the user's avatar to one of the ready-made presets from `List avatar presets`. Requires an active session. It is the alternative to `Upload avatar`; the most recent of the two wins.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Authenticates the owner | set by Register/Login |
+  | `preset_id` | body | yes | string | a `preset_id` from the catalog | no | Chosen preset | `scholar-owl` |
+
+  ## Success behavior and response fields
+
+  `200 OK` replaces the current avatar. A previously uploaded file is deleted. The returned `avatar_url` then appears on own-profile, public-profile, friends-list, and room-member payloads, exactly like an uploaded avatar.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.avatar_url` | string | yes | no | URL | The preset's image |
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `422` | `INVALID_AVATAR_PRESET` | `preset_id` missing or not in the catalog |
+examples:
+  - name: Success - Preset selected
+    request: {url: "{{baseUrl}}/api/users/me/avatar", method: PUT, headers: [], params: [], body: {mode: json, json: '{"preset_id":"scholar-owl"}'}}
+    response: {status: 200, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"data":{"avatar_url":"/avatars/presets/scholar-owl.png"}}'}}
+  - name: Error - Unknown preset
+    request: {url: "{{baseUrl}}/api/users/me/avatar", method: PUT, headers: [], params: [], body: {mode: json, json: '{"preset_id":"dragon"}'}}
+    response: {status: 422, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"INVALID_AVATAR_PRESET","message":"Avatar preset ''dragon'' does not exist.","details":{"field":"preset_id"}}}'}}

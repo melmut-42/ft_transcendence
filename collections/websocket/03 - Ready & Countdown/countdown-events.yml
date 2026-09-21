@@ -60,6 +60,7 @@ docs: |-
           "status": "COUNTDOWN",
           "host_user_id": 42,
           "player_count": 4,
+          "max_players": 8,
           "startable": true,
           "countdown": {
             "seconds_remaining": 3
@@ -176,6 +177,7 @@ docs: |-
           "status": "WAITING",
           "host_user_id": 42,
           "player_count": 4,
+          "max_players": 8,
           "startable": false,
           "players": [
             {

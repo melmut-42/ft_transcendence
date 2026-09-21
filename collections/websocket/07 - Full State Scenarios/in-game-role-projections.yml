@@ -38,6 +38,7 @@ docs: |-
   | `payload.room.status` | enum | yes | no | `IN_GAME` | Post-countdown state |
   | `payload.room.host_user_id` | integer | yes | no | member ID | Host |
   | `payload.room.player_count` | integer | yes | no | `>= 4` | Participants |
+  | `payload.room.max_players` | integer | yes | no | `4..8` | Room capacity |
   | `payload.room.startable` | boolean | yes | no | `false` | Start predicate is only actionable in `WAITING` |
   | `payload.room.players[]` | array<object> | yes | no | configured members | Join-ordered membership |
   | `payload.room.players[].user_id` | integer | yes | no | positive | Member |
@@ -80,6 +81,7 @@ docs: |-
         "status": "IN_GAME",
         "host_user_id": 42,
         "player_count": 4,
+        "max_players": 8,
         "startable": false,
         "players": [
           {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},
@@ -144,6 +146,7 @@ docs: |-
         "status": "IN_GAME",
         "host_user_id": 42,
         "player_count": 4,
+        "max_players": 8,
         "startable": false,
         "players": [
           {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},

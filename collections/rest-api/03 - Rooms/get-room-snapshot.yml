@@ -43,6 +43,7 @@ docs: |-
   | `data.status` | string enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME`, `FINISHED`, `CLOSED` | Lifecycle state |
   | `data.host_user_id` | integer | yes | no | member user ID | Host; deterministic after transfer |
   | `data.player_count` | integer | yes | no | `>= 1` for accessible room | Current members |
+  | `data.max_players` | integer | yes | no | `4..8` | Room capacity; joins are rejected once `player_count` reaches it |
   | `data.startable` | boolean | yes | no | `true`, `false` | Complete start predicate, not merely all-ready |
   | `data.countdown.seconds_remaining` | integer | conditional | no | `0..3` | Present only in `COUNTDOWN` |
   | `data.players[]` | array<object> | yes | no | one or more | Members in join order |
@@ -101,6 +102,7 @@ examples:
               "status": "WAITING",
               "host_user_id": 42,
               "player_count": 1,
+              "max_players": 8,
               "startable": false,
               "players": [
                 {
@@ -131,6 +133,7 @@ examples:
               "status": "WAITING",
               "host_user_id": 42,
               "player_count": 4,
+              "max_players": 8,
               "startable": false,
               "players": [
                 {
@@ -188,6 +191,7 @@ examples:
               "status": "WAITING",
               "host_user_id": 42,
               "player_count": 4,
+              "max_players": 8,
               "startable": false,
               "players": [
                 {
@@ -245,6 +249,7 @@ examples:
               "status": "WAITING",
               "host_user_id": 42,
               "player_count": 4,
+              "max_players": 8,
               "startable": false,
               "players": [
                 {
@@ -302,6 +307,7 @@ examples:
               "status": "IN_GAME",
               "host_user_id": 42,
               "player_count": 4,
+              "max_players": 8,
               "startable": false,
               "players": [
                 {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},

@@ -34,6 +34,7 @@ docs: |-
   | `data.matches[].game_id` | integer | yes | no | positive | Match ID |
   | `data.matches[].room_id` | integer | yes | no | positive | Room the match was played in |
   | `data.matches[].team` | enum | yes | no | `RED`, `BLUE` | This user's team in the match |
+  | `data.matches[].role` | enum | yes | no | `SPYMASTER`, `OPERATIVE` | This user's role in the match |
   | `data.matches[].opponents[]` | array<object> | yes | no | `user_id`, `username` | Opposing team's roster |
   | `data.matches[].result` | enum | yes | no | `WIN`, `LOSS` | Outcome for this user |
   | `data.matches[].end_reason` | enum | yes | no | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `PLAYER_FORFEIT` | Terminal cause |
@@ -59,6 +60,7 @@ examples:
                   "game_id": 5001,
                   "room_id": 1001,
                   "team": "RED",
+                  "role": "OPERATIVE",
                   "opponents": [
                     {"user_id": 44, "username": "blue_master"},
                     {"user_id": 45, "username": "blue_agent"}
@@ -72,6 +74,7 @@ examples:
                   "game_id": 4998,
                   "room_id": 998,
                   "team": "BLUE",
+                  "role": "OPERATIVE",
                   "opponents": [
                     {"user_id": 46, "username": "extra_red"}
                   ],

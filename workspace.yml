@@ -106,6 +106,10 @@ docs: |-
 
   Teams are exactly `RED` and `BLUE`. Temporary room roles are exactly `SPYMASTER` and `OPERATIVE`. A configured member has one team and one role. A startable room has at least four players, exactly one Spymaster on each team, and at least one Operative on each team.
 
+  ## Room Capacity
+
+  Every room has `max_players`, an integer in `4..8` with default `8`. The host sets it in Create room and may change it while the room is `WAITING` through `room.settings.update`, never below the current `player_count`. Join room and Invite friend return `409 ROOM_FULL` when `player_count` equals `max_players`.
+
   ## Start Conditions
 
   Let `P` be all participating room members. The server enters `COUNTDOWN` exactly when all clauses are true:
@@ -214,11 +218,15 @@ docs: |-
 
   ## Friends, Presence, and Chat Scope
 
-  Friends (REST: list/add/remove, plus username search for discovery — see `05 - Friends/search-users.yml`; immediate/mutual, no request-accept workflow) and basic Chat (per-user WebSocket, friend-or-shared-active-room permission) implement the mandatory User Interaction module. Advanced Chat (bonus module: read receipts, typing indicators, blocking, persistent history, game invites) is out of scope for this revision and must stay distinguishable from basic Chat if added later.
+  Friends (REST: list/add/remove, plus username search for discovery — see `05 - Friends/search-users.yml`; immediate/mutual, no request-accept workflow) and basic Chat (per-user WebSocket, friend-or-shared-active-room permission) implement the mandatory User Interaction module. Advanced Chat (bonus module: read receipts, typing indicators, blocking, persistent history) is out of scope for this revision and must stay distinguishable from basic Chat if added later.
 
   **Chat permission:** allowed if the sender and recipient are friends, **or** both are current members of the same room while that room is `WAITING`, `COUNTDOWN`, or `IN_GAME` (any state where the chat widget is actually mounted — not `IN_GAME` only, and not `FINISHED`/`CLOSED`, since co-membership ends when either leaves). A message to a recipient with no currently open `/ws/chat` socket is not silently accepted as delivered: the sender's ack reports `delivery_status: "RECIPIENT_OFFLINE"` instead of `"DELIVERED"` (there is still no persisted history — the message is not stored or redelivered later, the sender is just told the truth about delivery).
 
   **Presence:** a user is `online` while they hold at least one currently open authenticated WebSocket connection (room or chat socket) — tracked ephemerally in Redis, no separate heartbeat protocol needed beyond the socket's own lifetime. `is_online` is exposed consistently everywhere the UI shows presence: the friends list, the public profile, and room member lists.
+
+  ## Room Invitations
+
+  A room member invites an online friend with no active room through `POST /api/rooms/{room_id}/invites` while the room is `WAITING` and not full. The invitation reaches the friend as `room.invite.received` on `/ws/chat` and is never stored. Accepting it is an ordinary Join room request.
 
   ## Room Identifier Consistency
 
@@ -230,7 +238,7 @@ docs: |-
 
   ## Profile Completion (Standard User Management — subject-mandatory)
 
-  Beyond the read-only profile, the contract defines `PATCH /api/users/me` (editable fields: `username`, within the same uniqueness/format rule as registration) and `POST /api/users/me/avatar` (multipart upload — `image/jpeg`, `image/png`, `image/webp` only; max 2 MiB; server validates MIME type and dimensions server-side regardless of client-declared type; replacing an avatar deletes the previous stored file; a user with no uploaded avatar gets a deterministic default derived from `user_id`). `avatar_url` is added to own-profile, public-profile, room member, and friend list payloads so every player list in the UI can render it consistently. See `02 - Users & Profile/update-own-profile.yml` and `upload-avatar.yml`.
+  Beyond the read-only profile, the contract defines `PATCH /api/users/me` (editable fields: `username`, within the same uniqueness/format rule as registration) and `POST /api/users/me/avatar` (multipart upload — `image/jpeg`, `image/png`, `image/webp` only; max 2 MiB; server validates MIME type and dimensions server-side regardless of client-declared type; replacing an avatar deletes the previous stored file; a user with no uploaded avatar gets a deterministic default derived from `user_id`). `avatar_url` is added to own-profile, public-profile, room member, and friend list payloads so every player list in the UI can render it consistently. Instead of uploading, a user can pick one of the ready-made avatars listed by `GET /api/avatars/presets` with `PUT /api/users/me/avatar`; the most recent upload or pick wins. See `02 - Users & Profile/update-own-profile.yml`, `upload-avatar.yml`, `list-avatar-presets.yml` and `select-avatar-preset.yml`.
 
   ## OAuth
 
@@ -238,7 +246,7 @@ docs: |-
 
   ## Match History and Stats (minor module: Game Statistics)
 
-  Every terminal `game.ended` (normal win, assassin, or `PLAYER_FORFEIT`) writes exactly one match record to Stats: `game_id`, `room_id`, both teams' final rosters (`user_id`, `username`, `team`), `winner`, `end_reason`, `score`, `started_at`, `finished_at`. `GET /api/users/me/matches` (own match history, paginated) and the existing `wins`/`losses`/`matches_played` on both own and public profile read from this table. `level` stays in scope and is defined as a simple deterministic function of `wins` (`level = 1 + floor(wins / 5)`) — enough to satisfy "level" as a persistent stat without inventing an XP/points economy nothing else in scope requires. The contract defines no leaderboard endpoint; the selected module set does not require one. See `07 - Stats/get-match-history.yml`.
+  Every terminal `game.ended` (normal win, assassin, or `PLAYER_FORFEIT`) writes exactly one match record to Stats: `game_id`, `room_id`, both teams' final rosters (`user_id`, `username`, `team`, `role`), `winner`, `end_reason`, `score`, `started_at`, `finished_at`. `GET /api/users/me/matches` (own match history, paginated) and the existing `wins`/`losses`/`matches_played` on both own and public profile read from this table. `level` stays in scope and is defined as a simple deterministic function of `wins` (`level = 1 + floor(wins / 5)`) — enough to satisfy "level" as a persistent stat without inventing an XP/points economy nothing else in scope requires. The contract defines no leaderboard endpoint; the selected module set does not require one. See `07 - Stats/get-match-history.yml`.
 
   ## Privacy Policy and Terms of Service
 

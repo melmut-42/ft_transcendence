@@ -72,6 +72,7 @@ docs: |-
           "status": "WAITING",
           "host_user_id": 42,
           "player_count": 1,
+          "max_players": 8,
           "startable": false,
           "players": [
             {

@@ -146,6 +146,7 @@ docs: |-
       "room_id": 1001,
       "status": "WAITING",
       "player_count": 4,
+      "max_players": 8,
       "startable": false,
       "players": [
         {
@@ -183,6 +184,7 @@ docs: |-
       "room_id": 1001,
       "status": "WAITING",
       "player_count": 4,
+      "max_players": 8,
       "startable": true,
       "players": [
         {

@@ -7,8 +7,16 @@ http:
   method: POST
   url: "{{baseUrl}}/api/rooms"
   headers:
+    - name: Content-Type
+      value: application/json
     - name: Accept
       value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "max_players": 8
+      }
 runtime:
   scripts:
     - type: after-response
@@ -40,8 +48,9 @@ docs: |-
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Creating user | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+  | `max_players` | body | no | integer | `4..8`, default `8` | no | Room capacity | `8` |
 
-  There is no body: room capacity, passwords, timers, and custom boards are not contract features.
+  The body is optional; an empty or absent body creates a room with `max_players: 8`. Passwords, timers, and custom boards are not contract features.
 
   ## Response fields
 
@@ -52,6 +61,7 @@ docs: |-
   | `data.status` | string enum | yes | no | `WAITING` | Initial lifecycle state |
   | `data.host_user_id` | integer | yes | no | creator ID | Current host |
   | `data.player_count` | integer | yes | no | `1` | Current membership count |
+  | `data.max_players` | integer | yes | no | `4..8` | Room capacity; joins are rejected once `player_count` reaches it |
   | `data.startable` | boolean | yes | no | `false` | Full start predicate result |
   | `data.players[]` | array<object> | yes | no | one creator | Members in join order |
   | `data.players[].user_id` | integer | yes | no | positive | Member ID |
@@ -72,7 +82,7 @@ docs: |-
 
   ## Errors
 
-  `401 UNAUTHORIZED`; `409 ALREADY_IN_ROOM`. Neither creates a room.
+  `401 UNAUTHORIZED`; `409 ALREADY_IN_ROOM`; `422 VALIDATION_ERROR` when `max_players` is not an integer in `4..8`. None creates a room.
 examples:
   - name: Success - Newly created room
     request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [], params: [], body: {mode: none}}
@@ -89,6 +99,7 @@ examples:
               "status": "WAITING",
               "host_user_id": 42,
               "player_count": 1,
+              "max_players": 8,
               "startable": false,
               "players": [
                 {

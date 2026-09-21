@@ -1,0 +1,135 @@
+info:
+  name: Update room settings
+  type: websocket
+  seq: 2
+  tags: [action, room]
+websocket:
+  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  message:
+    - title: Success - Host lowers capacity to 6
+      selected: true
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.settings.update",
+            "request_id": "req_0003",
+            "payload": {
+              "max_players": 6
+            }
+          }
+    - title: Error - Below current player count
+      selected: false
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.settings.update",
+            "request_id": "req_0004",
+            "payload": {
+              "max_players": 4
+            }
+          }
+    - title: Error - Not host
+      selected: false
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.settings.update",
+            "request_id": "req_0011",
+            "payload": {
+              "max_players": 8
+            }
+          }
+docs: |-
+  # Update room settings
+
+  ## Purpose and preconditions
+
+  Changes the room's player capacity. Only the current host may send it, and only while the room is `WAITING`. Capacity is the only room setting.
+
+  ## Message and payload parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | WebSocket path | yes | integer | positive | no | Connected room | `1001` |
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
+  | `type` | envelope | yes | string enum | `room.settings.update` | no | Operation | `room.settings.update` |
+  | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0003` |
+  | `payload.max_players` | payload | yes | integer | `4..8` and `>= player_count` | no | New capacity | `6` |
+
+  ## Success, state, and emitted events
+
+  The requester receives an ack, then every member receives `room.settings.updated` followed by `room.state`. Team, role, and readiness do not change.
+
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0003",
+      "ok": true,
+      "payload": {
+        "max_players": 6,
+        "room_status": "WAITING"
+      }
+    }
+  ```
+
+  ```json
+    {
+      "type": "room.settings.updated",
+      "event_id": "evt_0011",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:41:25Z",
+      "payload": {
+        "max_players": 6,
+        "player_count": 5,
+        "changed_by_user_id": 42
+      }
+    }
+  ```
+
+  | Result field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `ack.payload.max_players` | integer | yes | no | `4..8` | Accepted capacity |
+  | `ack.payload.room_status` | enum | yes | no | `WAITING` | Post-command state |
+  | `room.settings.updated.payload.max_players` | integer | yes | no | `4..8` | New capacity |
+  | `room.settings.updated.payload.player_count` | integer | yes | no | `>= 1` | Current membership |
+  | `room.settings.updated.payload.changed_by_user_id` | integer | yes | no | host ID | Actor |
+
+  ## Errors
+
+  - `NOT_HOST`: the sender is a member but not the current host.
+  - `INVALID_PAYLOAD`: `max_players` is absent, not an integer, outside `4..8`, or below the current `player_count`.
+  - `INVALID_ROOM_STATE`: the room is not `WAITING`.
+  - `NOT_ROOM_MEMBER`: the session user is outside the room.
+
+  ```json
+    {
+      "type": "error",
+      "request_id": "req_0004",
+      "error": {
+        "code": "INVALID_PAYLOAD",
+        "message": "payload.max_players cannot be lower than the current player count (5).",
+        "details": {
+          "field": "payload.max_players",
+          "min": 5,
+          "max": 8
+        }
+      }
+    }
+  ```
+
+  ```json
+    {
+      "type": "error",
+      "request_id": "req_0011",
+      "error": {
+        "code": "NOT_HOST",
+        "message": "Only the host can change room settings.",
+        "details": {
+          "host_user_id": 42
+        }
+      }
+    }
+  ```

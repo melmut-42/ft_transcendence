@@ -52,6 +52,7 @@ docs: |-
       "status":"FINISHED",
       "host_user_id":42,
       "player_count":4,
+      "max_players": 8,
       "startable":false,
       "players":[
         {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"is_host":true,"joined_at":"2026-09-10T08:41:00Z"},
@@ -105,4 +106,4 @@ docs: |-
 
   ## Scope boundary
 
-  There is no rematch, spectator, bot, matchmaking, room-password, capacity, kick/ban, custom-board, custom-timer, or chat event protocol in this revision.
+  There is no rematch, spectator, bot, matchmaking, room-password, kick/ban, custom-board, custom-timer, or chat event protocol in this revision.
