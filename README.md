@@ -5,7 +5,9 @@ Design system and screen reference for ft_transcendence, authored in [pen.dev](h
 ## Contents
 
 - `ui.pen` — the design file: reusable components, design tokens (color, radius, stroke, typography), and every screen/state in the product flow.
-- `avatars/` — SVG avatar assets used across profile and lobby components.
+- `svg/avatars/` — SVG avatar assets used across profile and lobby components.
+- `img/avatars/` — PNG exports of the avatars.
+- `img/illustrations/` — raster illustrations used by screens, such as the landing hero.
 
 ## Screens
 
