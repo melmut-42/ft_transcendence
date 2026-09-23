@@ -1,0 +1,14 @@
+{
+  "common": {
+    "language": "Language",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "retry": "Try again",
+    "back": "Back"
+  },
+  "i18n": {
+    "ready": "Multilingual infrastructure is working."
+  }
+}

@@ -1,0 +1,38 @@
+.language-selector {
+  position: fixed;
+  top: clamp(0.75rem, 2vw, 1.5rem);
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  z-index: 1000;
+  background: transparent;
+}
+
+.language-selector__trigger,
+.language-selector__option {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.language-selector__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+}
+
+.language-selector__menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.language-selector__option {
+  padding: 0.5rem;
+  text-align: left;
+}

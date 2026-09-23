@@ -1,0 +1,13 @@
+{
+  "common": {
+    "loading": "Yükleniyor...",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "close": "Kapat",
+    "retry": "Tekrar dene",
+    "back": "Geri"
+  },
+  "i18n": {
+    "ready": "Çok dilli altyapı çalışıyor."
+  }
+}

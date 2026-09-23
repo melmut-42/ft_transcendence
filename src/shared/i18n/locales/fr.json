@@ -1,0 +1,14 @@
+{
+  "common": {
+    "language": "Langue",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "retry": "Réessayer",
+    "back": "Retour"
+  },
+  "i18n": {
+    "ready": "L’infrastructure multilingue fonctionne."
+  }
+}
