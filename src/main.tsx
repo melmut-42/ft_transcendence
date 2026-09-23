@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client';
 import { App } from '@app/App';
 import '@shared/styles/global.css';
 import '@shared/i18n/i18n';
-// import { LanguageSelector } from '@shared/i18n/languageSelector';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element #root is missing from index.html.');
@@ -12,8 +11,7 @@ if (!container) throw new Error('Root element #root is missing from index.html.'
 function render(root: HTMLElement): void {
   createRoot(root).render(
     <StrictMode>
-      <App />   language selector testing
-      {/* Manual test: <LanguageSelector />*/}
+      <App />
     </StrictMode>,
   );
 }
