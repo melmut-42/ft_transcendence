@@ -10,6 +10,13 @@ const DEFAULT_LANGUAGE = 'en';
 
 const savedLanguage = localStorage.getItem(LANGUAGE_FLAG) || DEFAULT_LANGUAGE;
 
+function updateDocumentLanguage(language: string): void {
+	document.documentElement.lang = language;
+}
+
+updateDocumentLanguage(savedLanguage);
+i18n.on('languageChanged', updateDocumentLanguage);
+
 void i18n.use(initReactI18next).init({
   resources: {
 	tr: { translation: tr },
