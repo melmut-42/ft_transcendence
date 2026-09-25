@@ -1,0 +1,69 @@
+{
+	"common": {
+		"loading": "Chargement...",
+		"save": "Enregistrer",
+		"cancel": "Annuler",
+		"close": "Fermer",
+		"retry": "Réessayer",
+		"back": "Retour"
+	},
+	"i18n": {
+		"ready": "L'infrastructure multilingue fonctionne."
+	},
+	"privacy": {
+		"title": "Politique de confidentialité",
+		"lastUpdated": "Dernière mise à jour : 24 septembre 2026",
+		"about": {
+			"title": "À propos du projet",
+			"educationalProject": "Codenames Online est une application web multijoueur indépendante et à visée pédagogique, développée par des étudiants de 42 dans le cadre du projet ft_transcendence. L'application a été conçue à des fins d'apprentissage, de développement et d'évaluation du projet.",
+			"independentProject": "L'application s'inspire de la mécanique de jeu d'association de mots de Codenames. Ce projet n'est ni un produit, ni un service, ni une filiale, ni une application officielle ou approuvée de Czech Games Edition (CGE) ou de la marque Codenames.",
+			"policyPurpose": "Cette politique de confidentialité explique quelles informations sont traitées lors de l'utilisation de l'application, à quelles fins ces informations sont utilisées et de quelles options les utilisateurs disposent."
+		},
+		"dataAndPrivacy": {
+			"title": "Données et confidentialité"
+		},
+		"dataCollected": {
+			"title": "Informations que nous pouvons traiter",
+			"introduction": "Afin de fournir les fonctionnalités de l'application, les informations suivantes peuvent être traitées :",
+			"account": "L'adresse e-mail, le nom d'utilisateur et le mot de passe utilisés pour créer un compte et se connecter.",
+			"password": "Les mots de passe ne sont pas stockés en clair ; ils sont stockés uniquement sous forme salée et hachée.",
+			"profile": "L'avatar choisi ou téléversé par l'utilisateur ainsi que les autres informations de profil.",
+			"gameplay": "Les informations liées au jeu, telles que la participation aux salons de jeu, les résultats des parties et les statistiques des joueurs.",
+			"social": "Les données d'interaction nécessaires au fonctionnement des fonctionnalités d'amitié, de profil et de discussion lorsqu'elles sont utilisées, ainsi que les messages envoyés.",
+			"onlineStatus": "Le statut en ligne, visible par les amis.",
+			"session": "Un JSON Web Token (JWT) à courte durée de vie et un mécanisme de renouvellement utilisés pour maintenir la session active.",
+			"language": "La langue choisie pour l'application. Cette préférence est stockée dans le stockage local du navigateur afin d'être retenue lors de la prochaine ouverture de l'application."
+		},
+		"dataUse": {
+			"title": "Comment utilisons-nous ces informations ?",
+			"body": "Les informations traitées sont utilisées uniquement pour le fonctionnement de l'application : gérer le compte et la session de l'utilisateur, fournir les fonctionnalités de profil, d'amitié, de statut en ligne et de discussion, faire fonctionner les salons de jeu multijoueur et le déroulement des parties, afficher les résultats et les statistiques, mémoriser la préférence de langue, analyser les erreurs et améliorer l'application."
+		},
+		"visibility": {
+			"title": "Visibilité et partage des informations",
+			"body": "En raison du caractère social et multijoueur de l'application, certaines informations peuvent être visibles par les autres utilisateurs inscrits. Cela peut inclure le nom d'utilisateur, l'avatar, le statut en ligne, les activités dans les salons de jeu communs, les résultats des parties et les messages de discussion partagés. Ce projet ne vend ni ne loue les données des utilisateurs, et ne les partage pas avec des tiers à des fins publicitaires, marketing ou commerciales."
+		},
+		"storage": {
+			"title": "Conservation des données et sécurité",
+			"retention": "Les données du compte et de l'application sont conservées tant que le compte est actif, ou jusqu'à la fin du processus d'évaluation du projet ft_transcendence et l'arrêt du serveur de l'application.",
+			"security": "Lorsque l'application est déployée, la communication entre le navigateur et le serveur est chiffrée via HTTPS/TLS. Les mots de passe ne sont pas stockés en clair, et des mesures techniques raisonnables sont mises en œuvre pour empêcher tout accès inutile aux données des utilisateurs.",
+			"sensitiveInformation": "Cette application est un projet développé à des fins pédagogiques. Il est recommandé aux utilisateurs de ne pas partager d'informations personnelles sensibles dans les discussions, le profil ou d'autres champs."
+		},
+		"choicesAndUpdates": {
+			"title": "Vos choix et les mises à jour de la politique"
+		},
+		"choices": {
+			"title": "Vos choix et vos demandes concernant les données",
+			"body": "Les utilisateurs peuvent mettre à jour leurs informations de profil et modifier leur préférence de langue dans les espaces prévus par l'application. Pour demander la suppression de votre compte et des données associées, vous pouvez contacter l'équipe du projet. Les demandes de suppression sont examinées manuellement par l'équipe, en tenant compte du périmètre technique du projet et des exigences d'évaluation."
+		},
+		"changes": {
+			"title": "Modifications de cette politique",
+			"body": "Cette politique de confidentialité peut être mise à jour à mesure que les fonctionnalités de l'application évoluent. La version en vigueur est toujours publiée sur la page Politique de confidentialité de l'application. Si une fonctionnalité d'authentification tierce, comme la connexion avec Google, est ajoutée à l'application, les informations collectées et leurs finalités seront clairement mises à jour avant la publication de cette politique."
+		},
+		"contact": {
+			"title": "Contact",
+			"body": "Pour toute question ou demande relative à la confidentialité, vous pouvez contacter l'équipe du projet via le dépôt GitHub ou via l'intra de 42.",
+			"toolTip": "Dépôt GitHub (s'ouvre dans un nouvel onglet)",
+			"repositoryLink": "ft_transcendence"
+		}
+	}
+}

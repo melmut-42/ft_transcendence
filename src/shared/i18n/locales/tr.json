@@ -1,0 +1,69 @@
+{
+  "common": {
+	"loading": "Yükleniyor...",
+	"save": "Kaydet",
+	"cancel": "İptal",
+	"close": "Kapat",
+	"retry": "Tekrar dene",
+	"back": "Geri"
+  },
+  "i18n": {
+	"ready": "Çok dilli altyapı çalışıyor."
+  },
+  "privacy": {
+	"title": "Gizlilik Politikası",
+	"lastUpdated": "Son güncelleme: 24 Eylül 2026",
+	"about": {
+	  "title": "Proje hakkında",
+	  "educationalProject": "Codenames Online, 42 öğrencileri tarafından ft_transcendence projesi kapsamında geliştirilmiş bağımsız ve eğitim amaçlı çok oyunculu bir web uygulamasıdır. Uygulama; öğrenme, geliştirme ve proje değerlendirmesi amaçlarıyla hazırlanmıştır.",
+	  "independentProject": "Uygulama, kelime ilişkilendirme temelli Codenames oyun mekaniğinden esinlenir. Bu proje, Czech Games Edition (CGE) veya Codenames markasının resmî bir ürünü, hizmeti, iştiraki ya da onaylı uygulaması değildir.",
+	  "policyPurpose": "Bu Gizlilik Politikası, uygulamayı kullanırken hangi bilgilerin işlendiğini, bu bilgilerin hangi amaçlarla kullanıldığını ve kullanıcıların hangi tercih seçeneklerine sahip olduğunu açıklar."
+	},
+	"dataAndPrivacy": {
+	  "title": "Veri ve gizlilik"
+	},
+	"dataCollected": {
+	  "title": "İşleyebileceğimiz bilgiler",
+	  "introduction": "Uygulamanın özelliklerini sunabilmek için aşağıdaki bilgiler işlenebilir:",
+	  "account": "Hesap oluşturmak ve giriş yapmak için kullanılan e-posta adresi, kullanıcı adı ve parola.",
+	  "password": "Parolalar düz metin olarak saklanmaz; yalnızca tuzlanmış ve hash’lenmiş biçimde saklanır.",
+	  "profile": "Kullanıcının seçtiği veya yüklediği avatar ile diğer profil bilgileri.",
+	  "gameplay": "Oyun odalarına katılım, oyun sonuçları ve oyuncu istatistikleri gibi oyunla ilişkili bilgiler.",
+	  "social": "Arkadaşlık, profil ve sohbet özellikleri kullanıldığında bu özelliklerin çalışması için gerekli etkileşim bilgileri ve gönderilen mesajlar.",
+	  "onlineStatus": "Arkadaşların görebileceği çevrimiçi durum bilgisi.",
+	  "session": "Oturumun devamını sağlamak için kullanılan kısa ömürlü JSON Web Token (JWT) ve yenileme mekanizması.",
+	  "language": "Seçilen uygulama dili. Bu tercih, uygulama tekrar açıldığında hatırlanabilmesi için tarayıcının yerel depolamasında saklanır."
+	},
+	"dataUse": {
+	  "title": "Bilgileri nasıl kullanırız?",
+	  "body": "İşlenen bilgiler yalnızca uygulamanın çalışması için kullanılır: kullanıcı hesabını ve oturumunu yönetmek, profil, arkadaşlık, çevrimiçi durum ve sohbet özelliklerini sunmak, çok oyunculu oyun odalarını ve oyun akışını yürütmek, oyun sonuçlarını ve istatistikleri göstermek, dil tercihini hatırlamak, hataları incelemek ve uygulamayı geliştirmek."
+	},
+	"visibility": {
+	  "title": "Bilgilerin görünürlüğü ve paylaşımı",
+	  "body": "Bazı bilgiler, uygulamanın sosyal ve çok oyunculu yapısı gereği diğer kayıtlı kullanıcılara görünür olabilir. Buna kullanıcı adı, avatar, çevrimiçi durum, ortak oyun odalarındaki etkinlikler, oyun sonuçları ve paylaşılan sohbet mesajları dâhil olabilir. Bu proje kullanıcı verilerini reklam, pazarlama veya ticari amaçlarla satmaz, kiralamaz ya da bu amaçlarla üçüncü taraflarla paylaşmaz."
+	},
+	"storage": {
+	  "title": "Veri saklama ve güvenlik",
+	  "retention": "Hesap ve uygulama verileri, hesap aktif olduğu sürece veya ft_transcendence projesinin değerlendirme süreci tamamlanıp uygulama sunucusu kapatılana kadar saklanır.",
+	  "security": "Uygulama dağıtıldığında tarayıcı ile sunucu arasındaki iletişim HTTPS/TLS üzerinden şifrelenir. Parolalar düz metin olarak saklanmaz ve kullanıcı verilerine gereksiz erişimi önlemek için makul teknik önlemler uygulanır.",
+	  "sensitiveInformation": "Bu uygulama eğitim amaçlı geliştirilen bir projedir. Kullanıcıların sohbet, profil veya diğer alanlarda hassas kişisel bilgilerini paylaşmamaları önerilir."
+	},
+	"choicesAndUpdates": {
+	  "title": "Tercihleriniz ve politika güncellemeleri"
+	},
+	"choices": {
+	  "title": "Tercihleriniz ve veri talepleriniz",
+	  "body": "Kullanıcılar, uygulama tarafından sunulan alanlarda profil bilgilerini güncelleyebilir ve dil tercihini değiştirebilir. Hesabınızın ve ilişkili verilerinizin silinmesini talep etmek için proje ekibiyle iletişime geçebilirsiniz. Silme talepleri, projenin teknik kapsamı ve değerlendirme gereksinimleri dikkate alınarak ekip tarafından manuel olarak değerlendirilir."
+	},
+	"changes": {
+	  "title": "Bu politikadaki değişiklikler",
+	  "body": "Uygulamanın özellikleri geliştikçe bu Gizlilik Politikası güncellenebilir. Güncel sürüm her zaman uygulama içindeki Gizlilik Politikası sayfasında yayımlanır. Google ile giriş gibi üçüncü taraf bir kimlik doğrulama özelliği uygulamaya eklenirse, alınan bilgiler ve kullanım amaçları bu politika yayımlanmadan önce açıkça güncellenir."
+	},
+	"contact": {
+	  "title": "İletişim",
+	  "body": "Gizlilikle ilgili soru ve talepler için proje ekibiyle GitHub deposu üzerinden veya 42 intra aracılığıyla iletişime geçebilirsiniz.",
+	  "toolTip": "GitHub deposu (yeni sekmede açılır)",
+	  "repositoryLink": "ft_transcendence"
+	}
+  }
+}

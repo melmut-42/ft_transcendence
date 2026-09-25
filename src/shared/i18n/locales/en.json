@@ -1,0 +1,69 @@
+{
+	"common": {
+		"loading": "Loading...",
+		"save": "Save",
+		"cancel": "Cancel",
+		"close": "Close",
+		"retry": "Try again",
+		"back": "Back"
+	},
+	"i18n": {
+		"ready": "Multilingual infrastructure is working."
+	},
+	"privacy": {
+		"title": "Privacy Policy",
+		"lastUpdated": "Last updated: September 24, 2026",
+		"about": {
+			"title": "About the project",
+			"educationalProject": "Codenames Online is an independent, educational multiplayer web application developed by 42 students as part of the ft_transcendence project. The application was created for learning, development, and project evaluation purposes.",
+			"independentProject": "The application is inspired by the word-association gameplay of Codenames. This project is not an official product, service, affiliate, or endorsed application of Czech Games Edition (CGE) or the Codenames brand.",
+			"policyPurpose": "This Privacy Policy explains what information is processed while using the application, for what purposes this information is used, and what choices users have."
+		},
+		"dataAndPrivacy": {
+			"title": "Data and privacy"
+		},
+		"dataCollected": {
+			"title": "Information we may process",
+			"introduction": "To provide the features of the application, the following information may be processed:",
+			"account": "The email address, username, and password used to create an account and sign in.",
+			"password": "Passwords are not stored in plain text; they are stored only in salted and hashed form.",
+			"profile": "The avatar selected or uploaded by the user and other profile information.",
+			"gameplay": "Game-related information such as joining game rooms, game results, and player statistics.",
+			"social": "The interaction data required for the friendship, profile, and chat features to work when they are used, and the messages sent.",
+			"onlineStatus": "Online status information that friends can see.",
+			"session": "A short-lived JSON Web Token (JWT) and a refresh mechanism used to keep the session active.",
+			"language": "The selected application language. This preference is stored in the browser's local storage so that it can be remembered when the application is opened again."
+		},
+		"dataUse": {
+			"title": "How do we use the information?",
+			"body": "The processed information is used only for the operation of the application: managing the user account and session, providing profile, friendship, online status, and chat features, running multiplayer game rooms and gameplay, displaying game results and statistics, remembering the language preference, investigating errors, and improving the application."
+		},
+		"visibility": {
+			"title": "Visibility and sharing of information",
+			"body": "Due to the social and multiplayer nature of the application, some information may be visible to other registered users. This may include username, avatar, online status, activities in shared game rooms, game results, and shared chat messages. This project does not sell or rent user data, nor does it share it with third parties for advertising, marketing, or commercial purposes."
+		},
+		"storage": {
+			"title": "Data retention and security",
+			"retention": "Account and application data is retained for as long as the account is active, or until the evaluation process of the ft_transcendence project is completed and the application server is shut down.",
+			"security": "When the application is deployed, communication between the browser and the server is encrypted over HTTPS/TLS. Passwords are not stored in plain text, and reasonable technical measures are applied to prevent unnecessary access to user data.",
+			"sensitiveInformation": "This application is a project developed for educational purposes. Users are advised not to share sensitive personal information in chat, profile, or other fields."
+		},
+		"choicesAndUpdates": {
+			"title": "Your choices and policy updates"
+		},
+		"choices": {
+			"title": "Your choices and data requests",
+			"body": "Users can update their profile information and change their language preference in the areas provided by the application. To request the deletion of your account and associated data, you can contact the project team. Deletion requests are reviewed manually by the team, taking into account the technical scope of the project and evaluation requirements."
+		},
+		"changes": {
+			"title": "Changes to this policy",
+			"body": "This Privacy Policy may be updated as the application's features evolve. The current version is always published on the Privacy Policy page within the application. If a third-party authentication feature such as Google sign-in is added to the application, the information collected and the purposes of its use will be clearly updated before this policy is published."
+		},
+		"contact": {
+			"title": "Contact",
+			"body": "For privacy-related questions and requests, you can contact the project team via the GitHub repository or through 42 intra.",
+			"toolTip": "GitHub repository (opens in a new tab)",
+			"repositoryLink": "ft_transcendence"
+		}
+	}
+}
