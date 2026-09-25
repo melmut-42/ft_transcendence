@@ -17,12 +17,18 @@ function render(root: HTMLElement): void {
   );
 }
 
-// Development-only mock sockets. The dynamic import sits behind a build-time constant,
-// so production bundles never include the mock layer.
-if (import.meta.env.DEV && import.meta.env.VITE_MOCK_SOCKETS === 'true') {
-  void import('@shared/websocket/mock')
-    .then(({ installMockSockets }) => installMockSockets())
-    .finally(() => render(container));
-} else {
-  render(container);
+// Development-only mock layers. Each dynamic import sits behind a build-time constant,
+// so production bundles never include them. REST and sockets switch independently.
+async function installDevMocks(): Promise<void> {
+  if (!import.meta.env.DEV) return;
+  if (import.meta.env.VITE_MOCK_API === 'true') {
+    const { installMockApi } = await import('@shared/api/mock');
+    installMockApi();
+  }
+  if (import.meta.env.VITE_MOCK_SOCKETS === 'true') {
+    const { installMockSockets } = await import('@shared/websocket/mock');
+    installMockSockets();
+  }
 }
+
+void installDevMocks().finally(() => render(container));

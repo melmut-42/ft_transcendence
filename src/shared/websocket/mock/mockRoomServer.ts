@@ -63,6 +63,15 @@ export interface MockPlayer {
   username: string;
 }
 
+/** Simulated players, using the same ids and names as the Bruno examples. */
+export const MOCK_BOTS = {
+  redAgent: { user_id: 43, username: 'red_agent' },
+  blueMaster: { user_id: 44, username: 'blue_master' },
+  blueAgent: { user_id: 45, username: 'blue_agent' },
+  extraRed: { user_id: 46, username: 'extra_red' },
+  lateJoiner: { user_id: 47, username: 'night_owl' },
+} as const satisfies Record<string, MockPlayer>;
+
 /** A rejected mock action, mirroring the WebSocket error envelope's `code`/`message`. */
 export class MockActionError extends Error {
   readonly code: WsErrorCode | 'ROOM_FULL';
@@ -81,6 +90,18 @@ export class MockActionError extends Error {
 }
 
 const other = (team: Team): Team => (team === 'RED' ? 'BLUE' : 'RED');
+
+/** Small seeded PRNG (mulberry32) so a room's board and starting team are reproducible. */
+function seededRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4_294_967_296;
+  };
+}
 const now = (): string => new Date().toISOString();
 
 export class MockRoomServer implements MockServerBinding {
@@ -94,19 +115,32 @@ export class MockRoomServer implements MockServerBinding {
   private eventSeq = 0;
   private readonly endpoints = new Set<MockEndpoint>();
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly random: () => number;
 
-  constructor(roomId: number, self: MockPlayer, maxPlayers: number = ROOM_CAPACITY.default) {
+  /**
+   * `initialMembers` seeds a room that other players already occupy (the first one is
+   * host) and leaves `self` outside it until `playerJoin(self)`. Omitted, `self`
+   * creates the room and hosts it.
+   */
+  constructor(
+    roomId: number,
+    self: MockPlayer,
+    maxPlayers: number = ROOM_CAPACITY.default,
+    initialMembers: MockPlayer[] = [self],
+  ) {
     this.roomId = roomId;
     this.self = self;
+    this.random = seededRandom(roomId);
     const createdAt = now();
+    const host = initialMembers[0] ?? self;
     this.room = {
       room_id: roomId,
       status: 'WAITING',
-      host_user_id: self.user_id,
-      player_count: 1,
+      host_user_id: host.user_id,
+      player_count: initialMembers.length,
       max_players: maxPlayers,
       startable: false,
-      players: [this.newMember(self, true, createdAt)],
+      players: initialMembers.map((p) => this.newMember(p, p.user_id === host.user_id, createdAt)),
       game: null,
       created_at: createdAt,
     };
@@ -158,6 +192,15 @@ export class MockRoomServer implements MockServerBinding {
     });
   }
 
+  /** Role-safe snapshot as `self` receives it — what REST `Get room snapshot` returns. */
+  snapshot(): Room {
+    return this.projectRoom();
+  }
+
+  hasMember(userId: number): boolean {
+    return this.find(userId) !== undefined;
+  }
+
   /* ---------------------------- other players act --------------------------- */
 
   playerJoin(player: MockPlayer): Room {
@@ -205,8 +248,9 @@ export class MockRoomServer implements MockServerBinding {
     if (wasInGame && member.team) {
       this.finish(other(member.team), 'PLAYER_FORFEIT', null, userId);
     } else {
-      this.queue('room.player.left', this.membershipPayload(member));
+      // Contract order during COUNTDOWN: cancelled, then left, then the snapshot.
       if (this.room.status === 'COUNTDOWN') this.cancelCountdown('PLAYER_LEFT', userId);
+      this.queue('room.player.left', this.membershipPayload(member));
       this.recheckStart(userId);
       this.queueState();
     }
@@ -244,17 +288,13 @@ export class MockRoomServer implements MockServerBinding {
    * player's seat on RED.
    */
   configureStartable(selfRole: RoomRole = 'OPERATIVE'): Room {
-    const bots: MockPlayer[] = [
-      { user_id: 9001, username: 'red_agent' },
-      { user_id: 9002, username: 'blue_master' },
-      { user_id: 9003, username: 'blue_agent' },
-    ];
+    const bots: MockPlayer[] = [MOCK_BOTS.redAgent, MOCK_BOTS.blueMaster, MOCK_BOTS.blueAgent];
     for (const bot of bots) if (!this.find(bot.user_id)) this.playerJoin(bot);
     const seats: [number, Team, RoomRole][] = [
       [this.self.user_id, 'RED', selfRole],
-      [9001, 'RED', selfRole === 'SPYMASTER' ? 'OPERATIVE' : 'SPYMASTER'],
-      [9002, 'BLUE', 'SPYMASTER'],
-      [9003, 'BLUE', 'OPERATIVE'],
+      [MOCK_BOTS.redAgent.user_id, 'RED', selfRole === 'SPYMASTER' ? 'OPERATIVE' : 'SPYMASTER'],
+      [MOCK_BOTS.blueMaster.user_id, 'BLUE', 'SPYMASTER'],
+      [MOCK_BOTS.blueAgent.user_id, 'BLUE', 'OPERATIVE'],
     ];
     const seated = new Set(seats.map(([id]) => id));
     // Everyone else becomes an Operative so no Spymaster seat is contested.
@@ -526,7 +566,7 @@ export class MockRoomServer implements MockServerBinding {
         this.queue('room.countdown.tick', { seconds_remaining: left });
       } else {
         this.stopCountdownTimer();
-        this.beginGame(Math.random() < 0.5 ? 'RED' : 'BLUE');
+        this.beginGame(this.random() < 0.5 ? 'RED' : 'BLUE');
       }
       this.flush();
     }, 1_000);
@@ -546,7 +586,11 @@ export class MockRoomServer implements MockServerBinding {
       ...Array<CardColor>(7).fill('NEUTRAL'),
       'ASSASSIN',
     ];
-    this.hiddenColors = colors.sort(() => Math.random() - 0.5);
+    for (let i = colors.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(this.random() * (i + 1));
+      [colors[i], colors[j]] = [colors[j] as CardColor, colors[i] as CardColor];
+    }
+    this.hiddenColors = colors;
     this.room.status = 'IN_GAME';
     delete this.room.countdown;
     this.room.players.forEach((p) => (p.ready = false));

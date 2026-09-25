@@ -75,7 +75,28 @@ function runRefresh(): Promise<boolean> {
   return inFlightRefresh;
 }
 
-async function send(path: string, options: ApiRequestOptions): Promise<Response> {
+/**
+ * Transport seam for REST calls, mirroring the WebSocket transport factory.
+ *
+ * The default sends a real `fetch` to the same-origin `/api` prefix. A development
+ * build can install the mock REST layer (`shared/api/mock`), which answers with real
+ * `Response` objects in the documented envelopes, so everything above this seam —
+ * envelope unwrapping, error normalization, silent refresh — runs unchanged.
+ */
+export type RequestTransport = (path: string, options: ApiRequestOptions) => Promise<Response>;
+
+let activeTransport: RequestTransport = fetchTransport;
+
+/** Replace the REST transport. `null` restores the browser `fetch` one. */
+export function setRequestTransport(transport: RequestTransport | null): void {
+  activeTransport = transport ?? fetchTransport;
+}
+
+function send(path: string, options: ApiRequestOptions): Promise<Response> {
+  return activeTransport(path, options);
+}
+
+async function fetchTransport(path: string, options: ApiRequestOptions): Promise<Response> {
   const { method = 'GET', body, formData, query, signal } = options;
 
   const headers: Record<string, string> = { Accept: 'application/json' };
