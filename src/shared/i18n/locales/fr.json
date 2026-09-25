@@ -70,5 +70,53 @@
 			"toolTip": "Dépôt GitHub (s'ouvre dans un nouvel onglet)",
 			"repositoryLink": "ft_transcendence"
 		}
+	},
+	"terms": {
+		"title": "Conditions d'utilisation",
+		"lastUpdated": "Dernière mise à jour : 25 septembre 2026",
+		"about": {
+			"title": "À propos du projet",
+			"body": "Codenames Online est une application web multijoueur indépendante et à visée pédagogique, développée par des étudiants de 42 dans le cadre du projet ft_transcendence. En utilisant l'application, vous acceptez les présentes Conditions d'utilisation. L'application s'inspire de la mécanique de jeu d'association de mots de Codenames. Ce projet n'est ni un produit, ni un service, ni une filiale, ni une application officielle ou approuvée de Czech Games Edition (CGE) ou de la marque Codenames."
+		},
+		"accounts": {
+			"title": "Comptes et responsabilités",
+			"body": "Vous êtes responsable de veiller à ce que les informations fournies lors de la création de votre compte soient exactes et tenues à jour. Vous êtes responsable de toute activité effectuée depuis votre compte ainsi que de la confidentialité de votre nom d'utilisateur et de votre mot de passe. Vous ne devez pas partager votre mot de passe avec d'autres personnes et devez éviter de réutiliser un mot de passe que vous utilisez sur d'autres services. Un compte est destiné à un usage individuel ; le partage de comptes est interdit."
+		},
+		"acceptableUse": {
+			"title": "Utilisation acceptable",
+			"introduction": "En utilisant l'application, vous vous engagez à ne pas :",
+			"harassment": "Harceler, menacer ou insulter d'autres utilisateurs, ni publier de contenu haineux, discriminatoire, offensant ou illicite.",
+			"cheating": "Utiliser des triches, des bots ou des outils d'automatisation, ou exploiter des bugs, afin d'obtenir un avantage déloyal dans les parties.",
+			"impersonation": "Usurper l'identité d'une autre personne ou fournir de fausses informations sur votre lien avec une personne ou une organisation.",
+			"unauthorizedAccess": "Tenter d'accéder sans autorisation aux comptes d'autres utilisateurs, aux systèmes de l'application ou à ses données.",
+			"disruption": "Perturber, surcharger ou entraver le fonctionnement normal de l'application, notamment par l'envoi de spam ou des tentatives d'attaque par déni de service.",
+			"avatarContent": "Utiliser, dans l'image d'avatar que vous téléversez, du contenu offensant, haineux, obscène, portant atteinte aux droits d'auteur ou violant les droits d'autrui."
+		},
+		"userContentAndIP": {
+			"title": "Contenu des utilisateurs et propriété intellectuelle",
+			"userContent": "Vous conservez les droits sur les images d'avatar que vous téléversez et sur les messages de discussion que vous envoyez. Toutefois, afin que l'application puisse fonctionner, vous accordez à l'équipe du projet une licence limitée et non exclusive pour stocker, traiter et afficher ce contenu aux utilisateurs concernés. Vous garantissez disposer du droit d'utiliser le contenu que vous téléversez et que celui-ci ne porte pas atteinte aux droits de tiers.",
+			"intellectualProperty": "Le code source de l'application, la conception de l'interface utilisateur, les avatars par défaut et les autres ressources sont soumis à leurs licences et exigences d'attribution respectives. Les informations relatives à la source et à la licence des ressources tierces utilisées sont documentées dans le dépôt du projet."
+		},
+		"enforcement": {
+			"title": "Suspension, résiliation et durée de vie du projet",
+			"restriction": "En cas de violation des présentes Conditions d'utilisation, ou si la sécurité d'autres utilisateurs ou le bon fonctionnement de l'application sont mis en danger, l'équipe du projet peut restreindre l'accès à votre compte, le suspendre ou le résilier.",
+			"deletionRequest": "Comme indiqué dans la Politique de confidentialité, vous pouvez demander à l'équipe du projet de supprimer votre compte et les données associées.",
+			"projectLifetime": "Ce projet est réalisé à des fins pédagogiques et d'évaluation. L'application et son serveur peuvent être arrêtés une fois le processus d'évaluation du projet ft_transcendence terminé."
+		},
+		"disclaimer": {
+			"title": "Fourniture du service et avertissement",
+			"availability": "L'application est fournie « telle quelle », dans le cadre d'un projet éducatif étudiant. Aucune garantie, expresse ou implicite, n'est donnée quant à une disponibilité ininterrompue, l'absence d'erreurs, une accessibilité permanente ou une adéquation à un usage particulier.",
+			"liability": "Dans la mesure permise par la loi applicable, l'équipe du projet ne pourra être tenue responsable de tout dommage indirect, accessoire ou consécutif résultant de l'utilisation ou de l'impossibilité d'utiliser l'application."
+		},
+		"changes": {
+			"title": "Modifications de ces conditions",
+			"body": "Les présentes Conditions d'utilisation peuvent être mises à jour à mesure que les fonctionnalités et le périmètre technique de l'application évoluent. La version en vigueur est toujours publiée sur la page Conditions d'utilisation de l'application."
+		},
+		"contact": {
+			"title": "Contact",
+			"body": "Pour toute question ou demande concernant les présentes Conditions d'utilisation, vous pouvez contacter l'équipe du projet via le dépôt GitHub ou via l'intra de 42.",
+			"tooltip": "Dépôt GitHub (s'ouvre dans un nouvel onglet)",
+			"repositoryLink": "Dépôt GitHub de ft_transcendence"
+		}
 	}
 }

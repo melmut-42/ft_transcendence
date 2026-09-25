@@ -1,0 +1,38 @@
+.header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: var(--z-overlay);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: var(--space-4) var(--space-5);
+}
+
+.header--public {
+  background: var(--bg);
+}
+
+.header--minimal {
+  background: transparent;
+}
+
+.header__brand {
+  color: var(--ink);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+/*
+ * LanguageSelector normalde kendi başına sağ üstte fixed duruyordu.
+ * Header içine girdiğinde bu konumu Header yönetir.
+ */
+.header .language-selector {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: auto;
+}

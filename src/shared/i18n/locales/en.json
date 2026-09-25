@@ -10,7 +10,6 @@
 	"i18n": {
 		"ready": "Multilingual infrastructure is working."
 	},
-
 	"footer": {
 		"privacyPolicy": "Privacy Policy",
 		"termsOfService": "Terms of Service",
@@ -70,6 +69,54 @@
 			"body": "For privacy-related questions and requests, you can contact the project team via the GitHub repository or through 42 intra.",
 			"toolTip": "GitHub repository (opens in a new tab)",
 			"repositoryLink": "ft_transcendence"
+		}
+	},
+	"terms": {
+		"title": "Terms of Service",
+		"lastUpdated": "Last updated: September 25, 2026",
+		"about": {
+			"title": "About the project",
+			"body": "Codenames Online is an independent, educational multiplayer web application developed by 42 students as part of the ft_transcendence project. By using the application, you agree to these Terms of Service. The application is inspired by the word-association gameplay of Codenames. This project is not an official product, service, affiliate, or endorsed application of Czech Games Edition (CGE) or the Codenames brand."
+		},
+		"accounts": {
+			"title": "Accounts and responsibilities",
+			"body": "You are responsible for ensuring that the information you provide when creating your account is accurate and kept up to date. You are responsible for all activity carried out through your account and for keeping your username and password confidential. You must not share your password with others and should avoid reusing a password you use on other services. An account is intended for use by a single user; sharing accounts is not allowed."
+		},
+		"acceptableUse": {
+			"title": "Acceptable use",
+			"introduction": "When using the application, you agree not to:",
+			"harassment": "Harass, threaten, or abuse other users, or post hateful, discriminatory, offensive, or unlawful content.",
+			"cheating": "Use cheats, bots, or automation tools, or exploit bugs, to gain an unfair advantage in games.",
+			"impersonation": "Impersonate another person or misrepresent your affiliation with any person or organization.",
+			"unauthorizedAccess": "Attempt to gain unauthorized access to other users' accounts, the application's systems, or its data.",
+			"disruption": "Disrupt, overload, or interfere with the normal operation of the application, including spamming or denial-of-service attempts.",
+			"avatarContent": "Use offensive, hateful, obscene, copyright-infringing content, or content that violates the rights of others, in your uploaded avatar image."
+		},
+		"userContentAndIP": {
+			"title": "User content and intellectual property",
+			"userContent": "You retain the rights to the avatar images you upload and the chat messages you send. However, for the application to function, you grant the project team a limited, non-exclusive license to store, process, and display this content to relevant users. You represent that you have the right to use the content you upload and that it does not infringe the rights of any third party.",
+			"intellectualProperty": "The application's source code, user interface design, default avatars, and other assets are subject to their applicable licenses and attribution requirements. Source and license information for any third-party assets used is documented in the project repository."
+		},
+		"enforcement": {
+			"title": "Suspension, termination, and project lifetime",
+			"restriction": "If these Terms of Service are violated, or if the safety of other users or the operation of the application is put at risk, the project team may restrict access to, suspend, or terminate your account.",
+			"deletionRequest": "As described in the Privacy Policy, you may request the project team to delete your account and associated data.",
+			"projectLifetime": "This project is for educational and evaluation purposes. The application and its server may be shut down once the ft_transcendence evaluation process is completed."
+		},
+		"disclaimer": {
+			"title": "Service provision and disclaimer",
+			"availability": "The application is provided \"as is\", as part of an educational student project. No warranty, express or implied, is given that the application will be uninterrupted, error-free, always accessible, or fit for a particular purpose.",
+			"liability": "To the extent permitted by applicable law, the project team shall not be held liable for any indirect, incidental, or consequential damages arising from the use of, or inability to use, the application."
+		},
+		"changes": {
+			"title": "Changes to these terms",
+			"body": "These Terms of Service may be updated as the application's features and technical scope evolve. The current version is always published on the in-app Terms of Service page."
+		},
+		"contact": {
+			"title": "Contact",
+			"body": "For questions or requests regarding these Terms of Service, you can contact the project team via the GitHub repository or through 42 intra.",
+			"tooltip": "GitHub repository (opens in a new tab)",
+			"repositoryLink": "ft_transcendence GitHub repository"
 		}
 	}
 }

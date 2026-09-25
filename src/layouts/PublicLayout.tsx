@@ -1,6 +1,8 @@
 import { Outlet } from 'react-router-dom';
 
 import { Footer } from './Footer';
+import { Header } from './Header';
+
 
 //import './PublicLayout.css';
 
@@ -8,8 +10,10 @@ import { Footer } from './Footer';
 /** Unauthenticated shell: landing, login, register, privacy, terms. No chat widget. */
 export function PublicLayout() {
   return (
-    <div className="layout layout--public">
-      <main>
+    <div className="min-h-screen flex flex-col">
+      <Header variant="public" />
+      
+      <main className="flex-1 pt-16">
         <Outlet />
       </main>
       <Footer />
