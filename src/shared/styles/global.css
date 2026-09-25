@@ -1,6 +1,6 @@
 /*
- * Global base layer. Everything beyond this is component-scoped CSS colocated with the
- * component that owns it (`shared/ui/*` and each feature's `components/`).
+ * Global base layer. Components style themselves with Tailwind utility classes; the
+ * theme in `tailwind.css` maps those utilities onto the tokens in `tokens.css`.
  */
 
 @import './tokens.css';

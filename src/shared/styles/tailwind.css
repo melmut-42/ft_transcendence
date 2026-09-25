@@ -1,0 +1,74 @@
+/*
+ * Tailwind entry point. The theme maps Tailwind utilities onto the design tokens in
+ * `tokens.css`, so classes such as `bg-surface`, `text-team-red`, `p-4` or `rounded-md`
+ * resolve to the shared design values. Preflight is disabled; `reset.css` is the only reset.
+ */
+
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme) theme(reference);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@theme inline {
+  --color-*: initial;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-blue: var(--blue);
+  --color-blue-dark: var(--blue-dark);
+  --color-coral: var(--coral);
+  --color-coral-dark: var(--coral-dark);
+  --color-mint: var(--mint);
+  --color-yellow: var(--yellow);
+  --color-team-red: var(--team-red);
+  --color-team-red-strong: var(--team-red-strong);
+  --color-team-blue: var(--team-blue);
+  --color-team-blue-strong: var(--team-blue-strong);
+  --color-card-neutral: var(--card-neutral);
+  --color-card-assassin: var(--card-assassin);
+  --color-card-hidden: var(--card-hidden);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-focus-ring: var(--focus-ring);
+  --color-white: #fff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-sans: var(--font-family-base);
+  --font-weight-regular: var(--font-weight-regular);
+  --font-weight-bold: var(--font-weight-bold);
+  --font-weight-black: var(--font-weight-black);
+
+  --text-xs: var(--font-size-xs);
+  --text-sm: var(--font-size-sm);
+  --text-md: var(--font-size-md);
+  --text-lg: var(--font-size-lg);
+  --text-xl: var(--font-size-xl);
+  --text-2xl: var(--font-size-2xl);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow);
+
+  --z-index-chat: var(--z-chat);
+  --z-index-modal: var(--z-modal);
+  --z-index-overlay: var(--z-overlay);
+  --z-index-toast: var(--z-toast);
+
+  /* `p-1`..`p-7` follow the token spacing scale rather than Tailwind's 4px multiplier. */
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-7: var(--space-7);
+}
