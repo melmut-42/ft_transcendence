@@ -76,7 +76,7 @@ export function PrivacyPage() {
 				<a
 					href="https://github.com/melmut-42/ft_transcendence"
 					className="tooltip-link"
-					data-tooltip={t('privacy.contact.tooltip')}
+					data-tooltip={t('privacy.contact.toolTip')}
 					target="_blank"
 					rel="external noopener noreferrer"
 				>

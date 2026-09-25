@@ -10,6 +10,11 @@
 	"i18n": {
 		"ready": "L'infrastructure multilingue fonctionne."
 	},
+	"footer": {
+		"privacyPolicy": "Politique de confidentialité",
+		"termsOfService": "Conditions d'utilisation",
+		"navigation": "Légal"
+	},
 	"privacy": {
 		"title": "Politique de confidentialité",
 		"lastUpdated": "Dernière mise à jour : 24 septembre 2026",

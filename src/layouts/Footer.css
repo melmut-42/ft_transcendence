@@ -1,0 +1,30 @@
+.footer {
+  margin-top: auto;
+  padding: var(--space-4) var(--space-5);
+}
+
+.footer__legal-links {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer__link {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+}
+
+.footer__link:hover {
+  color: var(--blue-dark);
+}
+
+.footer__link[aria-current='page'] {
+  color: var(--ink);
+  font-weight: var(--font-weight-black);
+}

@@ -10,6 +10,12 @@
 	"i18n": {
 		"ready": "Multilingual infrastructure is working."
 	},
+
+	"footer": {
+		"privacyPolicy": "Privacy Policy",
+		"termsOfService": "Terms of Service",
+		"navigation": "Legal"
+	},
 	"privacy": {
 		"title": "Privacy Policy",
 		"lastUpdated": "Last updated: September 24, 2026",

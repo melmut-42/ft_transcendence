@@ -10,6 +10,11 @@
   "i18n": {
 	"ready": "Çok dilli altyapı çalışıyor."
   },
+  "footer": {
+	"privacyPolicy": "Gizlilik Politikası",
+	"termsOfService": "Hizmet Şartları",
+	"navigation": "Legal"
+  },
   "privacy": {
 	"title": "Gizlilik Politikası",
 	"lastUpdated": "Son güncelleme: 24 Eylül 2026",

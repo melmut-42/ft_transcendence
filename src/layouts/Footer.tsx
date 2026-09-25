@@ -1,19 +1,24 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { ROUTES } from '@shared/constants';
 
-/**
- * Footer present on every layout, public and authenticated.
- *
- * The Privacy and Terms links are subject-mandatory; their absence is a rejection
- * risk, so the footer is part of the layout foundation rather than a page detail.
- */
+import './Footer.css';
+
 export function Footer() {
+  const { t } = useTranslation();
+
   return (
-    <footer>
-      <nav aria-label="Legal">
-        <Link to={ROUTES.privacy}>Privacy Policy</Link>
-        <Link to={ROUTES.terms}>Terms of Service</Link>
+    <footer className="footer">
+      <nav aria-label={t('footer.navigation')}>
+        <ul className="footer__legal-links">
+          <li>
+            <NavLink className="footer__link"  to={ROUTES.privacy}>{t('footer.privacyPolicy')}</NavLink>
+          </li>
+          <li>
+            <NavLink className="footer__link" to={ROUTES.terms}>{t('footer.termsOfService')}</NavLink>
+          </li>
+        </ul>
       </nav>
     </footer>
   );
