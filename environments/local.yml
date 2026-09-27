@@ -3,7 +3,11 @@ variables:
   - name: apiVersion
     value: "v1"
     type: string
-    description: "Version prefix shared by REST and WebSocket endpoints"
+    description: "Stable legacy REST and WebSocket contract prefix"
+  - name: gameApiVersion
+    value: "v2"
+    type: string
+    description: "Version prefix for the new room and game lifecycle contracts"
   - name: chatApiVersion
     value: "v2"
     type: string
@@ -17,9 +21,9 @@ variables:
     type: string
     description: "Local Game Gateway WebSocket origin"
   - name: chatWsUrl
-    value: "ws://localhost:3001"
+    value: "ws://localhost:3000"
     type: string
-    description: "Local Chat Gateway WebSocket origin"
+    description: "Same-origin Chat Gateway route through the local reverse proxy"
   - name: userId
     value: "42"
     type: number
