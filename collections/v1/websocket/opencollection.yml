@@ -1,7 +1,7 @@
 opencollection: 1.0.0
 
 info:
-  name: WebSocket
+  name: WebSocket v1
   version: 1.2.0-dev
 config:
   proxy:
@@ -17,13 +17,13 @@ config:
 
 docs:
   content: |-
-    # ft_transcendence WebSocket Protocol
+    # ft_transcendence WebSocket Protocol v1
 
     ## Connection
 
     Connect to `{{wsUrl}}/ws/{{apiVersion}}/rooms/{{roomId}}` (room socket) or `{{wsUrl}}/ws/{{apiVersion}}/chat` (per-user chat socket, see `08 - Chat`). The session must be active; for the room socket the user must already belong to the room through REST. Authentication is never placed in the URL.
 
-    Chat v2 is additive and connects to the independent Chat Gateway at `{{chatWsUrl}}/ws/{{chatApiVersion}}/channels`; see `09 - Chat Gateway v2`. The existing `/ws/v1/chat` contract remains unchanged.
+    Durable Chat v2 is documented in the separate `Chat WebSocket v2` collection. The existing `/ws/v1/chat` contract in this collection remains unchanged.
 
     ## Authentication
 
@@ -35,7 +35,7 @@ docs:
 
     ## Reconnect (canonical snapshot)
 
-    `room.state` is the one authoritative initial/reconnect snapshot for the room socket. It embeds `game` whenever `room.status` is `IN_GAME` or `FINISHED`, so a client never needs a second recovery message type for that case. `game.state` (see the event matrix) is the Game Session-internal payload shape reused inside that embed — not a separate recovery path a client requests independently; a client that has `room.state` never needs to additionally fetch `game.state`. On reconnect, do not attempt to replay missed incremental events — apply the fresh snapshot and discard prior local state.
+    `room.state` is the one authoritative initial/reconnect snapshot for the room socket. It embeds `game` whenever `room.status` is `IN_GAME` or `FINISHED`, so a client never needs a second recovery message type. On reconnect, do not attempt to replay missed incremental events — apply the fresh snapshot and discard prior local state.
 
     ## Envelopes and ordering
 
@@ -63,7 +63,6 @@ docs:
     | `room.countdown.tick` | S to C | `COUNTDOWN` | server | remaining `2`, `1`, `0` |
     | `room.countdown.cancelled` | S to C | `WAITING` | server | invariant broke |
     | `game.started` | S to C | `IN_GAME` | recipient projection | complete role-safe game |
-    | `game.state` | S to C | `IN_GAME`, `FINISHED` | recipient projection | recovery snapshot |
     | `game.clue.submitted` | S to C | `IN_GAME / GUESSING` | server | public clue |
     | `game.card.revealed` | S to C | `IN_GAME`, `FINISHED` | recipient projection | reveal result |
     | `game.score.updated` | S to C | `IN_GAME`, `FINISHED` | server | revealed team totals |
@@ -88,7 +87,6 @@ docs:
 
     `03 - Ready & Countdown` contains minimum valid room, countdown, and cancellation. `07 - Full State Scenarios` contains full Spymaster and Operative boards. `04 - Game` contains clue, own-team continuation, last-guess turn end, own-team victory, opponent turn end, opponent final-card victory, neutral, assassin, pass, and invalid-action cases. `08 - Chat` contains the per-user chat socket's send/receive and permission-error cases.
 
-    `09 - Chat Gateway v2` contains durable channel messaging through RabbitMQ and the independent gateway.
   type: text/markdown
 bundled: false
 extensions: {}

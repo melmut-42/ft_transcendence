@@ -1,7 +1,7 @@
 opencollection: 1.0.0
 
 info:
-  name: REST API
+  name: REST API v1
   version: 1.2.0-dev
 config:
   proxy:
@@ -17,7 +17,7 @@ config:
 
 docs:
   content: |-
-    # ft_transcendence REST API
+    # ft_transcendence REST API v1
 
     ## Transport and session
 
@@ -51,9 +51,6 @@ docs:
     | `GET` | `/api/v1/friends` | List friends with snapshot presence | yes | active session |
     | `POST` | `/api/v1/friends` | Add a friend (immediate, mutual) | yes | target user exists, not self |
     | `DELETE` | `/api/v1/friends/{user_id}` | Remove a friend | yes | friendship exists |
-    | `GET` | `/api/v2/channels` | List Chat v2 direct channels | yes | active session |
-    | `POST` | `/api/v2/channels/direct` | Resolve/create a Chat v2 direct channel | yes | friend or shared active room |
-    | `GET` | `/api/v2/channels/{channel_id}/messages` | Read retained Chat v2 history | yes | channel member |
 
     ## Status conventions
 
@@ -75,7 +72,6 @@ docs:
     - Room-code join preview: `03 - Rooms/Lookup room by code`
     - Countdown and both role projections: WebSocket `07 - Full State Scenarios`
     - Clue and all reveal outcomes, plus forfeit: WebSocket `04 - Game`
-    - Durable Chat v2 channels and retained history: `06 - Channels v2`
 
     ## Environment
 

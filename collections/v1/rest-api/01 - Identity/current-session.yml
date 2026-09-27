@@ -14,7 +14,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Resolves the `ft_session` credential (from Register, Login, or Refresh) to its user and current room membership, derived live from Game Session's authoritative membership index (`workspace.yml`, State Ownership) — never a stale cached value. A valid unexpired `ft_session` cookie is required; this is also the endpoint frontend route recovery calls on bootstrap to decide which screen to show (Routing Recovery).
+  Resolves the `ft_session` credential (from Register, Login, or Refresh) to its user and current room membership, derived live from Game Session's authoritative membership index (`workspace.yml`, State Ownership) — never a stale cached value. A valid unexpired `ft_session` cookie is required; this is also the endpoint frontend route recovery calls on bootstrap to decide which screen and protocol version to restore.
 
   ## Request parameters
 
@@ -32,6 +32,7 @@ docs: |-
   | `data.user.user_id` | integer | yes | no | positive | Authenticated user |
   | `data.user.username` | string | yes | no | username rule | Stored display username |
   | `data.active_room_id` | integer or null | yes | yes | positive or `null` | Current live room membership (from Game Session's membership index), never a permanent profile field |
+  | `data.active_room_api_version` | string enum or null | yes | yes | `v1`, `v2`, or `null` | REST/room-WebSocket pair the frontend must restore; null exactly when `active_room_id` is null |
   | `data.session_expires_at` | `string<date-time>` | yes | no | ISO 8601 UTC | `ft_session` expiry |
 
   ## State changes, events, and errors
@@ -53,6 +54,7 @@ examples:
                 "username": "player_one"
               },
               "active_room_id": null,
+              "active_room_api_version": null,
               "session_expires_at": "2026-09-10T09:10:01Z"
             }
           }
@@ -71,6 +73,7 @@ examples:
                 "username": "player_one"
               },
               "active_room_id": 1001,
+              "active_room_api_version": "v2",
               "session_expires_at": "2026-09-10T09:10:01Z"
             }
           }

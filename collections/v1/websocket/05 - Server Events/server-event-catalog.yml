@@ -45,7 +45,6 @@ docs: |-
   | `room.countdown.tick` | `seconds_remaining` | server timer | common |
   | `room.countdown.cancelled` | `reason`, `changed_by_user_id` | predicate becomes false | common |
   | `game.started` | `room` containing `game` | valid countdown reaches zero | role-safe board |
-  | `game.state` | `room` containing `game` | internal shape reused inside `room.state.payload.room.game` when `IN_GAME`/`FINISHED` — not a separate client-requested recovery event; `room.state` is the one canonical reconnect snapshot (`opencollection.yml`, Reconnect) | role-safe board |
   | `game.clue.submitted` | `game_id`, actor, team, clue, guesses, turn | accepted clue | common |
   | `game.card.revealed` | game/card/actor/team/score/turn/result | accepted guess | role-safe board delta |
   | `game.score.updated` | `game_id`, `score`, `changed_color` | RED or BLUE reveal | common |

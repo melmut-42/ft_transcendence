@@ -43,7 +43,7 @@ docs: |-
 
   ```json
   {
-    "type":"game.state",
+    "type":"room.state",
     "event_id":"evt_0183",
     "room_id":1001,
     "sent_at":"2026-09-10T08:50:01Z",

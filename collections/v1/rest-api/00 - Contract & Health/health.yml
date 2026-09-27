@@ -16,7 +16,7 @@ runtime:
         test("returns the development contract version", function () {
           expect(res.status).to.equal(200);
           expect(res.body.data.status).to.equal("OK");
-          expect(res.body.data.contract_version).to.equal("1.0.0-dev");
+          expect(res.body.data.contract_version).to.equal("1.2.0-dev");
         });
 docs: |-
   # Health and contract version
@@ -40,7 +40,7 @@ docs: |-
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
   | `data.status` | string enum | yes | no | `OK` | Process is serving requests |
-  | `data.contract_version` | string | yes | no | `1.0.0-dev` | Implemented contract revision |
+  | `data.contract_version` | string | yes | no | `1.2.0-dev` | Implemented contract revision; matches the REST API v1 collection metadata |
   | `data.server_time` | `string<date-time>` | yes | no | ISO 8601 UTC | Server clock at response creation |
 
   ## State changes and events
@@ -72,7 +72,7 @@ examples:
           {
             "data": {
               "status": "OK",
-              "contract_version": "1.0.0-dev",
+              "contract_version": "1.2.0-dev",
               "server_time": "2026-09-10T08:40:00Z"
             }
           }

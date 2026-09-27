@@ -1,0 +1,8 @@
+info:
+  name: 06 - Errors
+  type: folder
+  seq: 6
+docs: |-
+  # WebSocket errors
+
+  Errors correlate to the rejected `request_id`, contain a concrete code and message, and normally leave state unchanged while keeping the socket open. Handshake failures occur as HTTP responses before the WebSocket opens. An authenticated socket may close after explicit session invalidation (`4401`), lost room authorization (`4403`/`4404`), or repeated protocol abuse; those terminal cases are the documented exceptions.
