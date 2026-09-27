@@ -1,0 +1,48 @@
+﻿info:
+  name: Post-game event reference
+  type: websocket
+  seq: 5
+  tags: [server-event, room, post-game]
+websocket:
+  url: "{{wsUrl}}/ws/{{gameApiVersion}}/rooms/{{roomId}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Post-game events and timeout
+
+  A terminal result emits `game.ended`, then `room.post_game.started`. The latter carries one absolute deadline; the server does not emit per-second ticks.
+
+  ```json
+  {
+    "type": "room.post_game.started",
+    "event_id": "evt_0501",
+    "room_id": 1001,
+    "sent_at": "2026-09-10T08:52:00Z",
+    "payload": {
+      "game_id": 5001,
+      "deadline_at": "2026-09-10T08:53:00Z",
+      "pending_user_ids": [42, 43, 44, 45]
+    }
+  }
+  ```
+
+  The default decision window is 60 seconds and is server-configurable. Disconnect does not pause or extend it. Reconnect before the deadline returns the recipient's result projection and remaining absolute deadline.
+
+  At the deadline every member still in `POST_GAME` is removed with `room.player.left.payload.reason = POST_GAME_TIMEOUT`. If no members remain the room becomes `CLOSED`; otherwise it remains `WAITING`. After the first Back to Lobby, shared status never falls back to `POST_GAME`, even if every returned member exits before this cleanup. Whenever the pending set becomes empty—by return, Exit, kick, or timeout—the cause-specific event(s) come first, then the server emits `room.post_game.completed`, then one final recipient-specific `room.state` to remaining members. If the room closes empty, no socket remains to receive that final snapshot.
+
+  ```json
+  {
+    "type": "room.post_game.completed",
+    "event_id": "evt_0509",
+    "room_id": 1001,
+    "sent_at": "2026-09-10T08:53:00Z",
+    "payload": {
+      "room_status": "WAITING",
+      "remaining_member_ids": [42, 43]
+    }
+  }
+  ```
+
+  New countdown is forbidden while any current member remains `POST_GAME`.
+examples: []

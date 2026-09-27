@@ -1,0 +1,106 @@
+﻿info:
+  name: Connect to room stream
+  type: websocket
+  seq: 1
+  tags: [connection, smoke]
+websocket:
+  url: "{{wsUrl}}/ws/{{gameApiVersion}}/rooms/{{roomId}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Connect to room stream
+
+  ## Authentication (secure session cookie)
+
+  Authentication is cookie-only. The handshake authenticates via the HttpOnly, `Secure`, `SameSite=Lax` `ft_session` cookie set by Register/Login/Refresh — the client attaches it automatically on the upgrade request, same-origin, no client code needed. No authentication header is sent; the server validates the cookie alone.
+
+  **Origin policy:** the server validates the upgrade request's `Origin` header against the deployment's own origin (the single public origin from `workspace.yml`'s Deployment / Same-Origin Model) and rejects the handshake with `403` before checking the cookie if it doesn't match. This is the WebSocket-specific cross-site protection that complements `SameSite=Lax` (which alone does not fully cover WebSocket upgrades in every browser).
+
+  **Multi-tab:** a user may open several authenticated sockets to the same room (e.g. two tabs) without creating a second seat — see `workspace.yml`, Multi-Tab / Multi-Socket. All of that user's sockets receive the same events; a disconnect only starts the reconnect grace period once the *last* of that user's sockets for this room closes.
+
+  ## Purpose
+
+  Opens the realtime channel for one REST-joined room. No subscription message is needed because `room_id` is in the path.
+
+  ## Preconditions and handshake parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | path | yes | integer | positive | no | Existing room already joined by user | `1001` |
+  | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
+
+  ## Success behavior
+
+  The server upgrades with HTTP `101 Switching Protocols`, then sends a recipient-specific `room.state`. An `IN_GAME` member receives the active role-safe board. A `POST_GAME` member receives the completed game plus `post_game.deadline_at`, even when another member already returned the shared room to `WAITING`. An `IN_LOBBY` member receives the current lobby plus `last_game`.
+
+  Initial event fields:
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `type` | string enum | yes | no | `room.state` | Snapshot event name |
+  | `event_id` | string | yes | no | unique in room stream | Ordering/correlation ID |
+  | `room_id` | integer | yes | no | positive | Subscribed room |
+  | `sent_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Event creation time |
+  | `payload.room` | object | yes | no | canonical room schema | Recipient-safe snapshot |
+
+  ## Failure behavior
+
+  | HTTP status | Code | Condition | Socket opens |
+  | --- | --- | --- | --- |
+  | `403` | (handshake rejected, no code) | `Origin` does not match the deployment's own origin | no |
+  | `401` | `UNAUTHORIZED` | missing, invalid, revoked, or expired token | no |
+  | `404` | `ROOM_NOT_FOUND` | path room does not exist | no |
+  | `403` | `NOT_ROOM_MEMBER` | authenticated user is not a member | no |
+  | `409` | `INVALID_ROOM_STATE` | room is `CLOSED` | no |
+
+  A transport disconnect starts reconnect grace: 30s in `WAITING`/`COUNTDOWN`, 60s in `IN_GAME`. Post-game is different: its shared 60s decision deadline continues while disconnected and is never extended by reconnect. A pending member reconnecting before `deadline_at` gets the result snapshot; after timeout the membership is gone and the handshake returns `403 NOT_ROOM_MEMBER`.
+
+  ## Concrete frames
+
+  First frame for the newly created fixture room:
+
+  ```json
+    {
+      "type": "room.state",
+      "event_id": "evt_0100",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:41:01Z",
+      "payload": {
+        "room": {
+          "room_id": 1001,
+          "status": "WAITING",
+          "host_user_id": 42,
+          "player_count": 1,
+          "max_players": 8,
+          "startable": false,
+          "players": [
+            {
+              "user_id": 42,
+              "username": "player_one",
+              "team": null,
+              "role": null,
+              "ready": false,
+              "state": "IN_LOBBY",
+              "is_host": true,
+              "joined_at": "2026-09-10T08:41:00Z"
+            }
+          ],
+          "game": null,
+          "created_at": "2026-09-10T08:41:00Z"
+        }
+      }
+    }
+  ```
+
+  Failed authentication body before upgrade:
+
+  ```json
+    {
+      "error": {
+        "code": "UNAUTHORIZED",
+        "message": "A valid active session is required.",
+        "details": {}
+      }
+    }
+  ```

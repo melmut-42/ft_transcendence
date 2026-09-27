@@ -1,0 +1,97 @@
+﻿info:
+  name: Return to lobby
+  type: websocket
+  seq: 3
+  tags: [action, room, post-game]
+websocket:
+  url: "{{wsUrl}}/ws/{{gameApiVersion}}/rooms/{{roomId}}"
+  message:
+    - title: Success - Return independently
+      selected: true
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.lobby.return",
+            "request_id": "req_0500",
+            "payload": {}
+          }
+docs: |-
+  # Return to lobby
+
+  Lets any `POST_GAME` member return independently; host privilege is not required. The first accepted command moves the shared room from `POST_GAME` to `WAITING`. Only the requester moves to member state `IN_LOBBY`; other undecided members remain `POST_GAME` and retain their result projection until they return, exit, are kicked, or reach the post-game deadline. Shared status is sticky after this first return: it remains `WAITING` even if all already-returned members subsequently leave, while the pending set and original deadline continue normally.
+
+  Returning preserves `room_id`, `room_code`, membership, host, team, and role. It hides the completed board/turn/score from that returned member's lobby projection and exposes the completed match there as `last_game`; the server still retains the role-safe completed-game projection for members who remain `POST_GAME`. Readiness resets to `false`. A new game is created only after every remaining member is `IN_LOBBY` and the ordinary start predicate becomes valid.
+
+  The requester independently regains access to the room's Chat v2 `ROOM` channel. Chat Gateway emits `chat.channel.access_changed` with `access:ACTIVE` and reason `BACK_TO_LOBBY`; members still in `POST_GAME` remain unable to list, read, or send to that channel.
+
+  Requester ack:
+
+  ```json
+  {
+    "type": "ack",
+    "request_id": "req_0500",
+    "ok": true,
+    "payload": {
+      "room_id": 1001,
+      "previous_game_id": 5001,
+      "room_status": "WAITING",
+      "member_state": "IN_LOBBY"
+    }
+  }
+  ```
+
+  Every room member receives `room.player.returned_to_lobby`. If this removes the final pending user, `room.post_game.completed` follows; the recipient-specific `room.state` is last. Otherwise `room.state` follows immediately:
+
+  ```json
+  {
+    "type": "room.player.returned_to_lobby",
+    "event_id": "evt_0500",
+    "room_id": 1001,
+    "sent_at": "2026-09-10T08:52:15Z",
+    "payload": {
+      "user_id": 43,
+      "previous_game_id": 5001,
+      "room_status": "WAITING",
+      "member_state": "IN_LOBBY"
+    }
+  }
+  ```
+
+  Shared state after user `43` returns first can contain mixed member states:
+
+  ```json
+  {
+    "room_id": 1001,
+    "room_code": "ABCD12",
+    "status": "WAITING",
+    "host_user_id": 42,
+    "player_count": 4,
+    "max_players": 8,
+    "startable": false,
+    "players": [
+      {"user_id":42,"username":"player_one","avatar_url":"/static/avatars/default/42.svg","team":"RED","role":"SPYMASTER","ready":false,"state":"POST_GAME","is_host":true,"joined_at":"2026-09-10T08:41:00Z"},
+      {"user_id":43,"username":"red_agent","avatar_url":"/static/avatars/default/43.svg","team":"RED","role":"OPERATIVE","ready":false,"state":"IN_LOBBY","is_host":false,"joined_at":"2026-09-10T08:41:20Z"},
+      {"user_id":44,"username":"blue_master","avatar_url":"/static/avatars/default/44.svg","team":"BLUE","role":"SPYMASTER","ready":false,"state":"POST_GAME","is_host":false,"joined_at":"2026-09-10T08:41:30Z"},
+      {"user_id":45,"username":"blue_agent","avatar_url":"/static/avatars/default/45.svg","team":"BLUE","role":"OPERATIVE","ready":false,"state":"POST_GAME","is_host":false,"joined_at":"2026-09-10T08:41:40Z"}
+    ],
+    "game": null,
+    "post_game": {
+      "deadline_at": "2026-09-10T08:53:00Z",
+      "pending_user_ids": [42,44,45]
+    },
+    "last_game": {
+      "game_id": 5001,
+      "status": "GAME_FINISHED",
+      "winner": "RED",
+      "loser": "BLUE",
+      "end_reason": "ALL_TEAM_CARDS_REVEALED",
+      "score": {"red":9,"blue":5},
+      "finished_at": "2026-09-10T08:52:00Z"
+    },
+    "created_at": "2026-09-10T08:41:00Z"
+  }
+  ```
+
+  Identical retries return the original ack without another event. A different member returning later produces their own event. Errors: `NOT_ROOM_MEMBER`, `INVALID_ROOM_STATE` when the requester is not `POST_GAME`, and `POST_GAME_DEADLINE_EXPIRED` when the deadline has passed.
+examples: []

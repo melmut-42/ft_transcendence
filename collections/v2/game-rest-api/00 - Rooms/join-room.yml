@@ -1,0 +1,197 @@
+﻿info:
+  name: Join room
+  type: http
+  seq: 2
+  tags: [rooms]
+http:
+  method: POST
+  url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/{{roomId}}/members"
+  headers:
+    - name: Accept
+      value: application/json
+docs: |-
+  # Join room
+
+  ## Purpose and preconditions
+
+  Adds the authenticated user as an unconfigured member. The room must exist, be `WAITING`, and have no member still in `POST_GAME`; the user must have no active room. No body is accepted.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | path | yes | integer | positive | no | Room to join | `1001` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Joining user | set by Register/Login |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Response fields
+
+  `201 Created` returns `{data: room_snapshot}`. The new item has `team:null`, `role:null`, `ready:false`, `state:IN_LOBBY`, `is_host:false`, and a UTC `joined_at`. `player_count` increments and `startable` is recomputed.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.room_id` | integer | yes | no | positive | Joined room |
+  | `data.room_code` | string | yes | no | `^[A-Z0-9]{6}$` | Human-shareable code for the joined room |
+  | `data.status` | string enum | yes | no | `WAITING` | Joinable lifecycle state |
+  | `data.host_user_id` | integer | yes | no | member ID | Current host |
+  | `data.player_count` | integer | yes | no | `>= 2` in this flow | Count after join |
+  | `data.max_players` | integer | yes | no | `4..8` | Room capacity; joins are rejected once `player_count` reaches it |
+  | `data.startable` | boolean | yes | no | `false` | New member is unconfigured, so full predicate fails |
+  | `data.players[]` | array<object> | yes | no | members in join order | Membership snapshot |
+  | `data.players[].user_id` | integer | yes | no | positive | Member ID |
+  | `data.players[].username` | string | yes | no | username rule | Display name |
+  | `data.players[].avatar_url` | string | yes | no | same-origin URL | Current avatar for lobby rendering |
+  | `data.players[].team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
+  | `data.players[].role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Temporary role |
+  | `data.players[].ready` | boolean | yes | no | `true`, `false` | Current readiness |
+  | `data.players[].state` | string enum | yes | no | `IN_LOBBY` | New joins always enter the active lobby |
+  | `data.players[].is_host` | boolean | yes | no | `true`, `false` | Host marker |
+  | `data.players[].joined_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Membership order |
+  | `data.game` | object or null | yes | yes | `null` on join | Game absent in `WAITING` |
+  | `data.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Room creation time |
+
+  ## State changes and emitted events
+
+  Sets `active_room_id` and atomically appends a durable channel-membership outbox event with a new room-membership epoch ID. Channel Service applies that event idempotently to the existing Chat v2 `ROOM` channel and opens the epoch's first visibility window after the channel's current message-sequence high-water mark. Temporary chat failure delays `chat.channel.available` but never rolls back room membership. Game Session emits `room.player.joined`, then a role-safe `room.state`. A join can never trigger countdown because the new unconfigured member makes the start predicate false.
+
+  ## Errors
+
+  | Status | Code | When | State change |
+  | --- | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session | none |
+  | `404` | `ROOM_NOT_FOUND` | room ID absent | none |
+  | `409` | `ROOM_NOT_JOINABLE` | state is `COUNTDOWN`, `IN_GAME`, `POST_GAME`, or `CLOSED`; or shared state is `WAITING` but `post_game.pending_user_ids` is non-empty | none |
+  | `409` | `ROOM_FULL` | `player_count` already equals `max_players` | none |
+  | `409` | `ALREADY_IN_ROOM` | user already has active room, including this one | none |
+  | `422` | `VALIDATION_ERROR` | room ID is not positive integer | none |
+
+  ## Invariants
+
+  `player_count` never exceeds `max_players`; the capacity check and insert are atomic, so two simultaneous joins cannot both take the last seat. Joining is forbidden as soon as countdown begins and throughout the mixed `WAITING`/`POST_GAME` recovery window.
+examples:
+  - name: Success - Join empty-team room
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 2,
+              "max_players": 8,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
+  - name: Success - Fifth player joins
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 201
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 5,
+              "max_players": 8,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": "RED",
+                  "role": "SPYMASTER",
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": "RED",
+                  "role": "OPERATIVE",
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "team": "BLUE",
+                  "role": "SPYMASTER",
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:30Z"
+                },
+                {
+                  "user_id": 45,
+                  "username": "blue_agent",
+                  "team": "BLUE",
+                  "role": "OPERATIVE",
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:40Z"
+                },
+                {
+                  "user_id": 46,
+                  "username": "extra_red",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:50Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
+  - name: Error - Room not found
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/9999/members", method: POST, headers: [], params: [], body: {mode: none}}
+    response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}
+  - name: Error - Countdown already started
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_JOINABLE","message":"Room 1001 is not joinable while status is COUNTDOWN.","details":{"room_id":1001,"status":"COUNTDOWN"}}}'}}
+  - name: Error - Already in another room
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"User 46 already belongs to active room 1002.","details":{"room_id":1002}}}'}}
+  - name: Error - Room full
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_FULL","message":"Room 1001 is full (8 of 8 players).","details":{"room_id":1001,"player_count":8,"max_players":8}}}'}}

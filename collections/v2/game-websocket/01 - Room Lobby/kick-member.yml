@@ -1,0 +1,41 @@
+﻿info:
+  name: Kick room member
+  type: websocket
+  seq: 4
+  tags: [action, room, host]
+websocket:
+  url: "{{wsUrl}}/ws/{{gameApiVersion}}/rooms/{{roomId}}"
+  message:
+    - title: Success - Host kicks member
+      selected: true
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.member.kick",
+            "request_id": "req_0600",
+            "payload": {
+              "user_id": 44
+            }
+          }
+docs: |-
+  # Kick room member
+
+  Only the current host may remove another room member. It is allowed in `WAITING`, `COUNTDOWN`, and `POST_GAME`; it is forbidden in `IN_GAME` and `CLOSED`. During `COUNTDOWN`, the server first cancels countdown with reason `PLAYER_KICKED`. The host cannot kick themself—Exit is the self-removal operation.
+
+  A successful kick clears the target's active room membership and Chat v2 `ROOM` channel access, emits `room.player.left` with reason `KICKED_BY_HOST`, and closes every target room socket with code `4403` (`KICKED_FROM_ROOM`). If that target was the final pending post-game member, `room.post_game.completed` follows; a new recipient-specific `room.state` is last. Chat Gateway separately emits `chat.channel.access_changed` with `access:INACTIVE`. The removed user may join again unless the implementation adds a separate ban feature; v2 defines no ban list.
+
+  ```json
+  {
+    "type": "ack",
+    "request_id": "req_0600",
+    "ok": true,
+    "payload": {
+      "kicked_user_id": 44,
+      "room_status": "WAITING"
+    }
+  }
+  ```
+
+  Errors: `NOT_HOST`, `NOT_ROOM_MEMBER`, `TARGET_NOT_ROOM_MEMBER`, `CANNOT_KICK_SELF`, `INVALID_ROOM_STATE`, and `INVALID_PAYLOAD`.
+examples: []

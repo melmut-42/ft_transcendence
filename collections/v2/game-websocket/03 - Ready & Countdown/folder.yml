@@ -1,0 +1,8 @@
+﻿info:
+  name: 03 - Ready & Countdown
+  type: folder
+  seq: 3
+docs: |-
+  # Ready and countdown
+
+  `ready=true` requires team, role, member state `IN_LOBBY`, and no pending `POST_GAME` members. The server automatically starts a three-second countdown when every start clause holds. Join, leave, kick, team, role, or ready changes can cancel it and return the room to `WAITING`.

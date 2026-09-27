@@ -1,0 +1,54 @@
+opencollection: 1.0.0
+
+info:
+  name: REST API v2 - Game
+  version: 2.0.0-dev
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+docs:
+  content: |-
+    # ft_transcendence Room REST API v2
+
+    This additive collection contains only the v2 room/game REST surface. The original room endpoints remain unchanged in `REST API v1`. Clients must pair this collection with `WebSocket v2 - Game`; mixing v1 and v2 room contracts in one session is unsupported.
+
+    ## Base path and authentication
+
+    Room endpoints use `{{baseUrl}}/api/{{gameApiVersion}}`, with `gameApiVersion=v2`. They reuse the existing HttpOnly `ft_session` cookie and the v1 identity/session endpoints. Token refresh therefore remains `POST /api/v1/auth/refresh`.
+
+    ## Endpoint matrix
+
+    | Method | Path | Purpose |
+    | --- | --- | --- |
+    | `POST` | `/api/v2/rooms` | Create and host a v2 room |
+    | `POST` | `/api/v2/rooms/{room_id}/members` | Join `WAITING` when no post-game member remains |
+    | `GET` | `/api/v2/rooms/{room_id}` | Read recipient-specific room/game/post-game state |
+    | `DELETE` | `/api/v2/rooms/{room_id}/members/me` | Exit; forfeit when currently `IN_GAME` |
+    | `GET` | `/api/v2/rooms/lookup/{room_code}` | Resolve a room code |
+    | `POST` | `/api/v2/rooms/{room_id}/invites` | Send a transient invite through Chat Gateway v2 |
+
+    ## Version-defining behavior
+
+    Room status is `WAITING | COUNTDOWN | IN_GAME | POST_GAME | CLOSED`; game status is separately `IN_PROGRESS | GAME_FINISHED`; member state is `IN_LOBBY | IN_GAME | POST_GAME`. After a terminal result, snapshots are recipient-specific: returned members see the lobby and `last_game`, while pending members continue seeing the completed game and common deadline.
+
+    Team, role, readiness, host kick, Back to Lobby, countdown, and gameplay mutations are WebSocket v2 commands. REST remains responsible for room membership bootstrapping, snapshots, explicit Exit, lookup, and invites.
+
+    ## Response conventions
+
+    Non-empty successes use `{ "data": value }`; `204 No Content` has no body. Errors use `{ "error": { "code": string, "message": string, "details": object } }`. IDs are positive integers, timestamps are ISO 8601 UTC, JSON fields are snake_case, and enums are UPPER_SNAKE_CASE.
+
+    ## Environment
+
+    Select `local`. `apiVersion=v1` continues to address legacy/general APIs; `gameApiVersion=v2` selects this room contract. The canonical fixtures use users `42..47`, room `1001`, and game `5001`.
+  type: text/markdown
+bundled: false
+extensions: {}

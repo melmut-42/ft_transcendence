@@ -1,0 +1,396 @@
+﻿info:
+  name: Get room snapshot
+  type: http
+  seq: 3
+  tags: [rooms, snapshot]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/{{roomId}}"
+  headers:
+    - name: Accept
+      value: application/json
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("returns canonical room vocabulary", function () {
+          expect(res.status).to.equal(200);
+          expect(["WAITING", "COUNTDOWN", "IN_GAME", "POST_GAME"]).to.include(res.body.data.status);
+          expect(res.body.data.room_id).to.equal(Number(bru.getVar("roomId")));
+          expect(res.body.data.room_code).to.match(/^[A-Z0-9]{6}$/);
+        });
+docs: |-
+  # Get room snapshot
+
+  ## Purpose
+
+  Returns the server-authoritative, recipient-specific room and optional game state. It is used after navigation or reconnect recovery; realtime changes continue over WebSocket.
+
+  ## Preconditions and request parameters
+
+  The room must exist and the authenticated user must be a current member.
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `room_id` | path | yes | integer | positive | no | Requested room | `1001` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Determines access and projection | set by Register/Login |
+  | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+
+  ## Room response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.room_id` | integer | yes | no | positive | Room ID shared with WebSocket |
+  | `data.room_code` | string | yes | no | `^[A-Z0-9]{6}$` | Human-shareable code; remains available after reload |
+  | `data.status` | string enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME`, `POST_GAME` | Lifecycle state; `CLOSED` has no remaining member who could read this endpoint |
+  | `data.host_user_id` | integer | yes | no | member user ID | Host; deterministic after transfer |
+  | `data.player_count` | integer | yes | no | `>= 1` for accessible room | Current members |
+  | `data.max_players` | integer | yes | no | `4..8` | Room capacity; joins are rejected once `player_count` reaches it |
+  | `data.startable` | boolean | yes | no | `true`, `false` | Complete start predicate, not merely all-ready |
+  | `data.countdown.seconds_remaining` | integer | conditional | no | `0..3` | Present only in `COUNTDOWN` |
+  | `data.players[]` | array<object> | yes | no | one or more | Members in join order |
+  | `data.players[].user_id` | integer | yes | no | positive | Member ID |
+  | `data.players[].username` | string | yes | no | username rule | Username |
+  | `data.players[].avatar_url` | string | yes | no | same-origin URL | Current avatar for lobby/game rendering |
+  | `data.players[].team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team; null until selected |
+  | `data.players[].role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Temporary role; null until selected |
+  | `data.players[].ready` | boolean | yes | no | `true`, `false` | Confirms current selections; selection change resets false |
+  | `data.players[].state` | string enum | yes | no | `IN_LOBBY`, `IN_GAME`, `POST_GAME` | Per-member lifecycle; may differ between members after a completed game |
+  | `data.players[].is_host` | boolean | yes | no | `true`, `false` | Exactly one true in non-empty room |
+  | `data.players[].joined_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Membership order |
+  | `data.game` | object or null | yes | yes | game object or `null` | Non-null for an active game or when this recipient is still `POST_GAME`; shared room status may already be `WAITING` |
+  | `data.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Room creation time |
+
+  ## Game response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.game.game_id` | integer | yes when game exists | no | positive | Match ID |
+  | `data.game.status` | string enum | yes when game exists | no | `IN_PROGRESS`, `GAME_FINISHED` | Game lifecycle, separate from room status |
+  | `data.game.starting_team` | enum | yes | no | `RED`, `BLUE` | Team owning 9 cards and first clue |
+  | `data.game.current_turn.team` | enum | yes | no | `RED`, `BLUE` | Active team |
+  | `data.game.current_turn.phase` | enum | yes | no | `WAITING_FOR_CLUE`, `GUESSING`, `GAME_OVER` | Round phase |
+  | `data.game.current_turn.clue.word` | string | conditional | no | normalized one word, `1..30` chars | Present in `GUESSING`; final clue may remain in `GAME_OVER` |
+  | `data.game.current_turn.clue.number` | integer | conditional | no | `1..9` | Clue number `N` |
+  | `data.game.current_turn.guesses_remaining` | integer or null | yes | yes | `0..10`, or `null` | `N+1` at clue acceptance; null while waiting for clue |
+  | `data.game.score.red` | integer | yes | no | `0..9` | Revealed RED cards (either team may start with 9 — see workspace.yml Game Rules) |
+  | `data.game.score.blue` | integer | yes | no | `0..9` | Revealed BLUE cards (either team may start with 9 — see workspace.yml Game Rules) |
+  | `data.game.board[]` | array<object> | yes | no | exactly 25 unique cards | Fixed board order |
+  | `data.game.board[].card_id` | integer | yes | no | `1..25` unique | Slot identifier; carries zero affiliation information (`workspace.yml`, Card ID invariant) — the fixture example's `card_id`↔color pattern is illustrative only, not a rule |
+  | `data.game.board[].word` | string | yes | no | fixture word | Visible to both roles |
+  | `data.game.board[].revealed` | boolean | yes | no | `true`, `false` | Reveal state |
+  | `data.game.board[].color` | enum or null | yes | yes | `RED`, `BLUE`, `NEUTRAL`, `ASSASSIN`, `null` | Null only for unrevealed cards hidden from an Operative; Spymasters always receive color |
+  | `data.game.winner` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Non-null only after terminal result |
+  | `data.game.end_reason` | enum or null | yes | yes | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `PLAYER_FORFEIT`, `null` | Terminal cause |
+  | `data.game.abandoned_by_user_id` | integer | `PLAYER_FORFEIT` only | no | member ID | Member whose exit/logout/grace expiry caused the forfeit; omitted for other outcomes |
+  | `data.game.started_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Board creation/start time |
+  | `data.game.finished_at` | `string<date-time>` or null | yes | yes | ISO 8601 UTC or `null` | Terminal time |
+  | `data.post_game` | object | conditional | no | deadline and pending members | Present while any current member remains `POST_GAME`; omitted otherwise |
+  | `data.post_game.deadline_at` | `string<date-time>` | conditional | no | ISO 8601 UTC | Common absolute decision deadline |
+  | `data.post_game.pending_user_ids[]` | array<integer> | conditional | no | current room members | Members still viewing the completed result |
+  | `data.last_game` | object | conditional | no | completed game summary | Present in an `IN_LOBBY` recipient's lobby projection after at least one completed match |
+  | `data.last_game.game_id` | integer | conditional | no | positive | Previous match ID |
+  | `data.last_game.status` | enum | conditional | no | `GAME_FINISHED` | Previous game lifecycle state |
+  | `data.last_game.winner` | enum | conditional | no | `RED`, `BLUE` | Winning team |
+  | `data.last_game.loser` | enum | conditional | no | `RED`, `BLUE` | Losing team |
+  | `data.last_game.end_reason` | enum | conditional | no | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `PLAYER_FORFEIT` | Terminal cause |
+  | `data.last_game.score` | object | conditional | no | `{red, blue}` | Final revealed-card totals |
+  | `data.last_game.finished_at` | `string<date-time>` | conditional | no | ISO 8601 UTC | Previous match end time |
+
+  A snapshot is recipient-specific after game end: an `IN_LOBBY` recipient sees the current lobby plus `last_game`; a `POST_GAME` recipient sees the completed game projection and the same shared deadline. New countdown is forbidden until `pending_user_ids` is empty.
+
+  ## State changes and events
+
+  Read-only and emits nothing. It does not advance countdown or turn state.
+
+  ## Errors and privacy invariant
+
+  `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`, `422 VALIDATION_ERROR`. Errors reveal no room state. The server projects every card for the authenticated viewer; an Operative never receives an unrevealed affiliation.
+examples:
+  - name: Newly created room
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 1,
+              "max_players": 8,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
+  - name: Four joined - Not configured
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 4,
+              "max_players": 8,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:30Z"
+                },
+                {
+                  "user_id": 45,
+                  "username": "blue_agent",
+                  "team": null,
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:40Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
+  - name: Teams selected - Roles incomplete
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 4,
+              "max_players": 8,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": "RED",
+                  "role": "SPYMASTER",
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": "RED",
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "team": "BLUE",
+                  "role": "SPYMASTER",
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:30Z"
+                },
+                {
+                  "user_id": 45,
+                  "username": "blue_agent",
+                  "team": "BLUE",
+                  "role": null,
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:40Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
+  - name: Roles valid - Players not ready
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "WAITING",
+              "host_user_id": 42,
+              "player_count": 4,
+              "max_players": 8,
+              "startable": false,
+              "players": [
+                {
+                  "user_id": 42,
+                  "username": "player_one",
+                  "team": "RED",
+                  "role": "SPYMASTER",
+                  "ready": true,
+                  "state": "IN_LOBBY",
+                  "is_host": true,
+                  "joined_at": "2026-09-10T08:41:00Z"
+                },
+                {
+                  "user_id": 43,
+                  "username": "red_agent",
+                  "team": "RED",
+                  "role": "OPERATIVE",
+                  "ready": true,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:20Z"
+                },
+                {
+                  "user_id": 44,
+                  "username": "blue_master",
+                  "team": "BLUE",
+                  "role": "SPYMASTER",
+                  "ready": true,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:30Z"
+                },
+                {
+                  "user_id": 45,
+                  "username": "blue_agent",
+                  "team": "BLUE",
+                  "role": "OPERATIVE",
+                  "ready": false,
+                  "state": "IN_LOBBY",
+                  "is_host": false,
+                  "joined_at": "2026-09-10T08:41:40Z"
+                }
+              ],
+              "game": null,
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
+  - name: In game - Operative projection
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "room_id": 1001,
+              "status": "IN_GAME",
+              "host_user_id": 42,
+              "player_count": 4,
+              "max_players": 8,
+              "startable": false,
+              "players": [
+                {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"state":"IN_GAME","is_host":true,"joined_at":"2026-09-10T08:41:00Z"},
+                {"user_id":43,"username":"red_agent","team":"RED","role":"OPERATIVE","ready":true,"state":"IN_GAME","is_host":false,"joined_at":"2026-09-10T08:41:20Z"},
+                {"user_id":44,"username":"blue_master","team":"BLUE","role":"SPYMASTER","ready":true,"state":"IN_GAME","is_host":false,"joined_at":"2026-09-10T08:41:30Z"},
+                {"user_id":45,"username":"blue_agent","team":"BLUE","role":"OPERATIVE","ready":true,"state":"IN_GAME","is_host":false,"joined_at":"2026-09-10T08:41:40Z"}
+              ],
+              "game": {
+                "game_id": 5001,
+                "status": "IN_PROGRESS",
+                "starting_team": "RED",
+                "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},
+                "score": {"red":0,"blue":0},
+                "board": [
+                  {"card_id":1,"word":"MOON","revealed":false,"color":null},
+                  {"card_id":2,"word":"APPLE","revealed":false,"color":null},
+                  {"card_id":3,"word":"TRAIN","revealed":false,"color":null},
+                  {"card_id":4,"word":"BRIDGE","revealed":false,"color":null},
+                  {"card_id":5,"word":"OCEAN","revealed":false,"color":null},
+                  {"card_id":6,"word":"KING","revealed":false,"color":null},
+                  {"card_id":7,"word":"LASER","revealed":false,"color":null},
+                  {"card_id":8,"word":"FOREST","revealed":false,"color":null},
+                  {"card_id":9,"word":"DOCTOR","revealed":false,"color":null},
+                  {"card_id":10,"word":"GLASS","revealed":false,"color":null},
+                  {"card_id":11,"word":"DRAGON","revealed":false,"color":null},
+                  {"card_id":12,"word":"TABLE","revealed":false,"color":null},
+                  {"card_id":13,"word":"SATURN","revealed":false,"color":null},
+                  {"card_id":14,"word":"SNOW","revealed":false,"color":null},
+                  {"card_id":15,"word":"PIANO","revealed":false,"color":null},
+                  {"card_id":16,"word":"HEART","revealed":false,"color":null},
+                  {"card_id":17,"word":"ROME","revealed":false,"color":null},
+                  {"card_id":18,"word":"WHALE","revealed":false,"color":null},
+                  {"card_id":19,"word":"ROBOT","revealed":false,"color":null},
+                  {"card_id":20,"word":"CROWN","revealed":false,"color":null},
+                  {"card_id":21,"word":"DESERT","revealed":false,"color":null},
+                  {"card_id":22,"word":"SCREEN","revealed":false,"color":null},
+                  {"card_id":23,"word":"MOUSE","revealed":false,"color":null},
+                  {"card_id":24,"word":"KNIFE","revealed":false,"color":null},
+                  {"card_id":25,"word":"CLOUD","revealed":false,"color":null}
+                ],
+                "winner": null,
+                "end_reason": null,
+                "started_at": "2026-09-10T08:43:15Z",
+                "finished_at": null
+              },
+              "created_at": "2026-09-10T08:41:00Z"
+            }
+          }
+  - name: Error - Room not found
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/9999", method: GET, headers: [], params: [], body: {mode: none}}
+    response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}
+  - name: Error - Not a member
+    request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    response: {status: 403, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"NOT_ROOM_MEMBER","message":"User 47 is not a member of room 1001.","details":{"room_id":1001,"user_id":47}}}'}}

@@ -1,0 +1,8 @@
+﻿info:
+  name: 06 - Errors
+  type: folder
+  seq: 6
+docs: |-
+  # WebSocket errors
+
+  Errors correlate to the rejected `request_id`, contain a concrete code and message, and normally leave state unchanged with the socket open. Documented exceptions are invalid/revoked authentication (`4401`), lost membership/kick/post-game timeout (`4403`), missing room (`4404`), deadline-expiry cleanup, and repeated protocol abuse. Handshake failures occur as HTTP responses before the WebSocket opens.
