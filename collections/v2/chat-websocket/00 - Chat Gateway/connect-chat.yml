@@ -1,0 +1,18 @@
+info:
+  name: Connect to Chat Gateway
+  type: websocket
+  seq: 1
+  tags: [connection, chat, gateway]
+websocket:
+  url: "{{chatWsUrl}}/ws/{{chatApiVersion}}/channels"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Connect to Chat Gateway
+
+  Opens one authenticated, per-user realtime connection directly to Chat Gateway. The HttpOnly `ft_session` cookie is the only credential; the gateway validates the handshake origin and session. Multi-tab connections are supported.
+
+  Success is `101 Switching Protocols`. The gateway then emits `chat.ready` with the authenticated `user_id` and `connected_at`. Channel discovery and retained history are loaded through the BFF endpoints in `Chat REST v2`; only currently authorized channels are returned, and the socket does not replay history during connection.
+
+  Handshake failures: `401 UNAUTHORIZED` for an invalid session and `403 ORIGIN_NOT_ALLOWED` for a rejected origin. If the session is explicitly revoked after connection, Chat Gateway emits `UNAUTHORIZED` when possible and closes with `4401`. Ordinary command errors keep the socket open; repeated protocol abuse may close it after an error.

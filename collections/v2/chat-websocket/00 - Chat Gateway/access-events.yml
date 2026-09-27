@@ -1,0 +1,73 @@
+info:
+  name: Channel lifecycle and access events
+  type: websocket
+  seq: 4
+  tags: [server-event, chat, authorization, room]
+websocket:
+  url: "{{chatWsUrl}}/ws/{{chatApiVersion}}/channels"
+docs: |-
+  # Channel lifecycle and access events
+
+  ## Automatic ROOM channel
+
+  Game Session commits `room.created` to a durable outbox. Lifecycle records carry a stable event ID and monotonically increasing `room_version`; the publisher preserves order per room, and Channel Service deduplicates IDs and pauses version gaps for replay/reconciliation. It therefore idempotently creates exactly one `ROOM` channel for that `room_id`, even after retries. Temporary Channel Service/RabbitMQ failure delays chat availability but never rolls back the room or requires a client create-room-channel command. The creator receives when provisioning completes:
+
+  ```json
+  {
+    "type": "chat.channel.available",
+    "event_id": "evt_c020",
+    "sent_at": "2026-09-17T10:30:00Z",
+    "payload": {
+      "channel_id": 8001,
+      "channel_type": "ROOM",
+      "room_id": 1001,
+      "access": "ACTIVE",
+      "reason": "ROOM_CREATED"
+    }
+  }
+  ```
+
+  A joining member receives the same event with reason `ROOM_JOINED`. Existing eligible members do not need a new channel event because the `channel_id` is unchanged. Closed sockets recover through `GET /api/v2/channels`, which returns the ROOM channel only while the caller has access.
+
+  A newly created friend-only DIRECT channel also produces `chat.channel.available` for both users with `channel_type:DIRECT`, `room_id:null`, a `peer` summary, and reason `DIRECT_CREATED`. Resolving an existing channel does not emit it again.
+
+  ## Access changes
+
+  Channel Service emits `chat.channel.access_changed` to the affected user's sockets whenever access changes. For ROOM channels, access is per member: `IN_LOBBY` is active in `WAITING`/`COUNTDOWN`, `IN_GAME` is active in `IN_GAME`, and `POST_GAME` is inactive.
+
+  ```json
+  {
+    "type": "chat.channel.access_changed",
+    "event_id": "evt_c021",
+    "sent_at": "2026-09-17T10:40:00Z",
+    "payload": {
+      "channel_id": 8001,
+      "channel_type": "ROOM",
+      "room_id": 1001,
+      "access": "INACTIVE",
+      "reason": "GAME_FINISHED"
+    }
+  }
+  ```
+
+  `game.ended` immediately makes the ROOM channel inactive for every member entering `POST_GAME` and closes each current visibility window at the channel's sequence high-water mark. Retained messages remain stored until `expires_at`, but inactive users cannot list the channel, read history, or send.
+
+  ```json
+  {
+    "type": "chat.channel.access_changed",
+    "event_id": "evt_c022",
+    "sent_at": "2026-09-17T10:41:10Z",
+    "payload": {
+      "channel_id": 8001,
+      "channel_type": "ROOM",
+      "room_id": 1001,
+      "access": "ACTIVE",
+      "reason": "BACK_TO_LOBBY"
+    }
+  }
+  ```
+
+  Back to Lobby restores access only for that returned `IN_LOBBY` member and opens a new visibility window after the then-current message sequence. Other `POST_GAME` members remain inactive and never gain later history for messages sent before their own return. Exit, kick, post-game timeout, and room closure produce `INACTIVE` with reason `ROOM_LEFT`, `KICKED_BY_HOST`, `POST_GAME_TIMEOUT`, or `ROOM_CLOSED`.
+
+  DIRECT channels use the same access event with `channel_type:DIRECT`, `room_id:null`, and reasons `FRIENDSHIP_ADDED` or `FRIENDSHIP_REMOVED`. Shared-room membership never activates a DIRECT channel.
+examples: []

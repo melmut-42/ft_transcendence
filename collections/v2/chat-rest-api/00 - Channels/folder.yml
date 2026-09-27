@@ -1,0 +1,14 @@
+info:
+  name: 00 - Channels
+  type: folder
+  seq: 0
+docs: |-
+  # Chat channels
+
+  Channel metadata and retained message history are served through the Web BFF. The BFF delegates ownership to Channel Service; clients never call Channel Service directly. Live messages use the separate `Chat WebSocket v2` collection.
+
+  Version 2 has two channel types. `DIRECT` is a canonical private conversation between exactly two friends; shared-room membership never creates a direct channel. `ROOM` is one common channel created automatically with a room and identified by `room_id`; all currently eligible room members use it.
+
+  ROOM access follows the member state rather than shared room status alone: `IN_LOBBY` can access during `WAITING`/`COUNTDOWN`, and `IN_GAME` can access during `IN_GAME`. `POST_GAME` cannot access. Back to Lobby restores that member's access; Exit, kick, timeout, and room closure remove it. DIRECT access requires the friendship to still exist. List, history, and send re-evaluate the applicable rule; stored participation alone never grants access.
+
+  Messages are durable for 30 days by default; the deployment may configure the retention period, and every message exposes its exact `expires_at` timestamp. Inactive history remains stored until expiration but cannot be listed or read without current access. A ROOM membership epoch owns one or more visibility windows over the channel's monotonic message sequence. Join opens the first window after the current high-water mark; `game.ended` closes it; Back to Lobby opens a new one; Exit/kick/timeout closes the epoch. History is the union of messages inside those windows. This ordering model—not cross-service wall-clock comparison—prevents both pre-join disclosure and disclosure of messages sent while that member remained `POST_GAME`. ROOM-channel creation and membership synchronization are internal, idempotent Game Session outbox → Channel Service operations, not public client endpoints.

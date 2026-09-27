@@ -1,0 +1,12 @@
+info:
+  name: 00 - Chat Gateway
+  type: folder
+  seq: 0
+docs: |-
+  # Chat Gateway
+
+  Live chat is an independently deployable gateway, separate from the Game Gateway. The browser connects to the same public origin at `{{chatWsUrl}}/ws/{{chatApiVersion}}/channels`; the reverse proxy routes that path directly to Chat Gateway, so chat traffic does not pass through the Web BFF or Game Gateway.
+
+  Version 2 supports friend-only private `DIRECT` channels and common `ROOM` channels. Exactly one ROOM channel is created automatically when a room is created; joining does not create pairwise direct channels. Channel records and retained history belong to Channel Service. Chat Gateway authenticates the connection, accepts channel commands, publishes them through RabbitMQ, and fans Channel Service events out to active sockets.
+
+  DIRECT access requires the friendship to exist. ROOM access requires the caller to be `IN_LOBBY` during `WAITING`/`COUNTDOWN`, or `IN_GAME` during `IN_GAME`. `game.ended` immediately removes ROOM access from every `POST_GAME` member; Back to Lobby restores it independently. Exit, kick, timeout, and room closure remove it. Messages are retained for 30 days by default even while access is inactive, but cannot be read or extended until authorization returns.

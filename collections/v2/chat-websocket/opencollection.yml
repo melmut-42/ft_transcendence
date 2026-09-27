@@ -1,0 +1,29 @@
+opencollection: 1.0.0
+
+info:
+  name: Chat WebSocket v2
+  version: 2.0.0-dev
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+docs:
+  content: |-
+    # ft_transcendence Chat WebSocket v2
+
+    Connect through the same public origin at `{{chatWsUrl}}/ws/{{chatApiVersion}}/channels`. The reverse proxy routes this path directly to Chat Gateway; live chat does not pass through the Web BFF.
+
+    Chat Gateway validates the session and transports commands/events. Channel Service owns channel records, dynamic authorization, idempotency, persistence, 30-day default retention, and canonical events. `DIRECT` is friend-only; `ROOM` follows the caller's room/member lifecycle and is inactive in `POST_GAME`.
+
+    Client commands use `{type, request_id, payload}`; acks and errors echo `request_id`. Application errors keep the socket open. Explicit session invalidation closes it with `4401`; handshake rejection happens before upgrade; repeated protocol abuse may close it after an error. A transport timeout has no delivery meaning, so clients retry `chat.message.send` with the same `request_id` and let Channel Service return the original persisted result.
+  type: text/markdown
+bundled: false
+extensions: {}
