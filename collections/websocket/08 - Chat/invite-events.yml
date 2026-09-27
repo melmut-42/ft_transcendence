@@ -4,7 +4,7 @@ info:
   seq: 3
   tags: [server-event, chat]
 websocket:
-  url: "{{wsUrl}}/ws/chat"
+  url: "{{wsUrl}}/ws/{{apiVersion}}/chat"
 docs: |-
   # Room invite events
 
@@ -39,4 +39,4 @@ docs: |-
 
   ## Client behavior
 
-  Accepting calls REST Join room for `room_id`; that request runs every normal join check, so a room that filled up or started in the meantime returns `ROOM_FULL` or `ROOM_NOT_JOINABLE`. Dismissing needs no request. The invitation is live-only: it is delivered to every open `/ws/chat` socket of the recipient and never stored.
+  Accepting calls REST Join room for `room_id`; that request runs every normal join check, so a room that filled up or started in the meantime returns `ROOM_FULL` or `ROOM_NOT_JOINABLE`. Dismissing needs no request. The invitation is live-only: it is delivered to every open `/ws/v1/chat` socket of the recipient and never stored.

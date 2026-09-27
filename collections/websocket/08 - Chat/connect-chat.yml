@@ -4,7 +4,7 @@ info:
   seq: 1
   tags: [connection, chat]
 websocket:
-  url: "{{wsUrl}}/ws/chat"
+  url: "{{wsUrl}}/ws/{{apiVersion}}/chat"
 settings:
   timeout: 30000
   keepAliveInterval: 20000
@@ -17,7 +17,7 @@ docs: |-
 
   ## Purpose
 
-  One per-user realtime channel for basic chat, separate from the per-room game socket. Delivers direct messages to/from friends and current room co-members while the shared room is `WAITING`, `COUNTDOWN`, or `IN_GAME`. Opening multiple `/ws/chat` sockets for the same user (multi-tab) is supported — see `08 - Chat/folder.yml`.
+  One per-user realtime channel for basic chat, separate from the per-room game socket. Delivers direct messages to/from friends and current room co-members while the shared room is `WAITING`, `COUNTDOWN`, or `IN_GAME`. Opening multiple `/ws/v1/chat` sockets for the same user (multi-tab) is supported — see `08 - Chat/folder.yml`.
 
   ## Preconditions and handshake parameters
 

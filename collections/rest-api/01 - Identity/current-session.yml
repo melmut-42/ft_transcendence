@@ -5,7 +5,7 @@ info:
   tags: [identity]
 http:
   method: GET
-  url: "{{baseUrl}}/api/auth/session"
+  url: "{{baseUrl}}/api/{{apiVersion}}/auth/session"
   headers:
     - name: Accept
       value: application/json
@@ -36,10 +36,10 @@ docs: |-
 
   ## State changes, events, and errors
 
-  Read-only; no event. Missing, invalid, revoked, or expired `ft_session` returns `401 UNAUTHORIZED` and an empty details object — the frontend should attempt `POST /api/auth/refresh` before treating this as a full logout.
+  Read-only; no event. Missing, invalid, revoked, or expired `ft_session` returns `401 UNAUTHORIZED` and an empty details object — the frontend should attempt `POST /api/v1/auth/refresh` before treating this as a full logout.
 examples:
   - name: Success - No active room
-    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -57,7 +57,7 @@ examples:
             }
           }
   - name: Success - Active room
-    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -75,7 +75,7 @@ examples:
             }
           }
   - name: Error - Invalid session
-    request: {url: "{{baseUrl}}/api/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}, {name: Cookie, value: "ft_session=invalid", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/session", method: GET, headers: [{name: Accept, value: application/json, enabled: true}, {name: Cookie, value: "ft_session=invalid", enabled: true}], params: [], body: {mode: none}}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]

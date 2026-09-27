@@ -4,7 +4,7 @@ info:
   seq: 1
   tags: [connection, smoke]
 websocket:
-  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  url: "{{wsUrl}}/ws/{{apiVersion}}/rooms/{{roomId}}"
 settings:
   timeout: 30000
   keepAliveInterval: 20000
@@ -54,7 +54,7 @@ docs: |-
   | `403` | `NOT_ROOM_MEMBER` | authenticated user is not a member | no |
   | `409` | `INVALID_ROOM_STATE` | room is `CLOSED` | no |
 
-  A transport disconnect never changes membership immediately — it starts the reconnect grace period (`workspace.yml`, Reconnect Grace Period and Abandonment): 30s by default in `WAITING`/`COUNTDOWN`, 60s `IN_GAME`. Reconnecting within that window (same session, new socket) yields a current snapshot with no state loss; missed incremental events need not be replayed, since the snapshot is authoritative. If the grace period expires, the member is removed (`WAITING`/`COUNTDOWN`) or the match ends by `PLAYER_FORFEIT` (`IN_GAME`) — see `04 - Game` and `workspace.yml`. If the access token expired, the client refreshes over REST (`POST /api/auth/refresh`) first, then reconnects — the refreshed cookie authenticates the new handshake automatically; this does not consume grace-period time any faster than a normal drop.
+  A transport disconnect never changes membership immediately — it starts the reconnect grace period (`workspace.yml`, Reconnect Grace Period and Abandonment): 30s by default in `WAITING`/`COUNTDOWN`, 60s `IN_GAME`. Reconnecting within that window (same session, new socket) yields a current snapshot with no state loss; missed incremental events need not be replayed, since the snapshot is authoritative. If the grace period expires, the member is removed (`WAITING`/`COUNTDOWN`) or the match ends by `PLAYER_FORFEIT` (`IN_GAME`) — see `04 - Game` and `workspace.yml`. If the access token expired, the client refreshes over REST (`POST /api/v1/auth/refresh`) first, then reconnects — the refreshed cookie authenticates the new handshake automatically; this does not consume grace-period time any faster than a normal drop.
 
   ## Concrete frames
 

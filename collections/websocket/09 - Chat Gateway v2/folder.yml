@@ -1,0 +1,12 @@
+info:
+  name: 09 - Chat Gateway v2
+  type: folder
+  seq: 9
+docs: |-
+  # Chat Gateway
+
+  Live chat is an independently deployable gateway, separate from the Game Gateway. The browser connects directly to `{{chatWsUrl}}/ws/{{chatApiVersion}}/channels`; chat traffic does not pass through the Web BFF or Game Gateway.
+
+  Version 2 supports durable one-to-one `DIRECT` channels. Channel membership and retained history belong to Channel Service. Chat Gateway authenticates the connection, accepts channel commands, publishes them through RabbitMQ, and fans Channel Service events out to every active socket of the affected users.
+
+  Messages are retained for 30 days by default. The retention window is server-configurable, so clients must use each message's `expires_at` rather than calculating expiration themselves.

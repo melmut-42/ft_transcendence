@@ -4,7 +4,7 @@ info:
   seq: 3
   tags: [action, game]
 websocket:
-  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  url: "{{wsUrl}}/ws/{{apiVersion}}/rooms/{{roomId}}"
   message:
     - title: Success - RED Operative passes
       selected: true

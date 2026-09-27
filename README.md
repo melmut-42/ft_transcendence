@@ -9,12 +9,14 @@ This repository is the development, Git-native API contract for the `ft_transcen
 - `environments/local.yml` — safe localhost defaults and blank secret session values.
 - `workspace.yml` — product rules, state machines, fixtures, privacy, and protocol boundaries.
 
+API v1 remains the default contract. The new durable chat architecture is additive under REST `/api/v2/channels` and Chat Gateway `/ws/v2/channels`; its version is controlled by `chatApiVersion: v2` without changing the existing v1 chat requests.
+
 ## Local use
 
 1. Start the development API at `http://localhost:3000`.
 2. Select the `local` environment.
 3. Register and create or join room `1001` through REST.
-4. Connect to `{{wsUrl}}/ws/rooms/{{roomId}}`. Authentication is cookie-only: `ft_session` attaches automatically on the upgrade, from the same cookie jar Bruno used for REST — there is no header to configure.
+4. Connect to `{{wsUrl}}/ws/{{apiVersion}}/rooms/{{roomId}}`. Authentication is cookie-only: `ft_session` attaches automatically on the upgrade, from the same cookie jar Bruno used for REST — there is no header to configure.
 5. Use the named WebSocket message examples only when their documented preconditions hold.
 
 The contract can lead implementation; a failing request can mean the backend has not yet implemented the specified behavior. Bruno authenticates through its cookie jar exactly like a browser — `ft_session`/`ft_refresh` are set automatically by Register/Login/Refresh, never held in a variable or committed.

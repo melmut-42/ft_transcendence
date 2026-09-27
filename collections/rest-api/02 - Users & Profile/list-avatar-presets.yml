@@ -5,7 +5,7 @@ info:
   tags: [profile]
 http:
   method: GET
-  url: "{{baseUrl}}/api/avatars/presets"
+  url: "{{baseUrl}}/api/{{apiVersion}}/avatars/presets"
   headers:
     - name: Accept
       value: application/json
@@ -35,5 +35,5 @@ docs: |-
   `401 UNAUTHORIZED` for an invalid session. Read-only; no event.
 examples:
   - name: Success - Preset catalog
-    request: {url: "{{baseUrl}}/api/avatars/presets", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/avatars/presets", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 200, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"data":{"presets":[{"preset_id":"alien astronaut aviator-fox blond-sunglasses brain-robot cyborg-cat glasses-boy headphones-girl orc punk scholar-owl","avatar_url":"/avatars/presets/alien astronaut aviator-fox blond-sunglasses brain-robot cyborg-cat glasses-boy headphones-girl orc punk scholar-owl.png"}]}}'}}

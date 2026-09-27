@@ -5,7 +5,7 @@ info:
   tags: [friends]
 http:
   method: GET
-  url: "{{baseUrl}}/api/friends"
+  url: "{{baseUrl}}/api/{{apiVersion}}/friends"
   headers:
     - name: Accept
       value: application/json
@@ -38,7 +38,7 @@ docs: |-
   `401 UNAUTHORIZED` for an invalid session. Read-only; no event.
 examples:
   - name: Success - Two friends
-    request: {url: "{{baseUrl}}/api/friends", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]

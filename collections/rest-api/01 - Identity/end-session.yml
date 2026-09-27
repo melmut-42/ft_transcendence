@@ -5,7 +5,7 @@ info:
   tags: [identity]
 http:
   method: DELETE
-  url: "{{baseUrl}}/api/auth/session"
+  url: "{{baseUrl}}/api/{{apiVersion}}/auth/session"
   headers:
     - name: Accept
       value: application/json
@@ -31,13 +31,13 @@ docs: |-
   `401 UNAUTHORIZED` covers invalid/revoked tokens. There is no room-membership error on this endpoint.
 examples:
   - name: Success - Session revoked, no active room
-    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Success - Session revoked, forfeits active game
-    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Error - Already revoked
-    request: {url: "{{baseUrl}}/api/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}, {name: Cookie, value: "ft_session=alreadyRevoked", enabled: true}], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/session", method: DELETE, headers: [{name: Accept, value: application/json, enabled: true}, {name: Cookie, value: "ft_session=alreadyRevoked", enabled: true}], params: [], body: {mode: none}}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]

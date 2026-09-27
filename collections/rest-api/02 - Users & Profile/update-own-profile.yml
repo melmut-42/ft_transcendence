@@ -5,7 +5,7 @@ info:
   tags: [profile]
 http:
   method: PATCH
-  url: "{{baseUrl}}/api/users/me"
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/me"
   headers:
     - name: Content-Type
       value: application/json
@@ -47,7 +47,7 @@ docs: |-
 examples:
   - name: Success - Username updated
     request:
-      url: "{{baseUrl}}/api/users/me"
+      url: "{{baseUrl}}/api/{{apiVersion}}/users/me"
       method: PATCH
       headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []
@@ -73,7 +73,7 @@ examples:
           }
   - name: Error - Username taken
     request:
-      url: "{{baseUrl}}/api/users/me"
+      url: "{{baseUrl}}/api/{{apiVersion}}/users/me"
       method: PATCH
       headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []

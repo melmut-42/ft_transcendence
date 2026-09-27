@@ -21,7 +21,7 @@ docs:
 
     ## Transport and session
 
-    Base URL: `{{baseUrl}}` (`http://localhost:3000` locally). JSON requests send `Content-Type: application/json`; JSON responses send the same media type. Protected endpoints require the `ft_session` cookie (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/`) — sent automatically by a browser, and by Bruno through its cookie jar. There is no header-based credential and no token value in any response body; see `workspace.yml`, Session and Credential Model. `POST /api/auth/refresh` reads the separate `ft_refresh` cookie (`Path=/api/auth/refresh`) and reissues both cookies. Tokens are never URL parameters.
+    Base URL: `{{baseUrl}}` (`http://localhost:3000` locally). JSON requests send `Content-Type: application/json`; JSON responses send the same media type. Protected endpoints require the `ft_session` cookie (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/`) — sent automatically by a browser, and by Bruno through its cookie jar. There is no header-based credential and no token value in any response body; see `workspace.yml`, Session and Credential Model. `POST /api/v1/auth/refresh` reads the separate `ft_refresh` cookie (`Path=/api/v1/auth/refresh`) and reissues both cookies. Tokens are never URL parameters.
 
     ## Response envelopes
 
@@ -31,26 +31,29 @@ docs:
 
     | Method | Path | Purpose | Auth | Main requirement |
     | --- | --- | --- | --- | --- |
-    | `GET` | `/api/health` | Contract/service health | no | none |
-    | `POST` | `/api/auth/register` | Create account + issue session pair | no | unique email + username |
-    | `POST` | `/api/auth/login` | Issue a new session pair | no | valid email + password |
-    | `POST` | `/api/auth/refresh` | Exchange refresh token for new access token | refresh token | unexpired, unrevoked refresh token |
-    | `GET` | `/api/auth/session` | Read current session identity | yes | active access token |
-    | `DELETE` | `/api/auth/session` | Revoke current session (forfeits an `IN_GAME` room first) | yes | active access token |
-    | `GET` | `/api/users/me` | Own persistent profile | yes | active session |
-    | `PATCH` | `/api/users/me` | Update own profile (`username`) | yes | active session |
-    | `POST` | `/api/users/me/avatar` | Upload/replace avatar | yes | active session, valid image |
-    | `GET` | `/api/users/me/matches` | Own match history (paginated) | yes | active session |
-    | `GET` | `/api/users/{user_id}` | Public persistent profile | yes | user exists |
-    | `GET` | `/api/users/search?q=` | Username search for friend discovery | yes | active session |
-    | `POST` | `/api/rooms` | Create and host a room | yes | not in active room |
-    | `POST` | `/api/rooms/{room_id}/members` | Join a room | yes | `WAITING`, not in active room |
-    | `GET` | `/api/rooms/{room_id}` | Role-safe room/game snapshot | yes | room member |
-    | `DELETE` | `/api/rooms/{room_id}/members/me` | Leave room (forfeits if `IN_GAME`) | yes | room member |
-    | `GET` | `/api/rooms/lookup/{room_code}` | Resolve room code to room ID | yes | active room with that code |
-    | `GET` | `/api/friends` | List friends with snapshot presence | yes | active session |
-    | `POST` | `/api/friends` | Add a friend (immediate, mutual) | yes | target user exists, not self |
-    | `DELETE` | `/api/friends/{user_id}` | Remove a friend | yes | friendship exists |
+    | `GET` | `/api/v1/health` | Contract/service health | no | none |
+    | `POST` | `/api/v1/auth/register` | Create account + issue session pair | no | unique email + username |
+    | `POST` | `/api/v1/auth/login` | Issue a new session pair | no | valid email + password |
+    | `POST` | `/api/v1/auth/refresh` | Exchange refresh token for new access token | refresh token | unexpired, unrevoked refresh token |
+    | `GET` | `/api/v1/auth/session` | Read current session identity | yes | active access token |
+    | `DELETE` | `/api/v1/auth/session` | Revoke current session (forfeits an `IN_GAME` room first) | yes | active access token |
+    | `GET` | `/api/v1/users/me` | Own persistent profile | yes | active session |
+    | `PATCH` | `/api/v1/users/me` | Update own profile (`username`) | yes | active session |
+    | `POST` | `/api/v1/users/me/avatar` | Upload/replace avatar | yes | active session, valid image |
+    | `GET` | `/api/v1/users/me/matches` | Own match history (paginated) | yes | active session |
+    | `GET` | `/api/v1/users/{user_id}` | Public persistent profile | yes | user exists |
+    | `GET` | `/api/v1/users/search?q=` | Username search for friend discovery | yes | active session |
+    | `POST` | `/api/v1/rooms` | Create and host a room | yes | not in active room |
+    | `POST` | `/api/v1/rooms/{room_id}/members` | Join a room | yes | `WAITING`, not in active room |
+    | `GET` | `/api/v1/rooms/{room_id}` | Role-safe room/game snapshot | yes | room member |
+    | `DELETE` | `/api/v1/rooms/{room_id}/members/me` | Leave room (forfeits if `IN_GAME`) | yes | room member |
+    | `GET` | `/api/v1/rooms/lookup/{room_code}` | Resolve room code to room ID | yes | active room with that code |
+    | `GET` | `/api/v1/friends` | List friends with snapshot presence | yes | active session |
+    | `POST` | `/api/v1/friends` | Add a friend (immediate, mutual) | yes | target user exists, not self |
+    | `DELETE` | `/api/v1/friends/{user_id}` | Remove a friend | yes | friendship exists |
+    | `GET` | `/api/v2/channels` | List Chat v2 direct channels | yes | active session |
+    | `POST` | `/api/v2/channels/direct` | Resolve/create a Chat v2 direct channel | yes | friend or shared active room |
+    | `GET` | `/api/v2/channels/{channel_id}/messages` | Read retained Chat v2 history | yes | channel member |
 
     ## Status conventions
 
@@ -72,6 +75,7 @@ docs:
     - Room-code join preview: `03 - Rooms/Lookup room by code`
     - Countdown and both role projections: WebSocket `07 - Full State Scenarios`
     - Clue and all reveal outcomes, plus forfeit: WebSocket `04 - Game`
+    - Durable Chat v2 channels and retained history: `06 - Channels v2`
 
     ## Environment
 

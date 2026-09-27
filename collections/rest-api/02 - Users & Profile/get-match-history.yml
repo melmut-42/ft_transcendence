@@ -5,7 +5,7 @@ info:
   tags: [profile, stats]
 http:
   method: GET
-  url: "{{baseUrl}}/api/users/me/matches?limit=20"
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/me/matches?limit=20"
   headers:
     - name: Accept
       value: application/json
@@ -46,7 +46,7 @@ docs: |-
   `401 UNAUTHORIZED` for an invalid session. Read-only; no event.
 examples:
   - name: Success - Two recent matches
-    request: {url: "{{baseUrl}}/api/users/me/matches?limit=20", method: GET, headers: [], params: [{name: limit, value: "20", enabled: true}], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me/matches?limit=20", method: GET, headers: [], params: [{name: limit, value: "20", enabled: true}], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]

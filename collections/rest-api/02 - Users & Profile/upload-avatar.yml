@@ -5,7 +5,7 @@ info:
   tags: [profile]
 http:
   method: POST
-  url: "{{baseUrl}}/api/users/me/avatar"
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/me/avatar"
   headers:
     - name: Accept
       value: application/json
@@ -47,7 +47,7 @@ docs: |-
   | `422` | `INVALID_IMAGE` | wrong MIME type, corrupt file, or over 2 MiB |
 examples:
   - name: Success - Avatar replaced
-    request: {url: "{{baseUrl}}/api/users/me/avatar", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me/avatar", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -60,7 +60,7 @@ examples:
             }
           }
   - name: Error - Invalid image
-    request: {url: "{{baseUrl}}/api/users/me/avatar", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me/avatar", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 422
       headers: [{name: Content-Type, value: application/json}]

@@ -5,7 +5,7 @@ info:
   tags: [profile]
 http:
   method: PUT
-  url: "{{baseUrl}}/api/users/me/avatar"
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/me/avatar"
   headers:
     - name: Content-Type
       value: application/json
@@ -47,8 +47,8 @@ docs: |-
   | `422` | `INVALID_AVATAR_PRESET` | `preset_id` missing or not in the catalog |
 examples:
   - name: Success - Preset selected
-    request: {url: "{{baseUrl}}/api/users/me/avatar", method: PUT, headers: [], params: [], body: {mode: json, json: '{"preset_id":"scholar-owl"}'}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me/avatar", method: PUT, headers: [], params: [], body: {mode: json, json: '{"preset_id":"scholar-owl"}'}}
     response: {status: 200, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"data":{"avatar_url":"/avatars/presets/scholar-owl.png"}}'}}
   - name: Error - Unknown preset
-    request: {url: "{{baseUrl}}/api/users/me/avatar", method: PUT, headers: [], params: [], body: {mode: json, json: '{"preset_id":"dragon"}'}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me/avatar", method: PUT, headers: [], params: [], body: {mode: json, json: '{"preset_id":"dragon"}'}}
     response: {status: 422, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"INVALID_AVATAR_PRESET","message":"Avatar preset ''dragon'' does not exist.","details":{"field":"preset_id"}}}'}}

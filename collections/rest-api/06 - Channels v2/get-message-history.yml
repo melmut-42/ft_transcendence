@@ -1,0 +1,34 @@
+info:
+  name: Get message history
+  type: http
+  seq: 3
+  tags: [chat, channels, history]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/{{chatApiVersion}}/channels/{{channelId}}/messages?limit=50"
+  headers:
+    - name: Accept
+      value: application/json
+  params:
+    - name: limit
+      value: "50"
+    - name: before
+      value: ""
+      enabled: false
+docs: |-
+  # Get retained message history
+
+  Returns newest-first cursor pagination for a channel the authenticated user belongs to. `limit` defaults to 50 and accepts `1..100`; optional `before` is the opaque `next_cursor` from the previous response.
+
+  Each item contains `message_id`, `channel_id`, `sender_user_id`, `text`, `sent_at`, and `expires_at`. Expired messages are physically deleted by Channel Service and never returned. `data.next_cursor` is nullable.
+
+  Errors: `401 UNAUTHORIZED`, `403 NOT_CHANNEL_MEMBER`, `404 CHANNEL_NOT_FOUND`, and `422 VALIDATION_ERROR`.
+examples:
+  - name: Success - Retained history
+    request: {url: "{{baseUrl}}/api/{{chatApiVersion}}/channels/7001/messages?limit=50", method: GET, headers: [], params: [{name: limit, value: "50", enabled: true}], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: '{"data":{"messages":[{"message_id":"msg_001","channel_id":7001,"sender_user_id":42,"text":"gg, ready?","sent_at":"2026-09-17T10:00:00Z","expires_at":"2026-10-17T10:00:00Z"}],"next_cursor":null}}'

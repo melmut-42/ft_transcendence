@@ -5,7 +5,7 @@ info:
   tags: [rooms]
 http:
   method: POST
-  url: "{{baseUrl}}/api/rooms/{{roomId}}/members"
+  url: "{{baseUrl}}/api/{{apiVersion}}/rooms/{{roomId}}/members"
   headers:
     - name: Accept
       value: application/json
@@ -67,7 +67,7 @@ docs: |-
   `player_count` never exceeds `max_players`; the capacity check and the insert are atomic, so two simultaneous joins cannot both take the last seat. Joining is forbidden as soon as countdown begins.
 examples:
   - name: Success - Join empty-team room
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
@@ -107,7 +107,7 @@ examples:
             }
           }
   - name: Success - Fifth player joins
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
@@ -174,14 +174,14 @@ examples:
             }
           }
   - name: Error - Room not found
-    request: {url: "{{baseUrl}}/api/rooms/9999/members", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/9999/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}
   - name: Error - Countdown already started
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_JOINABLE","message":"Room 1001 is not joinable while status is COUNTDOWN.","details":{"room_id":1001,"status":"COUNTDOWN"}}}'}}
   - name: Error - Already in another room
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"User 46 already belongs to active room 1002.","details":{"room_id":1002}}}'}}
   - name: Error - Room full
-    request: {url: "{{baseUrl}}/api/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_FULL","message":"Room 1001 is full (8 of 8 players).","details":{"room_id":1001,"player_count":8,"max_players":8}}}'}}

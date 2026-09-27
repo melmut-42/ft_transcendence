@@ -5,7 +5,7 @@ info:
   tags: [identity, smoke]
 http:
   method: POST
-  url: "{{baseUrl}}/api/auth/register"
+  url: "{{baseUrl}}/api/{{apiVersion}}/auth/register"
   headers:
     - name: Content-Type
       value: application/json
@@ -58,7 +58,7 @@ docs: |-
 
   ## Success behavior and response fields
 
-  `201 Created` creates the user and one session pair in the same transaction. The response sets two cookies and returns no token value in the body (Session and Credential Model, `workspace.yml`): `ft_session` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/`, short-lived JWT access credential) and `ft_refresh` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/api/auth/refresh`, long-lived opaque refresh credential). Both are sent automatically by a browser on subsequent REST calls and the WebSocket upgrade — no authentication header is used and no token value appears in JSON for any client, browser or non-browser; Bruno authenticates through its cookie jar exactly like a browser.
+  `201 Created` creates the user and one session pair in the same transaction. The response sets two cookies and returns no token value in the body (Session and Credential Model, `workspace.yml`): `ft_session` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/`, short-lived JWT access credential) and `ft_refresh` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/api/v1/auth/refresh`, long-lived opaque refresh credential). Both are sent automatically by a browser on subsequent REST calls and the WebSocket upgrade — no authentication header is used and no token value appears in JSON for any client, browser or non-browser; Bruno authenticates through its cookie jar exactly like a browser.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
@@ -86,11 +86,11 @@ docs: |-
 
   ## Notes/invariants
 
-  The password is never returned or logged. A duplicate transmission cannot claim an existing email or username. `ft_refresh` is scoped to `Path=/api/auth/refresh`, so the browser never sends it on any other request — it exists solely for the Refresh endpoint to read.
+  The password is never returned or logged. A duplicate transmission cannot claim an existing email or username. `ft_refresh` is scoped to `Path=/api/v1/auth/refresh`, so the browser never sends it on any other request — it exists solely for the Refresh endpoint to read.
 examples:
   - name: Success - player_one
     request:
-      url: "{{baseUrl}}/api/auth/register"
+      url: "{{baseUrl}}/api/{{apiVersion}}/auth/register"
       method: POST
       headers: [{name: Content-Type, value: application/json, enabled: true}, {name: Accept, value: application/json, enabled: true}]
       params: []
@@ -107,7 +107,7 @@ examples:
       headers:
         - {name: Content-Type, value: application/json}
         - {name: Set-Cookie, value: "ft_session=eyJhbGciOiJIUzI1NiJ9...; HttpOnly; Secure; SameSite=Lax; Path=/"}
-        - {name: Set-Cookie, value: "ft_refresh=rtok_7Hk2mQ9vLc4R8pXaZq; HttpOnly; Secure; SameSite=Lax; Path=/api/auth/refresh"}
+        - {name: Set-Cookie, value: "ft_refresh=rtok_7Hk2mQ9vLc4R8pXaZq; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth/refresh"}
       body:
         type: json
         data: |-
@@ -124,7 +124,7 @@ examples:
           }
   - name: Error - Invalid email
     request:
-      url: "{{baseUrl}}/api/auth/register"
+      url: "{{baseUrl}}/api/{{apiVersion}}/auth/register"
       method: POST
       headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []
@@ -153,7 +153,7 @@ examples:
           }
   - name: Error - Password too short
     request:
-      url: "{{baseUrl}}/api/auth/register"
+      url: "{{baseUrl}}/api/{{apiVersion}}/auth/register"
       method: POST
       headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []
@@ -183,7 +183,7 @@ examples:
           }
   - name: Error - Email already exists
     request:
-      url: "{{baseUrl}}/api/auth/register"
+      url: "{{baseUrl}}/api/{{apiVersion}}/auth/register"
       method: POST
       headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []
@@ -212,7 +212,7 @@ examples:
           }
   - name: Error - Username already exists
     request:
-      url: "{{baseUrl}}/api/auth/register"
+      url: "{{baseUrl}}/api/{{apiVersion}}/auth/register"
       method: POST
       headers: [{name: Content-Type, value: application/json, enabled: true}]
       params: []

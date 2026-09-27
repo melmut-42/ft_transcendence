@@ -1,0 +1,78 @@
+info:
+  name: Send channel message
+  type: websocket
+  seq: 2
+  tags: [action, chat, channels]
+websocket:
+  url: "{{chatWsUrl}}/ws/{{chatApiVersion}}/channels"
+  message:
+    - title: Success - Message to direct channel
+      selected: true
+      message:
+        type: json
+        data: |-
+          {
+            "type": "chat.message.send",
+            "request_id": "req_c001",
+            "payload": {
+              "channel_id": 7001,
+              "text": "gg, ready?"
+            }
+          }
+    - title: Error - Not a channel member
+      selected: false
+      message:
+        type: json
+        data: |-
+          {
+            "type": "chat.message.send",
+            "request_id": "req_c002",
+            "payload": {
+              "channel_id": 7999,
+              "text": "hi"
+            }
+          }
+docs: |-
+  # Send channel message
+
+  Chat Gateway validates the envelope and publishes the command to RabbitMQ. Channel Service verifies membership, persists the message, assigns `message_id`, `sent_at`, and `expires_at`, then publishes the canonical event. A success ack is sent only after persistence succeeds. Channel Service deduplicates retries by `(sender_user_id, request_id)`, so RabbitMQ redelivery or a client retry cannot create a second message.
+
+  Required fields are `type=chat.message.send`, a unique `request_id` of `1..64` visible ASCII characters, `payload.channel_id` as a positive integer, and trimmed `payload.text` of `1..500` characters.
+
+  Sender ack:
+
+  ```json
+  {
+    "type": "ack",
+    "request_id": "req_c001",
+    "ok": true,
+    "payload": {
+      "message_id": "msg_001",
+      "channel_id": 7001,
+      "stored": true,
+      "sent_at": "2026-09-17T10:00:00Z",
+      "expires_at": "2026-10-17T10:00:00Z"
+    }
+  }
+  ```
+
+  Every online member socket, including the sender's other tabs, receives:
+
+  ```json
+  {
+    "type": "chat.message.created",
+    "event_id": "evt_c001",
+    "sent_at": "2026-09-17T10:00:00Z",
+    "payload": {
+      "message_id": "msg_001",
+      "channel_id": 7001,
+      "sender_user_id": 42,
+      "text": "gg, ready?",
+      "expires_at": "2026-10-17T10:00:00Z"
+    }
+  }
+  ```
+
+  Offline members retrieve the stored message later through `GET /api/v2/channels/{channel_id}/messages`; offline delivery is no longer an error or a special ack status.
+
+  Errors: `NOT_CHANNEL_MEMBER`, `CHANNEL_NOT_FOUND`, `INVALID_PAYLOAD`, and `SERVICE_UNAVAILABLE`. Errors correlate to `request_id`; failed commands are not persisted.

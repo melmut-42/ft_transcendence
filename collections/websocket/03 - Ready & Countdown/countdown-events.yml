@@ -4,7 +4,7 @@ info:
   seq: 2
   tags: [server-event, countdown]
 websocket:
-  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  url: "{{wsUrl}}/ws/{{apiVersion}}/rooms/{{roomId}}"
 settings:
   timeout: 30000
   keepAliveInterval: 20000

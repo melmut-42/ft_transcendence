@@ -13,4 +13,4 @@ docs: |-
 
   A game can start only with at least four configured, ready members; exactly one Spymaster and at least one Operative per `RED` and `BLUE`. REST room snapshots use the same enums and privacy projections as realtime state.
 
-  `Leave room` and logout (`DELETE /api/auth/session`) are legal in every room status, including `IN_GAME`: leaving mid-game forfeits the match for that member's team (Room Abandonment, `workspace.yml`) rather than being rejected. A transport disconnect alone is never an immediate leave — it starts a reconnect grace period first, and only resolves to a leave/forfeit if that period expires without reconnect.
+  `Leave room` and logout (`DELETE /api/v1/auth/session`) are legal in every room status, including `IN_GAME`: leaving mid-game forfeits the match for that member's team (Room Abandonment, `workspace.yml`) rather than being rejected. A transport disconnect alone is never an immediate leave — it starts a reconnect grace period first, and only resolves to a leave/forfeit if that period expires without reconnect.

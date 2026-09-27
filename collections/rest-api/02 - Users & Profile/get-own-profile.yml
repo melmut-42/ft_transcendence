@@ -5,7 +5,7 @@ info:
   tags: [profile]
 http:
   method: GET
-  url: "{{baseUrl}}/api/users/me"
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/me"
   headers:
     - name: Accept
       value: application/json
@@ -42,7 +42,7 @@ docs: |-
   Read-only; no event. Invalid sessions return `401 UNAUTHORIZED`. Team, role, ready, score, and board are intentionally absent because they are room state.
 examples:
   - name: Success - Persistent stats with active room
-    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -63,7 +63,7 @@ examples:
             }
           }
   - name: Success - Persistent stats without room
-    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -84,7 +84,7 @@ examples:
             }
           }
   - name: Error - Unauthorized
-    request: {url: "{{baseUrl}}/api/users/me", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]

@@ -5,7 +5,7 @@ info:
   tags: [contract, health]
 http:
   method: GET
-  url: "{{baseUrl}}/api/health"
+  url: "{{baseUrl}}/api/{{apiVersion}}/health"
   headers:
     - name: Accept
       value: application/json
@@ -53,7 +53,7 @@ docs: |-
 examples:
   - name: Success - Service available
     request:
-      url: "{{baseUrl}}/api/health"
+      url: "{{baseUrl}}/api/{{apiVersion}}/health"
       method: GET
       headers:
         - name: Accept
@@ -78,7 +78,7 @@ examples:
           }
   - name: Error - Service unavailable
     request:
-      url: "{{baseUrl}}/api/health"
+      url: "{{baseUrl}}/api/{{apiVersion}}/health"
       method: GET
       headers:
         - name: Accept

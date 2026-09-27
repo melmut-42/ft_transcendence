@@ -5,7 +5,7 @@ info:
   tags: [rooms, snapshot]
 http:
   method: GET
-  url: "{{baseUrl}}/api/rooms/{{roomId}}"
+  url: "{{baseUrl}}/api/{{apiVersion}}/rooms/{{roomId}}"
   headers:
     - name: Accept
       value: application/json
@@ -89,7 +89,7 @@ docs: |-
   `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`, `422 VALIDATION_ERROR`. Errors reveal no room state. The server projects every card for the authenticated viewer; an Operative never receives an unrevealed affiliation.
 examples:
   - name: Newly created room
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -120,7 +120,7 @@ examples:
             }
           }
   - name: Four joined - Not configured
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -178,7 +178,7 @@ examples:
             }
           }
   - name: Teams selected - Roles incomplete
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -236,7 +236,7 @@ examples:
             }
           }
   - name: Roles valid - Players not ready
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -294,7 +294,7 @@ examples:
             }
           }
   - name: In game - Operative projection
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -356,8 +356,8 @@ examples:
             }
           }
   - name: Error - Room not found
-    request: {url: "{{baseUrl}}/api/rooms/9999", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/9999", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}
   - name: Error - Not a member
-    request: {url: "{{baseUrl}}/api/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 403, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"NOT_ROOM_MEMBER","message":"User 47 is not a member of room 1001.","details":{"room_id":1001,"user_id":47}}}'}}

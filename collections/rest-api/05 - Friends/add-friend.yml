@@ -5,7 +5,7 @@ info:
   tags: [friends]
 http:
   method: POST
-  url: "{{baseUrl}}/api/friends"
+  url: "{{baseUrl}}/api/{{apiVersion}}/friends"
   headers:
     - name: Content-Type
       value: application/json
@@ -52,7 +52,7 @@ docs: |-
   | `422` | `VALIDATION_ERROR` | `user_id` missing/non-integer, or equals the requester |
 examples:
   - name: Success - Add red_agent
-    request: {url: "{{baseUrl}}/api/friends", method: POST, headers: [{name: Content-Type, value: application/json, enabled: true}], params: [], body: {mode: json, json: '{"user_id":43}'}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends", method: POST, headers: [{name: Content-Type, value: application/json, enabled: true}], params: [], body: {mode: json, json: '{"user_id":43}'}}
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
@@ -68,5 +68,5 @@ examples:
             }
           }
   - name: Error - Already friends
-    request: {url: "{{baseUrl}}/api/friends", method: POST, headers: [], params: [], body: {mode: json, json: '{"user_id":43}'}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends", method: POST, headers: [], params: [], body: {mode: json, json: '{"user_id":43}'}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_FRIENDS","message":"User 43 is already a friend.","details":{"user_id":43}}}'}}

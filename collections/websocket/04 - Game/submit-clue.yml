@@ -4,7 +4,7 @@ info:
   seq: 1
   tags: [action, game]
 websocket:
-  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  url: "{{wsUrl}}/ws/{{apiVersion}}/rooms/{{roomId}}"
   message:
     - title: Success - Ocean 2
       selected: true

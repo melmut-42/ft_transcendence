@@ -5,7 +5,7 @@ info:
   tags: [friends]
 http:
   method: GET
-  url: "{{baseUrl}}/api/users/search?q=red"
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/search?q=red"
   headers:
     - name: Accept
       value: application/json
@@ -46,7 +46,7 @@ docs: |-
   | `422` | `VALIDATION_ERROR` | `q` missing or empty |
 examples:
   - name: Success - Matches for "red"
-    request: {url: "{{baseUrl}}/api/users/search?q=red", method: GET, headers: [], params: [{name: q, value: red, enabled: true}], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/search?q=red", method: GET, headers: [], params: [{name: q, value: red, enabled: true}], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]

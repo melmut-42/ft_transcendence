@@ -5,7 +5,7 @@ info:
   tags: [rooms]
 http:
   method: DELETE
-  url: "{{baseUrl}}/api/rooms/{{roomId}}/members/me"
+  url: "{{baseUrl}}/api/{{apiVersion}}/rooms/{{roomId}}/members/me"
   headers: []
 docs: |-
   # Leave room
@@ -33,14 +33,14 @@ docs: |-
   `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`. `IN_GAME` is not an error case for this endpoint: leaving mid-game resolves to a forfeit rather than a rejection. Errors do not change membership.
 examples:
   - name: Success - Member leaves waiting room
-    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Success - Host leaves and ownership transfers
-    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Success - Leave during IN_GAME triggers forfeit
-    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Error - Not a room member
-    request: {url: "{{baseUrl}}/api/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 403, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"NOT_ROOM_MEMBER","message":"User 47 is not a member of room 1001.","details":{"room_id":1001,"user_id":47}}}'}}

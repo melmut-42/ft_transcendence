@@ -4,7 +4,7 @@ info:
   seq: 1
   tags: [action, room]
 websocket:
-  url: "{{wsUrl}}/ws/rooms/{{roomId}}"
+  url: "{{wsUrl}}/ws/{{apiVersion}}/rooms/{{roomId}}"
   message:
     - title: Success - Select RED
       selected: true

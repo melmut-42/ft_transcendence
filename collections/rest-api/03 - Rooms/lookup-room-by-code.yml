@@ -5,7 +5,7 @@ info:
   tags: [rooms]
 http:
   method: GET
-  url: "{{baseUrl}}/api/rooms/lookup/ABCD12"
+  url: "{{baseUrl}}/api/{{apiVersion}}/rooms/lookup/ABCD12"
   headers:
     - name: Accept
       value: application/json
@@ -53,7 +53,7 @@ docs: |-
   This endpoint never returns `players[]`, `game`, or `host_user_id` — those require membership, via `Get room snapshot` after joining. Lookup does not create membership; the client still calls `Join room` with the resolved `room_id`.
 examples:
   - name: Success - Resolves to waiting room
-    request: {url: "{{baseUrl}}/api/rooms/lookup/ABCD12", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/lookup/ABCD12", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -70,8 +70,8 @@ examples:
             }
           }
   - name: Error - Unknown code
-    request: {url: "{{baseUrl}}/api/rooms/lookup/ZZZZZZ", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/lookup/ZZZZZZ", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"No active room matches code ZZZZZZ.","details":{"room_code":"ZZZZZZ"}}}'}}
   - name: Error - Malformed code
-    request: {url: "{{baseUrl}}/api/rooms/lookup/ab", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms/lookup/ab", method: GET, headers: [], params: [], body: {mode: none}}
     response: {status: 422, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"VALIDATION_ERROR","message":"room_code must match ^[A-Za-z0-9]{6}$.","details":{"field":"room_code"}}}'}}

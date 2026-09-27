@@ -4,7 +4,7 @@ info:
   seq: 2
   tags: [action, chat]
 websocket:
-  url: "{{wsUrl}}/ws/chat"
+  url: "{{wsUrl}}/ws/{{apiVersion}}/chat"
   message:
     - title: Success - Message to friend
       selected: true
@@ -51,7 +51,7 @@ docs: |-
 
   ## Success behavior
 
-  Ack to sender reports actual delivery, not a fire-and-forget assumption. `payload.delivery_status` is `"DELIVERED"` when the recipient has at least one open `/ws/chat` socket (delivered to all of them — multi-tab), or `"RECIPIENT_OFFLINE"` when they have none. Either way `ok: true` — the *send* succeeded; delivery status is separate, informational data, not a command failure.
+  Ack to sender reports actual delivery, not a fire-and-forget assumption. `payload.delivery_status` is `"DELIVERED"` when the recipient has at least one open `/ws/v1/chat` socket (delivered to all of them — multi-tab), or `"RECIPIENT_OFFLINE"` when they have none. Either way `ok: true` — the *send* succeeded; delivery status is separate, informational data, not a command failure.
 
   ```json
     {

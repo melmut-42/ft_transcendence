@@ -5,7 +5,7 @@ info:
   tags: [rooms, smoke]
 http:
   method: POST
-  url: "{{baseUrl}}/api/rooms"
+  url: "{{baseUrl}}/api/{{apiVersion}}/rooms"
   headers:
     - name: Content-Type
       value: application/json
@@ -85,7 +85,7 @@ docs: |-
   `401 UNAUTHORIZED`; `409 ALREADY_IN_ROOM`; `422 VALIDATION_ERROR` when `max_players` is not an integer in `4..8`. None creates a room.
 examples:
   - name: Success - Newly created room
-    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 201
       headers: [{name: Content-Type, value: application/json}]
@@ -117,7 +117,7 @@ examples:
             }
           }
   - name: Error - Already in room
-    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 409
       headers: [{name: Content-Type, value: application/json}]
@@ -134,7 +134,7 @@ examples:
             }
           }
   - name: Error - Unauthorized
-    request: {url: "{{baseUrl}}/api/rooms", method: POST, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/rooms", method: POST, headers: [], params: [], body: {mode: none}}
     response:
       status: 401
       headers: [{name: Content-Type, value: application/json}]

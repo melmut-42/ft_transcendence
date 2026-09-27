@@ -5,7 +5,7 @@ info:
   tags: [profile]
 http:
   method: GET
-  url: "{{baseUrl}}/api/users/43"
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/43"
   headers:
     - name: Accept
       value: application/json
@@ -42,7 +42,7 @@ docs: |-
   Read-only; no event. `401 UNAUTHORIZED` covers the requester session; `404 USER_NOT_FOUND` covers a valid positive ID with no user. Session credentials, active room, team, role, and ready state are never public profile fields.
 examples:
   - name: Success - red_agent
-    request: {url: "{{baseUrl}}/api/users/43", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/43", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -62,7 +62,7 @@ examples:
             }
           }
   - name: Error - User not found
-    request: {url: "{{baseUrl}}/api/users/9999", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/9999", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 404
       headers: [{name: Content-Type, value: application/json}]
@@ -79,7 +79,7 @@ examples:
             }
           }
   - name: Error - Invalid path ID
-    request: {url: "{{baseUrl}}/api/users/zero", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/zero", method: GET, headers: [], params: [], body: {mode: none}}
     response:
       status: 422
       headers: [{name: Content-Type, value: application/json}]

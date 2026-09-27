@@ -1,5 +1,13 @@
 name: local
 variables:
+  - name: apiVersion
+    value: "v1"
+    type: string
+    description: "Version prefix shared by REST and WebSocket endpoints"
+  - name: chatApiVersion
+    value: "v2"
+    type: string
+    description: "Version prefix for the new Channel Service and Chat Gateway contracts"
   - name: baseUrl
     value: "http://localhost:3000"
     type: string
@@ -7,7 +15,11 @@ variables:
   - name: wsUrl
     value: "ws://localhost:3000"
     type: string
-    description: "Local WebSocket origin"
+    description: "Local Game Gateway WebSocket origin"
+  - name: chatWsUrl
+    value: "ws://localhost:3001"
+    type: string
+    description: "Local Chat Gateway WebSocket origin"
   - name: userId
     value: "42"
     type: number
@@ -20,3 +32,7 @@ variables:
     value: "5001"
     type: number
     description: "Canonical match ID used by state examples"
+  - name: channelId
+    value: "7001"
+    type: number
+    description: "Current direct-chat channel ID"
