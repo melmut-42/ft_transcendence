@@ -42,13 +42,13 @@ docs:
     | `POST` | `/api/v1/users/me/avatar` | Upload/replace avatar | yes | active session, valid image |
     | `GET` | `/api/v1/users/me/matches` | Own match history (paginated) | yes | active session |
     | `GET` | `/api/v1/users/{user_id}` | Public persistent profile | yes | user exists |
-    | `GET` | `/api/v1/users/search?q=` | Username search for friend discovery | yes | active session |
+    | `GET` | `/api/v1/users/search?q=&limit=&offset=` | Offset-paginated username search for friend discovery | yes | active session |
     | `POST` | `/api/v1/rooms` | Create and host a room | yes | not in active room |
     | `POST` | `/api/v1/rooms/{room_id}/members` | Join a room | yes | `WAITING`, not in active room |
     | `GET` | `/api/v1/rooms/{room_id}` | Role-safe room/game snapshot | yes | room member |
     | `DELETE` | `/api/v1/rooms/{room_id}/members/me` | Leave room (forfeits if `IN_GAME`) | yes | room member |
     | `GET` | `/api/v1/rooms/lookup/{room_code}` | Resolve room code to room ID | yes | active room with that code |
-    | `GET` | `/api/v1/friends` | List friends with snapshot presence | yes | active session |
+    | `GET` | `/api/v1/friends?limit=&offset=` | Offset-paginated friends with snapshot presence | yes | active session |
     | `POST` | `/api/v1/friends` | Add a friend (immediate, mutual) | yes | target user exists, not self |
     | `DELETE` | `/api/v1/friends/{user_id}` | Remove a friend | yes | friendship exists |
 

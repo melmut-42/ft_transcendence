@@ -5,10 +5,15 @@ info:
   tags: [friends]
 http:
   method: GET
-  url: "{{baseUrl}}/api/{{apiVersion}}/friends"
+  url: "{{baseUrl}}/api/{{apiVersion}}/friends?limit=50&offset=0"
   headers:
     - name: Accept
       value: application/json
+  params:
+    - name: limit
+      value: "50"
+    - name: offset
+      value: "0"
 docs: |-
   # List friends
 
@@ -22,12 +27,17 @@ docs: |-
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
+  | `limit` | query | no | integer | `1..100`, default `50` | no | Maximum friends in this page | `50` |
+  | `offset` | query | no | integer | `>= 0`, default `0` | no | Number of ordered friends to skip | `0` |
 
   ## Response fields
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
   | `data.friend_count` | integer | yes | no | `>= 0` | Total friends |
+  | `data.limit` | integer | yes | no | `1..100` | Applied page size |
+  | `data.offset` | integer | yes | no | `>= 0` | Applied offset |
+  | `data.has_more` | boolean | yes | no | `true`, `false` | Whether another page exists |
   | `data.friends[].user_id` | integer | yes | no | positive | Friend's user ID |
   | `data.friends[].username` | string | yes | no | username rule | Friend's display name |
   | `data.friends[].avatar_url` | string | yes | no | URL | Friend's avatar |
@@ -35,10 +45,10 @@ docs: |-
 
   ## Errors
 
-  `401 UNAUTHORIZED` for an invalid session. Read-only; no event.
+  Friends are ordered case-insensitively by `username`, then `user_id`. Presence does not affect ordering. `401 UNAUTHORIZED` covers an invalid session; invalid `limit` or `offset` returns `422 VALIDATION_ERROR`. Read-only; no event.
 examples:
   - name: Success - Two friends
-    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends", method: GET, headers: [], params: [], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends?limit=50&offset=0", method: GET, headers: [], params: [{name: limit, value: "50", enabled: true}, {name: offset, value: "0", enabled: true}], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -48,6 +58,9 @@ examples:
           {
             "data": {
               "friend_count": 2,
+              "limit": 50,
+              "offset": 0,
+              "has_more": false,
               "friends": [
                 {
                   "user_id": 43,

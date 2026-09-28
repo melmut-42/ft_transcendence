@@ -19,7 +19,7 @@ docs:
   content: |-
     # ft_transcendence Chat REST API v2
 
-    The Web BFF exposes channel discovery and retained history at `/api/v2/channels`. Authentication reuses the existing same-origin `ft_session` cookie.
+    The Web BFF exposes cursor-paginated channel discovery (`limit` + opaque `after`) and retained history at `/api/v2/channels`. Authentication reuses the existing same-origin `ft_session` cookie.
 
     `DIRECT` channels are private and friend-only. `ROOM` channels are created automatically from the Game Session durable outbox, one per `room_id`; clients never create them directly. List and history endpoints obtain a current authorization verdict from the owning User/Auth or Game Session service. A ROOM verdict carries `room_version`, and Channel Service first reconciles its lifecycle projection through that version. ROOM history is bounded by the caller's current membership epoch and the sequence windows during which that member actually had ROOM access.
 

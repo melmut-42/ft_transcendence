@@ -5,13 +5,17 @@ info:
   tags: [friends]
 http:
   method: GET
-  url: "{{baseUrl}}/api/{{apiVersion}}/users/search?q=red"
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/search?q=red&limit=20&offset=0"
   headers:
     - name: Accept
       value: application/json
   params:
     - name: q
       value: red
+    - name: limit
+      value: "20"
+    - name: offset
+      value: "0"
 docs: |-
   # Search users
 
@@ -25,12 +29,17 @@ docs: |-
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
   | `q` | query | yes | string | trimmed, `1..20` chars | no | Case-insensitive username substring | `red` |
+  | `limit` | query | no | integer | `1..50`, default `20` | no | Maximum matches in this page | `20` |
+  | `offset` | query | no | integer | `>= 0`, default `0` | no | Number of ranked matches to skip | `0` |
 
   ## Response fields
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
-  | `data.results[]` | array<object> | yes | no | up to 20 matches | Ranked by prefix match, then alphabetically |
+  | `data.results[]` | array<object> | yes | no | up to `limit` matches | Prefix rank, username, then user ID |
+  | `data.limit` | integer | yes | no | `1..50` | Applied page size |
+  | `data.offset` | integer | yes | no | `>= 0` | Applied offset |
+  | `data.has_more` | boolean | yes | no | `true`, `false` | Whether another page exists |
   | `data.results[].user_id` | integer | yes | no | positive | Matched user |
   | `data.results[].username` | string | yes | no | username rule | Matched username |
   | `data.results[].avatar_url` | string | yes | no | URL | Avatar |
@@ -40,13 +49,15 @@ docs: |-
 
   ## Errors
 
+  Ordering is prefix rank first, then case-insensitive `username`, then `user_id`. Clients request the next page with `offset + results.length`.
+
   | Status | Code | When |
   | --- | --- | --- |
   | `401` | `UNAUTHORIZED` | invalid session |
-  | `422` | `VALIDATION_ERROR` | `q` missing or empty |
+  | `422` | `VALIDATION_ERROR` | invalid `q`, `limit`, or `offset` |
 examples:
   - name: Success - Matches for "red"
-    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/search?q=red", method: GET, headers: [], params: [{name: q, value: red, enabled: true}], body: {mode: none}}
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/search?q=red&limit=20&offset=0", method: GET, headers: [], params: [{name: q, value: red, enabled: true}, {name: limit, value: "20", enabled: true}, {name: offset, value: "0", enabled: true}], body: {mode: none}}
     response:
       status: 200
       headers: [{name: Content-Type, value: application/json}]
@@ -55,6 +66,9 @@ examples:
         data: |-
           {
             "data": {
+              "limit": 20,
+              "offset": 0,
+              "has_more": false,
               "results": [
                 {"user_id": 43, "username": "red_agent", "avatar_url": "https://{{baseUrl}}/static/avatars/default/43.svg", "is_friend": false},
                 {"user_id": 46, "username": "extra_red", "avatar_url": "https://{{baseUrl}}/static/avatars/default/46.svg", "is_friend": false}
