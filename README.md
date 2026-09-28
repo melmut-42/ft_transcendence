@@ -162,15 +162,23 @@ The interface uses a custom, game-oriented visual system built on CSS custom pro
 
 ## Repository / Branch Guide
 
-> [!NOTE]
-> The `main` branch is intentionally documentation-only and contains just this README. It is the public landing page for the project; implementation lives on dedicated branches.
+`main` is the primary integration branch and holds the canonical integrated project state. Implementation happens on development branches derived from `main`, which periodically incorporate the latest `main` and are merged back into it through a reviewed Pull Request once the work is stable and verified.
+
+```
+main
+├── frontend
+└── backend
+```
 
 | Branch | Purpose |
 | --- | --- |
-| `main` | Public project overview and repository landing page (this branch). |
-| `frontend` | React frontend implementation. |
+| `main` | Primary integration branch; canonical integrated project state and public project overview. |
+| `frontend` | React frontend development branch. |
+| `backend` | Go backend development branch. |
 | `bruno` | REST and WebSocket API contract (Bruno collection). |
 | `ui-design` | Visual design system, reference mockups and design assets. |
+
+Each development branch tracks its own remote counterpart. `main` is the base and integration target, not the upstream tracking branch of `frontend` or `backend`.
 
 ## Development
 
@@ -179,8 +187,19 @@ Each implementation branch documents its own setup. In short:
 ```bash
 git clone git@github.com:melmut-42/ft_transcendence.git
 git checkout frontend   # frontend app
+git checkout backend    # backend services
 git checkout bruno      # API contracts
 git checkout ui-design  # design system and assets
+```
+
+Development branches stay current with `main`, and integrate back into it once the work is verified:
+
+```bash
+git checkout frontend
+git fetch origin
+git merge origin/main   # repeat periodically, and again before integration
+
+# run the branch's checks, push, then open a frontend -> main pull request
 ```
 
 The full stack (frontend, backend services, PostgreSQL and Redis) is intended to run with a single Docker Compose command; see the `frontend` and `bruno` branches for current setup details.
