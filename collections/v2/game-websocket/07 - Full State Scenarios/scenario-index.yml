@@ -20,7 +20,7 @@ docs: |-
   | Scenario | Fixture transition | Contract location |
   | --- | --- | --- |
   | Newly created room | user `42` creates `1001` | REST `Create room` |
-  | Four joined, unconfigured | users `42..45`, all selections null | REST `Get room snapshot` |
+  | Four joined as spectators | users `42..45`, `team:null`, `role:SPECTATOR` | REST `Get room snapshot` |
   | Teams selected, roles incomplete | users `43` and `45` lack roles | REST `Get room snapshot` |
   | Duplicate Spymaster | user `43` requests RED Spymaster occupied by `42` | WebSocket `Select role` |
   | Roles valid, some unready | user `45` remains false | REST `Get room snapshot` |

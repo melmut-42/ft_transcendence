@@ -14,7 +14,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Adds the authenticated user as an unconfigured member. The room must exist, be `WAITING`, and have no member still in `POST_GAME`; the user must have no active room. No body is accepted.
+  Adds the authenticated user to a room in `WAITING`, `COUNTDOWN`, or `IN_GAME`. The user must have no active room and capacity must remain. No body is accepted. Every join starts as `team:null`, `role:SPECTATOR`, `ready:false`; state is `IN_LOBBY` before play and `IN_GAME` during play.
 
   ## Request parameters
 
@@ -26,33 +26,33 @@ docs: |-
 
   ## Response fields
 
-  `201 Created` returns `{data: room_snapshot}`. The new item has `team:null`, `role:null`, `ready:false`, `state:IN_LOBBY`, `is_host:false`, and a UTC `joined_at`. `player_count` increments and `startable` is recomputed.
+  `201 Created` returns `{data: room_snapshot}`. `player_count` increments atomically. Because every join is a spectator, joining never invalidates countdown, changes staffing, or mutates the board/turn.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
   | `data.room_id` | integer | yes | no | positive | Joined room |
   | `data.room_code` | string | yes | no | `^[A-Z0-9]{6}$` | Human-shareable code for the joined room |
-  | `data.status` | string enum | yes | no | `WAITING` | Joinable lifecycle state |
-  | `data.host_user_id` | integer | yes | no | member ID | Current host |
-  | `data.player_count` | integer | yes | no | `>= 2` in this flow | Count after join |
-  | `data.max_players` | integer | yes | no | `4..8` | Room capacity; joins are rejected once `player_count` reaches it |
-  | `data.startable` | boolean | yes | no | `false` | New member is unconfigured, so full predicate fails |
+  | `data.status` | string enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME` | Joinable lifecycle state |
+  | `data.host_user_id` | integer or null | yes | yes | member ID or `null` | Current host; an empty-room joiner becomes host |
+  | `data.player_count` | integer | yes | no | `>= 1` | Count after join; may be one when reviving an empty room |
+  | `data.max_players` | integer | yes | no | `4..20` | Room capacity; participants and spectators both count |
+  | `data.startable` | boolean | yes | no | current predicate | A spectator does not alter the predicate |
   | `data.players[]` | array<object> | yes | no | members in join order | Membership snapshot |
   | `data.players[].user_id` | integer | yes | no | positive | Member ID |
   | `data.players[].username` | string | yes | no | username rule | Display name |
   | `data.players[].avatar_url` | string | yes | no | same-origin URL | Current avatar for lobby rendering |
   | `data.players[].team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
-  | `data.players[].role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Temporary role |
+  | `data.players[].role` | enum | yes | no | `SPECTATOR` on join | Later changed atomically through `room.role.select` |
   | `data.players[].ready` | boolean | yes | no | `true`, `false` | Current readiness |
-  | `data.players[].state` | string enum | yes | no | `IN_LOBBY` | New joins always enter the active lobby |
+  | `data.players[].state` | string enum | yes | no | `IN_LOBBY`, `IN_GAME` | Mirrors whether the room is pre-game or active |
   | `data.players[].is_host` | boolean | yes | no | `true`, `false` | Host marker |
   | `data.players[].joined_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Membership order |
-  | `data.game` | object or null | yes | yes | `null` on join | Game absent in `WAITING` |
+  | `data.game` | object or null | yes | yes | active role-safe game or `null` | Present for `IN_GAME` joins |
   | `data.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Room creation time |
 
   ## State changes and emitted events
 
-  Sets `active_room_id` and atomically appends a durable channel-membership outbox event with a new room-membership epoch ID. Channel Service applies that event idempotently to the existing Chat v2 `ROOM` channel and opens the epoch's first visibility window after the channel's current message-sequence high-water mark. Temporary chat failure delays `chat.channel.available` but never rolls back room membership. Game Session emits `room.player.joined`, then a role-safe `room.state`. A join can never trigger countdown because the new unconfigured member makes the start predicate false.
+  Sets `active_room_id`, cancels an active empty-room closure timer, assigns host if the room was empty, and emits `room.player.joined` followed by a recipient-safe `room.state`. An in-game spectator receives the Operative-safe board projection and may later claim a legal team role over WebSocket. A join never starts a game by itself.
 
   ## Errors
 
@@ -60,14 +60,14 @@ docs: |-
   | --- | --- | --- | --- |
   | `401` | `UNAUTHORIZED` | invalid session | none |
   | `404` | `ROOM_NOT_FOUND` | room ID absent | none |
-  | `409` | `ROOM_NOT_JOINABLE` | state is `COUNTDOWN`, `IN_GAME`, `POST_GAME`, or `CLOSED`; or shared state is `WAITING` but `post_game.pending_user_ids` is non-empty | none |
+  | `409` | `ROOM_NOT_JOINABLE` | state is `POST_GAME` or `CLOSED`; or shared state is `WAITING` but post-game members remain | none |
   | `409` | `ROOM_FULL` | `player_count` already equals `max_players` | none |
   | `409` | `ALREADY_IN_ROOM` | user already has active room, including this one | none |
   | `422` | `VALIDATION_ERROR` | room ID is not positive integer | none |
 
   ## Invariants
 
-  `player_count` never exceeds `max_players`; the capacity check and insert are atomic, so two simultaneous joins cannot both take the last seat. Joining is forbidden as soon as countdown begins and throughout the mixed `WAITING`/`POST_GAME` recovery window.
+  `player_count` never exceeds `max_players`; the capacity check and insert are atomic. Mid-game joins are always spectators first and therefore cannot obtain hidden Spymaster information before a legal role claim.
 examples:
   - name: Success - Join empty-team room
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
@@ -90,7 +90,7 @@ examples:
                   "user_id": 42,
                   "username": "player_one",
                   "team": null,
-                  "role": null,
+                  "role": "SPECTATOR",
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": true,
@@ -100,7 +100,7 @@ examples:
                   "user_id": 43,
                   "username": "red_agent",
                   "team": null,
-                  "role": null,
+                  "role": "SPECTATOR",
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,
@@ -172,7 +172,7 @@ examples:
                   "user_id": 46,
                   "username": "extra_red",
                   "team": null,
-                  "role": null,
+                  "role": "SPECTATOR",
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,

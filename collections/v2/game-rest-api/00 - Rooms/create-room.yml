@@ -26,12 +26,12 @@ runtime:
         }
     - type: tests
       code: |-
-        test("creator is joined as unconfigured host", function () {
+        test("creator is joined as spectator host", function () {
           expect(res.status).to.equal(201);
           expect(res.body.data.status).to.equal("WAITING");
           expect(res.body.data.players[0].is_host).to.equal(true);
           expect(res.body.data.players[0].team).to.equal(null);
-          expect(res.body.data.players[0].role).to.equal(null);
+          expect(res.body.data.players[0].role).to.equal("SPECTATOR");
           expect(res.body.data.players[0].ready).to.equal(false);
           expect(res.body.data.players[0].state).to.equal("IN_LOBBY");
           expect(res.body.data.room_code).to.match(/^[A-Z0-9]{6}$/);
@@ -41,7 +41,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Creates a `WAITING` room, joins the authenticated creator, and makes that member host. The user must not already belong to any active room.
+  Creates a `WAITING` room, joins the authenticated creator as a spectator, and makes that member host. The user must not already belong to any active room.
 
   ## Request parameters
 
@@ -49,7 +49,7 @@ docs: |-
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Creating user | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
-  | `max_players` | body | no | integer | `4..8`, default `8` | no | Room capacity | `8` |
+  | `max_players` | body | no | integer | `4..20`, default `8` | no | Room capacity | `8` |
 
   The body is optional; an empty or absent body creates a room with `max_players: 8`. Passwords, timers, and custom boards are not contract features.
 
@@ -62,14 +62,14 @@ docs: |-
   | `data.status` | string enum | yes | no | `WAITING` | Initial lifecycle state |
   | `data.host_user_id` | integer | yes | no | creator ID | Current host |
   | `data.player_count` | integer | yes | no | `1` | Current membership count |
-  | `data.max_players` | integer | yes | no | `4..8` | Room capacity; joins are rejected once `player_count` reaches it |
+  | `data.max_players` | integer | yes | no | `4..20` | Room capacity; participants and spectators count |
   | `data.startable` | boolean | yes | no | `false` | Full start predicate result |
   | `data.players[]` | array<object> | yes | no | one creator | Members in join order |
   | `data.players[].user_id` | integer | yes | no | positive | Member ID |
   | `data.players[].username` | string | yes | no | username rule | Member username |
   | `data.players[].avatar_url` | string | yes | no | same-origin URL | Current avatar for lobby rendering |
   | `data.players[].team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
-  | `data.players[].role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Temporary role |
+  | `data.players[].role` | enum | yes | no | `SPECTATOR` | Every creator starts as spectator |
   | `data.players[].ready` | boolean | yes | no | `false` | Readiness |
   | `data.players[].state` | string enum | yes | no | `IN_LOBBY` | Recipient-independent member lifecycle state |
   | `data.players[].is_host` | boolean | yes | no | `true` | Host marker |
@@ -85,7 +85,7 @@ docs: |-
 
   ## Errors
 
-  `401 UNAUTHORIZED`; `409 ALREADY_IN_ROOM`; `422 VALIDATION_ERROR` when `max_players` is not an integer in `4..8`. None creates a room.
+  `401 UNAUTHORIZED`; `409 ALREADY_IN_ROOM`; `422 VALIDATION_ERROR` when `max_players` is not an integer in `4..20`. None creates a room.
 examples:
   - name: Success - Newly created room
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms", method: POST, headers: [], params: [], body: {mode: none}}
@@ -109,7 +109,7 @@ examples:
                   "user_id": 42,
                   "username": "player_one",
                   "team": null,
-                  "role": null,
+                  "role": "SPECTATOR",
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": true,

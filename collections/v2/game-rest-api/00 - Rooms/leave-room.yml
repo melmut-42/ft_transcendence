@@ -12,7 +12,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Removes the authenticated member. Legal in every room status, including `IN_GAME` (Room Abandonment, `workspace.yml`) — an explicit leave during `IN_GAME` immediately triggers `PLAYER_FORFEIT` for that member's team rather than being rejected. Transport disconnect alone is not a leave; it starts the reconnect grace period instead, and only becomes this same effect if the grace period expires without reconnect.
+  Removes the authenticated member in every room status. Leaving during `IN_GAME` never assigns an automatic loss. The server instead checks whether both teams still contain at least one Spymaster and one Operative.
 
   ## Request parameters
 
@@ -25,14 +25,15 @@ docs: |-
 
   `204 No Content` clears the user's active room.
 
-  - **`WAITING` / `COUNTDOWN` / `POST_GAME`:** emits `room.player.left` with reason `EXITED`. This includes a member whose personal state is still `POST_GAME` after the shared room already returned to `WAITING`. During `COUNTDOWN`, removal first cancels countdown. If the departure empties `post_game.pending_user_ids`, `room.post_game.completed` follows; the new recipient-specific `room.state` is last. If the host leaves, ownership transfers using the rule in `workspace.yml`; if none remain, status becomes `CLOSED` and no final snapshot has a recipient.
-  - **`IN_GAME`:** triggers forfeit—the departing member's team loses. One atomic transition captures the pre-departure roster for internal `match.finalized`, removes the member, transfers host if needed, sets every remaining member to `POST_GAME`, and creates the deadline. Remaining members then receive `game.ended` (`end_reason: "PLAYER_FORFEIT"`, `room_status: "POST_GAME"`, `game_status: "GAME_FINISHED"`, `phase: "GAME_OVER"`, `post_game_deadline_at`), `room.post_game.started` whose pending list excludes the departed member, `room.player.left` with reason `EXITED`, and a recipient-specific `room.state`, in that order.
+  - **`WAITING` / `COUNTDOWN` / `POST_GAME`:** emits `room.player.left`; countdown is cancelled when a participating departure invalidates start conditions.
+  - **`IN_GAME`:** a spectator departure has no gameplay effect. A participant departure keeps play running if both teams remain valid. Otherwise it emits `game.staffing.required`, preserves game state, changes phase to `PAUSED_FOR_PLAYERS`, and starts a 120-second deadline for each deficient team. If staffing is restored, `game.staffing.restored` resumes play. Deadline expiry emits `game.cancelled` with `INSUFFICIENT_PLAYERS`, no winner, and no statistics update.
+  - **Empty room:** the room remains active with `host_user_id:null` for 300 seconds. A join cancels closure; otherwise `room.closed` is emitted internally at `close_at` and the code becomes reusable.
 
   In every branch, the departing member immediately loses access to the Chat v2 `ROOM` channel. `game.ended` also removes ROOM access from every remaining member entering `POST_GAME`. Stored messages remain retained but inaccessible.
 
   ## Errors
 
-  `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`. `IN_GAME` is not an error case for this endpoint: leaving mid-game resolves to a forfeit rather than a rejection. Errors do not change membership.
+  `401 UNAUTHORIZED`, `404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`. `IN_GAME` is not an error case. Errors do not change membership.
 examples:
   - name: Success - Member leaves waiting room
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
@@ -40,7 +41,7 @@ examples:
   - name: Success - Host leaves and ownership transfers
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
-  - name: Success - Leave during IN_GAME triggers forfeit
+  - name: Success - Leave during IN_GAME rechecks staffing
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members/me", method: DELETE, headers: [], params: [], body: {mode: none}}
     response: {status: 204, headers: [], body: {type: text, data: ""}}
   - name: Error - Not a room member

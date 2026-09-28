@@ -46,15 +46,19 @@ docs: |-
   flowchart TD
       A[Lobby] --> B[Create or join room]
       B --> C[WAITING room]
-      C --> D[Choose RED or BLUE]
-      C --> E[Choose SPYMASTER or OPERATIVE]
-      D --> F[Set ready]
-      E --> F
+      C --> D[Start as SPECTATOR]
+      D --> E[Atomically claim team + playing role]
+      E --> F[Set ready]
       F --> G{Every start invariant valid?}
       G -->|No| C
       G -->|Yes| H[COUNTDOWN]
       H -->|Invariant breaks| C
       H -->|Completes validly| I[IN_GAME]
+      I --> L{Both teams staffed?}
+      L -->|Yes| I
+      L -->|No| M[PAUSED_FOR_PLAYERS: 120s per deficient team]
+      M -->|Staffing restored| I
+      M -->|A deadline expires| J[POST_GAME: cancelled]
       I --> J[POST_GAME]
       J -->|Any member returns| C
       J -->|Everyone exits or times out| K[CLOSED]
@@ -70,28 +74,25 @@ docs: |-
       COUNTDOWN --> IN_GAME: countdown completes while valid
       IN_GAME --> POST_GAME: terminal game result
       POST_GAME --> WAITING: first member returns to lobby
-      WAITING --> CLOSED: last member leaves
-      POST_GAME --> CLOSED: every member exits or times out
+      WAITING --> CLOSED: empty for 300 seconds
+      POST_GAME --> CLOSED: empty for 300 seconds
   ```
 
-  A room is joinable only while its shared status is `WAITING` and no current member remains `POST_GAME`. A creator joins automatically and becomes host. One user may belong to only one active room. Room members have a recipient-specific state: `IN_LOBBY`, `IN_GAME`, or `POST_GAME`. After `game.ended`, the room enters `POST_GAME` and every member enters `POST_GAME`. Any member—not only the host—may choose Back to Lobby; the first accepted choice moves the shared room to `WAITING` and that member to `IN_LOBBY`, while undecided members remain `POST_GAME` and continue seeing the result. Later returners become `IN_LOBBY` independently. Once this transition occurs, shared status remains `WAITING` even if every already-returned member later exits or is kicked; pending members and the original deadline still govern cleanup. New joins, invites, and countdown are forbidden until every remaining member is `IN_LOBBY`.
+  A room is joinable while its shared status is `WAITING`, `COUNTDOWN`, or `IN_GAME`, provided capacity remains. Every new member—including the creator/host—starts as `team:null`, `role:SPECTATOR`, `ready:false`; only member `state` follows the room (`IN_LOBBY` before play, `IN_GAME` during play). Joining alone never changes startability, staffing, board, or turn. A spectator may remain passive or atomically claim a legal `{team, role}` pair through `room.role.select`. `POST_GAME`, `CLOSED`, and a mixed `WAITING` room with unresolved post-game members are not joinable. After a normal `game.ended` or `game.cancelled`, the room enters `POST_GAME` and every member enters `POST_GAME`. Any member—not only the host—may return independently. New joins and countdown remain forbidden until every remaining post-game member returns or leaves.
 
-  The post-game decision deadline is 60 seconds by default and server-configurable. It starts at `game.ended`, is represented by the absolute `post_game.deadline_at`, and is not paused by disconnect. A member still in `POST_GAME` at the deadline is removed with reason `POST_GAME_TIMEOUT`. If every member exits or times out, the room becomes `CLOSED`; if at least one member returned, the room remains `WAITING`. The same `room_id`, `room_code`, host, team, and role selections survive a return; every member's `ready` resets to `false`, and a new `game_id`/board is created only after the next valid countdown.
+  The post-game decision deadline is 60 seconds by default and is not paused by disconnect. A member still in `POST_GAME` at the deadline is removed with reason `POST_GAME_TIMEOUT`. An empty room starts the separate 300-second closure timer instead of closing immediately. The same `room_id`, `room_code`, host, team, and role selections survive a return; every member's `ready` resets to `false`, and a new `game_id`/board is created only after the next valid countdown.
 
-  Host authority is limited to room administration, not returning to lobby or starting the game. Capacity updates require the host to be personally `IN_LOBBY`. A host may kick another member while the shared room is `WAITING` (including a mixed lobby/post-game room), during `COUNTDOWN` (which is cancelled first), or during `POST_GAME`; the host does not need to return before removing a pending post-game member. Kicking is forbidden during `IN_GAME`, and the host cannot kick themself. If the host leaves or times out, host transfers first to the earliest-joined `IN_LOBBY` member, otherwise to the earliest remaining member; an empty room closes.
+  Host authority is limited to room administration, not returning to lobby or starting the game. Capacity updates require the host to be personally `IN_LOBBY`. A host may kick another member while the shared room is `WAITING` (including a mixed lobby/post-game room), during `COUNTDOWN` (which is cancelled first), or during `POST_GAME`; kicking remains forbidden during `IN_GAME`. The host cannot kick themself. If the host leaves, host transfers first to the earliest-joined participant, otherwise to the earliest remaining spectator. An empty room has `host_user_id:null` until somebody joins or the 300-second closure timer expires.
 
   ## Reconnect Grace Period and Abandonment (Game v2)
 
-  A transport disconnect (closed socket, no REST leave call) is never treated as an immediate leave, in any room state. It starts a reconnect grace period (configurable server-side; example default 30s in `WAITING`/`COUNTDOWN`, 60s `IN_GAME`) during which the member's seat, team, role, ready state, and turn rights are reserved exactly as they were. Reconnecting inside the grace period (same authenticated session opening a new socket to the same room) restores the member with no state loss and no event beyond the normal reconnect snapshot.
+  A transport disconnect is never an immediate leave. It starts the configured reconnect grace period (examples: 30 seconds in `WAITING`/`COUNTDOWN`, 60 seconds in `IN_GAME`) and reserves the member's team, role, and turn rights. Reconnecting in time restores the membership unchanged.
 
-  If the grace period expires without reconnect, behavior depends on room status:
-  - **`WAITING` or `COUNTDOWN`:** the member is removed exactly as an explicit leave — `room.player.left`, host transfer if needed, countdown cancellation if the departure breaks a start invariant.
-  - **`IN_GAME`:** the member is marked permanently abandoned and the match ends immediately by **forfeit** — the abandoning member's team loses, the opposite team wins, regardless of score. This is the same terminal outcome as an explicit `Leave room` call during `IN_GAME` (which is now accepted, not rejected — see below) and the same outcome as logout during `IN_GAME` (which revokes the session immediately per the Session and Credential Model above, and runs this same forfeit path for room-lifecycle purposes rather than blocking on `ALREADY_IN_ROOM`). The resulting membership event uses `EXITED`, `SESSION_ENDED`, or `DISCONNECTED` respectively.
-  - **`POST_GAME`, or a `POST_GAME` member while the room is already `WAITING`:** reconnect grace does not extend the shared post-game deadline. Reconnect before `deadline_at` restores the result projection; expiry removes the unresolved member with `POST_GAME_TIMEOUT`.
+  When grace expires, or when an explicit leave/logout removes a member, spectators have no effect on team staffing. During `IN_GAME`, the server recomputes both teams. Play continues while each team has at least one `SPYMASTER` and one `OPERATIVE`. A deficient team receives its own absolute 120-second `staffing.deadline_at`; the game enters `PAUSED_FOR_PLAYERS`, preserving the board, score, clue, guesses, and turn. Normal game commands are rejected while paused.
 
-  `Leave room` (`DELETE /api/v2/rooms/{room_id}/members/me`) is legal in every v2 room status, including `IN_GAME`; during `IN_GAME` it triggers the same forfeit path as an abandonment timeout, without waiting out the grace period — an explicit leave is an immediate, deliberate signal. `End session` (logout) remains on v1 and is likewise legal regardless of `active_room_id`; if the user is in an `IN_GAME` room, forfeit resolves first, synchronously with the session revocation, then the cookies clear and any open sockets close.
+  Every join starts as a spectator. The spectator may atomically claim a legal `{team, role}` pair; a Spymaster claim requires that team's slot to be vacant. During a staffing pause, restoring one team clears only that team's deadline; restoring both teams resumes the preserved phase. If either deadline expires, the server emits `game.cancelled` with `end_reason:"INSUFFICIENT_PLAYERS"`, `winner:null`, and `loser:null`, then enters `POST_GAME`. Cancellation produces no win, loss, match-history entry, or `match.finalized` record.
 
-  The terminal `game.ended` event for a forfeit carries `end_reason: "PLAYER_FORFEIT"` alongside the usual `winner`, `loser`, `score`, `room_status: "POST_GAME"`, `game_status: "GAME_FINISHED"`, `phase: "GAME_OVER"`, and `post_game_deadline_at`; `revealed_card` is `null` because no card triggered it. The same atomic terminal transition appends one internal `match.finalized` record to the durable integration outbox. Stats consumes that complete record idempotently by `game_id`; it does not reconstruct rosters from the client-facing `game.ended` payload.
+  When the final room member is removed, the server sets `empty_since` and `close_at=empty_since+300s`. The room and room code remain active and joinable during this interval. A join cancels the timer and makes the joiner host. If nobody joins by `close_at`, the room becomes `CLOSED` and its code may be reused.
 
   ## Game Lifecycle
 
@@ -101,11 +102,16 @@ docs: |-
       WAITING_FOR_CLUE --> GUESSING: active Spymaster submits clue word and N
       GUESSING --> GUESSING: own card and guesses remain
       GUESSING --> WAITING_FOR_CLUE: pass, neutral, opponent card, or guesses exhausted
+      WAITING_FOR_CLUE --> PAUSED_FOR_PLAYERS: a team becomes deficient
+      GUESSING --> PAUSED_FOR_PLAYERS: a team becomes deficient
+      PAUSED_FOR_PLAYERS --> WAITING_FOR_CLUE: staffing restored; previous phase was clue
+      PAUSED_FOR_PLAYERS --> GUESSING: staffing restored; previous phase was guessing
+      PAUSED_FOR_PLAYERS --> GAME_OVER: a 120-second deadline expires
       GUESSING --> GAME_OVER: assassin or either team's final card
       GAME_OVER --> [*]
   ```
 
-  `room.status`, `game.status`, `game.current_turn.phase`, and member state are separate. Room status uses `WAITING | COUNTDOWN | IN_GAME | POST_GAME | CLOSED`; game status uses `IN_PROGRESS | GAME_FINISHED`; game phase uses `WAITING_FOR_CLUE | GUESSING | GAME_OVER`; member state uses `IN_LOBBY | IN_GAME | POST_GAME`.
+  `room.status`, `game.status`, `game.current_turn.phase`, and member state are separate. Room status uses `WAITING | COUNTDOWN | IN_GAME | POST_GAME | CLOSED`; game status uses `IN_PROGRESS | GAME_FINISHED | GAME_CANCELLED`; game phase uses `WAITING_FOR_CLUE | GUESSING | PAUSED_FOR_PLAYERS | GAME_OVER`; member state uses `IN_LOBBY | IN_GAME | POST_GAME`.
 
   ## Identity Model
 
@@ -128,15 +134,15 @@ docs: |-
 
   ## Teams and Roles
 
-  Teams are exactly `RED` and `BLUE`. Temporary room roles are exactly `SPYMASTER` and `OPERATIVE`. A configured member has one team and one role. A startable room has at least four players, exactly one Spymaster on each team, and at least one Operative on each team.
+  Teams are exactly `RED` and `BLUE`. Roles are `SPYMASTER`, `OPERATIVE`, and `SPECTATOR`. A spectator has `team:null`, always has `ready:false`, does not count toward the four-player start minimum or team composition, cannot submit clues, guess, or pass, and receives the Operative-safe board projection. A participant has a team and either `SPYMASTER` or `OPERATIVE`. Each team has at most one Spymaster and one or more Operatives. A startable room, and a running unpaused game, requires exactly one Spymaster and at least one Operative on each team.
 
   ## Room Capacity
 
-  Every room has `max_players`, an integer in `4..8` with default `8`. The host sets it in Create room and may change it while the room is `WAITING` through `room.settings.update`, never below the current `player_count`. Join room and Invite friend return `409 ROOM_FULL` when `player_count` equals `max_players`.
+  Every room has `max_players`, an integer in `4..20` with default `8`. Capacity counts participants and spectators together. The host sets it in Create room and may change it while the room is `WAITING` through `room.settings.update`, never below the current `player_count`. Join room and Invite friend return `409 ROOM_FULL` when `player_count` equals `max_players`.
 
   ## Start Conditions (Game v2)
 
-  Let `P` be all participating room members. The server enters `COUNTDOWN` exactly when all clauses are true:
+  Let `P` be all non-spectator participating room members. The server enters `COUNTDOWN` exactly when all clauses are true:
 
   ```text
   |P| >= 4
@@ -152,7 +158,7 @@ docs: |-
   AND room.status is WAITING or a still-valid COUNTDOWN
   ```
 
-  A member may set `ready=true` only after choosing team and role. Changing either choice sets `ready=false`. The server re-evaluates all clauses after ready, team, role, join, and leave changes. Invalidating a countdown cancels it and returns the room to `WAITING`; no host start action exists.
+  A participating member may set `ready=true` only after choosing team and role. Spectators remain `ready=false` and are ignored by readiness. Changing a participating selection sets `ready=false`. The server re-evaluates all clauses after ready, team, role, join, and leave changes. A spectator joining during `COUNTDOWN` does not cancel it; a new participant or any other invalidation does. No host start action exists.
 
   ## Game Rules
 
@@ -192,7 +198,7 @@ docs: |-
   | --- | --- | --- |
   | **Gateway** | Public HTTPS/WSS entry point; REST reverse-proxy routing to the other services; WebSocket connection lifecycle (accept, `ft_session` validation at handshake, per-user multi-socket fan-out, close codes); TLS termination boundary. Holds **no** domain/game state and makes **no** authorization decisions beyond "is `ft_session` valid" — role/turn/membership authorization is each domain service's job. | User/Auth (session validation), Game Session (routes room/game REST + WS traffic), all others (routes their REST traffic) |
   | **User/Auth** | Users, credentials, `ft_session`/`ft_refresh` issuance and rotation, profiles, avatars, friends, presence | Postgres (users, credentials, refresh-token metadata, profiles, friends); called by Gateway for session validation and by Game Session for room-membership authorization checks (does this user exist / is this user this user) |
-  | **Game Session** | Rooms, membership, team/role/ready, countdown, authoritative Codenames state (board, turn, clue, guesses, score), reconnect snapshots, abandonment/forfeit lifecycle, v1 basic-chat permission + delivery | Redis (all room/game state plus the v2 integration outbox, see State Ownership); Board Generator; publishes outbox records through RabbitMQ |
+  | **Game Session** | Rooms, membership, team/role/ready, countdown, authoritative Codenames state, reconnect snapshots, staffing deadlines, cancellation, and empty-room closure | Redis (all room/game state plus the v2 integration outbox, see State Ownership); Board Generator; publishes outbox records through RabbitMQ |
   | **Board Generator** | Stateless: given a word-pack, returns 25 words with randomized affiliations (`9` starting-team, `8` other-team, `7` neutral, `1` assassin) and a randomized `card_id` ↔ slot mapping satisfying the Card ID invariant above. No database, no session, no per-game memory. | Called synchronously by Game Session at game start only |
   | **Stats** | Finalized match results, wins/losses, match history, level (see Match History & Stats below) | Postgres (match_results, user_stats); idempotently consumes durable internal `match.finalized` events by `game_id` |
 
@@ -298,7 +304,7 @@ docs: |-
 
   ## Match History and Stats (minor module: Game Statistics)
 
-  Every terminal transition (normal win, assassin, or `PLAYER_FORFEIT`) appends exactly one internal `match.finalized` record containing `game_id`, `room_id`, both teams' final rosters (`user_id`, `username`, `team`, `role`), `winner`, `end_reason`, `score`, `started_at`, and `finished_at`. Stats consumes it at least once and upserts exactly once by unique `game_id`. `GET /api/v1/users/me/matches` (own match history, paginated) and the existing `wins`/`losses`/`matches_played` on both own and public profile read from this table. `level` stays in scope and is defined as a simple deterministic function of `wins` (`level = 1 + floor(wins / 5)`) — enough to satisfy "level" as a persistent stat without inventing an XP/points economy nothing else in scope requires. The contract defines no leaderboard endpoint; the selected module set does not require one. See `02 - Users & Profile/get-match-history.yml`.
+  Every competitive terminal transition (normal win or assassin) appends exactly one internal `match.finalized` record containing the final participating rosters, winner, end reason, score, and timestamps. Spectators are excluded. `INSUFFICIENT_PLAYERS` appends an auditable `game.cancelled` lifecycle record but no `match.finalized`; it changes no wins, losses, matches played, level, or match history. Stats consumes finalized matches idempotently by `game_id`.
 
   ## Privacy Policy and Terms of Service
 

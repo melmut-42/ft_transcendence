@@ -59,7 +59,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Selects an `IN_LOBBY` member's temporary team. Allowed in `WAITING`; during `COUNTDOWN`, a change clears readiness and cancels countdown. A member still in `POST_GAME` must return to lobby first. No host privilege is required.
+  Changes an existing participant's team during `WAITING`; during `COUNTDOWN`, the change clears readiness and cancels countdown. A spectator cannot use this command for initial setup: becoming a participant always sends both `payload.team` and `payload.role` atomically with `room.role.select`. This command is not accepted during `IN_GAME`.
 
   ## Message and payload parameters
 
@@ -85,7 +85,7 @@ docs: |-
       "payload": {
         "user_id": 42,
         "team": "RED",
-        "role": null,
+        "role": "OPERATIVE",
         "ready": false,
         "room_status": "WAITING"
       }
@@ -102,7 +102,7 @@ docs: |-
       "payload": {
         "user_id": 44,
         "team": "BLUE",
-        "role": null,
+        "role": "OPERATIVE",
         "ready": false,
         "room_status": "WAITING"
       }
@@ -139,7 +139,7 @@ docs: |-
           "user_id": 42,
           "username": "player_one",
           "team": "RED",
-          "role": null,
+          "role": "OPERATIVE",
           "ready": false,
           "state": "IN_LOBBY",
           "is_host": true,
@@ -158,7 +158,7 @@ docs: |-
   | --- | --- | ---: | ---: | --- | --- |
   | `ack.payload.user_id` | integer | yes | no | positive | Updated member |
   | `ack.payload.team` | enum | yes | no | `RED`, `BLUE` | Accepted team |
-  | `ack.payload.role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Retained role when valid |
+  | `ack.payload.role` | enum | yes | no | `SPYMASTER`, `OPERATIVE` | Existing participant role retained when valid |
   | `ack.payload.ready` | boolean | yes | no | `false` | Reset confirmation |
   | `ack.payload.room_status` | enum | yes | no | `WAITING` | Post-command state, including cancelled countdown |
   | `event.payload.changed_fields[]` | array<string enum> | yes | no | `team`, plus `ready` when it changed | Fields changed atomically |

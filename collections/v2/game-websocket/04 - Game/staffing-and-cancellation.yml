@@ -1,0 +1,90 @@
+info:
+  name: Staffing pause and cancellation
+  type: websocket
+  seq: 4
+  tags: [game, staffing, cancellation]
+websocket:
+  url: "{{wsUrl}}/ws/{{gameApiVersion}}/rooms/{{roomId}}"
+settings:
+  timeout: 30000
+  keepAliveInterval: 20000
+docs: |-
+  # Staffing pause and cancellation
+
+  This is a passive event reference. It sends no client command.
+
+  During `IN_GAME`, play may continue only while RED and BLUE each have exactly one `SPYMASTER` and at least one `OPERATIVE`. Spectators are ignored. When a departure or expired reconnect grace period makes a team deficient, the room remains `IN_GAME`, the game changes to `PAUSED_FOR_PLAYERS`, and the server preserves the board, score, active team, clue, and remaining guesses.
+
+  Each deficient team owns an independent absolute 120-second deadline. A second team becoming deficient later receives its own deadline; it does not reset the first team's timer. Clue, guess, and pass commands return `INVALID_GAME_PHASE` while paused.
+
+  ```json
+  {
+    "type": "game.staffing.required",
+    "event_id": "evt_0600",
+    "room_id": 1001,
+    "sent_at": "2026-09-10T08:46:00Z",
+    "payload": {
+      "game_id": 5001,
+      "phase": "PAUSED_FOR_PLAYERS",
+      "staffing": {
+        "red": {
+          "missing_roles": ["SPYMASTER"],
+          "deadline_at": "2026-09-10T08:48:00Z"
+        },
+        "blue": {
+          "missing_roles": [],
+          "deadline_at": null
+        }
+      }
+    }
+  }
+  ```
+
+  A user may join the active room through REST. The new member always starts as `team:null`, `role:SPECTATOR`, receives an Operative-safe board, and cannot play. The spectator atomically claims a legal pair with `room.role.select`, for example `{"team":"RED","role":"SPYMASTER"}`. Existing participants cannot switch teams or roles during the game. A team may never have more than one Spymaster.
+
+  When both teams are valid before every active deadline, the exact preserved turn resumes:
+
+  ```json
+  {
+    "type": "game.staffing.restored",
+    "event_id": "evt_0601",
+    "room_id": 1001,
+    "sent_at": "2026-09-10T08:46:35Z",
+    "payload": {
+      "game_id": 5001,
+      "restored_teams": ["RED"],
+      "current_turn": {
+        "team": "RED",
+        "phase": "GUESSING",
+        "clue": {"word": "ocean", "number": 2},
+        "guesses_remaining": 2
+      }
+    }
+  }
+  ```
+
+  If either team's deadline expires first, the game is cancelled without a winner:
+
+  ```json
+  {
+    "type": "game.cancelled",
+    "event_id": "evt_0602",
+    "room_id": 1001,
+    "sent_at": "2026-09-10T08:48:00Z",
+    "payload": {
+      "game_id": 5001,
+      "winner": null,
+      "loser": null,
+      "end_reason": "INSUFFICIENT_PLAYERS",
+      "deficient_team": "RED",
+      "score": {"red": 2, "blue": 2},
+      "room_status": "POST_GAME",
+      "game_status": "GAME_CANCELLED",
+      "phase": "GAME_OVER",
+      "post_game_deadline_at": "2026-09-10T08:49:00Z",
+      "finished_at": "2026-09-10T08:48:00Z"
+    }
+  }
+  ```
+
+  Cancellation is an operational outcome, not a competitive result: it creates no winner, loss, match-history row, or `match.finalized` record. `room.post_game.started` follows normally so members can return to the lobby or exit.

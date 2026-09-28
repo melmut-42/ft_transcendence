@@ -31,7 +31,7 @@ docs:
 
     A successful room connection receives a recipient-specific `room.state`. Projection depends on both shared room status and the caller's member state, which matters while some members have returned to `WAITING` and others remain `POST_GAME`.
 
-    Invalid session rejects the handshake with HTTP `401`; missing room uses `404`; an authenticated non-member uses `403`. A transport disconnect never removes room membership immediately — it starts the reconnect grace period (`workspace.yml`, Reconnect Grace Period and Abandonment: 30s `WAITING`/`COUNTDOWN`, 60s `IN_GAME`). Reconnect with the same session within that window obtains a fresh role-safe snapshot with no state loss. If the grace period expires, membership is removed (`WAITING`/`COUNTDOWN`) or the match ends by `PLAYER_FORFEIT` (`IN_GAME`) — see `04 - Game`. If the access token has expired, the client refreshes over REST (`POST /api/v1/auth/refresh`) before reconnecting — the reissued cookie authenticates the new handshake automatically.
+    Invalid session rejects the handshake with HTTP `401`; missing room uses `404`; an authenticated non-member uses `403`. A transport disconnect starts the reconnect grace period. If it expires during `IN_GAME`, membership is removed and team staffing is rechecked. Play continues when both teams remain valid; otherwise `PAUSED_FOR_PLAYERS` starts the deficient team's 120-second deadline.
 
     ## Reconnect (canonical snapshot)
 
@@ -49,8 +49,8 @@ docs:
 
     | Type | Direction | Allowed room/phase | Permission | Purpose |
     | --- | --- | --- | --- | --- |
-    | `room.team.select` | C to S | `WAITING`, `COUNTDOWN` | member | select team; countdown change cancels |
-    | `room.role.select` | C to S | `WAITING`, `COUNTDOWN` | member with team | select role; countdown change cancels |
+    | `room.team.select` | C to S | `WAITING`, `COUNTDOWN` | existing participant | change team; countdown change cancels |
+    | `room.role.select` | C to S | `WAITING`, `COUNTDOWN`, conditional `IN_GAME` | spectator/member | atomically claim `{team, role}` or return to spectator |
     | `room.ready.set` | C to S | `WAITING`, `COUNTDOWN` for false | configured member | toggle readiness |
     | `room.lobby.return` | C to S | member state `POST_GAME` | any member | return independently; first return moves room to `WAITING` |
     | `room.member.kick` | C to S | `WAITING`, `COUNTDOWN`, `POST_GAME` | host | remove another member; forbidden `IN_GAME` |
@@ -58,7 +58,7 @@ docs:
     | `game.card.guess` | C to S | `IN_GAME / GUESSING` | active Operative | reveal one card |
     | `game.turn.pass` | C to S | `IN_GAME / GUESSING` | active Operative | end team turn |
     | `room.state` | S to C | any non-closed state | recipient projection | full room snapshot |
-    | `room.player.joined` | S to C | `WAITING` | server | membership added |
+    | `room.player.joined` | S to C | `WAITING`, `COUNTDOWN`, `IN_GAME` | server | spectator membership added |
     | `room.player.left` | S to C | any non-closed state | server | exit, disconnect, kick, or timeout; may include host transfer |
     | `room.player.returned_to_lobby` | S to C | `POST_GAME` or `WAITING` | server | one member moved from `POST_GAME` to `IN_LOBBY` |
     | `room.post_game.started` | S to C | `POST_GAME` | server | result decision deadline begins |
@@ -72,7 +72,10 @@ docs:
     | `game.card.revealed` | S to C | `IN_GAME`, `POST_GAME` | recipient projection | reveal result |
     | `game.score.updated` | S to C | `IN_GAME`, `POST_GAME` | server | revealed team totals |
     | `game.turn.changed` | S to C | `IN_GAME` | server | next team waits for clue |
-    | `game.ended` | S to C | `POST_GAME / GAME_OVER` | server | terminal result, incl. `PLAYER_FORFEIT` |
+    | `game.ended` | S to C | `POST_GAME / GAME_OVER` | server | competitive terminal result |
+    | `game.staffing.required` | S to C | `IN_GAME / PAUSED_FOR_PLAYERS` | server | missing roles and per-team 120-second deadline |
+    | `game.staffing.restored` | S to C | `IN_GAME` | server | both teams valid; preserved turn resumes |
+    | `game.cancelled` | S to C | `POST_GAME / GAME_OVER` | server | no-winner `INSUFFICIENT_PLAYERS` cancellation |
     | `ack` | S to C | command-dependent | requester | command accepted |
     | `error` | S to C | any open connection | requester | command rejected |
 

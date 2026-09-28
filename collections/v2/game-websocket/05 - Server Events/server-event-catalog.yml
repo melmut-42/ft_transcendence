@@ -40,7 +40,7 @@ docs: |-
   | `room.player.joined` | `player`, `host_user_id`, `player_count`, `room_status` | REST join | common |
   | `room.player.left` | membership fields plus `reason`; optional `kicked_by_user_id` | Exit, logout, disconnect expiry, host kick, post-game timeout | common |
   | `room.player.returned_to_lobby` | user, previous game, room/member state | accepted `room.lobby.return` | common |
-  | `room.post_game.started` | game ID, deadline, pending users | immediately after `game.ended` | common |
+  | `room.post_game.started` | game ID, deadline, pending users | immediately after `game.ended` or `game.cancelled` | common |
   | `room.post_game.completed` | room status, remaining members | pending set becomes empty | common |
   | `room.settings.updated` | `max_players`, `player_count`, `changed_by_user_id` | host `room.settings.update` | common |
   | `room.player.updated` | `player`, `changed_fields`, `room_status`, `startable` | team, role, ready | common |
@@ -52,7 +52,10 @@ docs: |-
   | `game.card.revealed` | game/card/actor/team/score/turn/result | accepted guess | role-safe board delta |
   | `game.score.updated` | `game_id`, `score`, `changed_color` | RED or BLUE reveal | common |
   | `game.turn.changed` | game ID, previous team, reason, current turn, score | non-terminal turn end | common |
-  | `game.ended` | winner, loser, reason, revealed card, score, `room_status=POST_GAME`, `game_status=GAME_FINISHED`, phase, post-game deadline, time | terminal reveal or `PLAYER_FORFEIT` | contains only the revealed terminal card; no hidden-board disclosure |
+  | `game.ended` | winner, loser, reason, revealed card, score, `room_status=POST_GAME`, `game_status=GAME_FINISHED`, phase, post-game deadline, time | terminal reveal | contains only the revealed terminal card; no hidden-board disclosure |
+  | `game.staffing.required` | missing roles and `deadline_at` per deficient team | live composition becomes invalid | common |
+  | `game.staffing.restored` | restored teams and resumed turn/phase | both teams become valid before deadlines | role-safe state |
+  | `game.cancelled` | null winner/loser, `INSUFFICIENT_PLAYERS`, score, deadline, time | a staffing deadline expires | no match/stat update |
 
   ## Concrete game events
 
@@ -147,29 +150,29 @@ docs: |-
 
   A terminal `game.ended` is final for the match and no `game.turn.changed` follows it. The same atomic terminal transition appends an internal `match.finalized` outbox record containing the complete pre-departure roster and timestamps; that integration record is not sent to clients and Stats deduplicates it by `game_id`. An Operative event never leaks any unrelated unrevealed card color, including after `POST_GAME`. Duplicate request IDs do not duplicate domain events.
 
-  ## Forfeit example
+  ## Insufficient-player cancellation example
 
-  Abandonment (grace period expiry), explicit `Leave room`, or logout during `IN_GAME` all produce this same event shape — RED's Spymaster (user `42`) abandons mid-match. The separate internal `match.finalized` record still contains user `42` in the final roster:
+  RED remains without a Spymaster until its 120-second staffing deadline expires:
 
   ```json
     {
-      "type": "game.ended",
+      "type": "game.cancelled",
       "event_id": "evt_0190",
       "room_id": 1001,
       "sent_at": "2026-09-10T08:46:30Z",
       "payload": {
         "game_id": 5001,
-        "winner": "BLUE",
-        "loser": "RED",
-        "end_reason": "PLAYER_FORFEIT",
-        "abandoned_by_user_id": 42,
+        "winner": null,
+        "loser": null,
+        "end_reason": "INSUFFICIENT_PLAYERS",
+        "deficient_team": "RED",
         "revealed_card": null,
         "score": {
           "red": 2,
           "blue": 2
         },
         "room_status": "POST_GAME",
-        "game_status": "GAME_FINISHED",
+        "game_status": "GAME_CANCELLED",
         "phase": "GAME_OVER",
         "post_game_deadline_at": "2026-09-10T08:47:30Z",
         "finished_at": "2026-09-10T08:46:30Z"

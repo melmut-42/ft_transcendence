@@ -35,7 +35,7 @@ docs: |-
   | `payload.player.username` | string | yes | no | username rule | Affected username |
   | `payload.player.avatar_url` | string | yes | no | same-origin URL | Affected member's current avatar |
   | `payload.player.team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
-  | `payload.player.role` | enum or null | yes | yes | `SPYMASTER`, `OPERATIVE`, `null` | Temporary role |
+  | `payload.player.role` | enum | yes | no | `SPYMASTER`, `OPERATIVE`, `SPECTATOR` | New joins are always `SPECTATOR` |
   | `payload.player.ready` | boolean | yes | no | `true`, `false` | Readiness at change time |
   | `payload.player.state` | enum | yes | no | `IN_LOBBY`, `IN_GAME`, `POST_GAME` | Member lifecycle state at removal/join |
   | `payload.reason` | enum | leave only | no | `EXITED`, `SESSION_ENDED`, `DISCONNECTED`, `POST_GAME_TIMEOUT`, `KICKED_BY_HOST` | Why membership ended; logout is distinct from transport grace expiry |
@@ -61,7 +61,7 @@ docs: |-
           "user_id": 43,
           "username": "red_agent",
           "team": null,
-          "role": null,
+          "role": "SPECTATOR",
           "ready": false,
           "state": "IN_LOBBY",
           "is_host": false,

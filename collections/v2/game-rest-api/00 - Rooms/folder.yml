@@ -5,12 +5,12 @@
 docs: |-
   # Rooms
 
-  Creating joins the creator and assigns host. A room accepts joins only when it is `WAITING` and `post_game.pending_user_ids` is empty; a user may have one active room. After a game, members independently choose Back to Lobby or Exit during a 60-second default post-game window. Any member may return; only the host may kick. An empty room closes. Team, role, ready, kick, return-to-lobby, countdown, and gameplay mutations use WebSocket.
+  Creating joins the creator and assigns host. A room accepts joins in `WAITING`, `COUNTDOWN`, and `IN_GAME` while capacity remains; in-game joiners start as spectators. A user may have one active room. After a game, members independently choose Back to Lobby or Exit during a 60-second post-game window. An empty room remains recoverable for 300 seconds before closure.
 
-  Every room has a capacity, `max_players`, in `4..8` (default `8`). The host sets it on create and can change it while the room is `WAITING` with `room.settings.update`; it can never drop below the current `player_count`. Join returns `409 ROOM_FULL` once `player_count` equals `max_players`.
+  Every room has a capacity, `max_players`, in `4..20` (default `8`). Participants and spectators both count. The host sets it on create and can change it while the room is `WAITING`; it can never drop below `player_count`.
 
   A room member can invite a friend with `Invite friend`; the transient invite is accepted for delivery through Chat Gateway v2, and accepting it is an ordinary v2 Join.
 
   A game can start only with at least four configured, ready members; exactly one Spymaster and at least one Operative per `RED` and `BLUE`. REST room snapshots use the same enums and privacy projections as realtime state.
 
-  `Leave room` and logout are legal in every room status. Leaving mid-game forfeits the match. A post-game member who exits or reaches the deadline is removed without affecting the completed result. A new countdown cannot begin while any remaining member is still `POST_GAME`.
+  `Leave room` and logout are legal in every room status. Leaving mid-game rechecks team staffing and never assigns an immediate loss. A deficient team has 120 seconds to regain at least one Spymaster and one Operative; expiry cancels the game without a winner. A post-game member who exits or reaches the deadline is removed without affecting the completed result. An empty room closes after 300 seconds, not immediately.

@@ -36,7 +36,7 @@ docs: |-
   | `400` or `422` | `VALIDATION_ERROR` | `user_id must be a positive integer.` | malformed JSON or field/path validation |
   | `429` | `RATE_LIMITED` | `Too many registration attempts; retry after 60 seconds.` | throttled operation |
 
-  Malformed JSON uses `400 VALIDATION_ERROR`; syntactically valid values that fail field constraints use `422 VALIDATION_ERROR`. Every error keeps state unchanged. **`Leave room` never returns `409 INVALID_ROOM_STATE` for `IN_GAME`** — leaving (or logging out) during `IN_GAME` succeeds and triggers forfeit (`workspace.yml`, Room Abandonment). `INVALID_ROOM_STATE` applies to the WebSocket room/game action errors documented in `06 - Errors/error-catalog.yml`.
+  Malformed JSON uses `400 VALIDATION_ERROR`; syntactically valid values that fail field constraints use `422 VALIDATION_ERROR`. Every error keeps state unchanged. `Leave room` is valid during `IN_GAME`; it rechecks staffing and may start a 120-second staffing pause. `INVALID_ROOM_STATE` applies to WebSocket actions that are illegal in the current phase.
 
   ## State example index
 
