@@ -43,7 +43,7 @@
   --focus-ring: #76b6ef;
 
   /* ---- Typography ---- */
-  --font-family-base: 'Baloo 2', system-ui, sans-serif;
+  --font-family-base: 'Baloo 2', sans-serif;
   --font-weight-regular: 600;
   --font-weight-bold: 700;
   --font-weight-black: 800;
