@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import alienAvatar from '@assets/avatars/alien-avatar.svg';
 import aviatorFoxAvatar from '@assets/avatars/aviator-fox-avatar.svg';
@@ -16,7 +16,10 @@ import heroArtwork from '@assets/landing/landing-hero.svg';
 import beatOtherTeamArtwork from '@assets/landing/landing-step-beat-the-other-team.svg';
 import giveClueArtwork from '@assets/landing/landing-step-give-a-clue.svg';
 import guessTogetherArtwork from '@assets/landing/landing-step-guess-together.svg';
+import { AuthDialog } from '@features/auth/components/AuthDialog';
+import type { AuthMode } from '@features/auth/components/AuthDialog.types';
 import { ROUTES } from '@shared/constants';
+import { useSessionStore } from '@shared/stores';
 import { Icon } from '@shared/ui';
 import type { IconName } from '@shared/ui';
 import { cn } from '@shared/utils';
@@ -84,30 +87,45 @@ const COMMUNITY_AVATARS = [
 /**
  * Landing screen: the entry point that introduces the game and leads into Log In.
  *
- * Every call to action opens the Log In dialog, which the `/login` route renders into the
- * outlet over this page; an authenticated visitor is sent on to the Lobby by that route's
- * guard. Learn More and Help bring the How To Play section into view.
+ * Every call to action opens the Log In dialog over this page, which stays mounted and
+ * visible underneath; an authenticated visitor goes straight on to the Lobby instead.
+ * `/login` and `/register` render this page with the dialog already open, and closing
+ * the dialog there leaves the address at `/`. Learn More and Help bring the How To Play
+ * section into view.
  */
-export function LandingPage() {
+export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode }) {
   const { t } = useTranslation();
   const { hash } = useLocation();
+  const navigate = useNavigate();
+  const authenticated = useSessionStore((state) => state.status === 'AUTHENTICATED');
+  const [authMode, setAuthMode] = useState<AuthMode | null>(linkedAuthMode ?? null);
 
   // Links from other screens, such as How to Play on the legal pages, arrive with a hash.
   useEffect(() => {
     if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
   }, [hash]);
 
+  const openAuth = (mode: AuthMode) => {
+    if (authenticated) navigate(ROUTES.lobby);
+    else setAuthMode(mode);
+  };
+
+  const closeAuth = useCallback(() => {
+    setAuthMode(null);
+    if (linkedAuthMode) navigate(ROUTES.landing, { replace: true });
+  }, [linkedAuthMode, navigate]);
+
   return (
     <div className={styles.page}>
       <div className={styles.stage}>
         <header>
           <nav aria-label={t('landing.primaryNavigation')} className={styles.header}>
-            <Link to={ROUTES.login} className={styles.logIn}>
+            <button type="button" onClick={() => openAuth('login')} className={styles.logIn}>
               {t('landing.logIn')}
-            </Link>
-            <Link to={ROUTES.login} className={styles.topPlayNow}>
+            </button>
+            <button type="button" onClick={() => openAuth('login')} className={styles.topPlayNow}>
               {t('landing.playNow')}
-            </Link>
+            </button>
           </nav>
         </header>
 
@@ -129,9 +147,13 @@ export function LandingPage() {
               </h1>
               <p className={styles.descriptionShort}>{t('landing.descriptionShort')}</p>
               <p className={styles.description}>{t('landing.description')}</p>
-              <Link to={ROUTES.login} className={styles.heroPlayNow}>
+              <button
+                type="button"
+                onClick={() => openAuth('login')}
+                className={styles.heroPlayNow}
+              >
                 {t('landing.playNow')}
-              </Link>
+              </button>
               <a href={`#${HOW_TO_PLAY_ID}`} className={styles.learnMore}>
                 {t('landing.learnMore')}
               </a>
@@ -188,10 +210,14 @@ export function LandingPage() {
             <p id="landing-community" className={styles.communityMessage}>
               {t('landing.community')}
             </p>
-            <Link to={ROUTES.login} className={styles.inviteFriends}>
+            <button
+              type="button"
+              onClick={() => openAuth('login')}
+              className={styles.inviteFriends}
+            >
               <Icon name="userAdd" className="text-[23px]" />
               {t('landing.inviteFriends')}
-            </Link>
+            </button>
           </section>
         </main>
 
@@ -220,7 +246,7 @@ export function LandingPage() {
       <img src={edgeLeftArtwork} alt="" className={styles.edgeLeft} />
       <img src={edgeRightArtwork} alt="" className={styles.edgeRight} />
 
-      <Outlet />
+      {authMode && <AuthDialog initialMode={authMode} onClose={closeAuth} />}
     </div>
   );
 }

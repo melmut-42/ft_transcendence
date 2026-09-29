@@ -64,7 +64,6 @@ export function RegisterForm() {
   };
 
   const fieldProps = (field: RegisterField) => ({
-    mode: 'register' as const,
     name: field,
     value: values[field],
     onChange: (event: ChangeEvent<HTMLInputElement>) => edit(field, event.target.value),
@@ -114,11 +113,7 @@ export function RegisterForm() {
         type="submit"
         aria-busy={submitting || undefined}
         aria-disabled={submitting || undefined}
-        className={cn(
-          styles.submit.register,
-          styles.submitBase,
-          submitting && 'pointer-events-none',
-        )}
+        className={cn(styles.submit.register, submitting && 'pointer-events-none')}
       >
         {t('auth.register.submit')}
         {submitting && <span className={styles.loadingEllipsis}>…</span>}

@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 import alienArtwork from '@assets/auth/auth-alien.svg';
 import cardsArtwork from '@assets/auth/auth-cards.svg';
 import foxCornerArtwork from '@assets/auth/auth-fox-corner.svg';
 import foxPeekArtwork from '@assets/auth/auth-fox-peek.svg';
 import mascotArtwork from '@assets/auth/auth-mascot.svg';
-import { ROUTES } from '@shared/constants';
 import { useFocusTrap } from '@shared/hooks';
 import { Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
@@ -21,29 +19,32 @@ import { RegisterForm } from './RegisterForm';
 
 const MODES: AuthMode[] = ['login', 'register'];
 
+export interface AuthDialogProps {
+  /** The form the dialog opens on. */
+  initialMode: AuthMode;
+  /** Closes the dialog; the page underneath stays where it was. */
+  onClose: () => void;
+}
+
 /**
- * The Log In / Sign Up dialog, opened over the Landing page by `/login` and `/register`.
+ * The Log In / Sign Up dialog, opened over the Landing page.
  *
  * One dialog holds both forms behind the Log In / Register tabs; switching keeps the
- * dialog open and the URL unchanged, and starts the other form empty. It follows the
- * dialog keyboard contract of the shared `Modal` — focus is trapped inside, Escape and
- * the close button return to the Landing page, focus goes back to the control that
- * opened it — but draws its own shell, because the design fills the screen below
- * desktop and sets the desktop dialog on a backdrop of its own rather than the dimmed
- * overlay. It does not close on a backdrop click, so a stray click never discards what
- * was typed.
+ * dialog open and starts the other form empty. Nothing here changes the route: only a
+ * successful Log In or Sign Up moves on, to the Lobby. It follows the dialog keyboard
+ * contract of the shared `Modal` — focus is trapped inside, Escape and the close button
+ * close it, focus goes back to the control that opened it — but draws its own shell for
+ * the design's artwork. It does not close on a backdrop click, so a stray click never
+ * discards what was typed.
  */
-export function AuthDialog({ initialMode }: { initialMode: AuthMode }) {
+export function AuthDialog({ initialMode, onClose }: AuthDialogProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const dialogRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Partial<Record<AuthMode, HTMLButtonElement | null>>>({});
   const focusFieldAfterSwitch = useRef(false);
   const id = useId();
   const other: AuthMode = mode === 'login' ? 'register' : 'login';
-
-  const close = useCallback(() => navigate(ROUTES.landing, { replace: true }), [navigate]);
 
   useFocusTrap(dialogRef);
 
@@ -59,21 +60,26 @@ export function AuthDialog({ initialMode }: { initialMode: AuthMode }) {
     dialogRef.current?.querySelector('input')?.focus();
   }, [mode]);
 
+  // The page stays still behind the dialog. Where the scrollbar takes up room, its width
+  // is kept as padding so the page does not shift sideways when the scrollbar goes.
   useEffect(() => {
-    const { overflow } = document.body.style;
+    const { overflow, paddingRight } = document.body.style;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
     return () => {
       document.body.style.overflow = overflow;
+      document.body.style.paddingRight = paddingRight;
     };
   }, []);
 
   useEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') close();
+      if (event.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [close]);
+  }, [onClose]);
 
   /** The prompt and the large button hand over to the other form's first field. */
   const switchTo = (next: AuthMode) => {
@@ -112,7 +118,12 @@ export function AuthDialog({ initialMode }: { initialMode: AuthMode }) {
         tabIndex={-1}
         className={styles.dialog}
       >
-        <button type="button" onClick={close} aria-label={t('auth.close')} className={styles.close}>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('auth.close')}
+          className={styles.close}
+        >
           <Icon name="close" />
         </button>
 
@@ -123,12 +134,8 @@ export function AuthDialog({ initialMode }: { initialMode: AuthMode }) {
           {t(`auth.${mode}.subtitle`)}
         </p>
 
-        <div className={cn(styles.cardBase, styles.card[mode])}>
-          <div
-            role="tablist"
-            aria-label={t('auth.modes')}
-            className={cn(styles.tabsBase, styles.tabs[mode])}
-          >
+        <div className={styles.card}>
+          <div role="tablist" aria-label={t('auth.modes')} className={styles.tabs}>
             <span
               aria-hidden="true"
               className={cn(styles.tabIndicatorBase, styles.tabIndicator[mode])}
@@ -147,7 +154,7 @@ export function AuthDialog({ initialMode }: { initialMode: AuthMode }) {
                 tabIndex={tabMode === mode ? 0 : -1}
                 onClick={() => setMode(tabMode)}
                 onKeyDown={onTabKeyDown}
-                className={cn(styles.tabBase, styles.tab[mode])}
+                className={styles.tab}
               >
                 {t(`auth.${tabMode}.tab`)}
               </button>

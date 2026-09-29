@@ -71,7 +71,6 @@ export function LoginForm() {
     <form ref={formRef} noValidate onSubmit={onSubmit}>
       <div className={cn(styles.fieldsBase, styles.fields.login)}>
         <AuthField
-          mode="login"
           label={t('auth.fields.email')}
           type="email"
           name="email"
@@ -85,17 +84,10 @@ export function LoginForm() {
           error={errors.email && t(errors.email)}
           confirmed={username !== null}
         >
-          {alert && (
-            <AuthAlert
-              alert={alert}
-              values={username ? { username } : undefined}
-              className={styles.alertPlacement.login}
-            />
-          )}
+          {alert && <AuthAlert alert={alert} values={username ? { username } : undefined} />}
         </AuthField>
 
         <AuthField
-          mode="login"
           label={t('auth.fields.password')}
           password
           name="password"
@@ -111,7 +103,7 @@ export function LoginForm() {
         type="submit"
         aria-busy={submitting || undefined}
         aria-disabled={submitting || undefined}
-        className={cn(styles.submit.login, styles.submitBase, submitting && 'pointer-events-none')}
+        className={cn(styles.submit.login, submitting && 'pointer-events-none')}
       >
         {t('auth.login.submit')}
         {submitting && <span className={styles.loadingEllipsis}>…</span>}

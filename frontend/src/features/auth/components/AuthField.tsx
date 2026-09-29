@@ -7,10 +7,8 @@ import type { IconName } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import * as styles from './AuthDialog.styles';
-import type { AuthMode } from './AuthDialog.types';
 
 export interface AuthFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  mode: AuthMode;
   label: string;
   value: string;
   /** Translated message under the field. The field paints its error state while it is set. */
@@ -30,7 +28,6 @@ export interface AuthFieldProps extends Omit<InputHTMLAttributes<HTMLInputElemen
  * failure is read out with the field it belongs to.
  */
 export function AuthField({
-  mode,
   label,
   value,
   error,
@@ -50,18 +47,13 @@ export function AuthField({
   const status = error ? 'error' : confirmed ? 'success' : 'default';
 
   return (
-    <div className={cn(styles.fieldBase, styles.field[mode])}>
-      <label htmlFor={id} className={cn(styles.labelBase, styles.label[mode])}>
+    <div className={styles.field}>
+      <label htmlFor={id} className={styles.label}>
         {label}
       </label>
 
       <div className="relative flex items-center">
-        {leadingIcon && (
-          <Icon
-            name={leadingIcon}
-            className={cn(styles.leadingIconBase, styles.leadingIcon[mode])}
-          />
-        )}
+        {leadingIcon && <Icon name={leadingIcon} className={styles.leadingIcon} />}
 
         <input
           id={id}
@@ -71,11 +63,10 @@ export function AuthField({
           aria-describedby={error ? messageId : undefined}
           className={cn(
             styles.controlBase,
-            styles.control[mode],
             styles.controlStatus[status],
-            leadingIcon ? styles.controlLeading[mode] : styles.controlPlain,
+            leadingIcon ? styles.controlLeading : styles.controlPlain,
             password && styles.controlTrailing,
-            hidden && value ? cn(styles.maskedBase, styles.masked[mode]) : styles.controlText[mode],
+            hidden && value ? styles.masked : styles.controlText,
             className,
           )}
           {...props}
@@ -88,7 +79,7 @@ export function AuthField({
             aria-label={t(visible ? 'auth.fields.hidePassword' : 'auth.fields.showPassword')}
             aria-pressed={visible}
             aria-controls={id}
-            className={cn(styles.visibilityToggleBase, styles.visibilityToggle[mode])}
+            className={styles.visibilityToggle}
           >
             <Icon name={visible ? 'password' : 'passwordHidden'} />
           </button>
@@ -96,8 +87,8 @@ export function AuthField({
       </div>
 
       {error && (
-        <p id={messageId} role="alert" className={cn(styles.messageBase, styles.message[mode])}>
-          <span className={cn(styles.messageBadgeBase, styles.messageBadge[mode])}>
+        <p id={messageId} role="alert" className={styles.message}>
+          <span className={styles.messageBadge}>
             <Icon name="warning" />
           </span>
           {error}
