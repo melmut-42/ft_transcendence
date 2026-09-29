@@ -1,11 +1,15 @@
 import { cn } from '@shared/utils';
+import { Icon } from '@shared/ui/Icon';
 
 import { iconBaseStyles, iconSizeStyles, variantStyles } from './Button.styles';
 import type { ButtonIconProps } from './Button.types';
-import { Icon } from '../Icon';
 
+/**
+ * Circular icon-only button: close, invite, send, navigate.
+ *
+ * It has no visible label, so `aria-label` is required and says what the button does.
+ */
 export function ButtonIcon({
-  children,
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -19,12 +23,19 @@ export function ButtonIcon({
   return (
     <button
       type={type}
-      disabled={disabled || loading}
+      disabled={disabled}
       aria-busy={loading || undefined}
-      className={cn(iconBaseStyles[theme], variantStyles[theme][variant], iconSizeStyles[size], className)}
+      aria-disabled={loading || undefined}
+      className={cn(
+        iconBaseStyles[theme],
+        variantStyles[theme][variant],
+        iconSizeStyles[size],
+        loading && 'pointer-events-none',
+        className,
+      )}
       {...props}
     >
-      <Icon name={icon}/>
+      <Icon name={icon} spin={loading} />
     </button>
   );
 }

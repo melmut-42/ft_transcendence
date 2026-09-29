@@ -154,6 +154,9 @@
   --shadow-card: 0 6px 10px var(--color-shadow-warm);
   --shadow-panel: 0 6px 9px var(--color-shadow-warm-soft);
   --shadow-word-card: 0 3px 7px var(--color-shadow-card);
+  --shadow-team-a: 0 6px 12px var(--color-shadow-team-a);
+  --shadow-team-b: 0 6px 12px var(--color-shadow-team-b);
+  --shadow-danger: 0 6px 12px var(--color-shadow-danger);
   --shadow-toast: 0 4px 8px var(--color-shadow-medium);
   --shadow-modal: 0 6px 14px var(--color-shadow-medium);
   --shadow-alert: 0 1px 3px var(--color-shadow-subtle);
@@ -161,12 +164,72 @@
     0 4px 0px var(--color-shadow-primary), 0 5px 7px var(--color-shadow-medium);
   --shadow-button-secondary:
     0 4px 0px var(--color-shadow-secondary), 0 5px 7px var(--color-shadow-medium);
+  --shadow-button-neutral:
+    0 4px 0px var(--color-shadow-warm-strong), 0 5px 7px var(--color-shadow-medium);
+  --shadow-button-coral: 0 4px 0px var(--color-accent-red), 0 5px 7px var(--color-shadow-medium);
+  --shadow-button-muted: 0 4px 7px var(--color-shadow-warm-soft);
   --shadow-button-destructive:
     0 4px 0px var(--color-shadow-destructive), 0 5px 7px var(--color-shadow-medium);
   --shadow-button-cta: 0 4px 0px var(--color-shadow-cta), 0 5px 7px var(--color-shadow-medium);
   --shadow-button-disabled:
     0 4px 0px var(--color-shadow-disabled), 0 5px 7px var(--color-shadow-soft);
   --inset-shadow-pressed: inset 0 3px 4px var(--color-shadow-strong);
+
+  /* Hovering lifts a button by 2px, so its shadow grows by the same 2px and the button
+   * stays attached to the surface it rises from instead of floating over a gap. */
+  --shadow-button-primary-hover:
+    0 6px 0px var(--color-shadow-primary), 0 8px 12px var(--color-shadow-medium);
+  --shadow-button-neutral-hover:
+    0 6px 0px var(--color-shadow-warm-strong), 0 8px 12px var(--color-shadow-medium);
+  --shadow-button-coral-hover:
+    0 6px 0px var(--color-accent-red), 0 8px 12px var(--color-shadow-medium);
+  --shadow-button-muted-hover: 0 6px 10px var(--color-shadow-warm-medium);
+  --shadow-button-destructive-hover:
+    0 6px 0px var(--color-shadow-destructive), 0 8px 12px var(--color-shadow-medium);
+  --shadow-button-cta-hover:
+    0 6px 0px var(--color-shadow-cta), 0 8px 12px var(--color-shadow-medium);
+
+  /* ---- Motion ----
+   * One easing pair and one duration scale, so every component reacts the same way:
+   * `ease-pop` overshoots slightly for anything that appears, `ease-out` for state
+   * changes on an element that is already on screen. */
+  --ease-pop: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-press: cubic-bezier(0.4, 0, 1, 1);
+
+  --animate-fade-in: fade-in 160ms ease-out;
+  --animate-pop-in: pop-in 200ms var(--ease-pop);
+  --animate-rise-in: rise-in 220ms var(--ease-pop);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.94) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 /*

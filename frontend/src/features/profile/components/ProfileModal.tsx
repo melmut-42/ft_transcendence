@@ -1,3 +1,5 @@
+import { Modal } from '@shared/ui';
+
 /**
  * Profile modal shell.
  *
@@ -7,12 +9,9 @@
  */
 export function ProfileModal({ userId, onClose }: { userId: number; onClose: () => void }) {
   return (
-    <div role="dialog" aria-modal="true" aria-label="Player profile">
+    <Modal title="Player profile" onClose={onClose}>
       {/* TODO(profile): profile content for user {userId} — stats, avatar, friendship. */}
       <p>Profile #{userId}</p>
-      <button type="button" onClick={onClose}>
-        Close
-      </button>
-    </div>
+    </Modal>
   );
 }

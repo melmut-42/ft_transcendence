@@ -1,4 +1,5 @@
 import { useConnectionStore } from '@shared/stores';
+import { LoadingDots, Overlay } from '@shared/ui';
 
 /**
  * Reconnecting overlay.
@@ -13,9 +14,16 @@ export function ConnectionOverlay() {
   if (status !== 'RECONNECTING') return null;
 
   return (
-    <div role="status" aria-live="polite">
-      {/* TODO(design): reconnect overlay with grace-period feedback. */}
-      Reconnecting…
-    </div>
+    <Overlay level="overlay">
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex flex-col items-center gap-4 rounded-lg bg-surface p-5 text-center shadow-modal motion-safe:animate-pop-in"
+      >
+        <LoadingDots label="Reconnecting" />
+        <p className="text-xl font-black">Reconnecting…</p>
+        <p className="text-md text-text-muted">Your seat is held while we reconnect you.</p>
+      </div>
+    </Overlay>
   );
 }

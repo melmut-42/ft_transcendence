@@ -10,7 +10,7 @@ export function LobbyLayout() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* TODO(design): top navigation with the current user and profile entry. */}
-      <main className="flex-1">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-3 py-4 sm:px-4">
         <Outlet />
       </main>
       <Footer />
