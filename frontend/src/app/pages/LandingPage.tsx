@@ -145,16 +145,8 @@ export function LandingPage() {
             <h2 id="how-to-play-title" className={styles.howToPlayTitle}>
               {t('landing.howToPlay')}
             </h2>
-            <img
-              src={dividerArtwork}
-              alt=""
-              className={cn(styles.divider, 'desktop:left-[414px]')}
-            />
-            <img
-              src={dividerArtwork}
-              alt=""
-              className={cn(styles.divider, 'desktop:left-[1074px]')}
-            />
+            <img src={dividerArtwork} alt="" className={cn(styles.divider, 'desktop:left-103.5')} />
+            <img src={dividerArtwork} alt="" className={cn(styles.divider, 'desktop:left-268.5')} />
             <ol className={styles.stack}>
               {STEPS.map((step) => (
                 <li key={step.key} className={cn(styles.step, step.position)}>
