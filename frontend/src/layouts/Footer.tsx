@@ -11,10 +11,10 @@ import { ROUTES } from '@shared/constants';
 export function Footer() {
   return (
     <footer>
-      <nav aria-label="Legal">
+      {/* <nav aria-label="Legal">
         <Link to={ROUTES.privacy}>Privacy Policy</Link>
         <Link to={ROUTES.terms}>Terms of Service</Link>
-      </nav>
+      </nav> */}
     </footer>
   );
 }
