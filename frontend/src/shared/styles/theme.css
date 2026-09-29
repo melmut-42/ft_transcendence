@@ -44,9 +44,9 @@
   --color-primary-ink: #3f658a;
 
   /* ---- Secondary (coral) ---- */
-  --color-secondary: #faf4e6;
-  --color-secondary-deep: #e07a5f;
-  --color-secondary-dark: #b8512e;
+  --color-secondary: #fe756a;
+  --color-secondary-deep: #f2675f;
+  --color-secondary-dark: #d9605b;
 
   /* ---- Accents ---- */
   --color-accent-yellow: #ffd93d;
@@ -223,6 +223,17 @@
   --animate-fade-in: fade-in 160ms ease-out;
   --animate-pop-in: pop-in 200ms var(--ease-pop);
   --animate-rise-in: rise-in 220ms var(--ease-pop);
+  --animate-card-reveal: card-reveal 380ms var(--ease-pop);
+
+  /* A word card turning over to show its affiliation. */
+  @keyframes card-reveal {
+    from {
+      transform: perspective(600px) rotateY(80deg) scale(0.96);
+    }
+    to {
+      transform: perspective(600px) rotateY(0) scale(1);
+    }
+  }
 
   @keyframes fade-in {
     from {

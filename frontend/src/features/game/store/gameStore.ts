@@ -13,10 +13,15 @@
 
 import { create } from 'zustand';
 
-import type { Game, RoomServerEvent } from '@shared/types';
+import type { CurrentTurn, Game, RoomServerEvent } from '@shared/types';
 
 interface GameState {
   game: Game | null;
+  /**
+   * Who left a match that ended in `PLAYER_FORFEIT`, from the `game.ended` event. The
+   * snapshot does not carry it, so after a reload the result is shown without the name.
+   */
+  forfeitedBy: number | null;
 
   applyGame: (game: Game | null) => void;
   /** Apply one room-stream event; non-game events are ignored. */
@@ -24,8 +29,20 @@ interface GameState {
   clear: () => void;
 }
 
+/**
+ * Apply a turn update from an event. An event may carry only part of the turn (the clue
+ * event, for one, repeats the clue beside `current_turn` rather than inside it), so the
+ * fields it leaves out keep their value, and a turn waiting for its clue never shows the
+ * previous one.
+ */
+function nextTurn(previous: CurrentTurn, update: Partial<CurrentTurn>): CurrentTurn {
+  const merged: CurrentTurn = { ...previous, ...update };
+  return merged.phase === 'WAITING_FOR_CLUE' ? { ...merged, clue: null } : merged;
+}
+
 export const useGameStore = create<GameState>((set, get) => ({
   game: null,
+  forfeitedBy: null,
 
   applyGame: (game) => set({ game }),
 
@@ -34,12 +51,27 @@ export const useGameStore = create<GameState>((set, get) => ({
     switch (event.type) {
       case 'room.state':
       case 'game.started':
-      case 'game.state':
-        set({ game: event.payload.room.game });
+      case 'game.state': {
+        const next = event.payload.room.game;
+        const sameGame = next !== null && next.game_id === game?.game_id;
+        set({ game: next, forfeitedBy: sameGame ? get().forfeitedBy : null });
         return;
-      case 'game.clue.submitted':
-        if (game) set({ game: { ...game, current_turn: event.payload.current_turn } });
+      }
+      case 'game.clue.submitted': {
+        if (!game) return;
+        const { clue, guesses_remaining: guesses, current_turn: turn } = event.payload;
+        set({
+          game: {
+            ...game,
+            current_turn: nextTurn(game.current_turn, {
+              ...turn,
+              clue,
+              guesses_remaining: guesses,
+            }),
+          },
+        });
         return;
+      }
       case 'game.card.revealed': {
         if (!game) return;
         const { card } = event.payload;
@@ -47,8 +79,10 @@ export const useGameStore = create<GameState>((set, get) => ({
           game: {
             ...game,
             score: event.payload.score,
-            current_turn: event.payload.current_turn,
+            current_turn: nextTurn(game.current_turn, event.payload.current_turn),
             board: game.board.map((c) => (c.card_id === card.card_id ? card : c)),
+            winner: event.payload.winner ?? game.winner,
+            end_reason: event.payload.end_reason ?? game.end_reason,
           },
         });
         return;
@@ -59,7 +93,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       case 'game.turn.changed':
         if (game) {
           set({
-            game: { ...game, current_turn: event.payload.current_turn, score: event.payload.score },
+            game: {
+              ...game,
+              current_turn: nextTurn(game.current_turn, event.payload.current_turn),
+              score: event.payload.score,
+            },
           });
         }
         return;
@@ -67,6 +105,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         if (!game) return;
         const { revealed_card: revealed } = event.payload;
         set({
+          forfeitedBy: event.payload.abandoned_by_user_id ?? null,
           game: {
             ...game,
             winner: event.payload.winner,
@@ -86,5 +125,5 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
-  clear: () => set({ game: null }),
+  clear: () => set({ game: null, forfeitedBy: null }),
 }));

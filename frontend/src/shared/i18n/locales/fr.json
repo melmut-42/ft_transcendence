@@ -364,9 +364,6 @@
 			"returnToRoom": "Aller à ma salle"
 		},
 		"loading": "Chargement du salon…",
-		"inGame": {
-			"title": "La partie a commencé"
-		},
 		"unavailable": {
 			"title": "Ce salon n'est plus disponible",
 			"body": "Il a été fermé, ou vous n'en faites plus partie.",
@@ -390,7 +387,7 @@
 			},
 			"game": {
 				"title": "Quitter la partie ?",
-				"body": "Vous quitterez cette partie et reviendrez à la recherche de salons. Votre équipe déclare forfait.",
+				"body": "Vous quitterez cette partie et reviendrez au salon. Votre équipe déclare forfait.",
 				"confirm": "Quitter la partie"
 			}
 		},
@@ -500,6 +497,103 @@
 				"offline": "Vous êtes hors ligne. Réessayez une fois reconnecté.",
 				"generic": "Ça n'a pas marché. Réessayez."
 			}
+		}
+	},
+	"game": {
+		"loading": "Chargement de la partie…",
+		"board": "Plateau de mots",
+		"team": {
+			"RED": "Rouge",
+			"BLUE": "Bleue"
+		},
+		"teamName": {
+			"RED": "Équipe rouge",
+			"BLUE": "Équipe bleue"
+		},
+		"score": {
+			"label": "Score : Rouge {{red}}, Bleue {{blue}}"
+		},
+		"turn": {
+			"title": "Au tour de l'équipe <team>{{team}}</team>",
+			"over": "Partie terminée"
+		},
+		"instruction": {
+			"CLUE": "Vous êtes l'Espion en chef. Donnez un indice à votre équipe.",
+			"CLUE_SENT": "Indice envoyé. Vos agents choisissent leurs cartes."
+		},
+		"clue": {
+			"label": "Indice",
+			"heading": "Donner un indice",
+			"number": "Nombre",
+			"placeholder": "Un seul mot",
+			"submit": "Donner l'indice",
+			"sending": "Envoi…",
+			"rule": "Un seul mot de 30 lettres au plus, sans espace.",
+			"decrease": "Moins de cartes",
+			"increase": "Plus de cartes",
+			"sent": "Indice envoyé",
+			"sentLabel": "Indice :",
+			"sentNumber": "Nombre :",
+			"value": "Indice : {{word}} · {{number}}",
+			"guesses": "Essais restants : {{count}}"
+		},
+		"status": {
+			"waitingLabel": "En attente",
+			"waitingTitle": "En attente de l'indice…",
+			"waitingBody": "Votre Espion en chef choisit un indice.",
+			"opponentGuessing": "L'équipe {{team}} devine",
+			"opponentClue": "L'Espion en chef {{team}} réfléchit",
+			"opponentBody": "Attendez votre tour. Les cartes ne peuvent pas être choisies maintenant.",
+			"spymasterOpponentBody": "Attendez votre tour pour donner un indice."
+		},
+		"pass": {
+			"action": "Passer",
+			"passing": "Passage…"
+		},
+		"roster": {
+			"operatives": "Agents",
+			"spymaster": "Espion en chef",
+			"spymasterLine": "Espion en chef : {{names}}",
+			"operativesLine": "Agents : {{names}}",
+			"nobody": "—",
+			"openProfile": "Ouvrir le profil de {{username}}"
+		},
+		"card": {
+			"pick": "Choisir {{word}}",
+			"key": "{{word}}, {{affiliation}}",
+			"revealed": "{{word}}, révélée : {{affiliation}}",
+			"affiliation": {
+				"RED": "Agent rouge",
+				"BLUE": "Agent bleu",
+				"NEUTRAL": "Passant",
+				"ASSASSIN": "Assassin"
+			}
+		},
+		"leave": "Quitter la partie",
+		"results": {
+			"badge": "Partie terminée",
+			"wins": "L'équipe {{team}} gagne !",
+			"reason": {
+				"ALL_TEAM_CARDS_REVEALED": "L'équipe {{team}} a révélé son dernier agent.",
+				"ASSASSIN_REVEALED": "L'équipe {{team}} a révélé l'assassin.",
+				"PLAYER_FORFEIT": "L'équipe {{team}} déclare forfait.",
+				"PLAYER_FORFEIT_NAMED": "{{username}} a quitté la partie. L'équipe {{team}} déclare forfait."
+			},
+			"backToLobby": "Retour au salon",
+			"viewBoard": "Voir le plateau final",
+			"showResults": "Voir les résultats"
+		},
+		"errors": {
+			"invalidClue": "L'indice doit être un seul mot de 30 lettres au plus.",
+			"invalidNumber": "Choisissez un nombre de 1 à 9.",
+			"invalidCard": "Cette carte n'est pas sur ce plateau.",
+			"alreadyRevealed": "Cette carte a déjà été révélée.",
+			"noGuesses": "Votre équipe n'a plus d'essais.",
+			"notYourTurn": "Ce n'est plus votre tour.",
+			"roleForbidden": "Votre rôle ne permet pas cette action.",
+			"finished": "La partie est déjà terminée.",
+			"offline": "Vous êtes hors ligne. Réessayez une fois la connexion rétablie.",
+			"generic": "Un problème est survenu. Réessayez."
 		}
 	}
 }

@@ -15,12 +15,17 @@ import * as styles from './ProfileMenu.styles';
  * `card` is the Room Discovery header: mobile and tablet show the avatar and the name at
  * the head of the page; the desktop layout shows the full card in the top-right corner.
  * `plain` is the top of the Ready Room sidebar: avatar, name and presence, without a card.
+ * `game` is the Game Board header: avatar, name, the player's role badge and the chevron
+ * on the desktop board, and the avatar beside the role badge on phones and tablets.
  */
 export function ProfileMenu({
   variant = 'card',
+  badge,
   className,
 }: {
-  variant?: 'card' | 'plain';
+  variant?: 'card' | 'plain' | 'game';
+  /** The `game` variant's role badge, such as SPYMASTER. */
+  badge?: string | undefined;
   className?: string;
 }) {
   const { t } = useTranslation();
@@ -32,6 +37,38 @@ export function ProfileMenu({
   const username = profile?.username ?? session?.username ?? '';
   const avatarUrl = profile?.avatar_url;
   const open = () => userId !== undefined && openProfileModal(userId);
+
+  if (variant === 'game') {
+    return (
+      <button
+        type="button"
+        onClick={open}
+        aria-haspopup="dialog"
+        aria-label={t('lobby.profile.open', { username })}
+        className={cn(styles.game.menu, className)}
+      >
+        <span className={styles.game.avatar}>
+          {avatarUrl && !imageFailed ? (
+            <img
+              src={avatarUrl}
+              alt=""
+              onError={() => setImageFailed(true)}
+              className={styles.avatarImage}
+            />
+          ) : (
+            <Icon name="smile" className={styles.game.avatarPlaceholder} />
+          )}
+        </span>
+        <span className={styles.game.details}>
+          <span className={styles.game.name}>{username}</span>
+          {badge && <span className={styles.game.badge}>{badge}</span>}
+        </span>
+        <span aria-hidden="true" className={styles.game.chevron}>
+          <Icon name="chevronDown" />
+        </span>
+      </button>
+    );
+  }
 
   if (variant === 'plain') {
     return (

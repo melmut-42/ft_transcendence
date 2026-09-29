@@ -364,9 +364,6 @@
 			"returnToRoom": "Go to my room"
 		},
 		"loading": "Loading the room…",
-		"inGame": {
-			"title": "The match has started"
-		},
 		"unavailable": {
 			"title": "This room is no longer available",
 			"body": "It closed, or you are no longer one of its players.",
@@ -390,7 +387,7 @@
 			},
 			"game": {
 				"title": "Leave Game?",
-				"body": "You will leave this match and return to Room Discovery. Your team forfeits the match.",
+				"body": "You will leave this match and return to the lobby. Your team forfeits the match.",
 				"confirm": "Leave Game"
 			}
 		},
@@ -500,6 +497,103 @@
 				"offline": "You're offline. Try again once you're reconnected.",
 				"generic": "That didn't work. Try again."
 			}
+		}
+	},
+	"game": {
+		"loading": "Loading the match…",
+		"board": "Word board",
+		"team": {
+			"RED": "Red",
+			"BLUE": "Blue"
+		},
+		"teamName": {
+			"RED": "Red Team",
+			"BLUE": "Blue Team"
+		},
+		"score": {
+			"label": "Score: Red {{red}}, Blue {{blue}}"
+		},
+		"turn": {
+			"title": "<team>{{team}}</team> Team's Turn",
+			"over": "Match Over"
+		},
+		"instruction": {
+			"CLUE": "You are the Spymaster. Give your team a clue.",
+			"CLUE_SENT": "Clue sent. Your operatives are choosing their cards."
+		},
+		"clue": {
+			"label": "Clue",
+			"heading": "Give a Clue",
+			"number": "Number",
+			"placeholder": "Type a one-word clue",
+			"submit": "Give Clue",
+			"sending": "Sending…",
+			"rule": "Use one word of up to 30 letters, with no spaces.",
+			"decrease": "Fewer cards",
+			"increase": "More cards",
+			"sent": "Clue Sent",
+			"sentLabel": "Clue:",
+			"sentNumber": "Number:",
+			"value": "Clue: {{word}} · {{number}}",
+			"guesses": "Guesses Remaining: {{count}}"
+		},
+		"status": {
+			"waitingLabel": "Waiting",
+			"waitingTitle": "Waiting for the clue…",
+			"waitingBody": "Your Spymaster is choosing a clue.",
+			"opponentGuessing": "{{team}} Team Is Guessing",
+			"opponentClue": "{{team}} Spymaster Is Choosing",
+			"opponentBody": "Wait for your turn. Cards can't be picked right now.",
+			"spymasterOpponentBody": "Wait for your turn to give a clue."
+		},
+		"pass": {
+			"action": "Pass",
+			"passing": "Passing…"
+		},
+		"roster": {
+			"operatives": "Operatives",
+			"spymaster": "Spymaster",
+			"spymasterLine": "Spymaster: {{names}}",
+			"operativesLine": "Operatives: {{names}}",
+			"nobody": "—",
+			"openProfile": "Open {{username}}'s profile"
+		},
+		"card": {
+			"pick": "Pick {{word}}",
+			"key": "{{word}}, {{affiliation}}",
+			"revealed": "{{word}}, revealed: {{affiliation}}",
+			"affiliation": {
+				"RED": "Red agent",
+				"BLUE": "Blue agent",
+				"NEUTRAL": "Bystander",
+				"ASSASSIN": "Assassin"
+			}
+		},
+		"leave": "Leave Game",
+		"results": {
+			"badge": "Match Over",
+			"wins": "{{team}} Team Wins!",
+			"reason": {
+				"ALL_TEAM_CARDS_REVEALED": "{{team}} revealed their last agent.",
+				"ASSASSIN_REVEALED": "{{team}} revealed the assassin.",
+				"PLAYER_FORFEIT": "{{team}} forfeited the match.",
+				"PLAYER_FORFEIT_NAMED": "{{username}} left the match. {{team}} forfeits."
+			},
+			"backToLobby": "Back to Lobby",
+			"viewBoard": "View Final Board",
+			"showResults": "Show Results"
+		},
+		"errors": {
+			"invalidClue": "The clue must be one word of up to 30 letters.",
+			"invalidNumber": "Choose a number from 1 to 9.",
+			"invalidCard": "That card isn't on this board.",
+			"alreadyRevealed": "That card was already revealed.",
+			"noGuesses": "Your team has no guesses left.",
+			"notYourTurn": "It isn't your turn any more.",
+			"roleForbidden": "Your role can't do that.",
+			"finished": "The match is already over.",
+			"offline": "You're offline. Try again once the connection is back.",
+			"generic": "Something went wrong. Try again."
 		}
 	}
 }

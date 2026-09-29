@@ -408,9 +408,21 @@ export class MockRoomServer implements MockServerBinding {
           game_id: this.requireGame().game_id,
           current_turn: this.requireGame().current_turn,
         };
-      case 'game.card.guess':
+      case 'game.card.guess': {
         this.doGuess(id, command.payload.card_id);
-        return { game_id: this.requireGame().game_id, card_id: command.payload.card_id };
+        // The game may have just ended, so read it directly rather than through `requireGame`.
+        const game = this.room.game!;
+        const card = game.board.find((c) => c.card_id === command.payload.card_id)!;
+        return {
+          game_id: game.game_id,
+          card: { ...card },
+          guessing_team: this.find(id)?.team,
+          score: { ...game.score },
+          current_turn: { ...game.current_turn },
+          winner: game.winner,
+          end_reason: game.end_reason,
+        };
+      }
       case 'game.turn.pass':
         this.doPass(id);
         return {

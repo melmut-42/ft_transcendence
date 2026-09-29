@@ -16,3 +16,9 @@ pages of `ui-design/ui.pen`.
 `ready-room/` holds the Ready Room artwork, the mascots over the team panels and the
 Spymaster and Operative role illustrations, exported the same way from the Ready Room
 page of `ui-design/ui.pen`.
+
+`game/` holds the Game Board artwork, exported the same way from the game pages and the
+word card components of `ui-design/ui.pen`: the patterned face of a hidden word card, the
+skull on the assassin card, and the trophy illustration of the Results card. The trophy
+and star glyphs in the trophy illustration are Font Awesome Free icons (CC BY 4.0), the
+same icon set the rest of the interface uses.

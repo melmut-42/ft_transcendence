@@ -364,9 +364,6 @@
 			"returnToRoom": "Odama git"
 		},
 		"loading": "Oda yükleniyor…",
-		"inGame": {
-			"title": "Maç başladı"
-		},
 		"unavailable": {
 			"title": "Bu oda artık kullanılamıyor",
 			"body": "Oda kapandı ya da artık oyuncularından biri değilsin.",
@@ -390,7 +387,7 @@
 			},
 			"game": {
 				"title": "Oyundan çıkılsın mı?",
-				"body": "Bu maçtan çıkıp Oda Keşfine döneceksin. Takımın maçı hükmen kaybeder.",
+				"body": "Bu maçtan çıkıp lobiye döneceksin. Takımın maçı hükmen kaybeder.",
 				"confirm": "Oyundan Çık"
 			}
 		},
@@ -501,5 +498,102 @@
 				"generic": "Olmadı. Tekrar dene."
 			}
 		}
-	}
+	},
+  "game": {
+  	"loading": "Maç yükleniyor…",
+  	"board": "Kelime tahtası",
+  	"team": {
+  		"RED": "Kırmızı",
+  		"BLUE": "Mavi"
+  	},
+  	"teamName": {
+  		"RED": "Kırmızı Takım",
+  		"BLUE": "Mavi Takım"
+  	},
+  	"score": {
+  		"label": "Skor: Kırmızı {{red}}, Mavi {{blue}}"
+  	},
+  	"turn": {
+  		"title": "Sıra <team>{{team}}</team> Takımda",
+  		"over": "Maç Bitti"
+  	},
+  	"instruction": {
+  		"CLUE": "Casus Şefisin. Takımına bir ipucu ver.",
+  		"CLUE_SENT": "İpucu gönderildi. Ajanların kartlarını seçiyor."
+  	},
+  	"clue": {
+  		"label": "İpucu",
+  		"heading": "İpucu Ver",
+  		"number": "Sayı",
+  		"placeholder": "Tek kelimelik ipucu yaz",
+  		"submit": "İpucu Ver",
+  		"sending": "Gönderiliyor…",
+  		"rule": "Boşluksuz, en fazla 30 harflik tek bir kelime kullan.",
+  		"decrease": "Daha az kart",
+  		"increase": "Daha fazla kart",
+  		"sent": "İpucu Gönderildi",
+  		"sentLabel": "İpucu:",
+  		"sentNumber": "Sayı:",
+  		"value": "İpucu: {{word}} · {{number}}",
+  		"guesses": "Kalan Tahmin: {{count}}"
+  	},
+  	"status": {
+  		"waitingLabel": "Bekleniyor",
+  		"waitingTitle": "İpucu bekleniyor…",
+  		"waitingBody": "Casus Şefin bir ipucu seçiyor.",
+  		"opponentGuessing": "{{team}} Takım Tahmin Ediyor",
+  		"opponentClue": "{{team}} Casus Şef Düşünüyor",
+  		"opponentBody": "Sıranı bekle. Şu anda kart seçilemez.",
+  		"spymasterOpponentBody": "İpucu vermek için sıranı bekle."
+  	},
+  	"pass": {
+  		"action": "Pas",
+  		"passing": "Pas geçiliyor…"
+  	},
+  	"roster": {
+  		"operatives": "Ajanlar",
+  		"spymaster": "Casus Şef",
+  		"spymasterLine": "Casus Şef: {{names}}",
+  		"operativesLine": "Ajanlar: {{names}}",
+  		"nobody": "—",
+  		"openProfile": "{{username}} profilini aç"
+  	},
+  	"card": {
+  		"pick": "{{word}} kartını seç",
+  		"key": "{{word}}, {{affiliation}}",
+  		"revealed": "{{word}}, açıldı: {{affiliation}}",
+  		"affiliation": {
+  			"RED": "Kırmızı ajan",
+  			"BLUE": "Mavi ajan",
+  			"NEUTRAL": "Masum",
+  			"ASSASSIN": "Suikastçı"
+  		}
+  	},
+  	"leave": "Oyundan Çık",
+  	"results": {
+  		"badge": "Maç Bitti",
+  		"wins": "{{team}} Takım Kazandı!",
+  		"reason": {
+  			"ALL_TEAM_CARDS_REVEALED": "{{team}} son ajanını açtı.",
+  			"ASSASSIN_REVEALED": "{{team}} suikastçıyı açtı.",
+  			"PLAYER_FORFEIT": "{{team}} maçı hükmen kaybetti.",
+  			"PLAYER_FORFEIT_NAMED": "{{username}} maçtan ayrıldı. {{team}} hükmen kaybetti."
+  		},
+  		"backToLobby": "Lobiye Dön",
+  		"viewBoard": "Son Tahtayı Gör",
+  		"showResults": "Sonuçları Gör"
+  	},
+  	"errors": {
+  		"invalidClue": "İpucu en fazla 30 harflik tek bir kelime olmalı.",
+  		"invalidNumber": "1 ile 9 arasında bir sayı seç.",
+  		"invalidCard": "Bu kart bu tahtada yok.",
+  		"alreadyRevealed": "O kart zaten açıldı.",
+  		"noGuesses": "Takımının tahmin hakkı kalmadı.",
+  		"notYourTurn": "Artık senin sıran değil.",
+  		"roleForbidden": "Rolün bunu yapamaz.",
+  		"finished": "Maç zaten bitti.",
+  		"offline": "Çevrimdışısın. Bağlantı gelince tekrar dene.",
+  		"generic": "Bir şeyler ters gitti. Tekrar dene."
+  	}
+  }
 }

@@ -178,6 +178,9 @@ export type RoomCountdownCancelledEvent = ServerEventEnvelope<
 
 /* ----------------------------- game events -------------------------------- */
 
+/** A turn as a game event reports it: `team` and `phase` always, the rest when changed. */
+export type TurnUpdate = Pick<CurrentTurn, 'team' | 'phase'> & Partial<CurrentTurn>;
+
 export type GameStartedEvent = ServerEventEnvelope<'game.started', { room: Room }>;
 
 /**
@@ -195,7 +198,8 @@ export type GameClueSubmittedEvent = ServerEventEnvelope<
     team: Team;
     clue: Clue;
     guesses_remaining: number;
-    current_turn: CurrentTurn;
+    /** May carry only `team` and `phase`; the clue and count are the fields beside it. */
+    current_turn: TurnUpdate;
   }
 >;
 
@@ -208,7 +212,8 @@ export type GameCardRevealedEvent = ServerEventEnvelope<
     guessed_by_user_id: number;
     guessing_team: Team;
     score: Score;
-    current_turn: CurrentTurn;
+    /** The turn after the reveal; `clue` may be left out. */
+    current_turn: TurnUpdate;
     winner: Team | null;
     end_reason: GameEndReason | null;
   }

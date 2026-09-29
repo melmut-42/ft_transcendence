@@ -74,3 +74,33 @@ export const plain = {
   status: 'flex items-center gap-[8px] text-[16px] leading-[16px] font-regular text-text-ink',
   statusDot: 'size-[11px] shrink-0 rounded-pill bg-success-soft',
 };
+
+// ---- Game Board header ----
+
+/**
+ * The Game Profile Header. On the desktop board it is the design's header at 80%: a
+ * 66px avatar, the name over the role badge, and the chevron. Phones and tablets show the
+ * 36px avatar beside the role badge only, as the Role Chip of those layouts.
+ */
+export const game = {
+  menu:
+    'group/menu flex min-w-0 cursor-pointer items-center gap-[6px] rounded-pill text-left ' +
+    'transition-[translate] duration-200 ease-pop motion-safe:hover:-translate-y-0.5 ' +
+    'desktop:items-start desktop:gap-[8px]',
+  avatar:
+    'flex size-[36px] shrink-0 items-center justify-center overflow-hidden rounded-pill ' +
+    'bg-accent-yellow-deep shadow-avatar desktop:size-[66px]',
+  avatarPlaceholder: 'text-xl text-text-black desktop:text-4xl',
+  details: 'flex min-w-0 flex-col desktop:gap-[8px] desktop:pt-[6px]',
+  name:
+    'sr-only desktop:not-sr-only desktop:truncate desktop:text-[22px] desktop:leading-none ' +
+    'desktop:font-black desktop:text-text-ink',
+  badge:
+    'inline-flex h-[32px] min-w-[112px] items-center justify-center rounded-lg ' +
+    'bg-primary-muted px-[12px] text-md leading-none font-black text-surface uppercase ' +
+    'md:min-w-[143px] md:text-lg ' +
+    'desktop:h-[26px] desktop:min-w-[114px] desktop:rounded-[13px] desktop:text-[14px]',
+  chevron:
+    'hidden shrink-0 pt-[10px] text-xl text-text-faint transition-transform duration-200 ' +
+    'ease-pop motion-safe:group-hover/menu:translate-y-0.5 desktop:block',
+};

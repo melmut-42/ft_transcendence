@@ -105,6 +105,16 @@ export class RoomConnection {
   }
 
   /**
+   * Drop local ordering and take a fresh `room.state`: the server sends the canonical
+   * snapshot on every connect. Used after an event gap, and after a command error that
+   * shows local state is behind the server's.
+   */
+  resync(): void {
+    this.socket.disconnect();
+    this.socket.connect();
+  }
+
+  /**
    * Send one command and return its `request_id` so the caller can correlate the ack.
    * Returns `null` when the socket is not open.
    */

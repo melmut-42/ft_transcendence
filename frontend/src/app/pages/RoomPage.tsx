@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useBlocker, useNavigate } from 'react-router-dom';
 
 import { useRoomConnection } from '@app/connection/roomConnectionContext';
+import { useGameStore } from '@features/game/store/gameStore';
 import { LeaveRoomDialog } from '@features/room/components/RoomOverlays';
 import { useLeaveRoom } from '@features/room/hooks/useLeaveRoom';
 import { forgetRoomCode, recallRoomCode } from '@features/room/model/roomCode';
@@ -11,6 +12,7 @@ import { ROUTES } from '@shared/constants';
 import { useConnectionStore, useSessionStore } from '@shared/stores';
 import { ErrorState, LoadingState } from '@shared/ui';
 
+import { GameScreen } from './GameScreen';
 import { ReadyRoom } from './ReadyRoom';
 import * as styles from './ReadyRoom.styles';
 
@@ -37,22 +39,25 @@ function RoomUnavailable() {
 
 /**
  * The room route. It shows the screen that matches the server's `room.status` — the Ready
- * Room while the room waits or counts down, the board once the game starts — so a refresh
- * lands on the right screen from the fresh snapshot, never from navigation history.
+ * Room while the room waits or counts down, the Game Board once the game starts and its
+ * result once it ends — so a refresh lands on the right screen from the fresh snapshot,
+ * never from navigation history.
  *
  * Until the first snapshot arrives the route shows a loading state rather than an empty
  * room. A room that closed, or that the player no longer belongs to, clears the room from
  * the session and offers the way back to Room Discovery.
  *
- * Leaving is always explicit. LEAVE ROOM asks first and tells the server, and a Back or any
- * other navigation away from the room is held for the same confirmation, so nobody leaves a
- * seat taken by nobody.
+ * Leaving is always explicit. LEAVE ROOM and LEAVE GAME ask first and tell the server, and
+ * a Back or any other navigation away from the room is held for the same confirmation, so
+ * nobody leaves a seat taken by nobody. A finished match has nothing left to confirm, so
+ * leaving it, by Back to Lobby or by Back, tells the server and goes straight to the Lobby.
  */
 export function RoomPage() {
   const { t } = useTranslation();
   const connection = useRoomConnection();
   const roomId = connection.roomId;
   const room = useRoomStore((state) => state.room);
+  const game = useGameStore((state) => state.game);
   const socket = useConnectionStore((state) => state.room);
   const setAnonymous = useSessionStore((state) => state.setAnonymous);
   const leave = useLeaveRoom();
@@ -91,7 +96,18 @@ export function RoomPage() {
     if (sessionEnded) setAnonymous();
   }, [sessionEnded, setAnonymous]);
 
-  const leaveOpen = leave.status !== 'IDLE' || blocker.state === 'blocked';
+  // Leaving a finished room needs no confirmation: a held navigation leaves at once.
+  const { request: requestLeave, action: leaveAction } = leave;
+  const blocked = blocker.state === 'blocked';
+  useEffect(() => {
+    if (!blocked || leaveAction.confirmation) return;
+    blocker.reset?.();
+    requestLeave();
+  }, [blocked, blocker, leaveAction.confirmation, requestLeave]);
+
+  const leaveOpen = leaveAction.confirmation
+    ? leave.status !== 'IDLE' || blocked
+    : leave.status === 'FAILED';
   const cancelLeave = () => {
     leave.cancel();
     if (blocker.state === 'blocked') blocker.reset();
@@ -123,16 +139,19 @@ export function RoomPage() {
       );
   } else if (room.status === 'WAITING' || room.status === 'COUNTDOWN') {
     screen = <ReadyRoom room={room} roomCode={roomCode} onLeave={leave.request} />;
+  } else if (game) {
+    screen = (
+      <GameScreen
+        room={room}
+        game={game}
+        leaving={leave.status === 'LEAVING'}
+        onLeave={leave.request}
+      />
+    );
   } else {
-    // TODO(game): render the board (IN_GAME) and the results (FINISHED) here.
     screen = (
       <main className={styles.state}>
-        <div className={styles.stateCard}>
-          <h1 className="text-3xl font-black normal-case">{t('room.inGame.title')}</h1>
-          <button type="button" onClick={leave.request} className={styles.stateAction}>
-            {t(`room.leave.${leave.action.kind === 'LEAVE_GAME' ? 'game' : 'room'}.confirm`)}
-          </button>
-        </div>
+        <LoadingState label={t('game.loading')} />
       </main>
     );
   }

@@ -38,10 +38,7 @@ export function RoomConnectionProvider() {
         useGameStore.getState().applyEvent(event);
       },
       // A suspected gap: drop local state and reconnect for a fresh `room.state`.
-      onSnapshotRequired: () => {
-        instance.disconnect();
-        instance.connect();
-      },
+      onSnapshotRequired: () => instance.resync(),
     });
 
     setConnection(instance);
