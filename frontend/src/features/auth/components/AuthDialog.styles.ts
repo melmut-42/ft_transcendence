@@ -6,29 +6,18 @@ import type { AuthMode } from './AuthDialog.types';
  * Class recipes for the Log In and Sign Up dialog.
  *
  * The dialog is a compact card over the dimmed Landing page at every width, as tall as
- * its form needs. Mobile is the base: the card spans the screen less a 16px margin on
- * each side and centers its header. From `md:` it is 440px wide, with the mascot beside a
- * left-aligned header and the design's artwork around the form.
+ * its form needs; the shared `Dialog` shell draws the backdrop and the close button.
+ * Mobile is the base: the card spans the screen less a 16px margin on each side and
+ * centers its header. From `md:` it is 440px wide, with the mascot beside a left-aligned
+ * header and the design's artwork around the form.
  */
 
-// ---- Shell ----
-
-export const backdrop: string =
-  'fixed inset-0 z-(--z-modal) flex overflow-y-auto overscroll-contain bg-overlay p-3 ' +
-  'backdrop-blur-[2px] motion-safe:animate-fade-in';
+// ---- Surface ----
 
 export const dialog: string =
-  'relative m-auto flex w-full max-w-[440px] shrink-0 flex-col items-center rounded-xl ' +
-  'bg-linear-to-l from-surface-raised to-background px-[14px] pt-[18px] pb-[20px] ' +
-  'shadow-auth-dialog motion-safe:animate-pop-in md:rounded-2xl md:px-0 md:pt-[46px] ' +
+  'max-w-[440px] items-center rounded-xl bg-linear-to-l from-surface-raised to-background ' +
+  'px-[14px] pt-[18px] pb-[20px] shadow-auth-dialog md:rounded-2xl md:px-0 md:pt-[46px] ' +
   'md:pb-[38px]';
-
-export const close: string =
-  'absolute top-[12px] right-[12px] z-10 inline-flex h-10 w-10 cursor-pointer items-center ' +
-  'justify-center rounded-pill bg-surface-muted text-xl text-text-slate ' +
-  'transition-[scale,background-color,color] duration-100 ease-in hover:bg-surface-sunken ' +
-  'hover:text-text-ink motion-safe:hover:scale-105 motion-safe:active:scale-95 ' +
-  'md:top-[16px] md:right-[14px]';
 
 /** The title keeps clear of the close button: centered on mobile, beside the mascot above. */
 export const title: string =

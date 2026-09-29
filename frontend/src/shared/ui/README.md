@@ -29,6 +29,7 @@ Rules:
 | `Card`                              | Elevated surface grouping related content.                       |
 | `Overlay`                           | Dimmed full-screen backdrop, rendered in a portal.               |
 | `Modal`                             | Dialog shell over `Overlay`: title, close control, action row.   |
+| `Dialog`                            | Popup over the visible page for a designed surface of its own.   |
 | `Toast`, `ToastStack`               | Transient notice and the stack it renders into.                  |
 | `PlayerRow`                         | One seat in a lobby or team list, including the empty seat.      |
 | `WordCard`                          | One board tile, hidden or revealed.                              |
