@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import alienAvatar from '@assets/avatars/alien-avatar.svg';
 import aviatorFoxAvatar from '@assets/avatars/aviator-fox-avatar.svg';
@@ -84,8 +84,9 @@ const COMMUNITY_AVATARS = [
 /**
  * Landing screen: the entry point that introduces the game and leads into Log In.
  *
- * Every call to action opens Log In; an authenticated visitor is sent on to the Lobby by
- * the Log In route's guard. Learn More and Help bring the How To Play section into view.
+ * Every call to action opens the Log In dialog, which the `/login` route renders into the
+ * outlet over this page; an authenticated visitor is sent on to the Lobby by that route's
+ * guard. Learn More and Help bring the How To Play section into view.
  */
 export function LandingPage() {
   const { t } = useTranslation();
@@ -218,6 +219,8 @@ export function LandingPage() {
 
       <img src={edgeLeftArtwork} alt="" className={styles.edgeLeft} />
       <img src={edgeRightArtwork} alt="" className={styles.edgeRight} />
+
+      <Outlet />
     </div>
   );
 }

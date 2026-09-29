@@ -10,6 +10,63 @@
 	"i18n": {
 		"ready": "L'infrastructure multilingue fonctionne."
 	},
+	"auth": {
+		"close": "Fermer",
+		"modes": "Se connecter ou s'inscrire",
+		"login": {
+			"tab": "Connexion",
+			"title": "Prêt à jouer ?",
+			"subtitle": "Connecte-toi ou crée un compte pour rejoindre la partie.",
+			"submit": "Se connecter",
+			"switchPrompt": "Pas encore de compte ?",
+			"switchAction": "Créer un compte"
+		},
+		"register": {
+			"tab": "Inscription",
+			"title": "Rejoins la partie !",
+			"subtitle": "Crée un compte et commence à jouer avec tes amis.",
+			"submit": "Créer un compte",
+			"switchPrompt": "Déjà un compte ?",
+			"switchAction": "Se connecter"
+		},
+		"fields": {
+			"username": "Nom d'utilisateur",
+			"usernamePlaceholder": "Choisis un nom d'utilisateur",
+			"email": "E-mail",
+			"emailPlaceholder": "Saisis ton e-mail",
+			"password": "Mot de passe",
+			"passwordPlaceholder": "Saisis ton mot de passe",
+			"newPasswordPlaceholder": "Crée un mot de passe",
+			"confirmPassword": "Confirmer le mot de passe",
+			"confirmPasswordPlaceholder": "Répète ton mot de passe",
+			"showPassword": "Afficher le mot de passe",
+			"hidePassword": "Masquer le mot de passe"
+		},
+		"validation": {
+			"usernameRequired": "Le nom d'utilisateur est obligatoire.",
+			"usernameInvalid": "Utilise 3 à 20 lettres, chiffres ou tirets bas.",
+			"emailRequired": "L'e-mail est obligatoire.",
+			"emailInvalid": "Oups ! Adresse e-mail invalide.",
+			"passwordRequired": "Le mot de passe est obligatoire.",
+			"passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
+			"passwordTooLong": "Le mot de passe est trop long.",
+			"passwordInvalid": "Le mot de passe doit contenir entre 8 et 72 caractères.",
+			"confirmPasswordRequired": "Confirme ton mot de passe.",
+			"passwordMismatch": "Les mots de passe ne correspondent pas."
+		},
+		"feedback": {
+			"emailTaken": "Cet e-mail est déjà enregistré.",
+			"usernameTaken": "Ce nom d'utilisateur est déjà pris.",
+			"credentialsTitle": "E-mail ou mot de passe incorrect",
+			"credentialsBody": "Vérifie tes informations et réessaie.",
+			"welcomeTitle": "Bon retour, {{username}} !",
+			"welcomeBody": "Direction le lobby…",
+			"rateLimitedTitle": "Trop de tentatives",
+			"rateLimitedBody": "Patiente un instant, puis réessaie.",
+			"unavailableTitle": "Un problème est survenu",
+			"unavailableBody": "Impossible de joindre le serveur. Réessaie dans un instant."
+		}
+	},
 	"landing": {
 		"badge": "LE JEU DE MOTS MULTIJOUEUR",
 		"headlineLead": "Pensez pareil.",

@@ -13,8 +13,7 @@ import { UIElements } from '@app/pages/ui';
 import { LandingPage } from '@app/pages/LandingPage';
 import { PrivacyPage } from '@app/pages/PrivacyPage';
 import { TermsPage } from '@app/pages/TermsPage';
-import { LoginPage } from '@features/auth/pages/LoginPage';
-import { RegisterPage } from '@features/auth/pages/RegisterPage';
+import { AuthDialog } from '@features/auth/components/AuthDialog';
 import { LobbyPage } from '@features/lobby/pages/LobbyPage';
 import { RoomPage } from '@features/room/pages/RoomPage';
 
@@ -26,7 +25,7 @@ import { RequireAuth } from './RequireAuth';
  *
  * Public: landing, login, register, privacy, terms. Authenticated: lobby, room. Landing
  * and the two legal pages render outside `PublicLayout` because they draw their own header
- * and footer.
+ * and footer. Login and register are the Landing page with the authentication dialog open.
  * Profile is a modal rendered by `ModalHost`, not a route — so it never changes the
  * underlying screen and stays reachable from Lobby, Room and Game alike.
  */
@@ -34,15 +33,23 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={ROUTES.landing} element={<LandingPage />} />
+        {/*
+          Log In and Sign Up open as a dialog over the Landing page, which stays mounted
+          underneath. An authenticated visitor is sent on to the Lobby instead.
+        */}
+        <Route path={ROUTES.landing} element={<LandingPage />}>
+          <Route element={<RequireAnonymous />}>
+            <Route path={ROUTES.login} element={<AuthDialog key="login" initialMode="login" />} />
+            <Route
+              path={ROUTES.register}
+              element={<AuthDialog key="register" initialMode="register" />}
+            />
+          </Route>
+        </Route>
         <Route path={ROUTES.privacy} element={<PrivacyPage />} />
         <Route path={ROUTES.terms} element={<TermsPage />} />
 
         <Route element={<PublicLayout />}>
-          <Route element={<RequireAnonymous />}>
-            <Route path={ROUTES.login} element={<LoginPage />} />
-            <Route path={ROUTES.register} element={<RegisterPage />} />
-          </Route>
           <Route path="/ui" element={<UIElements />}></Route>
         </Route>
 

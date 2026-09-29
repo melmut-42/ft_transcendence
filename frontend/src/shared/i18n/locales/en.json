@@ -10,6 +10,63 @@
 	"i18n": {
 		"ready": "Multilingual infrastructure is working."
 	},
+	"auth": {
+		"close": "Close",
+		"modes": "Log in or register",
+		"login": {
+			"tab": "Log In",
+			"title": "Ready to Play?",
+			"subtitle": "Log in or create an account to join the game.",
+			"submit": "Log In",
+			"switchPrompt": "Don't have an account?",
+			"switchAction": "Create Account"
+		},
+		"register": {
+			"tab": "Register",
+			"title": "Join the Game!",
+			"subtitle": "Create an account and start playing with friends.",
+			"submit": "Create Account",
+			"switchPrompt": "Already have an account?",
+			"switchAction": "Log In"
+		},
+		"fields": {
+			"username": "Username",
+			"usernamePlaceholder": "Choose a username",
+			"email": "Email",
+			"emailPlaceholder": "Enter your email",
+			"password": "Password",
+			"passwordPlaceholder": "Enter your password",
+			"newPasswordPlaceholder": "Create a password",
+			"confirmPassword": "Confirm Password",
+			"confirmPasswordPlaceholder": "Repeat your password",
+			"showPassword": "Show password",
+			"hidePassword": "Hide password"
+		},
+		"validation": {
+			"usernameRequired": "Username is required.",
+			"usernameInvalid": "Use 3 to 20 letters, numbers or underscores.",
+			"emailRequired": "Email is required.",
+			"emailInvalid": "Oops! Invalid email address.",
+			"passwordRequired": "Password is required.",
+			"passwordTooShort": "Password must be at least 8 characters.",
+			"passwordTooLong": "Password is too long.",
+			"passwordInvalid": "Password must be 8 to 72 characters long.",
+			"confirmPasswordRequired": "Please confirm your password.",
+			"passwordMismatch": "Passwords do not match."
+		},
+		"feedback": {
+			"emailTaken": "This email is already registered.",
+			"usernameTaken": "This username is already taken.",
+			"credentialsTitle": "Incorrect email or password",
+			"credentialsBody": "Check your details and try again.",
+			"welcomeTitle": "Welcome back, {{username}}!",
+			"welcomeBody": "Taking you to the lobby…",
+			"rateLimitedTitle": "Too many attempts",
+			"rateLimitedBody": "Wait a moment, then try again.",
+			"unavailableTitle": "Something went wrong",
+			"unavailableBody": "We could not reach the server. Try again in a moment."
+		}
+	},
 	"landing": {
 		"badge": "MULTIPLAYER WORD FUN",
 		"headlineLead": "Think alike.",

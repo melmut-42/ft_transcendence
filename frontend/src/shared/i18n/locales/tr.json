@@ -10,6 +10,63 @@
   "i18n": {
 	"ready": "Çok dilli altyapı çalışıyor."
   },
+  "auth": {
+	"close": "Kapat",
+	"modes": "Giriş yap veya kayıt ol",
+	"login": {
+		"tab": "Giriş Yap",
+		"title": "Oynamaya Hazır mısın?",
+		"subtitle": "Oyuna katılmak için giriş yap veya bir hesap oluştur.",
+		"submit": "Giriş Yap",
+		"switchPrompt": "Hesabın yok mu?",
+		"switchAction": "Hesap Oluştur"
+	},
+	"register": {
+		"tab": "Kayıt Ol",
+		"title": "Oyuna Katıl!",
+		"subtitle": "Bir hesap oluştur ve arkadaşlarınla oynamaya başla.",
+		"submit": "Hesap Oluştur",
+		"switchPrompt": "Zaten bir hesabın var mı?",
+		"switchAction": "Giriş Yap"
+	},
+	"fields": {
+		"username": "Kullanıcı adı",
+		"usernamePlaceholder": "Bir kullanıcı adı seç",
+		"email": "E-posta",
+		"emailPlaceholder": "E-posta adresini gir",
+		"password": "Şifre",
+		"passwordPlaceholder": "Şifreni gir",
+		"newPasswordPlaceholder": "Bir şifre oluştur",
+		"confirmPassword": "Şifreyi Onayla",
+		"confirmPasswordPlaceholder": "Şifreni tekrar gir",
+		"showPassword": "Şifreyi göster",
+		"hidePassword": "Şifreyi gizle"
+	},
+	"validation": {
+		"usernameRequired": "Kullanıcı adı gerekli.",
+		"usernameInvalid": "3 ile 20 arasında harf, rakam veya alt çizgi kullan.",
+		"emailRequired": "E-posta gerekli.",
+		"emailInvalid": "Hata! Geçersiz e-posta adresi.",
+		"passwordRequired": "Şifre gerekli.",
+		"passwordTooShort": "Şifre en az 8 karakter olmalı.",
+		"passwordTooLong": "Şifre çok uzun.",
+		"passwordInvalid": "Şifre 8 ile 72 karakter arasında olmalı.",
+		"confirmPasswordRequired": "Lütfen şifreni onayla.",
+		"passwordMismatch": "Şifreler eşleşmiyor."
+	},
+	"feedback": {
+		"emailTaken": "Bu e-posta zaten kayıtlı.",
+		"usernameTaken": "Bu kullanıcı adı zaten alınmış.",
+		"credentialsTitle": "E-posta veya şifre hatalı",
+		"credentialsBody": "Bilgilerini kontrol edip tekrar dene.",
+		"welcomeTitle": "Tekrar hoş geldin, {{username}}!",
+		"welcomeBody": "Lobiye yönlendiriliyorsun…",
+		"rateLimitedTitle": "Çok fazla deneme",
+		"rateLimitedBody": "Biraz bekleyip tekrar dene.",
+		"unavailableTitle": "Bir şeyler ters gitti",
+		"unavailableBody": "Sunucuya ulaşılamadı. Birazdan tekrar dene."
+	}
+  },
   "landing": {
 	"badge": "ÇOK OYUNCULU KELİME EĞLENCESİ",
 	"headlineLead": "Aynı düşün.",

@@ -171,6 +171,12 @@
   --shadow-avatar: 0 2px 5px var(--color-shadow-avatar);
   --shadow-how-to-play: 0 7px 11px var(--color-shadow-warm-soft);
   --shadow-document: 0 14px 24px var(--color-shadow-warm-medium);
+  --shadow-auth-dialog:
+    0 17px 27px var(--color-shadow-warm-medium), 0 3px 8px var(--color-shadow-subtle);
+  --shadow-auth-form: 0 7px 12px #4c49402e, 0 1px 3px var(--color-shadow-subtle);
+  --shadow-auth-form-compact: 0 8px 16px var(--color-shadow-warm-medium);
+  --shadow-auth-tab: 0 3px 5px #2a5b9040, 0 1px 2px #ffffff66;
+  --shadow-input-error: 0 0 6px var(--color-shadow-team-b), 0 3px 5px var(--color-shadow-soft);
   --shadow-button-cta-large:
     0 7px 1px var(--color-shadow-cta), 0 8px 9px var(--color-shadow-cta-deep);
   --shadow-button-icon-secondary: 0 4px 8px var(--color-shadow-warm-soft);
