@@ -1,5 +1,5 @@
 {
-  "version": "2.18",
+  "version": "2.19",
   "children": [
     {
       "type": "frame",
@@ -1257,8 +1257,7 @@
             "type": "shadow",
             "shadowType": "outer",
             "color": "$Color / Primary Light",
-            "blur": 10,
-            "spread": 2
+            "blur": 10
           }
         },
         {
@@ -1275,8 +1274,7 @@
             "type": "shadow",
             "shadowType": "outer",
             "color": "$Color / Primary Light",
-            "blur": 10,
-            "spread": 2
+            "blur": 10
           }
         },
         {
@@ -1293,8 +1291,7 @@
             "type": "shadow",
             "shadowType": "outer",
             "color": "$Color / Primary Light",
-            "blur": 10,
-            "spread": 2
+            "blur": 10
           },
           "width": 194,
           "height": 195
@@ -10384,19 +10381,6 @@
               "fontFamily": "Baloo 2",
               "fontSize": 40,
               "fontWeight": "800"
-            },
-            {
-              "type": "icon",
-              "id": "P2Wbjv",
-              "x": 14,
-              "y": 14,
-              "name": "Team Glyph",
-              "width": 24,
-              "height": 24,
-              "icon": "remove",
-              "library": "Material Symbols Rounded",
-              "weight": 700,
-              "fill": "$Color / Text Gray"
             }
           ]
         },
@@ -10453,19 +10437,6 @@
               "fontFamily": "Baloo 2",
               "fontSize": 40,
               "fontWeight": "800"
-            },
-            {
-              "type": "icon",
-              "id": "O4D9t",
-              "x": 14,
-              "y": 14,
-              "name": "Team Glyph",
-              "width": 24,
-              "height": 24,
-              "icon": "water_drop",
-              "library": "Material Symbols Rounded",
-              "weight": 700,
-              "fill": "$Color / Surface"
             }
           ]
         },
@@ -10522,19 +10493,6 @@
               "fontFamily": "Baloo 2",
               "fontSize": 40,
               "fontWeight": "800"
-            },
-            {
-              "type": "icon",
-              "id": "ROQzU",
-              "x": 14,
-              "y": 14,
-              "name": "Team Glyph",
-              "width": 24,
-              "height": 24,
-              "icon": "local_fire_department",
-              "library": "Material Symbols Rounded",
-              "weight": 700,
-              "fill": "$Color / Surface"
             }
           ]
         },
@@ -10719,8 +10677,7 @@
               "type": "shadow",
               "shadowType": "outer",
               "color": "$Color / Primary Light",
-              "blur": 14,
-              "spread": 2
+              "blur": 14
             },
             {
               "type": "shadow",
@@ -56260,12 +56217,6 @@
                                   "height": 96,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56294,12 +56245,6 @@
                                   "height": 96,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56318,12 +56263,6 @@
                                   "height": 96,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56351,12 +56290,6 @@
                                   "height": 96,
                                   "content": "OCTOPUS",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56384,12 +56317,6 @@
                                   "height": 96,
                                   "content": "CYCLE",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -56426,12 +56353,6 @@
                                   "height": 96,
                                   "content": "EAR",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56459,12 +56380,6 @@
                                   "height": 96,
                                   "content": "GARDEN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56492,12 +56407,6 @@
                                   "height": 96,
                                   "content": "NIGHT",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56515,12 +56424,6 @@
                                   "height": 96,
                                   "content": "VET",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56538,12 +56441,6 @@
                                   "height": 96,
                                   "content": "CHANGE",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -56570,12 +56467,6 @@
                                   "height": 96,
                                   "content": "CLUB",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56603,12 +56494,6 @@
                                   "height": 96,
                                   "content": "MAMMOTH",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56636,12 +56521,6 @@
                                   "height": 96,
                                   "content": "BAR",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56669,12 +56548,6 @@
                                   "height": 96,
                                   "content": "FUEL",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56692,12 +56565,6 @@
                                   "height": 96,
                                   "content": "GLOVE",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -56757,12 +56624,6 @@
                                   "height": 96,
                                   "content": "FOAM",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56790,12 +56651,6 @@
                                   "height": 96,
                                   "content": "ANT",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56823,12 +56678,6 @@
                                   "height": 96,
                                   "content": "RICE",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56856,12 +56705,6 @@
                                   "height": 96,
                                   "content": "CHAIN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -56898,12 +56741,6 @@
                                   "height": 96,
                                   "content": "BAND",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56931,12 +56768,6 @@
                                   "height": 96,
                                   "content": "SCREAM",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56954,12 +56785,6 @@
                                   "height": 96,
                                   "content": "BUCK",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -56987,12 +56812,6 @@
                                   "height": 96,
                                   "content": "PILLOW",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -57020,12 +56839,6 @@
                                   "height": 96,
                                   "content": "CAPITAL",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -57421,12 +57234,6 @@
                                   "height": 72,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57455,12 +57262,6 @@
                                   "height": 72,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57479,12 +57280,6 @@
                                   "height": 72,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57512,12 +57307,6 @@
                                   "height": 72,
                                   "content": "OCTOPUS",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57545,12 +57334,6 @@
                                   "height": 72,
                                   "content": "CYCLE",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -57587,12 +57370,6 @@
                                   "height": 72,
                                   "content": "EAR",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57620,12 +57397,6 @@
                                   "height": 72,
                                   "content": "GARDEN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57653,12 +57424,6 @@
                                   "height": 72,
                                   "content": "NIGHT",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57676,12 +57441,6 @@
                                   "height": 72,
                                   "content": "VET",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57699,12 +57458,6 @@
                                   "height": 72,
                                   "content": "CHANGE",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -57731,12 +57484,6 @@
                                   "height": 72,
                                   "content": "CLUB",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57764,12 +57511,6 @@
                                   "height": 72,
                                   "content": "MAMMOTH",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57797,12 +57538,6 @@
                                   "height": 72,
                                   "content": "BAR",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57830,12 +57565,6 @@
                                   "height": 72,
                                   "content": "FUEL",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57853,12 +57582,6 @@
                                   "height": 72,
                                   "content": "GLOVE",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -57918,12 +57641,6 @@
                                   "height": 72,
                                   "content": "FOAM",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57951,12 +57668,6 @@
                                   "height": 72,
                                   "content": "ANT",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -57984,12 +57695,6 @@
                                   "height": 72,
                                   "content": "RICE",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -58017,12 +57722,6 @@
                                   "height": 72,
                                   "content": "CHAIN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -58059,12 +57758,6 @@
                                   "height": 72,
                                   "content": "BAND",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -58092,12 +57785,6 @@
                                   "height": 72,
                                   "content": "SCREAM",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -58115,12 +57802,6 @@
                                   "height": 72,
                                   "content": "BUCK",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -58148,12 +57829,6 @@
                                   "height": 72,
                                   "content": "PILLOW",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -58181,12 +57856,6 @@
                                   "height": 72,
                                   "content": "CAPITAL",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -60547,12 +60216,6 @@
                                   "height": 96,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60581,12 +60244,6 @@
                                   "height": 96,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60605,12 +60262,6 @@
                                   "height": 96,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60638,12 +60289,6 @@
                                   "height": 96,
                                   "content": "OCTOPUS",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60671,12 +60316,6 @@
                                   "height": 96,
                                   "content": "CYCLE",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -60713,12 +60352,6 @@
                                   "height": 96,
                                   "content": "EAR",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60746,12 +60379,6 @@
                                   "height": 96,
                                   "content": "GARDEN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60779,12 +60406,6 @@
                                   "height": 96,
                                   "content": "NIGHT",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60802,12 +60423,6 @@
                                   "height": 96,
                                   "content": "VET",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60825,12 +60440,6 @@
                                   "height": 96,
                                   "content": "CHANGE",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -60857,12 +60466,6 @@
                                   "height": 96,
                                   "content": "CLUB",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60890,12 +60493,6 @@
                                   "height": 96,
                                   "content": "MAMMOTH",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60923,12 +60520,6 @@
                                   "height": 96,
                                   "content": "BAR",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60956,12 +60547,6 @@
                                   "height": 96,
                                   "content": "FUEL",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -60979,12 +60564,6 @@
                                   "height": 96,
                                   "content": "GLOVE",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -61044,12 +60623,6 @@
                                   "height": 96,
                                   "content": "FOAM",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -61077,12 +60650,6 @@
                                   "height": 96,
                                   "content": "ANT",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -61110,12 +60677,6 @@
                                   "height": 96,
                                   "content": "RICE",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -61143,12 +60704,6 @@
                                   "height": 96,
                                   "content": "CHAIN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -61185,12 +60740,6 @@
                                   "height": 96,
                                   "content": "BAND",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -61218,12 +60767,6 @@
                                   "height": 96,
                                   "content": "SCREAM",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -61241,12 +60784,6 @@
                                   "height": 96,
                                   "content": "BUCK",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -61274,12 +60811,6 @@
                                   "height": 96,
                                   "content": "PILLOW",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -61307,12 +60838,6 @@
                                   "height": 96,
                                   "content": "CAPITAL",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             }
@@ -61664,12 +61189,6 @@
                                   "height": 72,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -61698,12 +61217,6 @@
                                   "height": 72,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -61722,12 +61235,6 @@
                                   "height": 72,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -61755,12 +61262,6 @@
                                   "height": 72,
                                   "content": "OCTOPUS",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -61788,12 +61289,6 @@
                                   "height": 72,
                                   "content": "CYCLE",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -61830,12 +61325,6 @@
                                   "height": 72,
                                   "content": "EAR",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -61863,12 +61352,6 @@
                                   "height": 72,
                                   "content": "GARDEN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -61896,12 +61379,6 @@
                                   "height": 72,
                                   "content": "NIGHT",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -61919,12 +61396,6 @@
                                   "height": 72,
                                   "content": "VET",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -61942,12 +61413,6 @@
                                   "height": 72,
                                   "content": "CHANGE",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -61974,12 +61439,6 @@
                                   "height": 72,
                                   "content": "CLUB",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62007,12 +61466,6 @@
                                   "height": 72,
                                   "content": "MAMMOTH",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62040,12 +61493,6 @@
                                   "height": 72,
                                   "content": "BAR",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62073,12 +61520,6 @@
                                   "height": 72,
                                   "content": "FUEL",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62096,12 +61537,6 @@
                                   "height": 72,
                                   "content": "GLOVE",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -62161,12 +61596,6 @@
                                   "height": 72,
                                   "content": "FOAM",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62194,12 +61623,6 @@
                                   "height": 72,
                                   "content": "ANT",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62227,12 +61650,6 @@
                                   "height": 72,
                                   "content": "RICE",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62260,12 +61677,6 @@
                                   "height": 72,
                                   "content": "CHAIN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -62302,12 +61713,6 @@
                                   "height": 72,
                                   "content": "BAND",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62335,12 +61740,6 @@
                                   "height": 72,
                                   "content": "SCREAM",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62358,12 +61757,6 @@
                                   "height": 72,
                                   "content": "BUCK",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62391,12 +61784,6 @@
                                   "height": 72,
                                   "content": "PILLOW",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -62424,12 +61811,6 @@
                                   "height": 72,
                                   "content": "CAPITAL",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             }
@@ -64902,12 +64283,6 @@
                                   "height": 96,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -64935,12 +64310,6 @@
                                   "height": 96,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -64958,12 +64327,6 @@
                                   "height": 96,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -66042,12 +65405,6 @@
                                   "height": 72,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -66075,12 +65432,6 @@
                                   "height": 72,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -66098,12 +65449,6 @@
                                   "height": 72,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -69328,12 +68673,6 @@
                                   "height": 96,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -69361,12 +68700,6 @@
                                   "height": 96,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -69384,12 +68717,6 @@
                                   "height": 96,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -70466,12 +69793,6 @@
                                   "height": 72,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -70499,12 +69820,6 @@
                                   "height": 72,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -70522,12 +69837,6 @@
                                   "height": 72,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -73718,12 +73027,6 @@
                                   "height": 96,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "O4D9t": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -73751,12 +73054,6 @@
                                   "height": 96,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "ROQzU": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -73774,12 +73071,6 @@
                                   "height": 96,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / XL"
-                                },
-                                "P2Wbjv": {
-                                  "x": 10,
-                                  "y": 10,
-                                  "width": 20,
-                                  "height": 20
                                 }
                               }
                             },
@@ -74858,12 +74149,6 @@
                                   "height": 72,
                                   "content": "JUMPER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "O4D9t": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -74891,12 +74176,6 @@
                                   "height": 72,
                                   "content": "PEN",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "ROQzU": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -74914,12 +74193,6 @@
                                   "height": 72,
                                   "content": "LEATHER",
                                   "fontSize": "$Typography / Size / SM"
-                                },
-                                "P2Wbjv": {
-                                  "x": 6,
-                                  "y": 6,
-                                  "width": 14,
-                                  "height": 14
                                 }
                               }
                             },
@@ -78097,12 +77370,6 @@
                                       "height": 96,
                                       "content": "JUMPER",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "O4D9t": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -78130,12 +77397,6 @@
                                       "height": 96,
                                       "content": "PEN",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "ROQzU": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -78153,12 +77414,6 @@
                                       "height": 96,
                                       "content": "LEATHER",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "P2Wbjv": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -79324,12 +78579,6 @@
                                       "height": 72,
                                       "content": "JUMPER",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "O4D9t": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
@@ -79357,12 +78606,6 @@
                                       "height": 72,
                                       "content": "PEN",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "ROQzU": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
@@ -79380,12 +78623,6 @@
                                       "height": 72,
                                       "content": "LEATHER",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "P2Wbjv": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
@@ -82973,12 +82210,6 @@
                                       "height": 96,
                                       "content": "JUMPER",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "O4D9t": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -83006,12 +82237,6 @@
                                       "height": 96,
                                       "content": "PEN",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "ROQzU": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -83029,12 +82254,6 @@
                                       "height": 96,
                                       "content": "LEATHER",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "P2Wbjv": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -84554,12 +83773,6 @@
                                       "height": 72,
                                       "content": "JUMPER",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "O4D9t": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
@@ -84587,12 +83800,6 @@
                                       "height": 72,
                                       "content": "PEN",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "ROQzU": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
@@ -84610,12 +83817,6 @@
                                       "height": 72,
                                       "content": "LEATHER",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "P2Wbjv": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
@@ -88339,12 +87540,6 @@
                                       "height": 96,
                                       "content": "JUMPER",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "O4D9t": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -88372,12 +87567,6 @@
                                       "height": 96,
                                       "content": "PEN",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "ROQzU": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -88395,12 +87584,6 @@
                                       "height": 96,
                                       "content": "LEATHER",
                                       "fontSize": "$Typography / Size / XL"
-                                    },
-                                    "P2Wbjv": {
-                                      "x": 10,
-                                      "y": 10,
-                                      "width": 20,
-                                      "height": 20
                                     }
                                   }
                                 },
@@ -89618,12 +88801,6 @@
                                       "height": 72,
                                       "content": "JUMPER",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "O4D9t": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
@@ -89651,12 +88828,6 @@
                                       "height": 72,
                                       "content": "PEN",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "ROQzU": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
@@ -89674,12 +88845,6 @@
                                       "height": 72,
                                       "content": "LEATHER",
                                       "fontSize": "$Typography / Size / SM"
-                                    },
-                                    "P2Wbjv": {
-                                      "x": 6,
-                                      "y": 6,
-                                      "width": 14,
-                                      "height": 14
                                     }
                                   }
                                 },
