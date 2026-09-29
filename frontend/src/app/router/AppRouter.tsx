@@ -8,6 +8,8 @@ import { LobbyLayout } from '@layouts/LobbyLayout';
 import { PublicLayout } from '@layouts/PublicLayout';
 import { ROUTES } from '@shared/constants';
 
+import { UIElements } from '@app/pages/ui';
+
 import { LandingPage } from '@app/pages/LandingPage';
 import { PrivacyPage } from '@app/pages/PrivacyPage';
 import { TermsPage } from '@app/pages/TermsPage';
@@ -38,6 +40,7 @@ export function AppRouter() {
             <Route path={ROUTES.login} element={<LoginPage />} />
             <Route path={ROUTES.register} element={<RegisterPage />} />
           </Route>
+          <Route path="/ui" element={<UIElements />}></Route>
         </Route>
 
         <Route element={<RequireAuth />}>
