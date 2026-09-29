@@ -8,3 +8,7 @@ Landing page in `ui-design/ui.pen`.
 
 `auth/` holds the artwork of the Log In and Sign Up dialog, exported the same way from the
 Log In page of `ui-design/ui.pen`.
+
+`lobby/` holds the Room Discovery artwork and `room/` the artwork of the Create Room and
+Join Room dialogs, exported the same way from the Room Discovery, Create Room and Join Room
+pages of `ui-design/ui.pen`.

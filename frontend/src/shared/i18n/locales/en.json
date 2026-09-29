@@ -270,5 +270,98 @@
 				]
 			}
 		]
+	},
+	"lobby": {
+		"title": "Ready for the next clue?",
+		"subtitle": "Create a room or join your friends and start guessing.",
+		"profile": {
+			"open": "Open your profile, {{username}}",
+			"online": "Online",
+			"level": "Lvl {{level}}"
+		},
+		"create": {
+			"title": "Create Room",
+			"descriptionShort": "Start a new game and invite your friends.",
+			"description": "Start a new game and\ninvite your friends.",
+			"action": "Create Room"
+		},
+		"join": {
+			"title": "Join Room",
+			"descriptionShort": "Enter a room code and jump into the game.",
+			"description": "Enter a room and jump into\nthe game.",
+			"action": "Join Room"
+		},
+		"players": {
+			"title": "Players Online",
+			"loading": "Loading players online",
+			"online": "online",
+			"openProfile": "Open {{username}}'s profile",
+			"showMore": "Show\nMore",
+			"showMoreLabel": "Show {{count}} more players",
+			"emptyTitle": "No players online right now",
+			"emptyBody": "Create a room and share its code, or invite a friend to play.",
+			"invite": "Invite Friends",
+			"errorTitle": "Couldn't load players online",
+			"errorBody": "Check your connection and try again."
+		}
+	},
+	"room": {
+		"create": {
+			"title": "Create a Room",
+			"subtitle": "Start a new game room and invite your friends.",
+			"benefits": {
+				"newRoom": "New Game Room",
+				"inviteFriends": "Invite friends after creating.",
+				"chooseRole": "Choose your team and role inside."
+			},
+			"maxPlayers": "Max Players",
+			"maxPlayersHint": "{{min}}–{{max}} players",
+			"fewerPlayers": "Fewer players",
+			"morePlayers": "More players",
+			"submit": "Create Room",
+			"creating": "Creating room",
+			"goToRoom": "Go to Room",
+			"retry": "Try Again",
+			"createdTitle": "Room created!",
+			"createdBody": "Opening your room lobby…"
+		},
+		"join": {
+			"title": "Join a Room",
+			"subtitle": "Enter a room code and jump into the game.",
+			"codeLabel": "Room Code",
+			"codePlaceholder": "ABCD12",
+			"finding": "Finding room…",
+			"previewCaption": "Room code",
+			"players": "{{count}} / {{max}} Players",
+			"status": {
+				"waiting": "WAITING",
+				"full": "FULL",
+				"started": "STARTED"
+			},
+			"submit": "Join Room",
+			"joining": "Joining",
+			"opening": "Opening lobby",
+			"full": "Room Full",
+			"started": "Game Started",
+			"joinedTitle": "You're in!",
+			"joinedBody": "Opening the room lobby…",
+			"errors": {
+				"format": "Enter the six letters and digits of the room code.",
+				"notFound": "No room found with this code. Check it and try again.",
+				"full": "This room is full.",
+				"started": "This game has already started."
+			}
+		},
+		"feedback": {
+			"createFailedTitle": "Couldn't create the room",
+			"createFailedBody": "Something went wrong. Try again.",
+			"joinFailedTitle": "Couldn't join the room",
+			"joinFailedBody": "Something went wrong. Try again.",
+			"rateLimitedTitle": "Too many attempts",
+			"rateLimitedBody": "Wait a moment, then try again.",
+			"alreadyInRoomTitle": "You're already in a room",
+			"alreadyInRoomBody": "Leave it before you create or join another one.",
+			"returnToRoom": "Go to my room"
+		}
 	}
 }

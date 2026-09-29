@@ -270,5 +270,98 @@
 				]
 			}
 		]
+	},
+	"lobby": {
+		"title": "Sıradaki ipucuna hazır mısın?",
+		"subtitle": "Bir oda oluştur ya da arkadaşlarına katıl ve tahmin etmeye başla.",
+		"profile": {
+			"open": "Profilini aç, {{username}}",
+			"online": "Çevrimiçi",
+			"level": "Sv. {{level}}"
+		},
+		"create": {
+			"title": "Oda Oluştur",
+			"descriptionShort": "Yeni bir oyun başlat ve arkadaşlarını davet et.",
+			"description": "Yeni bir oyun başlat ve\narkadaşlarını davet et.",
+			"action": "Oda Oluştur"
+		},
+		"join": {
+			"title": "Odaya Katıl",
+			"descriptionShort": "Bir oda kodu gir ve oyuna katıl.",
+			"description": "Bir odaya gir ve\noyuna katıl.",
+			"action": "Odaya Katıl"
+		},
+		"players": {
+			"title": "Çevrimiçi Oyuncular",
+			"loading": "Çevrimiçi oyuncular yükleniyor",
+			"online": "çevrimiçi",
+			"openProfile": "{{username}} profilini aç",
+			"showMore": "Daha\nFazla",
+			"showMoreLabel": "{{count}} oyuncu daha göster",
+			"emptyTitle": "Şu anda çevrimiçi oyuncu yok",
+			"emptyBody": "Bir oda oluşturup kodunu paylaş ya da bir arkadaşını oyuna davet et.",
+			"invite": "Arkadaş Davet Et",
+			"errorTitle": "Çevrimiçi oyuncular yüklenemedi",
+			"errorBody": "Bağlantını kontrol edip tekrar dene."
+		}
+	},
+	"room": {
+		"create": {
+			"title": "Oda Oluştur",
+			"subtitle": "Yeni bir oyun odası aç ve arkadaşlarını davet et.",
+			"benefits": {
+				"newRoom": "Yeni Oyun Odası",
+				"inviteFriends": "Oluşturduktan sonra arkadaşlarını davet et.",
+				"chooseRole": "Takımını ve rolünü odada seç."
+			},
+			"maxPlayers": "En Fazla Oyuncu",
+			"maxPlayersHint": "{{min}}–{{max}} oyuncu",
+			"fewerPlayers": "Daha az oyuncu",
+			"morePlayers": "Daha fazla oyuncu",
+			"submit": "Oda Oluştur",
+			"creating": "Oda oluşturuluyor",
+			"goToRoom": "Odaya Git",
+			"retry": "Tekrar Dene",
+			"createdTitle": "Oda oluşturuldu!",
+			"createdBody": "Oda lobin açılıyor…"
+		},
+		"join": {
+			"title": "Odaya Katıl",
+			"subtitle": "Bir oda kodu gir ve oyuna katıl.",
+			"codeLabel": "Oda Kodu",
+			"codePlaceholder": "ABCD12",
+			"finding": "Oda aranıyor…",
+			"previewCaption": "Oda kodu",
+			"players": "{{count}} / {{max}} Oyuncu",
+			"status": {
+				"waiting": "BEKLİYOR",
+				"full": "DOLU",
+				"started": "BAŞLADI"
+			},
+			"submit": "Odaya Katıl",
+			"joining": "Katılınıyor",
+			"opening": "Lobi açılıyor",
+			"full": "Oda Dolu",
+			"started": "Oyun Başladı",
+			"joinedTitle": "Odadasın!",
+			"joinedBody": "Oda lobisi açılıyor…",
+			"errors": {
+				"format": "Oda kodunun altı harf ve rakamını gir.",
+				"notFound": "Bu kodla bir oda bulunamadı. Kodu kontrol edip tekrar dene.",
+				"full": "Bu oda dolu.",
+				"started": "Bu oyun çoktan başladı."
+			}
+		},
+		"feedback": {
+			"createFailedTitle": "Oda oluşturulamadı",
+			"createFailedBody": "Bir sorun oluştu. Tekrar dene.",
+			"joinFailedTitle": "Odaya katılınamadı",
+			"joinFailedBody": "Bir sorun oluştu. Tekrar dene.",
+			"rateLimitedTitle": "Çok fazla deneme",
+			"rateLimitedBody": "Biraz bekleyip tekrar dene.",
+			"alreadyInRoomTitle": "Zaten bir odadasın",
+			"alreadyInRoomBody": "Başka bir oda oluşturmadan ya da katılmadan önce ondan ayrıl.",
+			"returnToRoom": "Odama git"
+		}
 	}
 }

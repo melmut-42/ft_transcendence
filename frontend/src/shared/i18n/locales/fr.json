@@ -270,5 +270,98 @@
 				]
 			}
 		]
+	},
+	"lobby": {
+		"title": "Prêt pour le prochain indice ?",
+		"subtitle": "Crée une salle ou rejoins tes amis et commence à deviner.",
+		"profile": {
+			"open": "Ouvrir ton profil, {{username}}",
+			"online": "En ligne",
+			"level": "Niv. {{level}}"
+		},
+		"create": {
+			"title": "Créer une salle",
+			"descriptionShort": "Lance une nouvelle partie et invite tes amis.",
+			"description": "Lance une nouvelle partie\net invite tes amis.",
+			"action": "Créer une salle"
+		},
+		"join": {
+			"title": "Rejoindre",
+			"descriptionShort": "Saisis un code de salle et entre dans la partie.",
+			"description": "Entre dans une salle et\nrejoins la partie.",
+			"action": "Rejoindre"
+		},
+		"players": {
+			"title": "Joueurs en ligne",
+			"loading": "Chargement des joueurs en ligne",
+			"online": "en ligne",
+			"openProfile": "Ouvrir le profil de {{username}}",
+			"showMore": "Voir\nplus",
+			"showMoreLabel": "Afficher {{count}} joueurs de plus",
+			"emptyTitle": "Aucun joueur en ligne pour le moment",
+			"emptyBody": "Crée une salle et partage son code, ou invite un ami à jouer.",
+			"invite": "Inviter des amis",
+			"errorTitle": "Impossible de charger les joueurs en ligne",
+			"errorBody": "Vérifie ta connexion et réessaie."
+		}
+	},
+	"room": {
+		"create": {
+			"title": "Créer une salle",
+			"subtitle": "Lance une nouvelle salle de jeu et invite tes amis.",
+			"benefits": {
+				"newRoom": "Nouvelle salle de jeu",
+				"inviteFriends": "Invite tes amis après la création.",
+				"chooseRole": "Choisis ton équipe et ton rôle dans la salle."
+			},
+			"maxPlayers": "Joueurs max.",
+			"maxPlayersHint": "{{min}} à {{max}} joueurs",
+			"fewerPlayers": "Moins de joueurs",
+			"morePlayers": "Plus de joueurs",
+			"submit": "Créer la salle",
+			"creating": "Création de la salle",
+			"goToRoom": "Aller à la salle",
+			"retry": "Réessayer",
+			"createdTitle": "Salle créée !",
+			"createdBody": "Ouverture du salon de ta salle…"
+		},
+		"join": {
+			"title": "Rejoindre une salle",
+			"subtitle": "Saisis un code de salle et entre dans la partie.",
+			"codeLabel": "Code de la salle",
+			"codePlaceholder": "ABCD12",
+			"finding": "Recherche de la salle…",
+			"previewCaption": "Code de la salle",
+			"players": "{{count}} / {{max}} joueurs",
+			"status": {
+				"waiting": "EN ATTENTE",
+				"full": "PLEINE",
+				"started": "COMMENCÉE"
+			},
+			"submit": "Rejoindre",
+			"joining": "Connexion",
+			"opening": "Ouverture du salon",
+			"full": "Salle pleine",
+			"started": "Partie commencée",
+			"joinedTitle": "Tu es dans la salle !",
+			"joinedBody": "Ouverture du salon de la salle…",
+			"errors": {
+				"format": "Saisis les six lettres et chiffres du code de la salle.",
+				"notFound": "Aucune salle ne correspond à ce code. Vérifie-le et réessaie.",
+				"full": "Cette salle est pleine.",
+				"started": "Cette partie a déjà commencé."
+			}
+		},
+		"feedback": {
+			"createFailedTitle": "Impossible de créer la salle",
+			"createFailedBody": "Un problème est survenu. Réessaie.",
+			"joinFailedTitle": "Impossible de rejoindre la salle",
+			"joinFailedBody": "Un problème est survenu. Réessaie.",
+			"rateLimitedTitle": "Trop de tentatives",
+			"rateLimitedBody": "Patiente un instant, puis réessaie.",
+			"alreadyInRoomTitle": "Tu es déjà dans une salle",
+			"alreadyInRoomBody": "Quitte-la avant d'en créer ou d'en rejoindre une autre.",
+			"returnToRoom": "Aller à ma salle"
+		}
 	}
 }

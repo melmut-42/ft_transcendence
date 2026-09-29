@@ -15,7 +15,18 @@ export interface MockAccount extends PublicProfile {
   created_at: string;
 }
 
-const avatar = (presetId: string): string => `/avatars/presets/${presetId}.png`;
+/**
+ * The mock serves the avatars bundled with the app, so mock profiles show real pictures
+ * without a server behind them. The real server returns its own same-origin URLs.
+ */
+const BUNDLED_AVATARS = import.meta.glob<string>('../../../assets/avatars/*-avatar.svg', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+
+const avatar = (presetId: string): string =>
+  BUNDLED_AVATARS[`../../../assets/avatars/${presetId}-avatar.svg`] ?? '';
 
 /** The catalog is fixed: 11 entries, fixed order. */
 export const AVATAR_PRESET_IDS = [

@@ -11,9 +11,9 @@ import { ROUTES } from '@shared/constants';
 import { UIElements } from '@app/pages/ui';
 
 import { LandingPage } from '@app/pages/LandingPage';
+import { LobbyPage } from '@app/pages/LobbyPage';
 import { PrivacyPage } from '@app/pages/PrivacyPage';
 import { TermsPage } from '@app/pages/TermsPage';
-import { LobbyPage } from '@features/lobby/pages/LobbyPage';
 import { RoomPage } from '@features/room/pages/RoomPage';
 
 import { RequireAnonymous } from './RequireAnonymous';
