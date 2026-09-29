@@ -1,0 +1,117 @@
+import { useId } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { Dialog } from '@shared/ui';
+import { cn } from '@shared/utils';
+
+import type { LeaveStatus } from '../hooks/useLeaveRoom';
+import type { LeaveAction } from '../model/leave';
+import * as styles from './RoomOverlays.styles';
+
+/**
+ * Leave Room (or Leave Game, once the match runs) confirmation. Stay, the safe choice, sits
+ * on the left and the committing Leave on the right. While the leave request runs the
+ * dialog cannot be dismissed, so its result is always shown.
+ */
+export function LeaveRoomDialog({
+  action,
+  status,
+  failed,
+  onConfirm,
+  onCancel,
+}: {
+  action: LeaveAction;
+  status: LeaveStatus;
+  failed: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const { t } = useTranslation();
+  const titleId = useId();
+  const bodyId = useId();
+  const kind = action.kind === 'LEAVE_GAME' ? 'game' : 'room';
+  const leaving = status === 'LEAVING';
+
+  return (
+    <Dialog
+      role="alertdialog"
+      labelledBy={titleId}
+      describedBy={bodyId}
+      closeLabel={t('room.leave.stay')}
+      onClose={onCancel}
+      closable={!leaving}
+      showCloseButton={false}
+      className={styles.leave}
+    >
+      <h2 id={titleId} className={styles.leaveTitle}>
+        {t(`room.leave.${kind}.title`)}
+      </h2>
+      <p id={bodyId} className={styles.leaveBody}>
+        {t(`room.leave.${kind}.body`)}
+      </p>
+      {failed && (
+        <p role="alert" className={styles.leaveError}>
+          {t('room.leave.failed')}
+        </p>
+      )}
+      <div className={styles.leaveActions}>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={leaving}
+          className={cn(styles.leaveButton, styles.stayTone)}
+        >
+          {t('room.leave.stay')}
+        </button>
+        <button
+          type="button"
+          onClick={onConfirm}
+          disabled={leaving}
+          aria-busy={leaving}
+          className={cn(styles.leaveButton, styles.leaveTone)}
+        >
+          {t(leaving ? 'room.leave.leaving' : `room.leave.${kind}.confirm`)}
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
+/**
+ * GAME STARTING over the room while the server counts down. The number is the server's
+ * `seconds_remaining`, so every player sees the same count, and nothing here starts the
+ * game: the room moves on when the server announces `game.started`. Screen readers hear
+ * the start once, not every tick.
+ */
+export function CountdownOverlay({ seconds }: { seconds: number | null }) {
+  const { t } = useTranslation();
+  const titleId = useId();
+  const hintId = useId();
+
+  return (
+    <Dialog
+      role="alertdialog"
+      labelledBy={titleId}
+      describedBy={hintId}
+      closeLabel={t('common.close')}
+      onClose={() => {}}
+      closable={false}
+      showCloseButton={false}
+      className={styles.countdown}
+    >
+      <h2 id={titleId} className={styles.countdownEyebrow}>
+        {t('room.countdown.title')}
+      </h2>
+      <div aria-hidden="true" className={styles.countdownRing}>
+        {seconds !== null && (
+          <span key={seconds} className={styles.countdownNumber}>
+            {seconds}
+          </span>
+        )}
+      </div>
+      <p id={hintId} className={styles.countdownHint}>
+        {t('room.countdown.hint')}
+      </p>
+    </Dialog>
+  );
+}

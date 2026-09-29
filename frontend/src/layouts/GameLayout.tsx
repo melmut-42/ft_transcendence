@@ -6,14 +6,13 @@ import { Footer } from './Footer';
 
 /**
  * Room and Game shell — one layout, because Room Waiting, Countdown, In-Game and the
- * Results state are all states of the same room route, not separate routes.
+ * Results state are all states of the same room route, not separate routes. Each screen
+ * draws its own full-width composition above the legal footer.
  */
 export function GameLayout() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-3 py-4 sm:px-4">
-        <Outlet />
-      </main>
+    <div className="flex min-h-screen flex-col bg-background">
+      <Outlet />
       <ConnectionOverlay />
       <Footer />
     </div>

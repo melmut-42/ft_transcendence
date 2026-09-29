@@ -1,0 +1,102 @@
+/**
+ * The Ready Room's own commands — team, role, ready and room size — with the feedback the
+ * controls show while one is in flight and after the server turns one down.
+ *
+ * Nothing changes on screen when a command is sent. The member's new team, role or ready
+ * state appears when the server's `room.player.updated` and `room.state` arrive, so a
+ * command that loses a race (two players taking the same Spymaster seat) never shows a
+ * result the server did not accept. One command runs at a time; a second press while one
+ * is in flight is dropped.
+ */
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { RoomCommandError } from '@shared/websocket';
+import type { RoomRole, Team } from '@shared/types';
+
+import { useRoomCommands } from './useRoomCommands';
+
+export type SetupAction = 'team' | 'role' | 'ready' | 'capacity';
+
+export interface SetupFeedback {
+  action: SetupAction;
+  /** Translation key of the message. */
+  message: string;
+}
+
+function messageFor(error: unknown): string {
+  const code = error instanceof RoomCommandError ? error.code : null;
+  switch (code) {
+    case 'ROLE_CONFLICT':
+      return 'room.ready.errors.roleConflict';
+    case 'TEAM_REQUIRED':
+      return 'room.ready.errors.teamRequired';
+    case 'ROLE_REQUIRED':
+      return 'room.ready.errors.roleRequired';
+    case 'INVALID_ROOM_STATE':
+      return 'room.ready.errors.locked';
+    case 'NOT_HOST':
+      return 'room.ready.errors.notHost';
+    case 'INVALID_PAYLOAD':
+      return 'room.ready.errors.capacity';
+    case 'NOT_SENT':
+    case 'CONNECTION_LOST':
+      return 'room.ready.errors.offline';
+    default:
+      return 'room.ready.errors.generic';
+  }
+}
+
+export function useRoomSetup() {
+  const commands = useRoomCommands();
+  const [pending, setPending] = useState<SetupAction | null>(null);
+  const [feedback, setFeedback] = useState<SetupFeedback | null>(null);
+  const busy = useRef(false);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  const run = useCallback(async (action: SetupAction, send: () => Promise<unknown>) => {
+    if (busy.current) return;
+    busy.current = true;
+    setPending(action);
+    setFeedback(null);
+    try {
+      await send();
+    } catch (error) {
+      if (mounted.current) setFeedback({ action, message: messageFor(error) });
+    } finally {
+      busy.current = false;
+      if (mounted.current) setPending(null);
+    }
+  }, []);
+
+  return {
+    pending,
+    feedback,
+    dismissFeedback: useCallback(() => setFeedback(null), []),
+    selectTeam: useCallback(
+      (team: Team) => run('team', () => commands.selectTeam(team)),
+      [commands, run],
+    ),
+    selectRole: useCallback(
+      (role: RoomRole) => run('role', () => commands.selectRole(role)),
+      [commands, run],
+    ),
+    setReady: useCallback(
+      (ready: boolean) => run('ready', () => commands.setReady(ready)),
+      [commands, run],
+    ),
+    updateMaxPlayers: useCallback(
+      (maxPlayers: number) => run('capacity', () => commands.updateMaxPlayers(maxPlayers)),
+      [commands, run],
+    ),
+  };
+}
+
+export type RoomSetup = ReturnType<typeof useRoomSetup>;

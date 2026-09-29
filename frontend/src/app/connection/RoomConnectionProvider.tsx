@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { Navigate, Outlet, useParams } from 'react-router-dom';
 
 import { useGameStore } from '@features/game/store/gameStore';
 import { useRoomStore } from '@features/room/store/roomStore';
+import { ROUTES } from '@shared/constants';
 import { useConnectionStore } from '@shared/stores';
 import { RoomConnection } from '@shared/websocket';
 
@@ -56,11 +57,8 @@ export function RoomConnectionProvider() {
 
   const value = useMemo(() => connection, [connection]);
 
-  if (!isValidRoomId) {
-    // ROOM_RECOVERY: an unusable room id sends the user back to the Lobby.
-    // TODO(routing): redirect to the Lobby with an explanatory toast.
-    return null;
-  }
+  // An unusable room id sends the user back to the Lobby.
+  if (!isValidRoomId) return <Navigate to={ROUTES.lobby} replace />;
 
   if (!value) return null;
 

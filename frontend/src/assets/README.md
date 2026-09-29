@@ -12,3 +12,7 @@ Log In page of `ui-design/ui.pen`.
 `lobby/` holds the Room Discovery artwork and `room/` the artwork of the Create Room and
 Join Room dialogs, exported the same way from the Room Discovery, Create Room and Join Room
 pages of `ui-design/ui.pen`.
+
+`ready-room/` holds the Ready Room artwork, the mascots over the team panels and the
+Spymaster and Operative role illustrations, exported the same way from the Ready Room
+page of `ui-design/ui.pen`.

@@ -53,3 +53,24 @@ export const levelSkeleton: string =
 export const chevron: string =
   'hidden shrink-0 text-xl text-text-ink transition-transform duration-200 ease-pop ' +
   'motion-safe:group-hover/menu:translate-y-0.5 desktop:block';
+
+// ---- Ready Room sidebar ----
+
+/**
+ * The plain summary at the top of the Ready Room sidebar: a 74px avatar beside the name
+ * and the presence line, with no card, level or chevron. The sidebar shows from
+ * `desktop:` only, at 80% of the design's size like the rest of that layout.
+ */
+export const plain = {
+  menu:
+    'group/menu flex min-w-0 cursor-pointer items-center gap-[10px] rounded-pill pr-[10px] ' +
+    'text-left transition-[translate] duration-200 ease-pop motion-safe:hover:-translate-y-0.5',
+  avatar:
+    'flex size-[74px] shrink-0 items-center justify-center overflow-hidden rounded-pill ' +
+    'bg-accent-yellow-deep',
+  avatarPlaceholder: 'text-4xl text-text-black',
+  details: 'flex min-w-0 flex-col gap-[9px]',
+  name: 'truncate text-[22px] leading-[22px] font-black text-text-ink',
+  status: 'flex items-center gap-[8px] text-[16px] leading-[16px] font-regular text-text-ink',
+  statusDot: 'size-[11px] shrink-0 rounded-pill bg-success-soft',
+};

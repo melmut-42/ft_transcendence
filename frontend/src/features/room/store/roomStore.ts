@@ -8,12 +8,23 @@
 
 import { create } from 'zustand';
 
-import type { Room, RoomServerEvent } from '@shared/types';
+import type { CountdownCancelReason, Room, RoomServerEvent } from '@shared/types';
+
+/** The last countdown the server cancelled, and who caused it, for the waiting view. */
+export interface CountdownCancellation {
+  reason: CountdownCancelReason;
+  userId: number;
+  /** Read from the member list when the event arrived; `null` if they were unknown. */
+  username: string | null;
+  /** The cancelling event's id, so the same notice is never shown twice. */
+  eventId: string;
+}
 
 interface RoomState {
   room: Room | null;
   /** Server-driven countdown value; the frontend never runs its own start timer. */
   secondsRemaining: number | null;
+  countdownCancellation: CountdownCancellation | null;
 
   applySnapshot: (room: Room) => void;
   /** Apply one room-stream event. `game.*` deltas belong to the game store. */
@@ -24,6 +35,7 @@ interface RoomState {
 export const useRoomStore = create<RoomState>((set, get) => ({
   room: null,
   secondsRemaining: null,
+  countdownCancellation: null,
 
   applySnapshot: (room) =>
     set({ room, secondsRemaining: room.countdown?.seconds_remaining ?? null }),
@@ -37,12 +49,24 @@ export const useRoomStore = create<RoomState>((set, get) => ({
         get().applySnapshot(event.payload.room);
         return;
       case 'room.countdown.started':
+        set({ secondsRemaining: event.payload.seconds_remaining, countdownCancellation: null });
+        return;
       case 'room.countdown.tick':
         set({ secondsRemaining: event.payload.seconds_remaining });
         return;
-      case 'room.countdown.cancelled':
-        set({ secondsRemaining: null });
+      case 'room.countdown.cancelled': {
+        const userId = event.payload.changed_by_user_id;
+        set({
+          secondsRemaining: null,
+          countdownCancellation: {
+            reason: event.payload.reason,
+            userId,
+            username: room?.players.find((p) => p.user_id === userId)?.username ?? null,
+            eventId: event.event_id,
+          },
+        });
         return;
+      }
       case 'room.settings.updated':
         if (room) set({ room: { ...room, max_players: event.payload.max_players } });
         return;
@@ -82,5 +106,5 @@ export const useRoomStore = create<RoomState>((set, get) => ({
     }
   },
 
-  clear: () => set({ room: null, secondsRemaining: null }),
+  clear: () => set({ room: null, secondsRemaining: null, countdownCancellation: null }),
 }));

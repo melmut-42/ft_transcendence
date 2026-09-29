@@ -9,13 +9,20 @@ import { useOwnProfile } from '../hooks/useOwnProfile';
 import * as styles from './ProfileMenu.styles';
 
 /**
- * The signed-in player's summary in the Room Discovery header: avatar, name, presence and
- * level. It opens the player's own profile over the page.
+ * The signed-in player's summary: avatar, name, presence and level. It opens the player's
+ * own profile over the page.
  *
- * Mobile and tablet show the avatar and the name at the head of the page; the desktop layout
- * shows the full card in the top-right corner.
+ * `card` is the Room Discovery header: mobile and tablet show the avatar and the name at
+ * the head of the page; the desktop layout shows the full card in the top-right corner.
+ * `plain` is the top of the Ready Room sidebar: avatar, name and presence, without a card.
  */
-export function ProfileMenu({ className }: { className?: string }) {
+export function ProfileMenu({
+  variant = 'card',
+  className,
+}: {
+  variant?: 'card' | 'plain';
+  className?: string;
+}) {
   const { t } = useTranslation();
   const session = useSessionStore((state) => state.user);
   const { profile, status } = useOwnProfile();
@@ -24,11 +31,44 @@ export function ProfileMenu({ className }: { className?: string }) {
   const userId = profile?.user_id ?? session?.user_id;
   const username = profile?.username ?? session?.username ?? '';
   const avatarUrl = profile?.avatar_url;
+  const open = () => userId !== undefined && openProfileModal(userId);
+
+  if (variant === 'plain') {
+    return (
+      <button
+        type="button"
+        onClick={open}
+        aria-haspopup="dialog"
+        aria-label={t('lobby.profile.open', { username })}
+        className={cn(styles.plain.menu, className)}
+      >
+        <span className={styles.plain.avatar}>
+          {avatarUrl && !imageFailed ? (
+            <img
+              src={avatarUrl}
+              alt=""
+              onError={() => setImageFailed(true)}
+              className={styles.avatarImage}
+            />
+          ) : (
+            <Icon name="smile" className={styles.plain.avatarPlaceholder} />
+          )}
+        </span>
+        <span className={styles.plain.details}>
+          <span className={styles.plain.name}>{username}</span>
+          <span className={styles.plain.status}>
+            <span aria-hidden="true" className={styles.plain.statusDot} />
+            {t('lobby.profile.online')}
+          </span>
+        </span>
+      </button>
+    );
+  }
 
   return (
     <button
       type="button"
-      onClick={() => userId !== undefined && openProfileModal(userId)}
+      onClick={open}
       aria-haspopup="dialog"
       aria-label={t('lobby.profile.open', { username })}
       className={cn(styles.menu, className)}

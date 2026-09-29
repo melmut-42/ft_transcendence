@@ -120,7 +120,7 @@ export function useJoinRoom() {
       if (!mounted.current) return;
       setStatus('JOINED');
       await new Promise((resolve) => setTimeout(resolve, ENTRY_CONFIRMATION_MS));
-      if (mounted.current) enter(joined);
+      if (mounted.current) enter(joined, room.room_code);
     } catch (error) {
       if (!mounted.current) return;
       pending.current = false;

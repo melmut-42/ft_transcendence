@@ -19,6 +19,7 @@ import { useSessionStore } from '@shared/stores';
 import { leaveRoom } from '../api';
 import { leaveActionFor } from '../model/leave';
 import type { LeaveAction } from '../model/leave';
+import { forgetRoomCode } from '../model/roomCode';
 import { useRoomStore } from '../store/roomStore';
 
 export type LeaveStatus = 'IDLE' | 'CONFIRMING' | 'LEAVING' | 'FAILED';
@@ -46,6 +47,7 @@ export function useLeaveRoom() {
       }
     }
     connection.disconnect();
+    forgetRoomCode(connection.roomId);
     // Room and game stores are cleared by `RoomConnectionProvider` when it unmounts.
     useSessionStore.getState().setActiveRoomId(null);
     setStatus('IDLE');

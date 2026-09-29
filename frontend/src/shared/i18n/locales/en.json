@@ -362,6 +362,144 @@
 			"alreadyInRoomTitle": "You're already in a room",
 			"alreadyInRoomBody": "Leave it before you create or join another one.",
 			"returnToRoom": "Go to my room"
+		},
+		"loading": "Loading the room…",
+		"inGame": {
+			"title": "The match has started"
+		},
+		"unavailable": {
+			"title": "This room is no longer available",
+			"body": "It closed, or you are no longer one of its players.",
+			"action": "Back to Room Discovery"
+		},
+		"connection": {
+			"failedTitle": "Couldn't connect to the room",
+			"failedBody": "Check your connection and try again.",
+			"reconnecting": "Reconnecting…",
+			"reconnectingBody": "Your seat is held while we reconnect you."
+		},
+		"leave": {
+			"action": "Leave Room",
+			"stay": "Stay",
+			"leaving": "Leaving…",
+			"failed": "Couldn't leave the room. Try again.",
+			"room": {
+				"title": "Leave Room?",
+				"body": "You will leave this room and lose your team and role. Your seat opens for another player.",
+				"confirm": "Leave Room"
+			},
+			"game": {
+				"title": "Leave Game?",
+				"body": "You will leave this match and return to Room Discovery. Your team forfeits the match.",
+				"confirm": "Leave Game"
+			}
+		},
+		"countdown": {
+			"title": "Game Starting",
+			"hint": "Taking you to the board — good luck!",
+			"someone": "A player",
+			"cancelled": {
+				"PLAYER_UNREADY": "Countdown stopped: {{username}} is no longer ready.",
+				"PLAYER_LEFT": "Countdown stopped: {{username}} left the room.",
+				"TEAM_CHANGED": "Countdown stopped: {{username}} changed team.",
+				"ROLE_CHANGED": "Countdown stopped: {{username}} changed role."
+			}
+		},
+		"ready": {
+			"title": "{{host}}'s Room",
+			"titleFallback": "Ready Room",
+			"codeLabel": "Room code",
+			"copyCode": "Copy room code",
+			"codeCopied": "Room code copied",
+			"copyFailed": "Couldn't copy the code. Select it and copy it by hand.",
+			"shareHint": "Share this code with your friends.",
+			"maxPlayers": "Max Players",
+			"playerCount": "{{count}} / {{max}} Players",
+			"roomFull": "Room Full",
+			"phase": {
+				"WAITING": {
+					"title": "Waiting for Players…",
+					"body": "Share the room code. The game starts when all are ready."
+				},
+				"FULL": {
+					"title": "Room Full",
+					"body": "{{count}} of {{max}} seats are taken. New players cannot join."
+				},
+				"COUNTDOWN": {
+					"title": "Get Ready!",
+					"body": "Everyone is ready. The match is about to begin."
+				}
+			},
+			"team": {
+				"RED": "Red Team",
+				"BLUE": "Blue Team"
+			},
+			"teamButton": {
+				"RED": "Red Team",
+				"BLUE": "Blue Team"
+			},
+			"teamShort": {
+				"RED": "Red",
+				"BLUE": "Blue"
+			},
+			"host": "Host",
+			"hostSuffix": ", host",
+			"youSuffix": ", you",
+			"card": "{{username}}{{you}}{{host}}: {{role}}, {{status}}",
+			"role": {
+				"SPYMASTER": "Spymaster",
+				"OPERATIVE": "Operative",
+				"none": "No role yet"
+			},
+			"status": {
+				"ready": "Ready!",
+				"waiting": "Waiting"
+			},
+			"emptySeat": "Waiting for player…",
+			"choosing": "Choosing a team",
+			"setupTitle": "Your Setup",
+			"chooseTeam": "Choose Your Team",
+			"chooseRole": "Choose Your Role",
+			"roleCard": {
+				"SPYMASTER": {
+					"title": "Spymaster",
+					"description": "Give clues to\nyour team."
+				},
+				"OPERATIVE": {
+					"title": "Operative",
+					"description": "Guess the\ncorrect cards."
+				}
+			},
+			"taken": "Taken",
+			"readyAction": "Ready",
+			"readyDone": "Ready!",
+			"counter": "{{ready}} / {{count}} Players Ready",
+			"counterFull": "{{count}} / {{max}} Players · Room Full",
+			"summary": "You: {{setup}}",
+			"noTeam": "No team yet",
+			"change": "Change",
+			"choose": "Choose",
+			"hints": {
+				"teamFirst": "Choose a team first.",
+				"spymasterTaken": "{{username}} is this team's Spymaster.",
+				"locked": "The match is starting, so your setup is locked.",
+				"hostOnly": "Only the host can change the room size.",
+				"ready": {
+					"TEAM_REQUIRED": "Choose a team first.",
+					"ROLE_REQUIRED": "Choose a role first.",
+					"LOCKED": "The match is starting."
+				}
+			},
+			"errors": {
+				"roleConflict": "Another player just took this team's Spymaster seat.",
+				"teamRequired": "Choose a team first.",
+				"roleRequired": "Choose a role first.",
+				"locked": "The match is starting, so your setup can't change now.",
+				"notHost": "Only the host can change the room size.",
+				"capacity": "The room can't be smaller than the players in it.",
+				"offline": "You're offline. Try again once you're reconnected.",
+				"generic": "That didn't work. Try again."
+			}
 		}
 	}
 }

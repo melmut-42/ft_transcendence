@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ROOM_CAPACITY } from '@shared/types';
-import type { Room } from '@shared/types';
+import type { CreateRoomResponse } from '@shared/types';
 
 import { createRoom } from '../api';
 import { createFailure } from '../model/entry';
@@ -27,7 +27,7 @@ export function useCreateRoom() {
   const [maxPlayers, setMaxPlayers] = useState<number>(ROOM_CAPACITY.default);
   const [status, setStatus] = useState<CreateRoomStatus>('IDLE');
   const [failure, setFailure] = useState<BannerFailure | null>(null);
-  const [created, setCreated] = useState<Room | null>(null);
+  const [created, setCreated] = useState<CreateRoomResponse | null>(null);
   const pending = useRef(false);
   const mounted = useRef(true);
   const entered = useRef(false);
@@ -42,7 +42,7 @@ export function useCreateRoom() {
   const enterCreated = useCallback(() => {
     if (!created || entered.current) return;
     entered.current = true;
-    enter(created);
+    enter(created, created.room_code);
   }, [created, enter]);
 
   useEffect(() => {

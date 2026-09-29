@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import { ChatMount } from '@app/chat/ChatMount';
 import { ModalHost } from '@app/modal/ModalHost';
@@ -13,11 +13,22 @@ import { UIElements } from '@app/pages/ui';
 import { LandingPage } from '@app/pages/LandingPage';
 import { LobbyPage } from '@app/pages/LobbyPage';
 import { PrivacyPage } from '@app/pages/PrivacyPage';
+import { RoomPage } from '@app/pages/RoomPage';
 import { TermsPage } from '@app/pages/TermsPage';
-import { RoomPage } from '@features/room/pages/RoomPage';
 
 import { RequireAnonymous } from './RequireAnonymous';
 import { RequireAuth } from './RequireAuth';
+
+/** App-level mounts: available from every layout, imported by no feature. */
+function AppShell() {
+  return (
+    <>
+      <Outlet />
+      <ModalHost />
+      <ChatMount />
+    </>
+  );
+}
 
 /**
  * Route table.
@@ -27,53 +38,57 @@ import { RequireAuth } from './RequireAuth';
  * and footer. Login and register are the Landing page with its Log In / Sign Up dialog open.
  * Profile is a modal rendered by `ModalHost`, not a route — so it never changes the
  * underlying screen and stays reachable from Lobby, Room and Game alike.
+ *
+ * It is a data router so the room can hold a navigation away from it until the player
+ * confirms leaving (`useBlocker`).
  */
-export function AppRouter() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/*
-          Log In and Sign Up are a dialog over the Landing page, opened from its calls to
-          action without a route change. `/login` and `/register` link to the same page
-          with the dialog open; an authenticated visitor is sent on to the Lobby instead.
-        */}
-        <Route path={ROUTES.landing} element={<LandingPage />} />
-        <Route element={<RequireAnonymous />}>
-          <Route path={ROUTES.login} element={<LandingPage key="login" authMode="login" />} />
-          <Route
-            path={ROUTES.register}
-            element={<LandingPage key="register" authMode="register" />}
-          />
-        </Route>
-        <Route path={ROUTES.privacy} element={<PrivacyPage />} />
-        <Route path={ROUTES.terms} element={<TermsPage />} />
+const router = createBrowserRouter([
+  {
+    element: <AppShell />,
+    children: [
+      /*
+        Log In and Sign Up are a dialog over the Landing page, opened from its calls to
+        action without a route change. `/login` and `/register` link to the same page
+        with the dialog open; an authenticated visitor is sent on to the Lobby instead.
+      */
+      { path: ROUTES.landing, element: <LandingPage /> },
+      {
+        element: <RequireAnonymous />,
+        children: [
+          { path: ROUTES.login, element: <LandingPage key="login" authMode="login" /> },
+          {
+            path: ROUTES.register,
+            element: <LandingPage key="register" authMode="register" />,
+          },
+        ],
+      },
+      { path: ROUTES.privacy, element: <PrivacyPage /> },
+      { path: ROUTES.terms, element: <TermsPage /> },
 
-        <Route element={<PublicLayout />}>
-          <Route path="/ui" element={<UIElements />}></Route>
-        </Route>
+      { element: <PublicLayout />, children: [{ path: '/ui', element: <UIElements /> }] },
 
-        <Route element={<RequireAuth />}>
-          <Route element={<LobbyLayout />}>
-            <Route path={ROUTES.lobby} element={<LobbyPage />} />
-          </Route>
-
-          {/*
+      {
+        element: <RequireAuth />,
+        children: [
+          { element: <LobbyLayout />, children: [{ path: ROUTES.lobby, element: <LobbyPage /> }] },
+          /*
             Room and Game share one authoritative WebSocket, so the provider that owns
             it wraps the whole room route rather than living inside either feature.
-          */}
-          <Route element={<RoomConnectionProvider />}>
-            <Route element={<GameLayout />}>
-              <Route path={ROUTES.room} element={<RoomPage />} />
-            </Route>
-          </Route>
-        </Route>
+          */
+          {
+            element: <RoomConnectionProvider />,
+            children: [
+              { element: <GameLayout />, children: [{ path: ROUTES.room, element: <RoomPage /> }] },
+            ],
+          },
+        ],
+      },
 
-        <Route path="*" element={<Navigate to={ROUTES.landing} replace />} />
-      </Routes>
+      { path: '*', element: <Navigate to={ROUTES.landing} replace /> },
+    ],
+  },
+]);
 
-      {/* App-level mounts: available from every layout, imported by no feature. */}
-      <ModalHost />
-      <ChatMount />
-    </BrowserRouter>
-  );
+export function AppRouter() {
+  return <RouterProvider router={router} />;
 }

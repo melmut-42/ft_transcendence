@@ -362,6 +362,144 @@
 			"alreadyInRoomTitle": "Tu es déjà dans une salle",
 			"alreadyInRoomBody": "Quitte-la avant d'en créer ou d'en rejoindre une autre.",
 			"returnToRoom": "Aller à ma salle"
+		},
+		"loading": "Chargement du salon…",
+		"inGame": {
+			"title": "La partie a commencé"
+		},
+		"unavailable": {
+			"title": "Ce salon n'est plus disponible",
+			"body": "Il a été fermé, ou vous n'en faites plus partie.",
+			"action": "Retour à la recherche de salons"
+		},
+		"connection": {
+			"failedTitle": "Connexion au salon impossible",
+			"failedBody": "Vérifiez votre connexion et réessayez.",
+			"reconnecting": "Reconnexion…",
+			"reconnectingBody": "Votre place est gardée pendant la reconnexion."
+		},
+		"leave": {
+			"action": "Quitter le salon",
+			"stay": "Rester",
+			"leaving": "Départ…",
+			"failed": "Impossible de quitter le salon. Réessayez.",
+			"room": {
+				"title": "Quitter le salon ?",
+				"body": "Vous quitterez ce salon et perdrez votre équipe et votre rôle. Votre place sera libérée pour un autre joueur.",
+				"confirm": "Quitter le salon"
+			},
+			"game": {
+				"title": "Quitter la partie ?",
+				"body": "Vous quitterez cette partie et reviendrez à la recherche de salons. Votre équipe déclare forfait.",
+				"confirm": "Quitter la partie"
+			}
+		},
+		"countdown": {
+			"title": "La partie commence",
+			"hint": "Direction le plateau — bonne chance !",
+			"someone": "Un joueur",
+			"cancelled": {
+				"PLAYER_UNREADY": "Compte à rebours arrêté : {{username}} n'est plus prêt.",
+				"PLAYER_LEFT": "Compte à rebours arrêté : {{username}} a quitté le salon.",
+				"TEAM_CHANGED": "Compte à rebours arrêté : {{username}} a changé d'équipe.",
+				"ROLE_CHANGED": "Compte à rebours arrêté : {{username}} a changé de rôle."
+			}
+		},
+		"ready": {
+			"title": "Salon de {{host}}",
+			"titleFallback": "Salon d'attente",
+			"codeLabel": "Code du salon",
+			"copyCode": "Copier le code du salon",
+			"codeCopied": "Code du salon copié",
+			"copyFailed": "Impossible de copier le code. Sélectionnez-le et copiez-le à la main.",
+			"shareHint": "Partagez ce code avec vos amis.",
+			"maxPlayers": "Joueurs max",
+			"playerCount": "{{count}} / {{max}} joueurs",
+			"roomFull": "Salon complet",
+			"phase": {
+				"WAITING": {
+					"title": "En attente de joueurs…",
+					"body": "Partagez le code. La partie démarre quand tous sont prêts."
+				},
+				"FULL": {
+					"title": "Salon complet",
+					"body": "{{count}} places sur {{max}} sont prises. Aucun nouveau joueur ne peut rejoindre."
+				},
+				"COUNTDOWN": {
+					"title": "Préparez-vous !",
+					"body": "Tout le monde est prêt. La partie va commencer."
+				}
+			},
+			"team": {
+				"RED": "Équipe rouge",
+				"BLUE": "Équipe bleue"
+			},
+			"teamButton": {
+				"RED": "Équipe rouge",
+				"BLUE": "Équipe bleue"
+			},
+			"teamShort": {
+				"RED": "Rouge",
+				"BLUE": "Bleue"
+			},
+			"host": "Hôte",
+			"hostSuffix": ", hôte",
+			"youSuffix": ", vous",
+			"card": "{{username}}{{you}}{{host}} : {{role}}, {{status}}",
+			"role": {
+				"SPYMASTER": "Maître-espion",
+				"OPERATIVE": "Agent",
+				"none": "Pas encore de rôle"
+			},
+			"status": {
+				"ready": "Prêt !",
+				"waiting": "En attente"
+			},
+			"emptySeat": "En attente d'un joueur…",
+			"choosing": "Choisissent une équipe",
+			"setupTitle": "Votre configuration",
+			"chooseTeam": "Choisissez votre équipe",
+			"chooseRole": "Choisissez votre rôle",
+			"roleCard": {
+				"SPYMASTER": {
+					"title": "Maître-espion",
+					"description": "Donne des indices\nà son équipe."
+				},
+				"OPERATIVE": {
+					"title": "Agent",
+					"description": "Devine les\nbonnes cartes."
+				}
+			},
+			"taken": "Pris",
+			"readyAction": "Prêt",
+			"readyDone": "Prêt !",
+			"counter": "{{ready}} / {{count}} joueurs prêts",
+			"counterFull": "{{count}} / {{max}} joueurs · Salon complet",
+			"summary": "Vous : {{setup}}",
+			"noTeam": "Pas encore d'équipe",
+			"change": "Modifier",
+			"choose": "Choisir",
+			"hints": {
+				"teamFirst": "Choisissez d'abord une équipe.",
+				"spymasterTaken": "{{username}} est le maître-espion de cette équipe.",
+				"locked": "La partie commence, votre configuration est verrouillée.",
+				"hostOnly": "Seul l'hôte peut changer la taille du salon.",
+				"ready": {
+					"TEAM_REQUIRED": "Choisissez d'abord une équipe.",
+					"ROLE_REQUIRED": "Choisissez d'abord un rôle.",
+					"LOCKED": "La partie commence."
+				}
+			},
+			"errors": {
+				"roleConflict": "Un autre joueur vient de prendre la place de maître-espion de cette équipe.",
+				"teamRequired": "Choisissez d'abord une équipe.",
+				"roleRequired": "Choisissez d'abord un rôle.",
+				"locked": "La partie commence, votre configuration ne peut plus changer.",
+				"notHost": "Seul l'hôte peut changer la taille du salon.",
+				"capacity": "Le salon ne peut pas être plus petit que le nombre de joueurs présents.",
+				"offline": "Vous êtes hors ligne. Réessayez une fois reconnecté.",
+				"generic": "Ça n'a pas marché. Réessayez."
+			}
 		}
 	}
 }

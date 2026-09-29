@@ -19,6 +19,13 @@ export interface DialogProps {
    * result it still has to show: the close button is disabled and Escape is ignored.
    */
   closable?: boolean;
+  /**
+   * `false` for a dialog whose design has no close button, such as a confirmation that
+   * offers its own safe action. Escape still closes it while it is `closable`.
+   */
+  showCloseButton?: boolean;
+  /** `alertdialog` for a dialog that interrupts to ask for a decision or to announce one. */
+  role?: 'dialog' | 'alertdialog';
   /** The dialog surface: its width, background, padding and shadow. */
   className?: string;
   children: ReactNode;
@@ -56,6 +63,8 @@ export function Dialog({
   closeLabel,
   onClose,
   closable = true,
+  showCloseButton = true,
+  role = 'dialog',
   className,
   children,
 }: DialogProps) {
@@ -93,22 +102,24 @@ export function Dialog({
     >
       <div
         ref={dialogRef}
-        role="dialog"
+        role={role}
         aria-modal="true"
         aria-labelledby={labelledBy}
         aria-describedby={describedBy}
         tabIndex={-1}
         className={cn(surface, className)}
       >
-        <button
-          type="button"
-          onClick={onClose}
-          disabled={!closable}
-          aria-label={closeLabel}
-          className={closeButton}
-        >
-          <Icon name="close" />
-        </button>
+        {showCloseButton && (
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={!closable}
+            aria-label={closeLabel}
+            className={closeButton}
+          >
+            <Icon name="close" />
+          </button>
+        )}
         {children}
       </div>
     </div>,

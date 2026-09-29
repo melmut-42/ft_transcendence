@@ -362,6 +362,144 @@
 			"alreadyInRoomTitle": "Zaten bir odadasın",
 			"alreadyInRoomBody": "Başka bir oda oluşturmadan ya da katılmadan önce ondan ayrıl.",
 			"returnToRoom": "Odama git"
+		},
+		"loading": "Oda yükleniyor…",
+		"inGame": {
+			"title": "Maç başladı"
+		},
+		"unavailable": {
+			"title": "Bu oda artık kullanılamıyor",
+			"body": "Oda kapandı ya da artık oyuncularından biri değilsin.",
+			"action": "Oda Keşfine dön"
+		},
+		"connection": {
+			"failedTitle": "Odaya bağlanılamadı",
+			"failedBody": "Bağlantını kontrol edip tekrar dene.",
+			"reconnecting": "Yeniden bağlanılıyor…",
+			"reconnectingBody": "Yeniden bağlanırken yerin korunuyor."
+		},
+		"leave": {
+			"action": "Odadan Çık",
+			"stay": "Kal",
+			"leaving": "Çıkılıyor…",
+			"failed": "Odadan çıkılamadı. Tekrar dene.",
+			"room": {
+				"title": "Odadan çıkılsın mı?",
+				"body": "Bu odadan çıkacak, takımını ve rolünü kaybedeceksin. Yerin başka bir oyuncuya açılır.",
+				"confirm": "Odadan Çık"
+			},
+			"game": {
+				"title": "Oyundan çıkılsın mı?",
+				"body": "Bu maçtan çıkıp Oda Keşfine döneceksin. Takımın maçı hükmen kaybeder.",
+				"confirm": "Oyundan Çık"
+			}
+		},
+		"countdown": {
+			"title": "Oyun Başlıyor",
+			"hint": "Oyun tahtasına geçiyorsun — bol şans!",
+			"someone": "Bir oyuncu",
+			"cancelled": {
+				"PLAYER_UNREADY": "Geri sayım durdu: {{username}} artık hazır değil.",
+				"PLAYER_LEFT": "Geri sayım durdu: {{username}} odadan çıktı.",
+				"TEAM_CHANGED": "Geri sayım durdu: {{username}} takım değiştirdi.",
+				"ROLE_CHANGED": "Geri sayım durdu: {{username}} rol değiştirdi."
+			}
+		},
+		"ready": {
+			"title": "{{host}} adlı oyuncunun odası",
+			"titleFallback": "Hazırlık Odası",
+			"codeLabel": "Oda kodu",
+			"copyCode": "Oda kodunu kopyala",
+			"codeCopied": "Oda kodu kopyalandı",
+			"copyFailed": "Kod kopyalanamadı. Seçip elle kopyala.",
+			"shareHint": "Bu kodu arkadaşlarınla paylaş.",
+			"maxPlayers": "En Fazla Oyuncu",
+			"playerCount": "{{count}} / {{max}} Oyuncu",
+			"roomFull": "Oda Dolu",
+			"phase": {
+				"WAITING": {
+					"title": "Oyuncular bekleniyor…",
+					"body": "Oda kodunu paylaş. Herkes hazır olunca oyun başlar."
+				},
+				"FULL": {
+					"title": "Oda Dolu",
+					"body": "{{max}} yerin {{count}} tanesi dolu. Yeni oyuncular katılamaz."
+				},
+				"COUNTDOWN": {
+					"title": "Hazır ol!",
+					"body": "Herkes hazır. Maç başlamak üzere."
+				}
+			},
+			"team": {
+				"RED": "Kırmızı Takım",
+				"BLUE": "Mavi Takım"
+			},
+			"teamButton": {
+				"RED": "Kırmızı Takım",
+				"BLUE": "Mavi Takım"
+			},
+			"teamShort": {
+				"RED": "Kırmızı",
+				"BLUE": "Mavi"
+			},
+			"host": "Kurucu",
+			"hostSuffix": ", kurucu",
+			"youSuffix": ", sen",
+			"card": "{{username}}{{you}}{{host}}: {{role}}, {{status}}",
+			"role": {
+				"SPYMASTER": "Ajan Şefi",
+				"OPERATIVE": "Ajan",
+				"none": "Henüz rol yok"
+			},
+			"status": {
+				"ready": "Hazır!",
+				"waiting": "Bekliyor"
+			},
+			"emptySeat": "Oyuncu bekleniyor…",
+			"choosing": "Takım seçiyor",
+			"setupTitle": "Kurulumun",
+			"chooseTeam": "Takımını Seç",
+			"chooseRole": "Rolünü Seç",
+			"roleCard": {
+				"SPYMASTER": {
+					"title": "Ajan Şefi",
+					"description": "Takımına\nipucu verir."
+				},
+				"OPERATIVE": {
+					"title": "Ajan",
+					"description": "Doğru kartları\ntahmin eder."
+				}
+			},
+			"taken": "Dolu",
+			"readyAction": "Hazır",
+			"readyDone": "Hazır!",
+			"counter": "{{ready}} / {{count}} Oyuncu Hazır",
+			"counterFull": "{{count}} / {{max}} Oyuncu · Oda Dolu",
+			"summary": "Sen: {{setup}}",
+			"noTeam": "Henüz takım yok",
+			"change": "Değiştir",
+			"choose": "Seç",
+			"hints": {
+				"teamFirst": "Önce bir takım seç.",
+				"spymasterTaken": "Bu takımın Ajan Şefi {{username}}.",
+				"locked": "Maç başlıyor, kurulumun kilitlendi.",
+				"hostOnly": "Oda boyutunu yalnızca kurucu değiştirebilir.",
+				"ready": {
+					"TEAM_REQUIRED": "Önce bir takım seç.",
+					"ROLE_REQUIRED": "Önce bir rol seç.",
+					"LOCKED": "Maç başlıyor."
+				}
+			},
+			"errors": {
+				"roleConflict": "Başka bir oyuncu az önce bu takımın Ajan Şefi yerini aldı.",
+				"teamRequired": "Önce bir takım seç.",
+				"roleRequired": "Önce bir rol seç.",
+				"locked": "Maç başlıyor, kurulumun artık değişemez.",
+				"notHost": "Oda boyutunu yalnızca kurucu değiştirebilir.",
+				"capacity": "Oda, içindeki oyuncu sayısından küçük olamaz.",
+				"offline": "Çevrimdışısın. Yeniden bağlanınca tekrar dene.",
+				"generic": "Olmadı. Tekrar dene."
+			}
 		}
 	}
 }
