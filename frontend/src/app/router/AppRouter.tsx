@@ -24,7 +24,8 @@ import { RequireAuth } from './RequireAuth';
 /**
  * Route table.
  *
- * Public: landing, login, register, privacy, terms. Authenticated: lobby, room.
+ * Public: landing, login, register, privacy, terms. Authenticated: lobby, room. Landing
+ * renders outside `PublicLayout` because it draws its own header and footer.
  * Profile is a modal rendered by `ModalHost`, not a route — so it never changes the
  * underlying screen and stays reachable from Lobby, Room and Game alike.
  */
@@ -32,8 +33,9 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path={ROUTES.landing} element={<LandingPage />} />
+
         <Route element={<PublicLayout />}>
-          <Route path={ROUTES.landing} element={<LandingPage />} />
           <Route path={ROUTES.privacy} element={<PrivacyPage />} />
           <Route path={ROUTES.terms} element={<TermsPage />} />
           <Route element={<RequireAnonymous />}>

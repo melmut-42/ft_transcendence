@@ -60,6 +60,7 @@
   --color-accent-brown: #74403a;
 
   /* ---- Semantic state ---- */
+  --color-online: #45c979;
   --color-success: #47bd7a;
   --color-success-bright: #63d69b;
   --color-success-soft: #4dc783;
@@ -100,6 +101,7 @@
   --color-shadow-cta-deep: #684a1d38;
   --color-shadow-destructive: #a81f27;
   --color-shadow-disabled: #8a888344;
+  --color-shadow-avatar: #25203330;
 
   --color-transparent: #00000000;
   --color-current: currentColor;
@@ -141,6 +143,11 @@
   --spacing-5: 32px;
   --spacing-6: 48px;
 
+  /* ---- Breakpoints ----
+   * `desktop` is the narrowest viewport that holds the 1920px desktop composition's
+   * content (a 1246px span, offset right of centre) without clipping it. */
+  --breakpoint-desktop: 90rem;
+
   /* ---- Radius ---- */
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -160,6 +167,11 @@
   --shadow-toast: 0 4px 8px var(--color-shadow-medium);
   --shadow-modal: 0 6px 14px var(--color-shadow-medium);
   --shadow-alert: 0 1px 3px var(--color-shadow-subtle);
+  --shadow-avatar: 0 2px 5px var(--color-shadow-avatar);
+  --shadow-how-to-play: 0 7px 11px var(--color-shadow-warm-soft);
+  --shadow-button-cta-large:
+    0 7px 1px var(--color-shadow-cta), 0 8px 9px var(--color-shadow-cta-deep);
+  --shadow-button-icon-secondary: 0 4px 8px var(--color-shadow-warm-soft);
   --shadow-button-primary:
     0 4px 0px var(--color-shadow-primary), 0 5px 7px var(--color-shadow-medium);
   --shadow-button-secondary:
@@ -188,6 +200,9 @@
     0 6px 0px var(--color-shadow-destructive), 0 8px 12px var(--color-shadow-medium);
   --shadow-button-cta-hover:
     0 6px 0px var(--color-shadow-cta), 0 8px 12px var(--color-shadow-medium);
+  --shadow-button-cta-large-hover:
+    0 9px 1px var(--color-shadow-cta), 0 11px 13px var(--color-shadow-cta-deep);
+  --shadow-button-icon-secondary-hover: 0 6px 12px var(--color-shadow-warm-soft);
 
   /* ---- Motion ----
    * One easing pair and one duration scale, so every component reacts the same way:

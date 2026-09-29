@@ -24,7 +24,7 @@ import type { ButtonSize, ButtonTheme, ButtonVariant } from './Button.types';
  * tint instead: it grows on hover and shrinks past its resting size when pressed, over
  * the same two durations, which reads as the same gesture in a flatter register.
  */
-const interaction: string =
+export const interaction: string =
   'cursor-pointer select-none ' +
   'transition-[translate,scale,box-shadow,background-color,border-color,color,opacity] ' +
   'duration-200 ease-pop ' +

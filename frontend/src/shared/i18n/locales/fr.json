@@ -10,6 +10,32 @@
 	"i18n": {
 		"ready": "L'infrastructure multilingue fonctionne."
 	},
+	"landing": {
+		"badge": "LE JEU DE MOTS MULTIJOUEUR",
+		"headlineLead": "Pensez pareil.",
+		"headlineTail": "Gagnez ensemble.",
+		"tagline": "ft_transcendence :\nLe jeu de mots\nsocial ultime",
+		"description": "Rejoignez une équipe, donnez des indices malins et devinez\ndes mots ensemble dans cette aventure multijoueur fun et\ncompétitive ! Prêt à vous connecter ?",
+		"descriptionShort": "Rejoignez une équipe, donnez des indices malins et devinez des mots ensemble dans ce jeu multijoueur fun et compétitif.",
+		"playNow": "Jouer",
+		"logIn": "Connexion",
+		"learnMore": "En savoir plus",
+		"primaryNavigation": "Compte",
+		"howToPlay": "Comment jouer",
+		"giveClueTitle": "Donnez un indice",
+		"giveClueDescription": "Un seul mot astucieux pour\nguider votre équipe.",
+		"guessTogetherTitle": "Devinez ensemble",
+		"guessTogetherDescription": "Discutez de l'indice et\nchoisissez les bonnes cartes.",
+		"beatOtherTeamTitle": "Battez l'autre équipe",
+		"beatOtherTeamDescription": "Révélez les cartes de votre équipe\navant vos adversaires.",
+		"community": "Rejoignez des milliers de joueurs en ligne !\nJouez entre amis ou faites-vous-en de nouveaux.",
+		"inviteFriends": "Inviter des amis",
+		"legalNavigation": "Mentions légales",
+		"privacy": "Politique de confidentialité",
+		"terms": "Conditions d'utilisation",
+		"help": "Aide",
+		"copyright": "© 2026 équipe ft_transcendence. Créé pour les étudiants de 42 İstanbul (ft_transcendence). Tous droits réservés."
+	},
 	"privacy": {
 		"title": "Politique de confidentialité",
 		"lastUpdated": "Dernière mise à jour : 24 septembre 2026",

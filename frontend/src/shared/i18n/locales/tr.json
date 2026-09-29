@@ -10,6 +10,32 @@
   "i18n": {
 	"ready": "Çok dilli altyapı çalışıyor."
   },
+  "landing": {
+	"badge": "ÇOK OYUNCULU KELİME EĞLENCESİ",
+	"headlineLead": "Aynı düşün.",
+	"headlineTail": "Birlikte kazan.",
+	"tagline": "ft_transcendence:\nEn İyi Sosyal\nKelime Oyunu",
+	"description": "Takımlara katıl, zekice ipuçları ver ve bu eğlenceli, rekabetçi\nçok oyunculu macerada kelimeleri birlikte tahmin et!\nBağlanmaya hazır mısın?",
+	"descriptionShort": "Takımlara katıl, zekice ipuçları ver ve bu eğlenceli, rekabetçi çok oyunculu oyunda kelimeleri birlikte tahmin et.",
+	"playNow": "Hemen Oyna",
+	"logIn": "Giriş Yap",
+	"learnMore": "Daha Fazla",
+	"primaryNavigation": "Hesap",
+	"howToPlay": "Nasıl Oynanır",
+	"giveClueTitle": "İpucu ver",
+	"giveClueDescription": "Takımını yönlendirmek için\ntek bir zekice kelime kullan.",
+	"guessTogetherTitle": "Birlikte tahmin et",
+	"guessTogetherDescription": "İpucunu tartışın ve\ndoğru kartları seçin.",
+	"beatOtherTeamTitle": "Rakip takımı yen",
+	"beatOtherTeamDescription": "Takımının kartlarını\nrakiplerinden önce aç.",
+	"community": "Binlerce çevrim içi oyuncuya katıl!\nArkadaşlarınla oyna ya da yenileriyle tanış.",
+	"inviteFriends": "Arkadaş Davet Et",
+	"legalNavigation": "Yasal",
+	"privacy": "Gizlilik Politikası",
+	"terms": "Kullanım Koşulları",
+	"help": "Yardım",
+	"copyright": "© 2026 ft_transcendence ekibi. 42 İstanbul öğrencileri için oluşturuldu (ft_transcendence). Tüm hakları saklıdır."
+  },
   "privacy": {
 	"title": "Gizlilik Politikası",
 	"lastUpdated": "Son güncelleme: 24 Eylül 2026",

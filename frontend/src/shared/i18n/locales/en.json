@@ -10,6 +10,32 @@
 	"i18n": {
 		"ready": "Multilingual infrastructure is working."
 	},
+	"landing": {
+		"badge": "MULTIPLAYER WORD FUN",
+		"headlineLead": "Think alike.",
+		"headlineTail": "Win together.",
+		"tagline": "ft_transcendence:\nThe Ultimate Social\nWord Game",
+		"description": "Join teams, give clever clues, and guess words together in\nthis fun, competitive multiplayer adventure! Are you ready\nto connect?",
+		"descriptionShort": "Join teams, give clever clues, and guess words together in this fun, competitive multiplayer game.",
+		"playNow": "Play Now",
+		"logIn": "Log In",
+		"learnMore": "Learn More",
+		"primaryNavigation": "Account",
+		"howToPlay": "How To Play",
+		"giveClueTitle": "Give a clue",
+		"giveClueDescription": "Use one clever word to\nguide your team.",
+		"guessTogetherTitle": "Guess together",
+		"guessTogetherDescription": "Discuss the clue and\nchoose the right cards.",
+		"beatOtherTeamTitle": "Beat the other team",
+		"beatOtherTeamDescription": "Reveal your team's cards\nbefore your opponents.",
+		"community": "Join thousands of players online!\nPlay with friends or make new ones.",
+		"inviteFriends": "Invite Friends",
+		"legalNavigation": "Legal",
+		"privacy": "Privacy Policy",
+		"terms": "Terms of Service",
+		"help": "Help",
+		"copyright": "© 2026 ft_transcendence team. Created for 42 İstanbul students (ft_transcendence). All rights reserved."
+	},
 	"privacy": {
 		"title": "Privacy Policy",
 		"lastUpdated": "Last updated: September 24, 2026",
