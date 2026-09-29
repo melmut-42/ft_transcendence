@@ -36,60 +36,182 @@
 	"help": "Yardım",
 	"copyright": "© 2026 ft_transcendence ekibi. 42 İstanbul öğrencileri için oluşturuldu (ft_transcendence). Tüm hakları saklıdır."
   },
-  "privacy": {
-	"title": "Gizlilik Politikası",
-	"lastUpdated": "Son güncelleme: 24 Eylül 2026",
-	"about": {
-	  "title": "Proje hakkında",
-	  "educationalProject": "Codenames Online, 42 öğrencileri tarafından ft_transcendence projesi kapsamında geliştirilmiş bağımsız ve eğitim amaçlı çok oyunculu bir web uygulamasıdır. Uygulama; öğrenme, geliştirme ve proje değerlendirmesi amaçlarıyla hazırlanmıştır.",
-	  "independentProject": "Uygulama, kelime ilişkilendirme temelli Codenames oyun mekaniğinden esinlenir. Bu proje, Czech Games Edition (CGE) veya Codenames markasının resmî bir ürünü, hizmeti, iştiraki ya da onaylı uygulaması değildir.",
-	  "policyPurpose": "Bu Gizlilik Politikası, uygulamayı kullanırken hangi bilgilerin işlendiğini, bu bilgilerin hangi amaçlarla kullanıldığını ve kullanıcıların hangi tercih seçeneklerine sahip olduğunu açıklar."
+	"legal": {
+		"wordmark": "Codenames Online",
+		"home": "Codenames Online ana sayfa",
+		"navigation": "Ana menü",
+		"legalNavigation": "Yasal",
+		"howToPlay": "Nasıl Oynanır",
+		"privacy": "Gizlilik",
+		"terms": "Koşullar",
+		"privacyPolicy": "Gizlilik Politikası",
+		"termsOfService": "Hizmet Koşulları",
+		"logIn": "Giriş Yap",
+		"lastUpdated": "Son güncelleme 29 Eylül 2026",
+		"footer": "Codenames Online · Bir 42 okul projesi",
+		"repository": "GitHub'daki proje deposu (yeni sekmede açılır)"
 	},
-	"dataAndPrivacy": {
-	  "title": "Veri ve gizlilik"
+	"privacy": {
+		"title": "Gizlilik Politikası",
+		"intro": "Bu sayfa, Codenames Online'ın hakkınızda neleri sakladığını, bunları neden sakladığını ve ne kadar süre tuttuğunu açıklar. Codenames Online, 42 müfredatı için geliştirilmiş bir öğrenci projesidir ve yalnızca hesapları, maçları ve sohbeti çalıştırmak için gereken bilgileri toplar.",
+		"sections": [
+			{
+				"id": "what-we-store",
+				"title": "Neleri saklıyoruz",
+				"paragraphs": [
+					"Hesabınız bir e-posta adresi, bir kullanıcı adı ve bir parola içerir. Parola hiçbir zaman düz metin olarak değil, yalnızca özet (hash) olarak saklanır.",
+					"Profiliniz, hazır setten seçtiğiniz ya da yüklediğiniz avatarı içerir. Oynadığınız maçlar, maç geçmişinizi ve bundan türetilen galibiyet ve mağlubiyet gibi istatistikleri ekler. Sosyal özellikleri kullanmak, arkadaş bağlantılarınızı ve gönderdiğiniz sohbet mesajlarını ekler."
+				]
+			},
+			{
+				"id": "why-we-store-it",
+				"title": "Neden saklıyoruz",
+				"paragraphs": [
+					"Hesap verileri oturum açmanızı sağlar ve sizi diğer oyunculara tanıtır. Maç sonuçları profilinizi, maç geçmişinizi ve istatistiklerinizi oluşturur. Arkadaş bağlantıları ve mesajlar, arkadaş listesini ve sohbeti çalıştırır.",
+					"Verileriniz yalnızca oyunu çalıştırmak için kullanılır. Hiçbir veri satılmaz, kiralanmaz veya reklamcılarla paylaşılmaz."
+				]
+			},
+			{
+				"id": "cookies",
+				"title": "Çerezler ve tarayıcı depolaması",
+				"paragraphs": [
+					"Oturum açtığınızda iki çerez ayarlanır: kısa ömürlü bir oturum çerezi ve onu yenileyen bir yenileme çerezi. İkisi de HttpOnly'dir, yalnızca bu siteye gönderilir ve yalnızca kimlik doğrulama için kullanılır.",
+					"Dil tercihiniz tarayıcınızın yerel depolamasına kaydedilir, böylece oyun bir sonraki açılışta aynı dilde açılır. Reklam veya analiz çerezi kullanılmaz."
+				]
+			},
+			{
+				"id": "live-game-data",
+				"title": "Canlı oyun verileri",
+				"paragraphs": [
+					"Odalar, takımlar, roller, oyun tahtası ve skor, bir oda açık olduğu sürece geçici depolamada tutulur ve oda kapandığında silinir.",
+					"Bağlantınız koparsa, aynı maça geri dönebilmeniz için yeriniz kısa bir süre ayrılır. Bir maç bittiğinde sonucu, maçtaki her oyuncunun maç geçmişine eklenir."
+				]
+			},
+			{
+				"id": "chat-messages",
+				"title": "Sohbet mesajları",
+				"paragraphs": [
+					"Oda sohbeti ve arkadaşlar arasındaki özel mesajlar, sunucunun belirlediği sınırlı bir süre boyunca saklanır. Her mesaj bu süre dolduğunda silinir.",
+					"Oda mesajlarını yalnızca o odadaki oyuncular, özel mesajları ise yalnızca konuşmadaki iki arkadaş görebilir."
+				]
+			},
+			{
+				"id": "what-others-see",
+				"title": "Diğer oyuncular neleri görür",
+				"paragraphs": [
+					"Oturum açmış oyuncular kullanıcı adınızı, avatarınızı, çevrimiçi durumunuzu ve istatistikleriyle birlikte herkese açık profilinizi görebilir. Aynı odadaki oyuncular maç sırasında takımınızı, rolünüzü ve hamlelerinizi görür.",
+					"Proje, verilerinizi reklam, pazarlama veya herhangi bir ticari amaçla üçüncü taraflarla paylaşmaz."
+				]
+			},
+			{
+				"id": "how-long-we-keep-it",
+				"title": "Ne kadar süre saklıyoruz",
+				"paragraphs": [
+					"Hesap, profil, arkadaş ve maç verileri, hesabınız var olduğu ve projenin sunucusu çalıştığı sürece saklanır. Sohbet mesajları saklama süreleri dolduğunda, canlı oda verileri ise oda kapandığında silinir."
+				]
+			},
+			{
+				"id": "your-choices",
+				"title": "Seçimleriniz",
+				"paragraphs": [
+					"Kullanıcı adınızı ve avatarınızı istediğiniz zaman değiştirebilir, arkadaş ekleyip çıkarabilir ve arayüz dilini değiştirebilirsiniz.",
+					"E-posta adresini veya parolayı değiştirmek ve hesabı silmek oyun içinde mümkün değildir. Hesabınızın ve verilerinizin silinmesi için proje ekibiyle iletişime geçin."
+				]
+			},
+			{
+				"id": "security",
+				"title": "Güvenlik",
+				"paragraphs": [
+					"Parolalar yalnızca özet olarak saklanır, oturum çerezleri sayfa betikleri tarafından okunamaz ve yayındaki oyun HTTPS üzerinden sunulur. Hiçbir sistem tamamen güvenli değildir; bu nedenle kullanıcı adınızda, avatarınızda veya mesajlarınızda hassas kişisel bilgiler paylaşmaktan kaçının."
+				]
+			},
+			{
+				"id": "changes",
+				"title": "Bu politikadaki değişiklikler",
+				"paragraphs": [
+					"Bu politika, oyunun verileri işleme biçimi değiştiğinde güncellenir. Sayfanın üstündeki tarih geçerli sürümü gösterir."
+				]
+			},
+			{
+				"id": "contact",
+				"title": "İletişim",
+				"paragraphs": [
+					"Verilerinizle ilgili sorular ve talepler proje deposu üzerinden proje ekibine iletilir."
+				]
+			}
+		]
 	},
-	"dataCollected": {
-	  "title": "İşleyebileceğimiz bilgiler",
-	  "introduction": "Uygulamanın özelliklerini sunabilmek için aşağıdaki bilgiler işlenebilir:",
-	  "account": "Hesap oluşturmak ve giriş yapmak için kullanılan e-posta adresi, kullanıcı adı ve parola.",
-	  "password": "Parolalar düz metin olarak saklanmaz; yalnızca tuzlanmış ve hash’lenmiş biçimde saklanır.",
-	  "profile": "Kullanıcının seçtiği veya yüklediği avatar ile diğer profil bilgileri.",
-	  "gameplay": "Oyun odalarına katılım, oyun sonuçları ve oyuncu istatistikleri gibi oyunla ilişkili bilgiler.",
-	  "social": "Arkadaşlık, profil ve sohbet özellikleri kullanıldığında bu özelliklerin çalışması için gerekli etkileşim bilgileri ve gönderilen mesajlar.",
-	  "onlineStatus": "Arkadaşların görebileceği çevrimiçi durum bilgisi.",
-	  "session": "Oturumun devamını sağlamak için kullanılan kısa ömürlü JSON Web Token (JWT) ve yenileme mekanizması.",
-	  "language": "Seçilen uygulama dili. Bu tercih, uygulama tekrar açıldığında hatırlanabilmesi için tarayıcının yerel depolamasında saklanır."
-	},
-	"dataUse": {
-	  "title": "Bilgileri nasıl kullanırız?",
-	  "body": "İşlenen bilgiler yalnızca uygulamanın çalışması için kullanılır: kullanıcı hesabını ve oturumunu yönetmek, profil, arkadaşlık, çevrimiçi durum ve sohbet özelliklerini sunmak, çok oyunculu oyun odalarını ve oyun akışını yürütmek, oyun sonuçlarını ve istatistikleri göstermek, dil tercihini hatırlamak, hataları incelemek ve uygulamayı geliştirmek."
-	},
-	"visibility": {
-	  "title": "Bilgilerin görünürlüğü ve paylaşımı",
-	  "body": "Bazı bilgiler, uygulamanın sosyal ve çok oyunculu yapısı gereği diğer kayıtlı kullanıcılara görünür olabilir. Buna kullanıcı adı, avatar, çevrimiçi durum, ortak oyun odalarındaki etkinlikler, oyun sonuçları ve paylaşılan sohbet mesajları dâhil olabilir. Bu proje kullanıcı verilerini reklam, pazarlama veya ticari amaçlarla satmaz, kiralamaz ya da bu amaçlarla üçüncü taraflarla paylaşmaz."
-	},
-	"storage": {
-	  "title": "Veri saklama ve güvenlik",
-	  "retention": "Hesap ve uygulama verileri, hesap aktif olduğu sürece veya ft_transcendence projesinin değerlendirme süreci tamamlanıp uygulama sunucusu kapatılana kadar saklanır.",
-	  "security": "Uygulama dağıtıldığında tarayıcı ile sunucu arasındaki iletişim HTTPS/TLS üzerinden şifrelenir. Parolalar düz metin olarak saklanmaz ve kullanıcı verilerine gereksiz erişimi önlemek için makul teknik önlemler uygulanır.",
-	  "sensitiveInformation": "Bu uygulama eğitim amaçlı geliştirilen bir projedir. Kullanıcıların sohbet, profil veya diğer alanlarda hassas kişisel bilgilerini paylaşmamaları önerilir."
-	},
-	"choicesAndUpdates": {
-	  "title": "Tercihleriniz ve politika güncellemeleri"
-	},
-	"choices": {
-	  "title": "Tercihleriniz ve veri talepleriniz",
-	  "body": "Kullanıcılar, uygulama tarafından sunulan alanlarda profil bilgilerini güncelleyebilir ve dil tercihini değiştirebilir. Hesabınızın ve ilişkili verilerinizin silinmesini talep etmek için proje ekibiyle iletişime geçebilirsiniz. Silme talepleri, projenin teknik kapsamı ve değerlendirme gereksinimleri dikkate alınarak ekip tarafından manuel olarak değerlendirilir."
-	},
-	"changes": {
-	  "title": "Bu politikadaki değişiklikler",
-	  "body": "Uygulamanın özellikleri geliştikçe bu Gizlilik Politikası güncellenebilir. Güncel sürüm her zaman uygulama içindeki Gizlilik Politikası sayfasında yayımlanır. Google ile giriş gibi üçüncü taraf bir kimlik doğrulama özelliği uygulamaya eklenirse, alınan bilgiler ve kullanım amaçları bu politika yayımlanmadan önce açıkça güncellenir."
-	},
-	"contact": {
-	  "title": "İletişim",
-	  "body": "Gizlilikle ilgili soru ve talepler için proje ekibiyle GitHub deposu üzerinden veya 42 intra aracılığıyla iletişime geçebilirsiniz.",
-	  "toolTip": "GitHub deposu (yeni sekmede açılır)",
-	  "repositoryLink": "ft_transcendence"
+	"terms": {
+		"title": "Hizmet Koşulları",
+		"intro": "Bu koşullar Codenames Online'ın kullanımını kapsar. Hesap oluşturmak, bu koşulları kabul ettiğiniz anlamına gelir. Oyun, 42 müfredatı için geliştirilmiş bir öğrenci projesidir ve dostça oyun için sunulur.",
+		"sections": [
+			{
+				"id": "about-the-game",
+				"title": "Oyun hakkında",
+				"paragraphs": [
+					"Codenames Online gerçek zamanlı, çok oyunculu bir kelime oyunudur. Hesaplar, profiller, oyun odaları, arkadaşlar, sohbet, maç geçmişi ve istatistikler sunar.",
+					"Codenames masa oyunundan esinlenen bağımsız bir eğitim projesidir. Czech Games Edition veya Codenames markasıyla bir bağlantısı yoktur ve onlar tarafından onaylanmamıştır."
+				]
+			},
+			{
+				"id": "your-account",
+				"title": "Hesabınız",
+				"paragraphs": [
+					"Oynamak için bir hesaba ihtiyacınız vardır. Kontrol ettiğiniz bir e-posta adresi kullanın, saldırgan veya yanıltıcı olmayan bir kullanıcı adı seçin ve parolanızı kimseyle paylaşmayın. Hesabınız altında gerçekleşen her şeyden siz sorumlusunuz."
+				]
+			},
+			{
+				"id": "fair-play",
+				"title": "Adil oyun",
+				"paragraphs": [
+					"Oyunu tasarlandığı gibi oynayın. Gizli tahta bilgisini oyun dışında Ajanlara iletmeyin, oyunu otomatikleştirmeyin ve sonuçları veya istatistikleri manipüle etmeyin.",
+					"Başka hesaplara erişmeye, odaları veya hizmeti bozmaya ya da hatalardan yararlanmaya çalışmayın. Bir hata bulursanız bunun yerine proje ekibine bildirin."
+				]
+			},
+			{
+				"id": "chat-and-conduct",
+				"title": "Sohbet ve davranış",
+				"paragraphs": [
+					"Sohbet, odanızdaki oyuncular ve arkadaşlarınız içindir. Diğer oyunculara saygı gösterin: taciz, nefret söylemi, tehdit ve spam yasaktır. Gönderdiğiniz mesajlardan siz sorumlusunuz.",
+					"Maçları başkaları için bozmak amacıyla kasıtlı olarak terk etmeyin veya oyalamayın. Oda sahibi, devam eden bir maç dışında oyuncuları odadan çıkarabilir."
+				]
+			},
+			{
+				"id": "availability",
+				"title": "Erişilebilirlik",
+				"paragraphs": [
+					"Oyun bir öğrenci projesidir ve olduğu gibi sunulur. Bağlantılar kopabilir, maçlar kesintiye uğrayabilir ve hizmet bakım sırasında ya da proje sona erdiğinde kullanılamayabilir. Kesintisiz çalışma garantisi yoktur.",
+					"Bağlantınız koptuğunda yeriniz kısa bir süre ayrılır. Zamanında geri dönmezseniz odadan ayrılırsınız."
+				]
+			},
+			{
+				"id": "your-content",
+				"title": "İçeriğiniz",
+				"paragraphs": [
+					"Kullanıcı adınız, avatarınız ve mesajlarınız size aittir. Oyun, Gizlilik Politikası'nda açıklandığı gibi yalnızca bir maçı yürütmek, bir profili göstermek ve sohbeti iletmek için gerekenleri saklar."
+				]
+			},
+			{
+				"id": "intellectual-property",
+				"title": "Fikri mülkiyet",
+				"paragraphs": [
+					"Projenin kendi kodu, arayüz tasarımı ve görselleri proje ekibine aittir. Üçüncü taraf kütüphaneler ve yazı tipleri kendi lisanslarına tabidir. Codenames adı ve orijinal oyun, ilgili sahiplerine aittir."
+				]
+			},
+			{
+				"id": "changes-and-ending-use",
+				"title": "Değişiklikler ve kullanımın sona ermesi",
+				"paragraphs": [
+					"Bu koşullar oyun geliştikçe değişebilir; sayfanın üstündeki tarih geçerli sürümü gösterir. Oyunu istediğiniz zaman kullanmayı bırakabilirsiniz. Hesabınızın silinmesi için proje ekibiyle iletişime geçin."
+				]
+			},
+			{
+				"id": "contact",
+				"title": "İletişim",
+				"paragraphs": [
+					"Bu koşullarla ilgili sorular proje deposu üzerinden proje ekibine iletilir."
+				]
+			}
+		]
 	}
-  }
 }

@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Footer } from './Footer';
 import { Header } from './Header';
 
-/** Unauthenticated shell: login, register, privacy, terms. No chat widget. */
+/** Unauthenticated shell: login and register. No chat widget. */
 export function PublicLayout() {
   return (
     <div className="flex min-h-screen flex-col">

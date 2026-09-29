@@ -1,5 +1,6 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import alienAvatar from '@assets/avatars/alien-avatar.svg';
 import aviatorFoxAvatar from '@assets/avatars/aviator-fox-avatar.svg';
@@ -88,6 +89,12 @@ const COMMUNITY_AVATARS = [
  */
 export function LandingPage() {
   const { t } = useTranslation();
+  const { hash } = useLocation();
+
+  // Links from other screens, such as How to Play on the legal pages, arrive with a hash.
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
+  }, [hash]);
 
   return (
     <div className={styles.page}>

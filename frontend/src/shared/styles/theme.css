@@ -75,6 +75,7 @@
 
   /* ---- Lines & overlay ---- */
   --color-border: #d9d4c9;
+  --color-backdrop: #c6c1b5;
   --color-border-blue: #d5e0e9;
   --color-overlay: #1a204cc2;
 
@@ -169,6 +170,7 @@
   --shadow-alert: 0 1px 3px var(--color-shadow-subtle);
   --shadow-avatar: 0 2px 5px var(--color-shadow-avatar);
   --shadow-how-to-play: 0 7px 11px var(--color-shadow-warm-soft);
+  --shadow-document: 0 14px 24px var(--color-shadow-warm-medium);
   --shadow-button-cta-large:
     0 7px 1px var(--color-shadow-cta), 0 8px 9px var(--color-shadow-cta-deep);
   --shadow-button-icon-secondary: 0 4px 8px var(--color-shadow-warm-soft);
