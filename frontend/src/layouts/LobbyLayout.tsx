@@ -8,9 +8,9 @@ import { Footer } from './Footer';
  */
 export function LobbyLayout() {
   return (
-    <div className="layout layout--lobby">
+    <div className="flex min-h-screen flex-col">
       {/* TODO(design): top navigation with the current user and profile entry. */}
-      <main>
+      <main className="flex-1">
         <Outlet />
       </main>
       <Footer />

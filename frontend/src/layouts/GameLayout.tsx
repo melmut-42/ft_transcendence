@@ -10,8 +10,8 @@ import { Footer } from './Footer';
  */
 export function GameLayout() {
   return (
-    <div className="layout layout--game">
-      <main>
+    <div className="flex min-h-screen flex-col">
+      <main className="flex-1">
         <Outlet />
       </main>
       <ConnectionOverlay />

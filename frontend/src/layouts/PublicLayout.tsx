@@ -1,12 +1,14 @@
 import { Outlet } from 'react-router-dom';
 
 import { Footer } from './Footer';
+import { Header } from './Header';
 
 /** Unauthenticated shell: landing, login, register, privacy, terms. No chat widget. */
 export function PublicLayout() {
   return (
-    <div className="layout layout--public">
-      <main>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1">
         <Outlet />
       </main>
       <Footer />

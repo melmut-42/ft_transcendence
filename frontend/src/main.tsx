@@ -2,8 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from '@app/App';
-import '@shared/styles/tailwind.css';
-import '@shared/styles/global.css';
+import '@shared/styles/index.css';
 import '@shared/i18n/i18n';
 
 const container = document.getElementById('root');
