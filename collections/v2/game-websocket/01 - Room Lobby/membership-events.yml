@@ -38,15 +38,15 @@ docs: |-
   | `payload.player.role` | enum | yes | no | `SPYMASTER`, `OPERATIVE`, `SPECTATOR` | New joins are always `SPECTATOR` |
   | `payload.player.ready` | boolean | yes | no | `true`, `false` | Readiness at change time |
   | `payload.player.state` | enum | yes | no | `IN_LOBBY`, `IN_GAME`, `POST_GAME` | Member lifecycle state at removal/join |
-  | `payload.reason` | enum | leave only | no | `EXITED`, `SESSION_ENDED`, `DISCONNECTED`, `POST_GAME_TIMEOUT`, `KICKED_BY_HOST` | Why membership ended; logout is distinct from transport grace expiry |
+  | `payload.reason` | enum | leave only | no | `EXITED`, `SESSION_ENDED`, `DISCONNECTED`, `POST_GAME_TIMEOUT`, `KICKED_BY_HOST`, `ACCOUNT_DELETED` | Why membership ended; logout is distinct from transport grace expiry |
   | `payload.kicked_by_user_id` | integer | kick only | no | current host ID | Actor for `KICKED_BY_HOST` |
   | `payload.host_user_id` | integer or null | yes | yes | remaining member ID or `null` | Host after change; null only when room closes empty |
   | `payload.player_count` | integer | yes | no | `>= 0` | Membership after change |
-  | `payload.room_status` | enum | yes | no | `WAITING`, `POST_GAME`, `CLOSED` | State after membership processing |
+  | `payload.room_status` | enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME`, `POST_GAME`, `CLOSED` | State after membership processing |
 
   ## State behavior and ordering
 
-  Join initializes team/role to null, ready false, and state `IN_LOBBY`. Leave clears the user's active room. Host transfer prefers the earliest-joined `IN_LOBBY` member, otherwise the earliest remaining member. Countdown removal first produces `room.countdown.cancelled`, then `room.player.left`, then `room.state`. A kick additionally closes the target's sockets with `4403`.
+  Join initializes team/role to null, ready false, and state `IN_LOBBY`. Leave clears the user's active room. Host transfer prefers the earliest-joined `IN_LOBBY` member, otherwise the earliest remaining member. Countdown removal first produces `room.countdown.cancelled`, then `room.player.left`, then `room.state`. A kick additionally closes the target's sockets with `4403`. During `IN_GAME`, a participant's `room.player.left` is followed by `game.staffing.required` when the departure leaves a team deficient. When a staffing deadline closes the room, no per-member `room.player.left` is sent; `room.closed` replaces them.
 
   ## Concrete events
 

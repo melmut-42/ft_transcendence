@@ -14,7 +14,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Revokes the current session (`ft_session` and `ft_refresh`, from Register, Login, or Refresh) and clears both cookies. The user account and persistent statistics remain. Logout is legal regardless of room membership (`workspace.yml`, Session and Credential Model / Room Abandonment): if the user currently has `active_room_id` set and that room is `IN_GAME`, logout triggers the same `PLAYER_FORFEIT` lifecycle as an explicit `Leave room` call or an abandonment-timeout, synchronously, before the session is revoked — there is no `409 ALREADY_IN_ROOM` block here anymore. Logout also closes every open, authenticated WebSocket connection (room and chat) belonging to this session.
+  Revokes the current session (`ft_session` and `ft_refresh`, from Register, Login, or Refresh) and clears both cookies. The user account and persistent statistics remain. Logout is legal regardless of room membership (`workspace.yml`, Session and Credential Model / Room Abandonment): if the user currently has `active_room_id` set and that room is `IN_GAME`, logout triggers the same `PLAYER_FORFEIT` lifecycle as an explicit `Leave room` call or an abandonment-timeout, synchronously, before the session is revoked — there is no `409 ALREADY_IN_ROOM` block here anymore. Logout also closes every open, authenticated WebSocket connection (room and chat) belonging to this session. In a Game v2 room, logout is a departure with reason `SESSION_ENDED` and follows the Game v2 leave rules instead of the forfeit: during `IN_GAME` a participant receives the leave penalty and team staffing is rechecked (`workspace.yml`, Leave Penalty).
 
   ## Request parameters
 

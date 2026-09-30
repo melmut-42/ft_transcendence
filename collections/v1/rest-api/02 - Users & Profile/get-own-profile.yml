@@ -35,6 +35,7 @@ docs: |-
   | `data.wins` | integer | yes | no | `>= 0` | Finished matches won |
   | `data.losses` | integer | yes | no | `>= 0` | Finished matches lost |
   | `data.matches_played` | integer | yes | no | `wins + losses` | Total settled matches |
+  | `data.penalty_points` | integer | yes | no | `>= 0` | Accumulated leave penalties (`workspace.yml`, Leave Penalty); visible only to its owner |
   | `data.active_room_id` | integer or null | yes | yes | positive or `null` | Temporary room membership link |
   | `data.active_room_api_version` | string enum or null | yes | yes | `v1`, `v2`, or `null` | Protocol version paired with `active_room_id`; both are null together |
   | `data.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Account creation time |
@@ -61,6 +62,7 @@ examples:
               "wins": 12,
               "losses": 8,
               "matches_played": 20,
+              "penalty_points": 0,
               "active_room_id": 1001,
               "active_room_api_version": "v2",
               "created_at": "2026-08-01T10:00:00Z"
@@ -84,6 +86,7 @@ examples:
               "wins": 12,
               "losses": 8,
               "matches_played": 20,
+              "penalty_points": 0,
               "active_room_id": null,
               "active_room_api_version": null,
               "created_at": "2026-08-01T10:00:00Z"

@@ -36,12 +36,16 @@ docs:
     | `POST` | `/api/v1/auth/login` | Issue a new session pair | no | valid email + password |
     | `POST` | `/api/v1/auth/refresh` | Exchange refresh token for new access token | refresh token | unexpired, unrevoked refresh token |
     | `GET` | `/api/v1/auth/session` | Read current session identity | yes | active access token |
-    | `DELETE` | `/api/v1/auth/session` | Revoke current session (forfeits an `IN_GAME` room first) | yes | active access token |
+    | `DELETE` | `/api/v1/auth/session` | Revoke current session (v1 `IN_GAME` forfeits; v2 applies leave rules) | yes | active access token |
+    | `GET` | `/api/v1/auth/oauth/google/authorize` | Start Google sign-in (browser redirect) | no | none |
+    | `GET` | `/api/v1/auth/oauth/google/callback` | Complete Google sign-in; issue session pair | `ft_oauth` cookie | valid `state` and code |
     | `GET` | `/api/v1/users/me` | Own persistent profile | yes | active session |
     | `PATCH` | `/api/v1/users/me` | Update own profile (`username`) | yes | active session |
+    | `DELETE` | `/api/v1/users/me` | Permanently delete own account | yes | `confirm_username` matches |
     | `POST` | `/api/v1/users/me/avatar` | Upload/replace avatar | yes | active session, valid image |
     | `GET` | `/api/v1/users/me/matches` | Own match history (paginated) | yes | active session |
     | `GET` | `/api/v1/users/{user_id}` | Public persistent profile | yes | user exists |
+    | `POST` | `/api/v1/users/{user_id}/reports` | Report another user | yes | target exists, not self |
     | `GET` | `/api/v1/users/search?q=&limit=&offset=` | Offset-paginated username search for friend discovery | yes | active session |
     | `POST` | `/api/v1/rooms` | Create and host a room | yes | not in active room |
     | `POST` | `/api/v1/rooms/{room_id}/members` | Join a room | yes | `WAITING`, not in active room |
@@ -54,7 +58,7 @@ docs:
 
     ## Status conventions
 
-    `200` reads/updates; `201` creation/join/add; `204` session deletion or leave/remove; `400` malformed syntax; `401` authentication (`UNAUTHORIZED` for a bad access credential, `SESSION_EXPIRED` for a bad refresh credential); `403` access; `404` missing entity; `409` uniqueness/lifecycle conflict; `422` field validation; `429` throttling.
+    `200` reads/updates; `201` creation/join/add; `204` session or account deletion, leave/remove; `302` OAuth redirects; `400` malformed syntax; `401` authentication (`UNAUTHORIZED` for a bad access credential, `SESSION_EXPIRED` for a bad refresh credential); `403` access; `404` missing entity; `409` uniqueness/lifecycle conflict; `422` field validation; `429` throttling.
 
     ## Domain and lifetime
 

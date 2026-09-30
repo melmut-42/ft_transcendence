@@ -47,7 +47,9 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Changes the room's player capacity. Only the current host may send it, only while the room is `WAITING`, and only after that host's member state is `IN_LOBBY`. Capacity is the only room setting.
+  Changes the room settings: player capacity, per-turn timer, and word-pack language. Only the current host (the Room Owner) may send it, only while the room is `WAITING`, and only after that host's member state is `IN_LOBBY`. The payload carries at least one of the three fields; an omitted field keeps its current value.
+
+  **Unresolved:** the allowed `turn_timer_seconds` values, the supported `language` codes, both defaults, and the behavior when a turn timer runs out have no agreed values. Until they are agreed, rooms report `turn_timer_seconds: null`, and the server rejects any `turn_timer_seconds` or `language` change with `INVALID_PAYLOAD`.
 
   ## Message and payload parameters
 
@@ -57,11 +59,13 @@ docs: |-
   | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
   | `type` | envelope | yes | string enum | `room.settings.update` | no | Operation | `room.settings.update` |
   | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0003` |
-  | `payload.max_players` | payload | yes | integer | `4..20` and `>= player_count` | no | New capacity, counting spectators | `6` |
+  | `payload.max_players` | payload | no | integer | `4..20` and `>= player_count` | no | New capacity, counting spectators | `6` |
+  | `payload.turn_timer_seconds` | payload | no | integer or null | unresolved set; `null` means no limit | yes | Per-turn time limit | `null` |
+  | `payload.language` | payload | no | string | unresolved set of lowercase language codes | no | Language of the board's word pack | `en` |
 
   ## Success, state, and emitted events
 
-  The requester receives an ack, then every member receives `room.settings.updated` followed by `room.state`. Team, role, and readiness do not change.
+  The requester receives an ack, then every member receives `room.settings.updated` followed by `room.state`. Both carry the full current settings, not only the changed fields. Team, role, and readiness do not change.
 
   ```json
     {
@@ -70,6 +74,8 @@ docs: |-
       "ok": true,
       "payload": {
         "max_players": 6,
+        "turn_timer_seconds": null,
+        "language": "en",
         "room_status": "WAITING"
       }
     }
@@ -83,6 +89,8 @@ docs: |-
       "sent_at": "2026-09-10T08:41:25Z",
       "payload": {
         "max_players": 6,
+        "turn_timer_seconds": null,
+        "language": "en",
         "player_count": 5,
         "changed_by_user_id": 42
       }
@@ -92,15 +100,19 @@ docs: |-
   | Result field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
   | `ack.payload.max_players` | integer | yes | no | `4..20` | Accepted capacity |
+  | `ack.payload.turn_timer_seconds` | integer or null | yes | yes | unresolved set | Current per-turn limit |
+  | `ack.payload.language` | string | yes | no | unresolved set | Current word-pack language |
   | `ack.payload.room_status` | enum | yes | no | `WAITING` | Post-command state |
   | `room.settings.updated.payload.max_players` | integer | yes | no | `4..20` | New capacity |
+  | `room.settings.updated.payload.turn_timer_seconds` | integer or null | yes | yes | unresolved set | Current per-turn limit |
+  | `room.settings.updated.payload.language` | string | yes | no | unresolved set | Current word-pack language |
   | `room.settings.updated.payload.player_count` | integer | yes | no | `>= 1` | Current membership |
   | `room.settings.updated.payload.changed_by_user_id` | integer | yes | no | host ID | Actor |
 
   ## Errors
 
   - `NOT_HOST`: the sender is a member but not the current host.
-  - `INVALID_PAYLOAD`: `max_players` is absent, not an integer, outside `4..20`, or below the current `player_count`.
+  - `INVALID_PAYLOAD`: the payload has none of the three fields; `max_players` is not an integer, outside `4..20`, or below the current `player_count`; or `turn_timer_seconds`/`language` is outside its allowed set.
   - `INVALID_ROOM_STATE`: the room is not `WAITING`.
   - `NOT_ROOM_MEMBER`: the session user is outside the room.
 

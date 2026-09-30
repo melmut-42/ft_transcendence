@@ -54,6 +54,8 @@ docs: |-
       "host_user_id":42,
       "player_count":4,
       "max_players": 8,
+      "turn_timer_seconds": null,
+      "language": "en",
       "startable":false,
       "players":[
         {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":false,"state":"POST_GAME","is_host":true,"joined_at":"2026-09-10T08:41:00Z"},

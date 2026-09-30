@@ -1,0 +1,52 @@
+info:
+  name: Start Google sign-in
+  type: http
+  seq: 6
+  tags: [identity, oauth]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/{{apiVersion}}/auth/oauth/google/authorize?return_to=/lobby"
+  headers: []
+  params:
+    - name: return_to
+      value: /lobby
+docs: |-
+  # Start Google sign-in
+
+  ## Purpose and preconditions
+
+  Starts the Google OAuth 2.0 Authorization Code flow with PKCE. Google is the only OAuth provider (`workspace.yml`, OAuth). The browser reaches this endpoint by a top-level navigation from the Log In or Sign Up dialog ("Continue with Google"), never by `fetch`, because the answer is a redirect to Google. No session is required. When a session already exists, a successful callback replaces it.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `return_to` | query | no | string | same-origin SPA path: starts with one `/`, not `//`, at most 200 characters | no | Where the browser lands after a successful sign-in. Any other value falls back to `/lobby` | `/lobby` |
+
+  ## Success behavior
+
+  `302 Found` to Google's authorization endpoint. The server generates a single-use `state` and a PKCE `code_verifier`, and sends only the S256 `code_challenge` to Google. It stores `state`, `code_verifier`, and `return_to` in the `ft_oauth` cookie (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/api/v1/auth/oauth/google`, 10-minute lifetime), readable only by the callback.
+
+  | Location query parameter | Value |
+  | --- | --- |
+  | `client_id` | backend-configured Google client ID |
+  | `redirect_uri` | `{{baseUrl}}/api/v1/auth/oauth/google/callback` |
+  | `response_type` | `code` |
+  | `scope` | `openid email profile` |
+  | `state` | single-use random value |
+  | `code_challenge`, `code_challenge_method` | PKCE challenge, `S256` |
+
+  The Google client ID and client secret come from backend environment configuration (`.env`, never committed). The frontend holds neither and never sees a Google token.
+
+  ## Errors
+
+  Errors are redirects, not JSON, because the caller is a browser navigation. If Google sign-in is not configured or the request is throttled, the server answers `302` to `/?oauth_error=OAUTH_PROVIDER_ERROR`. See `oauth-google-callback.yml` for the complete `oauth_error` list.
+examples:
+  - name: Success - Redirect to Google
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/oauth/google/authorize?return_to=/lobby", method: GET, headers: [], params: [{name: return_to, value: /lobby, enabled: true}], body: {mode: none}}
+    response:
+      status: 302
+      headers:
+        - {name: Location, value: "https://accounts.google.com/o/oauth2/v2/auth?client_id=<configured>&redirect_uri={{baseUrl}}/api/v1/auth/oauth/google/callback&response_type=code&scope=openid%20email%20profile&state=<state>&code_challenge=<challenge>&code_challenge_method=S256"}
+        - {name: Set-Cookie, value: "ft_oauth=<opaque>; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth/oauth/google; Max-Age=600"}
+      body: {type: text, data: ""}

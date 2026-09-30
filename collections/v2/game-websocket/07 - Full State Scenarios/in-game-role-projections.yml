@@ -40,6 +40,8 @@ docs: |-
   | `payload.room.host_user_id` | integer | yes | no | member ID | Host |
   | `payload.room.player_count` | integer | yes | no | `>= 4` | Participants |
   | `payload.room.max_players` | integer | yes | no | `4..20` | Room capacity |
+  | `payload.room.turn_timer_seconds` | integer or null | yes | yes | unresolved set; `null` means no limit | Per-turn time limit |
+  | `payload.room.language` | string | yes | no | unresolved set of lowercase language codes | Word-pack language |
   | `payload.room.startable` | boolean | yes | no | `false` | Start predicate is only actionable in `WAITING` |
   | `payload.room.players[]` | array<object> | yes | no | configured members | Join-ordered membership |
   | `payload.room.players[].user_id` | integer | yes | no | positive | Member |
@@ -86,6 +88,8 @@ docs: |-
         "host_user_id": 42,
         "player_count": 4,
         "max_players": 8,
+        "turn_timer_seconds": null,
+        "language": "en",
         "startable": false,
         "players": [
           {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"state":"IN_GAME","is_host":true,"joined_at":"2026-09-10T08:41:00Z"},
@@ -152,6 +156,8 @@ docs: |-
         "host_user_id": 42,
         "player_count": 4,
         "max_players": 8,
+        "turn_timer_seconds": null,
+        "language": "en",
         "startable": false,
         "players": [
           {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"state":"IN_GAME","is_host":true,"joined_at":"2026-09-10T08:41:00Z"},

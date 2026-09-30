@@ -46,6 +46,8 @@ docs: |-
   | `data.host_user_id` | integer or null | yes | yes | member user ID or `null` | Null only during the 300-second empty-room window |
   | `data.player_count` | integer | yes | no | `>= 1` for accessible room | Current members |
   | `data.max_players` | integer | yes | no | `4..20` | Room capacity; participants and spectators count |
+  | `data.turn_timer_seconds` | integer or null | yes | yes | unresolved set; `null` means no limit | Per-turn time limit (`workspace.yml`, Room Settings) |
+  | `data.language` | string | yes | no | unresolved set of lowercase language codes | Word-pack language |
   | `data.startable` | boolean | yes | no | `true`, `false` | Complete start predicate, not merely all-ready |
   | `data.countdown.seconds_remaining` | integer | conditional | no | `0..3` | Present only in `COUNTDOWN` |
   | `data.players[]` | array<object> | yes | no | one or more | Members in join order |
@@ -82,7 +84,7 @@ docs: |-
   | `data.game.board[].color` | enum or null | yes | yes | `RED`, `BLUE`, `NEUTRAL`, `ASSASSIN`, `null` | Null only for unrevealed cards hidden from an Operative; Spymasters always receive color |
   | `data.game.winner` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Non-null only after terminal result |
   | `data.game.end_reason` | enum or null | yes | yes | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `INSUFFICIENT_PLAYERS`, `null` | Terminal cause; cancellation has no winner |
-  | `data.game.staffing` | object | conditional | no | per-team missing roles/deadlines | Present in `PAUSED_FOR_PLAYERS` |
+  | `data.game.staffing` | object | conditional | no | per-team missing roles/deadlines | Present in `PAUSED_FOR_PLAYERS`; the same shape as `game.staffing.required.payload.staffing`, so a reconnect restores the shutdown countdown |
   | `data.game.started_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Board creation/start time |
   | `data.game.finished_at` | `string<date-time>` or null | yes | yes | ISO 8601 UTC or `null` | Terminal time |
   | `data.post_game` | object | conditional | no | deadline and pending members | Present while any current member remains `POST_GAME`; omitted otherwise |
@@ -124,6 +126,8 @@ examples:
               "host_user_id": 42,
               "player_count": 1,
               "max_players": 8,
+              "turn_timer_seconds": null,
+              "language": "en",
               "startable": false,
               "players": [
                 {
@@ -156,6 +160,8 @@ examples:
               "host_user_id": 42,
               "player_count": 4,
               "max_players": 8,
+              "turn_timer_seconds": null,
+              "language": "en",
               "startable": false,
               "players": [
                 {
@@ -218,6 +224,8 @@ examples:
               "host_user_id": 42,
               "player_count": 4,
               "max_players": 8,
+              "turn_timer_seconds": null,
+              "language": "en",
               "startable": false,
               "players": [
                 {
@@ -280,6 +288,8 @@ examples:
               "host_user_id": 42,
               "player_count": 4,
               "max_players": 8,
+              "turn_timer_seconds": null,
+              "language": "en",
               "startable": false,
               "players": [
                 {
@@ -342,6 +352,8 @@ examples:
               "host_user_id": 42,
               "player_count": 4,
               "max_players": 8,
+              "turn_timer_seconds": null,
+              "language": "en",
               "startable": false,
               "players": [
                 {"user_id":42,"username":"player_one","team":"RED","role":"SPYMASTER","ready":true,"state":"IN_GAME","is_host":true,"joined_at":"2026-09-10T08:41:00Z"},

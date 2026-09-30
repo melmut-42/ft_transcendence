@@ -40,9 +40,9 @@ docs: |-
   | `room.player.joined` | `player`, `host_user_id`, `player_count`, `room_status` | REST join | common |
   | `room.player.left` | membership fields plus `reason`; optional `kicked_by_user_id` | Exit, logout, disconnect expiry, host kick, post-game timeout | common |
   | `room.player.returned_to_lobby` | user, previous game, room/member state | accepted `room.lobby.return` | common |
-  | `room.post_game.started` | game ID, deadline, pending users | immediately after `game.ended` or `game.cancelled` | common |
+  | `room.post_game.started` | game ID, deadline, pending users | immediately after `game.ended` | common |
   | `room.post_game.completed` | room status, remaining members | pending set becomes empty | common |
-  | `room.settings.updated` | `max_players`, `player_count`, `changed_by_user_id` | host `room.settings.update` | common |
+  | `room.settings.updated` | `max_players`, `turn_timer_seconds`, `language`, `player_count`, `changed_by_user_id` | host `room.settings.update` | common |
   | `room.player.updated` | `player`, `changed_fields`, `room_status`, `startable` | team, role, ready | common |
   | `room.countdown.started` | `seconds_remaining=3` | full start predicate becomes true | common |
   | `room.countdown.tick` | `seconds_remaining` | server timer | common |
@@ -53,9 +53,10 @@ docs: |-
   | `game.score.updated` | `game_id`, `score`, `changed_color` | RED or BLUE reveal | common |
   | `game.turn.changed` | game ID, previous team, reason, current turn, score | non-terminal turn end | common |
   | `game.ended` | winner, loser, reason, revealed card, score, `room_status=POST_GAME`, `game_status=GAME_FINISHED`, phase, post-game deadline, time | terminal reveal | contains only the revealed terminal card; no hidden-board disclosure |
-  | `game.staffing.required` | missing roles and `deadline_at` per deficient team | live composition becomes invalid | common |
+  | `game.staffing.required` | missing roles and `deadline_at` per deficient team, `departure` | live composition becomes invalid | common |
   | `game.staffing.restored` | restored teams and resumed turn/phase | both teams become valid before deadlines | role-safe state |
-  | `game.cancelled` | null winner/loser, `INSUFFICIENT_PLAYERS`, score, deadline, time | a staffing deadline expires | no match/stat update |
+  | `game.cancelled` | null winner/loser, `INSUFFICIENT_PLAYERS`, deficient team, score, `room_status=CLOSED`, time | a staffing deadline expires | no match/stat update |
+  | `room.closed` | `reason=INSUFFICIENT_PLAYERS`, game ID, deficient team, time | immediately after `game.cancelled`; sockets then close with `4404` | common |
 
   ## Concrete game events
 
@@ -152,7 +153,7 @@ docs: |-
 
   ## Insufficient-player cancellation example
 
-  RED remains without a Spymaster until its 120-second staffing deadline expires:
+  RED remains without a Spymaster until its staffing deadline expires. `room.closed` follows, then every room socket closes with `4404`:
 
   ```json
     {
@@ -171,11 +172,25 @@ docs: |-
           "red": 2,
           "blue": 2
         },
-        "room_status": "POST_GAME",
+        "room_status": "CLOSED",
         "game_status": "GAME_CANCELLED",
         "phase": "GAME_OVER",
-        "post_game_deadline_at": "2026-09-10T08:47:30Z",
         "finished_at": "2026-09-10T08:46:30Z"
+      }
+    }
+  ```
+
+  ```json
+    {
+      "type": "room.closed",
+      "event_id": "evt_0191",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:46:30Z",
+      "payload": {
+        "reason": "INSUFFICIENT_PLAYERS",
+        "game_id": 5001,
+        "deficient_team": "RED",
+        "closed_at": "2026-09-10T08:46:30Z"
       }
     }
   ```

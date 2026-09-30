@@ -35,7 +35,7 @@ docs: |-
   | `data.matches[].room_id` | integer | yes | no | positive | Room the match was played in |
   | `data.matches[].team` | enum | yes | no | `RED`, `BLUE` | This user's team in the match |
   | `data.matches[].role` | enum | yes | no | `SPYMASTER`, `OPERATIVE` | This user's role in the match |
-  | `data.matches[].opponents[]` | array<object> | yes | no | `user_id`, `username` | Opposing team's roster |
+  | `data.matches[].opponents[]` | array<object> | yes | no | `user_id`, `username` | Opposing team's roster; a deleted account appears as `user_id: null`, `username: "deleted_user"` |
   | `data.matches[].result` | enum | yes | no | `WIN`, `LOSS` | Outcome for this user |
   | `data.matches[].end_reason` | enum | yes | no | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `PLAYER_FORFEIT` | Terminal cause |
   | `data.matches[].score` | object | yes | no | `{red, blue}` | Final score |

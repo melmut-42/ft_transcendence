@@ -56,9 +56,9 @@ docs: |-
       H -->|Completes validly| I[IN_GAME]
       I --> L{Both teams staffed?}
       L -->|Yes| I
-      L -->|No| M[PAUSED_FOR_PLAYERS: 120s per deficient team]
+      L -->|No| M[PAUSED_FOR_PLAYERS: shutdown countdown per deficient team]
       M -->|Staffing restored| I
-      M -->|A deadline expires| J[POST_GAME: cancelled]
+      M -->|A deadline expires| N[CLOSED: every member returns to the Lobby]
       I --> J[POST_GAME]
       J -->|Any member returns| C
       J -->|Everyone exits or times out| K[CLOSED]
@@ -73,26 +73,35 @@ docs: |-
       COUNTDOWN --> WAITING: any invariant becomes invalid
       COUNTDOWN --> IN_GAME: countdown completes while valid
       IN_GAME --> POST_GAME: terminal game result
+      IN_GAME --> CLOSED: a staffing deadline expires
       POST_GAME --> WAITING: first member returns to lobby
       WAITING --> CLOSED: empty for 300 seconds
       POST_GAME --> CLOSED: empty for 300 seconds
   ```
 
-  A room is joinable while its shared status is `WAITING`, `COUNTDOWN`, or `IN_GAME`, provided capacity remains. Every new member—including the creator/host—starts as `team:null`, `role:SPECTATOR`, `ready:false`; only member `state` follows the room (`IN_LOBBY` before play, `IN_GAME` during play). Joining alone never changes startability, staffing, board, or turn. A spectator may remain passive or atomically claim a legal `{team, role}` pair through `room.role.select`. `POST_GAME`, `CLOSED`, and a mixed `WAITING` room with unresolved post-game members are not joinable. After a normal `game.ended` or `game.cancelled`, the room enters `POST_GAME` and every member enters `POST_GAME`. Any member—not only the host—may return independently. New joins and countdown remain forbidden until every remaining post-game member returns or leaves.
+  A room is joinable while its shared status is `WAITING`, `COUNTDOWN`, or `IN_GAME`, provided capacity remains. Every new member—including the creator/host—starts as `team:null`, `role:SPECTATOR`, `ready:false`; only member `state` follows the room (`IN_LOBBY` before play, `IN_GAME` during play). Joining alone never changes startability, staffing, board, or turn. A spectator may remain passive or atomically claim a legal `{team, role}` pair through `room.role.select`. `POST_GAME`, `CLOSED`, and a mixed `WAITING` room with unresolved post-game members are not joinable. After `game.ended`, the room enters `POST_GAME` and every member enters `POST_GAME`. Any member—not only the host—may return independently. New joins and countdown remain forbidden until every remaining post-game member returns or leaves.
 
   The post-game decision deadline is 60 seconds by default and is not paused by disconnect. A member still in `POST_GAME` at the deadline is removed with reason `POST_GAME_TIMEOUT`. An empty room starts the separate 300-second closure timer instead of closing immediately. The same `room_id`, `room_code`, host, team, and role selections survive a return; every member's `ready` resets to `false`, and a new `game_id`/board is created only after the next valid countdown.
 
-  Host authority is limited to room administration, not returning to lobby or starting the game. Capacity updates require the host to be personally `IN_LOBBY`. A host may kick another member while the shared room is `WAITING` (including a mixed lobby/post-game room), during `COUNTDOWN` (which is cancelled first), or during `POST_GAME`; kicking remains forbidden during `IN_GAME`. The host cannot kick themself. If the host leaves, host transfers first to the earliest-joined participant, otherwise to the earliest remaining spectator. An empty room has `host_user_id:null` until somebody joins or the 300-second closure timer expires.
+  The host is the Room Owner. Host authority is limited to room administration, not returning to lobby or starting the game: the host kicks members and changes the room settings (capacity, turn timer, and word-pack language; see Room Settings). Settings updates require the room to be `WAITING` and the host to be personally `IN_LOBBY`. A host may kick any other member, participant or spectator, in every open room status (`WAITING`, `COUNTDOWN`, `IN_GAME`, `POST_GAME`) without a vote or the target's consent. A kick during `COUNTDOWN` cancels the countdown first; a kick during `IN_GAME` rechecks team staffing exactly like any other departure. A kicked member receives no leave penalty. The host cannot kick themself. If the host leaves, host transfers first to the earliest-joined participant, otherwise to the earliest remaining spectator. An empty room has `host_user_id:null` until somebody joins or the 300-second closure timer expires.
 
   ## Reconnect Grace Period and Abandonment (Game v2)
 
   A transport disconnect is never an immediate leave. It starts the configured reconnect grace period (examples: 30 seconds in `WAITING`/`COUNTDOWN`, 60 seconds in `IN_GAME`) and reserves the member's team, role, and turn rights. Reconnecting in time restores the membership unchanged.
 
-  When grace expires, or when an explicit leave/logout removes a member, spectators have no effect on team staffing. During `IN_GAME`, the server recomputes both teams. Play continues while each team has at least one `SPYMASTER` and one `OPERATIVE`. A deficient team receives its own absolute 120-second `staffing.deadline_at`; the game enters `PAUSED_FOR_PLAYERS`, preserving the board, score, clue, guesses, and turn. Normal game commands are rejected while paused.
+  When grace expires, or when an explicit leave/logout removes a member, spectators have no effect on team staffing. During `IN_GAME`, the server recomputes both teams. Play continues while each team has at least one `SPYMASTER` and one `OPERATIVE`. A deficient team receives its own absolute `staffing.deadline_at` (120 seconds by default, server-configurable); the game enters `PAUSED_FOR_PLAYERS`, preserving the board, score, clue, guesses, and turn. Normal game commands are rejected while paused. A team becomes deficient when it loses its only Spymaster or its last Operative. `game.staffing.required` names the departed member and the reason, so every remaining player can see why the room may close, and its absolute `deadline_at` drives the live shutdown countdown: clients render the remaining time from it and never decide expiry themselves.
 
-  Every join starts as a spectator. The spectator may atomically claim a legal `{team, role}` pair; a Spymaster claim requires that team's slot to be vacant. During a staffing pause, restoring one team clears only that team's deadline; restoring both teams resumes the preserved phase. If either deadline expires, the server emits `game.cancelled` with `end_reason:"INSUFFICIENT_PLAYERS"`, `winner:null`, and `loser:null`, then enters `POST_GAME`. Cancellation produces no win, loss, match-history entry, or `match.finalized` record.
+  Every join starts as a spectator. The spectator may atomically claim a legal `{team, role}` pair; a Spymaster claim requires that team's slot to be vacant. During a staffing pause, restoring one team clears only that team's deadline; restoring both teams resumes the preserved phase. If either deadline expires, the server emits `game.cancelled` with `end_reason:"INSUFFICIENT_PLAYERS"`, `winner:null`, and `loser:null`, then shuts the room down: it emits `room.closed` with `reason:"INSUFFICIENT_PLAYERS"`, clears every remaining membership and all temporary room and game state, releases the room code, and closes every room socket with `4404`. Clients return every remaining member to the Lobby. Cancellation produces no win, loss, match-history entry, or `match.finalized` record.
 
   When the final room member is removed, the server sets `empty_since` and `close_at=empty_since+300s`. The room and room code remain active and joinable during this interval. A join cancels the timer and makes the joiner host. If nobody joins by `close_at`, the room becomes `CLOSED` and its code may be reused.
+
+  ## Leave Penalty (Game v2)
+
+  A participant (`SPYMASTER` or `OPERATIVE`) who voluntarily leaves while the room is `IN_GAME` receives a persistent leave penalty. Voluntary means an explicit Leave room (`reason:"EXITED"`) or a logout (`reason:"SESSION_ENDED"`). Spectators, departures in any other room status, kicked members, members removed when their reconnect grace period expires, and deleted accounts receive no penalty.
+
+  The penalty is `leave_penalty_base × role_multiplier`, and the Spymaster multiplier is strictly greater than the Operative multiplier. **Unresolved:** `leave_penalty_base`, the Spymaster multiplier, and the Operative multiplier have no agreed values. They are server configuration and stay unset until the values are agreed.
+
+  Game Session appends a `player.penalized` integration record (`user_id`, `room_id`, `game_id`, `role`, `reason`, `points`, `penalized_at`) to its outbox in the same atomic transition as the departure. Stats consumes it idempotently and adds `points` to the user's persistent `penalty_points`, exposed on the own profile. A penalty never changes wins, losses, level, or match history.
 
   ## Game Lifecycle
 
@@ -115,7 +124,7 @@ docs: |-
 
   ## Identity Model
 
-  Registration requires `{ "email", "username", "password" }` (subject Ch. III–IV, mandatory). Email is the login identifier; username is the public display name; password is hashed + salted server-side (`>= 8`, `<= 72` bytes — bcrypt's input limit). Both email and username are trimmed and case-insensitively unique. Every identity is a registered account; there is no anonymous identity.
+  Registration requires `{ "email", "username", "password" }` (subject Ch. III–IV, mandatory). Email is the login identifier; username is the public display name; password is hashed + salted server-side (`>= 8`, `<= 72` bytes — bcrypt's input limit). Both email and username are trimmed and case-insensitively unique. Every identity is a registered account; there is no anonymous identity. An account is created by registration or by Google sign-in (see OAuth), and its owner may delete it (see Account Deletion).
 
   ## Session and Credential Model
 
@@ -134,11 +143,13 @@ docs: |-
 
   ## Teams and Roles
 
-  Teams are exactly `RED` and `BLUE`. Roles are `SPYMASTER`, `OPERATIVE`, and `SPECTATOR`. A spectator has `team:null`, always has `ready:false`, does not count toward the four-player start minimum or team composition, cannot submit clues, guess, or pass, and receives the Operative-safe board projection. A participant has a team and either `SPYMASTER` or `OPERATIVE`. Each team has at most one Spymaster and one or more Operatives. A startable room, and a running unpaused game, requires exactly one Spymaster and at least one Operative on each team.
+  Teams are exactly `RED` and `BLUE`. Roles are `SPYMASTER`, `OPERATIVE`, and `SPECTATOR`. A spectator has `team:null`, always has `ready:false`, does not count toward the four-player start minimum or team composition, cannot submit clues, guess, or pass, and receives the Operative-safe board projection. A participant has a team and either `SPYMASTER` or `OPERATIVE`. Each team has at most one Spymaster and one or more Operatives. `room.role.select` rejects a second Spymaster claim on a team with `ROLE_CONFLICT`, and every member sees the occupied seat through `room.player.updated` and `room.state`. A startable room, and a running unpaused game, requires exactly one Spymaster and at least one Operative on each team.
 
-  ## Room Capacity
+  ## Room Settings
 
   Every room has `max_players`, an integer in `4..20` with default `8`. Capacity counts participants and spectators together. The host sets it in Create room and may change it while the room is `WAITING` through `room.settings.update`, never below the current `player_count`. Join room and Invite friend return `409 ROOM_FULL` when `player_count` equals `max_players`.
+
+  Game v2 rooms also carry `turn_timer_seconds` (the per-turn time limit; `null` means no limit) and `language` (a lowercase language code selecting the board's word pack). The host changes them through the same `room.settings.update` command under the same `WAITING`/`IN_LOBBY` preconditions. **Unresolved:** the allowed timer values, the supported language set, both defaults, and what happens when a turn timer runs out have no agreed values. Until they are agreed, rooms report `turn_timer_seconds:null`, and the server rejects a change to either field with `INVALID_PAYLOAD`.
 
   ## Start Conditions (Game v2)
 
@@ -174,11 +185,11 @@ docs: |-
 
   ## Temporary vs Persistent State
 
-  `username`, level, wins, losses, and supported match history are persistent user data. Team, role, ready status, room membership, board, clue, guesses, turn, and score are room/game-scoped and never become permanent account roles. Leaving or closing a room clears temporary membership data as appropriate.
+  `username`, level, wins, losses, `penalty_points`, and supported match history are persistent user data. Team, role, ready status, room membership, board, clue, guesses, turn, and score are room/game-scoped and never become permanent account roles. Leaving or closing a room clears temporary membership data as appropriate.
 
   ## REST vs WebSocket Responsibility
 
-  REST owns registration/session bootstrap (including refresh and logout), profile read/update, avatar, friends (list/add/remove/search), room creation, membership join/leave, snapshots, and match history. Once a member joins the realtime channel, team, role, readiness, countdown, clue, guess, pass, and live state propagation use WebSocket. Basic chat is a separate per-user WebSocket channel (`/ws/v1/chat`), independent of any room. REST and WebSocket share field names and domain enums, and identify the same session; both accept only the `ft_session` cookie — there is no header-based credential on either transport.
+  REST owns registration/session bootstrap (including refresh, logout, and Google OAuth), profile read/update, account deletion, user reports, avatar, friends (list/add/remove/search), room creation, membership join/leave, snapshots, and match history. Once a member joins the realtime channel, team, role, readiness, countdown, clue, guess, pass, and live state propagation use WebSocket. Basic chat is a separate per-user WebSocket channel (`/ws/v1/chat`), independent of any room. REST and WebSocket share field names and domain enums, and identify the same session; both accept only the `ft_session` cookie — there is no header-based credential on either transport.
 
   ## Multi-Tab / Multi-Socket
 
@@ -188,7 +199,7 @@ docs: |-
 
   Malformed JSON is `400`; absent/invalid access tokens are `401 UNAUTHORIZED`; an expired/invalid/used refresh token is `401 SESSION_EXPIRED` (refresh endpoint only — distinct from `UNAUTHORIZED` because it means "log in again," not "retry with a refreshed token"); permission failures are `403`; missing resources are `404`; uniqueness or lifecycle conflicts are `409`; field validation is `422`; throttling is `429`. REST errors use `{ "error": { "code", "message", "details" } }`. WebSocket errors correlate to `request_id` and normally do not mutate state or close the socket. Explicit exceptions are invalid/revoked authentication (`4401`), lost room membership, kick or post-game timeout (`4403`), missing room (`4404`), `POST_GAME_DEADLINE_EXPIRED` timeout cleanup, handshake rejection, and repeated protocol abuse.
 
-  **Frontend error-handling classes** (documented once here, not repeated per component): `INLINE_VALIDATION` (422 field errors — show next to the input: register/login/room-code/clue/chat/avatar fields), `TOAST` (transient failures with no dedicated UI state — 429, 5xx, `NOT_PERMITTED`, `USER_NOT_FOUND`), `AUTH_REDIRECT` (`401 UNAUTHORIZED`, WebSocket `4401`, or `401 SESSION_EXPIRED` after silent refresh fails — send to Login), `ROOM_RECOVERY` (`404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`, WebSocket `4403`/`4404`, or `409 ROOM_NOT_JOINABLE`/`ALREADY_IN_ROOM` — return to Lobby with an explanatory toast), `RECONNECT` (an unclassified transport drop while membership is still valid — show the Reconnecting overlay and retry within the grace period), `FATAL_GAME_STATE` (a room/game action error that implies local state is stale relative to the server, e.g. `CARD_ALREADY_REVEALED`, `GAME_ALREADY_FINISHED`, `INVALID_ROOM_STATE` — discard local state and re-fetch/re-apply the next canonical `room.state` snapshot rather than patching around it). Bruno's error codes (above and in `06 - Errors/error-catalog.yml`) stay the single authoritative code list; this is only the UI-handling bucket each one falls into.
+  **Frontend error-handling classes** (documented once here, not repeated per component): `INLINE_VALIDATION` (422 field errors — show next to the input: register/login/room-code/clue/chat/avatar fields), `TOAST` (transient failures with no dedicated UI state — 429, 5xx, `NOT_PERMITTED`, `USER_NOT_FOUND`), `AUTH_REDIRECT` (`401 UNAUTHORIZED`, WebSocket `4401`, or `401 SESSION_EXPIRED` after silent refresh fails — send to Login), `ROOM_RECOVERY` (`404 ROOM_NOT_FOUND`, `403 NOT_ROOM_MEMBER`, WebSocket `room.closed`, `4403`/`4404`, or `409 ROOM_NOT_JOINABLE`/`ALREADY_IN_ROOM` — return to Lobby with an explanatory toast), `RECONNECT` (an unclassified transport drop while membership is still valid — show the Reconnecting overlay and retry within the grace period), `FATAL_GAME_STATE` (a room/game action error that implies local state is stale relative to the server, e.g. `CARD_ALREADY_REVEALED`, `GAME_ALREADY_FINISHED`, `INVALID_ROOM_STATE` — discard local state and re-fetch/re-apply the next canonical `room.state` snapshot rather than patching around it). Bruno's error codes (above and in `06 - Errors/error-catalog.yml`) stay the single authoritative code list; this is only the UI-handling bucket each one falls into.
 
   ## Backend Architecture
 
@@ -197,18 +208,18 @@ docs: |-
   | Service | Owns | Talks to |
   | --- | --- | --- |
   | **Gateway** | Public HTTPS/WSS entry point; REST reverse-proxy routing to the other services; WebSocket connection lifecycle (accept, `ft_session` validation at handshake, per-user multi-socket fan-out, close codes); TLS termination boundary. Holds **no** domain/game state and makes **no** authorization decisions beyond "is `ft_session` valid" — role/turn/membership authorization is each domain service's job. | User/Auth (session validation), Game Session (routes room/game REST + WS traffic), all others (routes their REST traffic) |
-  | **User/Auth** | Users, credentials, `ft_session`/`ft_refresh` issuance and rotation, profiles, avatars, friends, presence | Postgres (users, credentials, refresh-token metadata, profiles, friends); called by Gateway for session validation and by Game Session for room-membership authorization checks (does this user exist / is this user this user) |
-  | **Game Session** | Rooms, membership, team/role/ready, countdown, authoritative Codenames state, reconnect snapshots, staffing deadlines, cancellation, and empty-room closure | Redis (all room/game state plus the v2 integration outbox, see State Ownership); Board Generator; publishes outbox records through RabbitMQ |
+  | **User/Auth** | Users, credentials, `ft_session`/`ft_refresh` issuance and rotation, Google OAuth links, account deletion, user reports, profiles, avatars, friends, presence | Postgres (users, credentials, refresh-token metadata, profiles, friends); called by Gateway for session validation and by Game Session for room-membership authorization checks (does this user exist / is this user this user) |
+  | **Game Session** | Rooms, membership, room settings, host kick, team/role/ready, countdown, authoritative Codenames state, reconnect snapshots, staffing deadlines, room shutdown, leave penalties, and empty-room closure | Redis (all room/game state plus the v2 integration outbox, see State Ownership); Board Generator; publishes outbox records through RabbitMQ |
   | **Board Generator** | Stateless: given a word-pack, returns 25 words with randomized affiliations (`9` starting-team, `8` other-team, `7` neutral, `1` assassin) and a randomized `card_id` ↔ slot mapping satisfying the Card ID invariant above. No database, no session, no per-game memory. | Called synchronously by Game Session at game start only |
-  | **Stats** | Finalized match results, wins/losses, match history, level (see Match History & Stats below) | Postgres (match_results, user_stats); idempotently consumes durable internal `match.finalized` events by `game_id` |
+  | **Stats** | Finalized match results, wins/losses, match history, level, penalty points (see Match History & Stats and Leave Penalty) | Postgres (match_results, user_stats); idempotently consumes durable internal `match.finalized` events by `game_id` and `player.penalized` records by their event ID |
 
   Game Session remains the sole authoritative source for room/game state; User/Auth remains the sole authoritative source for identity/social state; Stats remains the sole authoritative source for finalized results. No service re-derives another's authoritative data locally beyond what it's told through these calls/events.
 
   ## State Ownership and Storage
 
-  **PostgreSQL** (durable, survives restart): users, credentials, refresh-token metadata (for rotation/reuse detection), profiles, avatars, friends, finalized match results, user stats/match history, Chat v2 channel records, membership epochs with sequence-based ROOM visibility windows, and retained messages with `expires_at`.
+  **PostgreSQL** (durable, survives restart): users, credentials, refresh-token metadata (for rotation/reuse detection), Google OAuth links, profiles, avatars, friends, user reports, finalized match results, user stats/match history, penalty points, Chat v2 channel records, membership epochs with sequence-based ROOM visibility windows, and retained messages with `expires_at`.
 
-  **Redis** (room/game coordination): active room state (membership, team/role/ready, host), `(active_room_id, active_room_api_version)` lookup per user (a live index into Redis room membership, not durable Postgres profile fields — so it cannot permanently orphan an account or lose the protocol version needed for recovery), countdown deadlines, in-progress board/turn/clue/score, per-socket presence, WebSocket `request_id` idempotency cache (room-lifetime scoped), and the pub/sub channel Game Session uses to fan events to Gateway. V2 integration records (`room.created`, membership/access changes, and `match.finalized`) are appended atomically with their room mutation to an AOF-backed Redis Stream outbox; a publisher retries them to RabbitMQ until confirmed. They are not sent through lossy pub/sub.
+  **Redis** (room/game coordination): active room state (membership, team/role/ready, host), `(active_room_id, active_room_api_version)` lookup per user (a live index into Redis room membership, not durable Postgres profile fields — so it cannot permanently orphan an account or lose the protocol version needed for recovery), countdown deadlines, in-progress board/turn/clue/score, per-socket presence, WebSocket `request_id` idempotency cache (room-lifetime scoped), and the pub/sub channel Game Session uses to fan events to Gateway. V2 integration records (`room.created`, membership/access changes, `match.finalized`, and `player.penalized`) are appended atomically with their room mutation to an AOF-backed Redis Stream outbox; a publisher retries them to RabbitMQ until confirmed. They are not sent through lossy pub/sub.
 
   `GET /api/v1/auth/session`'s `active_room_id` and `active_room_api_version` are always derived together from Game Session's current Redis membership index at request time — they are never independently mutable Postgres fields. Both are null or both are non-null. The frontend uses the version to pair `/api/v1/rooms` with `/ws/v1/rooms` or `/api/v2/rooms` with `/ws/v2/rooms` after reload. If Redis state is lost (restart, flush), both values become `null` for affected users automatically — there is no stale value to get permanently stuck behind `409 ALREADY_IN_ROOM`; a Game Session restart is expected to reload any room state Redis still holds (Redis persistence/AOF at the infra level) and treat anything genuinely gone as if those rooms closed.
 
@@ -298,9 +309,17 @@ docs: |-
 
   Beyond the read-only profile, the contract defines `PATCH /api/v1/users/me` (editable fields: `username`, within the same uniqueness/format rule as registration) and `POST /api/v1/users/me/avatar` (multipart upload — `image/jpeg`, `image/png`, `image/webp` only; max 2 MiB; server validates MIME type and dimensions server-side regardless of client-declared type; replacing an avatar deletes the previous stored file; a user with no uploaded avatar gets a deterministic default derived from `user_id`). `avatar_url` is present in own-profile, public-profile, friend-list, Chat v2 peer, and Game v2 room-member payloads so current frontend lists can render it without extra profile requests; the stable v1 room schema remains unchanged. Instead of uploading, a user can pick one of the ready-made avatars listed by `GET /api/v1/avatars/presets` with `PUT /api/v1/users/me/avatar`; the most recent upload or pick wins. See `02 - Users & Profile/update-own-profile.yml`, `upload-avatar.yml`, `list-avatar-presets.yml` and `select-avatar-preset.yml`.
 
-  ## OAuth
+  ## OAuth (Google)
 
-  OAuth is **out of scope**. This contract defines no OAuth endpoint, provider integration or account-linking payload — registration and login are email/password only (see Identity Model above). Any provider integration added later must end in the same `ft_session`/`ft_refresh` session model as password login, with no separate session type.
+  Google is the only OAuth provider. `GET /api/v1/auth/oauth/google/authorize` starts an Authorization Code flow with PKCE and a single-use `state`; `GET /api/v1/auth/oauth/google/callback` completes it. A verified Google email that matches an existing account signs into that account and links it; otherwise the server creates an account with that email and a generated unique username. An account created through Google has no password and signs in through Google. Success ends in the same `ft_session`/`ft_refresh` session model as password login, with no separate session type, and redirects the browser to a same-origin SPA path. Failure redirects to the SPA with an `oauth_error` code. The Google client ID and client secret live only in backend configuration; the frontend never holds a client secret or a provider token. See `01 - Identity/oauth-google-authorize.yml` and `oauth-google-callback.yml`.
+
+  ## Account Deletion
+
+  `DELETE /api/v1/users/me` permanently deletes the signed-in user's own account after the user confirms by sending their current username. The server first removes the user from any active room as a departure with reason `ACCOUNT_DELETED`: Game v2 staffing rules apply and no leave penalty is recorded; a v1 `IN_GAME` room applies its forfeit. It then deletes the credentials, the Google link, the profile and avatar, friendships, DIRECT channels and their messages, and penalty points; revokes every session and refresh-token family; clears both cookies; and closes every socket of the user with `4401`. Other players' finalized match records remain, with the deleted participant shown as `user_id:null`, `username:"deleted_user"`. The email and username become available again. Deletion cannot be undone.
+
+  ## User Reports
+
+  `POST /api/v1/users/{user_id}/reports` lets a signed-in user report another user with a reason category (`HARASSMENT`, `CHEATING`, `OFFENSIVE_USERNAME`, `SPAM`, `OTHER`), optional free-text `details` (`0..500` characters), and an optional `room_id` for context. Reporting oneself returns `422 CANNOT_REPORT_SELF`. A reporter may file one report per target within a server-configured window (24 hours in examples); a repeat returns `409 ALREADY_REPORTED`. A report is stored for moderation and never notifies the reported user. **Unresolved:** how received reports are reviewed and acted on.
 
   ## Match History and Stats (minor module: Game Statistics)
 

@@ -5,4 +5,4 @@ info:
 docs: |-
   # Users and profiles
 
-  Profiles contain persistent identity and statistics: `wins`, `losses`, `level`, and supported match summaries. Temporary room team, role, readiness, score, board, clue, and turn never become account fields. The own profile may show the live `(active_room_id, active_room_api_version)` pair; public profiles omit session and active-room data.
+  Profiles contain persistent identity and statistics: `wins`, `losses`, `level`, and supported match summaries. The own profile also carries `penalty_points`. This folder also holds self-service account deletion and reporting another user. Temporary room team, role, readiness, score, board, clue, and turn never become account fields. The own profile may show the live `(active_room_id, active_room_api_version)` pair; public profiles omit session and active-room data.

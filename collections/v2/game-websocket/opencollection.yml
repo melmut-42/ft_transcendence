@@ -31,7 +31,7 @@ docs:
 
     A successful room connection receives a recipient-specific `room.state`. Projection depends on both shared room status and the caller's member state, which matters while some members have returned to `WAITING` and others remain `POST_GAME`.
 
-    Invalid session rejects the handshake with HTTP `401`; missing room uses `404`; an authenticated non-member uses `403`. A transport disconnect starts the reconnect grace period. If it expires during `IN_GAME`, membership is removed and team staffing is rechecked. Play continues when both teams remain valid; otherwise `PAUSED_FOR_PLAYERS` starts the deficient team's 120-second deadline.
+    Invalid session rejects the handshake with HTTP `401`; missing room uses `404`; an authenticated non-member uses `403`. A transport disconnect starts the reconnect grace period. If it expires during `IN_GAME`, membership is removed and team staffing is rechecked. Play continues when both teams remain valid; otherwise `PAUSED_FOR_PLAYERS` starts the deficient team's shutdown deadline (120 seconds by default). If a deadline expires, the room closes and every remaining member returns to the Lobby.
 
     ## Reconnect (canonical snapshot)
 
@@ -53,13 +53,15 @@ docs:
     | `room.role.select` | C to S | `WAITING`, `COUNTDOWN`, conditional `IN_GAME` | spectator/member | atomically claim `{team, role}` or return to spectator |
     | `room.ready.set` | C to S | `WAITING`, `COUNTDOWN` for false | configured member | toggle readiness |
     | `room.lobby.return` | C to S | member state `POST_GAME` | any member | return independently; first return moves room to `WAITING` |
-    | `room.member.kick` | C to S | `WAITING`, `COUNTDOWN`, `POST_GAME` | host | remove another member; forbidden `IN_GAME` |
+    | `room.settings.update` | C to S | `WAITING` | host, `IN_LOBBY` | change capacity, turn timer, language |
+    | `room.member.kick` | C to S | `WAITING`, `COUNTDOWN`, `IN_GAME`, `POST_GAME` | host | remove any other member; in `IN_GAME` rechecks staffing |
     | `game.clue.submit` | C to S | `IN_GAME / WAITING_FOR_CLUE` | active Spymaster | create clue and guesses |
     | `game.card.guess` | C to S | `IN_GAME / GUESSING` | active Operative | reveal one card |
     | `game.turn.pass` | C to S | `IN_GAME / GUESSING` | active Operative | end team turn |
     | `room.state` | S to C | any non-closed state | recipient projection | full room snapshot |
     | `room.player.joined` | S to C | `WAITING`, `COUNTDOWN`, `IN_GAME` | server | spectator membership added |
-    | `room.player.left` | S to C | any non-closed state | server | exit, disconnect, kick, or timeout; may include host transfer |
+    | `room.player.left` | S to C | any non-closed state | server | exit, logout, disconnect, kick, account deletion, or timeout; may include host transfer |
+    | `room.settings.updated` | S to C | `WAITING` | server | full current settings after a host change |
     | `room.player.returned_to_lobby` | S to C | `POST_GAME` or `WAITING` | server | one member moved from `POST_GAME` to `IN_LOBBY` |
     | `room.post_game.started` | S to C | `POST_GAME` | server | result decision deadline begins |
     | `room.post_game.completed` | S to C | `WAITING` or `CLOSED` | server | no pending post-game members remain |
@@ -73,9 +75,10 @@ docs:
     | `game.score.updated` | S to C | `IN_GAME`, `POST_GAME` | server | revealed team totals |
     | `game.turn.changed` | S to C | `IN_GAME` | server | next team waits for clue |
     | `game.ended` | S to C | `POST_GAME / GAME_OVER` | server | competitive terminal result |
-    | `game.staffing.required` | S to C | `IN_GAME / PAUSED_FOR_PLAYERS` | server | missing roles and per-team 120-second deadline |
+    | `game.staffing.required` | S to C | `IN_GAME / PAUSED_FOR_PLAYERS` | server | shutdown countdown: missing roles, departure, per-team deadline |
     | `game.staffing.restored` | S to C | `IN_GAME` | server | both teams valid; preserved turn resumes |
-    | `game.cancelled` | S to C | `POST_GAME / GAME_OVER` | server | no-winner `INSUFFICIENT_PLAYERS` cancellation |
+    | `game.cancelled` | S to C | `IN_GAME` to `CLOSED` | server | no-winner `INSUFFICIENT_PLAYERS` cancellation |
+    | `room.closed` | S to C | `CLOSED` | server | room shut down after a staffing deadline; sockets close with `4404` |
     | `ack` | S to C | command-dependent | requester | command accepted |
     | `error` | S to C | any open connection | requester | command rejected |
 
@@ -89,7 +92,7 @@ docs:
 
     ## Errors and connection policy
 
-    Action errors normally retain the connection and never mutate room/game state. Room-socket errors are `INVALID_EVENT`, `INVALID_PAYLOAD`, `NOT_ROOM_MEMBER`, `TARGET_NOT_ROOM_MEMBER`, `INVALID_ROOM_STATE`, `NOT_HOST`, `CANNOT_KICK_SELF`, `POST_GAME_PENDING`, `POST_GAME_DEADLINE_EXPIRED`, `TEAM_REQUIRED`, `ROLE_REQUIRED`, `ROLE_CONFLICT`, `NOT_YOUR_TURN`, `ROLE_FORBIDDEN`, `INVALID_CLUE`, `INVALID_CLUE_NUMBER`, `INVALID_CARD`, `CARD_ALREADY_REVEALED`, `NO_GUESSES_REMAINING`, and `GAME_ALREADY_FINISHED`; `POST_GAME_DEADLINE_EXPIRED` completes timeout removal and closes that member's socket with `4403`. All are defined in `06 - Errors/error-catalog.yml`. `UNAUTHORIZED` closes with `4401`; host kick and post-game timeout close the affected member with `4403`.
+    Action errors normally retain the connection and never mutate room/game state. Room-socket errors are `INVALID_EVENT`, `INVALID_PAYLOAD`, `NOT_ROOM_MEMBER`, `TARGET_NOT_ROOM_MEMBER`, `INVALID_ROOM_STATE`, `NOT_HOST`, `CANNOT_KICK_SELF`, `POST_GAME_PENDING`, `POST_GAME_DEADLINE_EXPIRED`, `TEAM_REQUIRED`, `ROLE_REQUIRED`, `ROLE_CONFLICT`, `NOT_YOUR_TURN`, `ROLE_FORBIDDEN`, `INVALID_CLUE`, `INVALID_CLUE_NUMBER`, `INVALID_CARD`, `CARD_ALREADY_REVEALED`, `NO_GUESSES_REMAINING`, and `GAME_ALREADY_FINISHED`; `POST_GAME_DEADLINE_EXPIRED` completes timeout removal and closes that member's socket with `4403`. All are defined in `06 - Errors/error-catalog.yml`. `UNAUTHORIZED` and account deletion close with `4401`; host kick and post-game timeout close the affected member with `4403`; a staffing shutdown sends `room.closed` and then closes every room socket with `4404`.
 
     ## Example index
 

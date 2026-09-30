@@ -13,4 +13,4 @@ docs: |-
 
   A game can start only with at least four configured, ready members; exactly one Spymaster and at least one Operative per `RED` and `BLUE`. REST room snapshots use the same enums and privacy projections as realtime state.
 
-  `Leave room` and logout are legal in every room status. Leaving mid-game rechecks team staffing and never assigns an immediate loss. A deficient team has 120 seconds to regain at least one Spymaster and one Operative; expiry cancels the game without a winner. A post-game member who exits or reaches the deadline is removed without affecting the completed result. An empty room closes after 300 seconds, not immediately.
+  `Leave room` and logout are legal in every room status. Leaving mid-game as a participant records a leave penalty, rechecks team staffing, and never assigns an immediate loss. A deficient team has a shutdown deadline (120 seconds by default) to regain at least one Spymaster and one Operative; expiry cancels the game without a winner and closes the room. A post-game member who exits or reaches the deadline is removed without affecting the completed result. An empty room closes after 300 seconds, not immediately.

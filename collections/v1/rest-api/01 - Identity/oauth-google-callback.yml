@@ -1,0 +1,75 @@
+info:
+  name: Complete Google sign-in
+  type: http
+  seq: 7
+  tags: [identity, oauth]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/{{apiVersion}}/auth/oauth/google/callback?code=<google_code>&state=<state>"
+  headers: []
+  params:
+    - name: code
+      value: <google_code>
+    - name: state
+      value: <state>
+docs: |-
+  # Complete Google sign-in
+
+  ## Purpose and preconditions
+
+  Google redirects the browser here after the user approves or cancels. The request must carry the `ft_oauth` cookie set by `Start Google sign-in`. Bruno cannot complete a real Google consent screen; the examples document the redirects the browser receives.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `code` | query | on approval | string | Google authorization code | no | Exchanged server-side with the PKCE verifier and client secret | `4/0Ad...` |
+  | `state` | query | yes | string | value issued by the authorize step | no | Must equal the value in `ft_oauth`; single-use | `<state>` |
+  | `error` | query | on cancel | string | Google error, e.g. `access_denied` | no | Present instead of `code` when the user cancels | `access_denied` |
+  | `ft_oauth` cookie | request cookie | yes | string | set by the authorize step, unexpired | no | Holds `state`, `code_verifier`, `return_to` | set by authorize |
+
+  ## Success behavior
+
+  The server verifies `state`, exchanges `code` for tokens, validates the ID token, and requires `email_verified = true`. It then resolves the account:
+
+  1. A user already linked to this Google account signs in.
+  2. Otherwise a user whose email matches the verified Google email (case-insensitive) is linked and signs in.
+  3. Otherwise a new account is created with that email, no password, the deterministic default avatar, and a generated unique username that matches `^[A-Za-z0-9_]{3,20}$` (derived from the Google name or email local part, with a numeric suffix on collision). The user can rename it in Settings.
+
+  `302 Found` to the stored `return_to` (default `/lobby`). The response sets `ft_session` and `ft_refresh` exactly as Login does (`workspace.yml`, Session and Credential Model), clears `ft_oauth`, and puts no token in the URL or body. The SPA then bootstraps with `GET /api/v1/auth/session`.
+
+  ## Errors
+
+  Every failure answers `302 Found` to `/?oauth_error=<code>`, clears `ft_oauth`, and creates or changes no account or session. The SPA reads `oauth_error`, shows the matching message in the Log In dialog, and removes the parameter from the address bar.
+
+  | `oauth_error` | When |
+  | --- | --- |
+  | `OAUTH_CANCELLED` | The user cancelled on Google (`error=access_denied`) |
+  | `OAUTH_STATE_INVALID` | `state` is missing, does not match `ft_oauth`, was already used, or `ft_oauth` expired |
+  | `OAUTH_EMAIL_UNVERIFIED` | Google reports the email as unverified |
+  | `OAUTH_PROVIDER_ERROR` | Google is unavailable or not configured, the code exchange fails, or the ID token is invalid |
+examples:
+  - name: Success - Signed in, redirect to Lobby
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/oauth/google/callback?code=<google_code>&state=<state>", method: GET, headers: [], params: [{name: code, value: <google_code>, enabled: true}, {name: state, value: <state>, enabled: true}], body: {mode: none}}
+    response:
+      status: 302
+      headers:
+        - {name: Location, value: /lobby}
+        - {name: Set-Cookie, value: "ft_session=<jwt>; HttpOnly; Secure; SameSite=Lax; Path=/"}
+        - {name: Set-Cookie, value: "ft_refresh=<opaque>; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth/refresh"}
+        - {name: Set-Cookie, value: "ft_oauth=; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth/oauth/google; Max-Age=0"}
+      body: {type: text, data: ""}
+  - name: Error - User cancelled on Google
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/oauth/google/callback?error=access_denied&state=<state>", method: GET, headers: [], params: [{name: error, value: access_denied, enabled: true}, {name: state, value: <state>, enabled: true}], body: {mode: none}}
+    response:
+      status: 302
+      headers:
+        - {name: Location, value: "/?oauth_error=OAUTH_CANCELLED"}
+      body: {type: text, data: ""}
+  - name: Error - State mismatch
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/auth/oauth/google/callback?code=<google_code>&state=tampered", method: GET, headers: [], params: [{name: code, value: <google_code>, enabled: true}, {name: state, value: tampered, enabled: true}], body: {mode: none}}
+    response:
+      status: 302
+      headers:
+        - {name: Location, value: "/?oauth_error=OAUTH_STATE_INVALID"}
+      body: {type: text, data: ""}

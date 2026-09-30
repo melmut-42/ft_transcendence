@@ -9,6 +9,6 @@ docs: |-
 
   Scores count revealed team cards, regardless of which team guessed them; either color's starting-team score ranges `0..9` (either color can start — `workspace.yml`). Every reveal checks terminal conditions before emitting a turn change.
 
-  If a deficient team's 120-second deadline expires, `game.cancelled` ends the game with `INSUFFICIENT_PLAYERS`, no winner, and no statistics update.
+  If a deficient team's deadline (120 seconds by default) expires, `game.cancelled` ends the game with `INSUFFICIENT_PLAYERS`, no winner, and no statistics update, and `room.closed` shuts the room down; every remaining member returns to the Lobby.
 
-  Every terminal result sets `game.status=GAME_FINISHED`, moves the shared room to `POST_GAME`, resets readiness, and starts the independent 60-second Back-to-Lobby/Exit decision window documented in `01 - Room Lobby`.
+  Every competitive terminal result sets `game.status=GAME_FINISHED`, moves the shared room to `POST_GAME`, resets readiness, and starts the independent 60-second Back-to-Lobby/Exit decision window documented in `01 - Room Lobby`.

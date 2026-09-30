@@ -5,4 +5,4 @@
 docs: |-
   # Room lobby
 
-  This folder owns realtime room administration across lobby and post-game: membership events, host-only capacity/kick commands, independent Back to Lobby, and the post-game deadline. Join is legal only in `WAITING`. Any member may return after a game; only the host may kick. Host transfer prefers the earliest-joined `IN_LOBBY` member, otherwise the earliest remaining member.
+  This folder owns realtime room administration across lobby and post-game: membership events, host-only settings (capacity, turn timer, language) and kick commands, independent Back to Lobby, and the post-game deadline. Join is legal only in `WAITING`. Any member may return after a game; only the host may kick, in every open room status. Host transfer prefers the earliest-joined `IN_LOBBY` member, otherwise the earliest remaining member.
