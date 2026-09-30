@@ -11,6 +11,7 @@
  */
 
 import { apiRequest } from '@shared/api';
+import { API_BASE_PATH } from '@shared/constants';
 import type {
   LoginRequest,
   LoginResponse,
@@ -37,6 +38,15 @@ export const refreshSession = (): Promise<RefreshResponse> =>
  * live `ft_refresh` must recover the session rather than drop the user to Login.
  */
 export const fetchSession = (): Promise<SessionResponse> => apiRequest('/auth/session');
+
+/**
+ * Where "Continue with Google" sends the browser. It is a top-level navigation, not a
+ * `fetch`: the server answers with a redirect to Google, and Google's callback sets the
+ * session cookies and redirects back to `returnTo`. A failure comes back to Landing as
+ * `?oauth_error=<code>`. The frontend never holds a Google token or client secret.
+ */
+export const googleSignInUrl = (returnTo: string): string =>
+  `${API_BASE_PATH}/auth/oauth/google/authorize?${new URLSearchParams({ return_to: returnTo })}`;
 
 /** Revokes both credentials. Legal in every room status; forfeits an `IN_GAME` match. */
 export const endSession = (): Promise<void> => apiRequest('/auth/session', { method: 'DELETE' });

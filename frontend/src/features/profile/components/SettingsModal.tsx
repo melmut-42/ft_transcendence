@@ -25,9 +25,15 @@ export interface LogOutControl {
   request: () => void;
 }
 
+/** Opens the Delete Account? confirmation, which the app layer runs. */
+export interface DeleteAccountControl {
+  request: () => void;
+}
+
 export interface SettingsModalProps {
   onClose: () => void;
   logOut: LogOutControl;
+  deleteAccount: DeleteAccountControl;
   /** `false` while another dialog stands over Settings, such as the Log Out confirmation. */
   active?: boolean;
 }
@@ -43,9 +49,14 @@ type View = 'SETTINGS' | 'CROP' | 'PICK';
  * ready-made pick, and the username — and each change is shown only once the server has
  * confirmed it, then everywhere at once through the shared stores. Crop Photo and Pick
  * Avatar take the place of the Settings card inside the same dialog, so the username draft
- * survives a trip to either. Log Out and the legal pages sit at the foot.
+ * survives a trip to either. Log Out, Delete Account and the legal pages sit at the foot.
  */
-export function SettingsModal({ onClose, logOut, active = true }: SettingsModalProps) {
+export function SettingsModal({
+  onClose,
+  logOut,
+  deleteAccount,
+  active = true,
+}: SettingsModalProps) {
   const { t } = useTranslation();
   const titleId = useId();
   const avatarNoteId = useId();
@@ -320,6 +331,17 @@ export function SettingsModal({ onClose, logOut, active = true }: SettingsModalP
               {t('settings.logOut.failed')}
             </p>
           )}
+
+          <button
+            type="button"
+            onClick={deleteAccount.request}
+            disabled={busy}
+            aria-haspopup="dialog"
+            className={styles.deleteAccount}
+          >
+            <Icon name="trash" />
+            {t('settings.deleteAccount.button')}
+          </button>
 
           {/* A new tab, so the room or match behind Settings keeps running. */}
           <nav aria-label={t('settings.legal.navigation')} className={styles.legal}>

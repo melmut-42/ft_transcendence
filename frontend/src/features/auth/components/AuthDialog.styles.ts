@@ -144,6 +144,27 @@ export const submit: Record<AuthMode, string> = {
   register: `${primaryButton} mt-[16px]`,
 };
 
+/** "or" between the form and Continue with Google. */
+export const oauthDivider: string =
+  'mt-[14px] flex items-center gap-[10px] text-md leading-none font-bold text-text-gray ' +
+  'uppercase';
+
+export const oauthDividerLine: string = 'h-[2px] flex-1 rounded-pill bg-surface-muted';
+
+/** Continue with Google: the neutral button with Google's mark, a peer of the form's submit. */
+export const google: string =
+  `${buttonInteraction} mt-[12px] inline-flex h-12 w-full shrink-0 items-center ` +
+  'justify-center gap-[10px] rounded-lg border-(length:--stroke-default) border-border ' +
+  'bg-surface text-xl leading-tight font-bold whitespace-nowrap text-text-ink ' +
+  'shadow-button-neutral not-aria-disabled:hover:bg-surface-raised ' +
+  'not-aria-disabled:hover:shadow-button-neutral-hover aria-disabled:cursor-default ' +
+  'aria-disabled:opacity-70';
+
+export const googleMark: string = 'size-[20px] shrink-0';
+
+/** A notice about how the dialog was reached, such as a failed Google sign-in. */
+export const notice: string = 'mb-[12px]';
+
 /** The loading ellipsis trails the label, as the design system's loading button does. */
 export const loadingEllipsis: string = 'motion-safe:animate-pulse';
 

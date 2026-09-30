@@ -5,8 +5,11 @@
 import { apiRequest } from '@shared/api';
 import type {
   AvatarPresetListResponse,
+  DeleteOwnAccountRequest,
   OwnProfile,
   PublicProfile,
+  ReportUserRequest,
+  ReportUserResponse,
   UpdateOwnProfileRequest,
   UploadAvatarResponse,
 } from '@shared/types';
@@ -18,6 +21,17 @@ export const getPublicProfile = (userId: number): Promise<PublicProfile> =>
 
 export const updateOwnProfile = (body: UpdateOwnProfileRequest): Promise<OwnProfile> =>
   apiRequest('/users/me', { method: 'PATCH', body });
+
+/**
+ * Permanently deletes the signed-in account. The server removes the user from any room,
+ * revokes every session, clears both cookies and closes every socket.
+ */
+export const deleteOwnAccount = (body: DeleteOwnAccountRequest): Promise<void> =>
+  apiRequest('/users/me', { method: 'DELETE', body });
+
+/** Reports another user for moderation; the reported user is not notified. */
+export const reportUser = (userId: number, body: ReportUserRequest): Promise<ReportUserResponse> =>
+  apiRequest(`/users/${userId}/reports`, { method: 'POST', body });
 
 /**
  * Multipart upload, field name `avatar`. `image/jpeg`, `image/png` or `image/webp`,

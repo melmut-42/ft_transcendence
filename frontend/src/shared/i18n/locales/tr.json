@@ -73,6 +73,29 @@
 		"confirm": "Çıkış Yap",
 		"pending": "Çıkış yapılıyor…",
 		"failed": "Çıkış yapılamadı. Tekrar dene."
+	},
+	"oauth": {
+		"or": "veya",
+		"continue": "Google ile devam et",
+		"redirecting": "Google'a yönlendiriliyor…",
+		"error": {
+			"OAUTH_CANCELLED": {
+				"title": "Google ile giriş iptal edildi",
+				"body": "Tekrar deneyebilir ya da e-postanla giriş yapabilirsin."
+			},
+			"OAUTH_STATE_INVALID": {
+				"title": "Google ile girişin süresi doldu",
+				"body": "Giriş çok uzun sürdü ya da yarıda kesildi. Tekrar dene."
+			},
+			"OAUTH_EMAIL_UNVERIFIED": {
+				"title": "E-posta doğrulanmamış",
+				"body": "Google hesabının e-postası doğrulanmamış. Google'da doğrula ya da e-postanla giriş yap."
+			},
+			"OAUTH_PROVIDER_ERROR": {
+				"title": "Google ile giriş başarısız",
+				"body": "Google ile giriş yapamadık. Biraz sonra tekrar dene."
+			}
+		}
 	}
   },
   "landing": {
@@ -99,7 +122,8 @@
 	"privacy": "Gizlilik Politikası",
 	"terms": "Kullanım Koşulları",
 	"help": "Yardım",
-	"copyright": "© 2026 ft_transcendence ekibi. 42 İstanbul öğrencileri için oluşturuldu (ft_transcendence). Tüm hakları saklıdır."
+	"copyright": "© 2026 ft_transcendence ekibi. 42 İstanbul öğrencileri için oluşturuldu (ft_transcendence). Tüm hakları saklıdır.",
+	"accountDeleted": "Hesabın silindi."
   },
 	"legal": {
 		"wordmark": "Codenames Online",
@@ -698,6 +722,39 @@
 				"PLAYER_FORFEIT": "Hükmen"
 			},
 			"scoreLabel": "Son skor: takımın {{own}}, rakip takım {{other}}"
+		},
+		"report": {
+			"action": "Oyuncuyu bildir",
+			"reported": "Bildirildi",
+			"back": "Profile dön",
+			"title": "{{username}} adlı oyuncuyu bildir",
+			"subtitle": "Ne olduğunu anlat. Oyuncu kimin bildirdiğini öğrenmez.",
+			"reasonLabel": "Neden",
+			"reasonHint": "Devam etmek için bir neden seç.",
+			"reason": {
+				"HARASSMENT": "Taciz veya hakaret",
+				"CHEATING": "Hile",
+				"OFFENSIVE_USERNAME": "Uygunsuz kullanıcı adı",
+				"SPAM": "Spam",
+				"OTHER": "Başka bir şey"
+			},
+			"detailsLabel": "Ayrıntılar (isteğe bağlı)",
+			"detailsPlaceholder": "Ne oldu, ne zaman oldu?",
+			"detailsCount": "{{count}} / {{max}}",
+			"cancel": "Vazgeç",
+			"submit": "Bildirimi gönder",
+			"sending": "Gönderiliyor…",
+			"done": "Tamam",
+			"outcome": {
+				"SENT": "Teşekkürler. {{username}} hakkındaki bildirimin incelemeye gönderildi.",
+				"ALREADY_REPORTED": "{{username}} adlı oyuncuyu kısa süre önce bildirdin. Önceki bildirimin inceleniyor."
+			},
+			"error": {
+				"NOT_FOUND": "{{username}} adlı oyuncunun hesabı artık yok.",
+				"RATE_LIMITED": "Çok fazla bildirim. Biraz bekleyip tekrar dene.",
+				"INVALID": "Bildirim kabul edilmedi. Nedeni ve ayrıntıları kontrol et.",
+				"FAILED": "Bildirim gönderilemedi. Tekrar dene."
+			}
 		}
 	},
 	"chat": {
@@ -886,6 +943,22 @@
 			"cancel": "İptal",
 			"save": "Avatarı kaydet",
 			"saving": "Kaydediliyor…"
+		},
+		"deleteAccount": {
+			"button": "Hesabı sil",
+			"title": "Hesap Silinsin mi?",
+			"body": "Bu işlem hesabını, profilini, arkadaşlarını, istatistiklerini ve mesajlarını kalıcı olarak siler. Geri alınamaz.",
+			"inMatch": "Bir maçtasın. Hesabını silmek seni maçtan da çıkarır.",
+			"confirmLabel": "Onaylamak için <name>{{username}}</name> yaz",
+			"confirmHint": "Kullanıcı adın, profilinde göründüğü gibi.",
+			"cancel": "Vazgeç",
+			"confirm": "Sil",
+			"pending": "Siliniyor…",
+			"error": {
+				"MISMATCH": "Bu senin kullanıcı adın değil. Onaylamak için aynen yaz.",
+				"RATE_LIMITED": "Çok fazla deneme. Biraz bekleyip tekrar dene.",
+				"FAILED": "Hesabın silinemedi. Tekrar dene."
+			}
 		}
 	}
 }

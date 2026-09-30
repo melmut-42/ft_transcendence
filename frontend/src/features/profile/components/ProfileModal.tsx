@@ -1,5 +1,5 @@
-import { useCallback, useId, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Room } from '@shared/types';
@@ -10,7 +10,9 @@ import { useInviteToRoom } from '../hooks/useInviteToRoom';
 import type { InviteState, InviteUnavailableReason } from '../hooks/useInviteToRoom';
 import { useProfile } from '../hooks/useProfile';
 import type { ProfileView } from '../hooks/useProfile';
+import { useReportUser } from '../hooks/useReportUser';
 import * as styles from './ProfileModal.styles';
+import { ReportView } from './ReportView';
 
 /**
  * The friendship between the signed-in user and the profile's player, as the app layer
@@ -53,6 +55,10 @@ export interface ProfileModalProps {
  * them. What the actions offer is derived from the live friend list and room snapshot, and
  * the server decides every action again when it is sent.
  *
+ * Another player's profile also offers REPORT at its foot. The report form takes the
+ * profile's place inside the same pop-up, and Close steps back from it to the profile. It
+ * is never offered on the user's own profile.
+ *
  * It is mounted once per user (`key`), so while one player's profile loads nothing of the
  * previous one can show.
  */
@@ -69,6 +75,22 @@ export function ProfileModal({
   const { t } = useTranslation();
   const titleId = useId();
   const { profile, status, retry, refresh } = useProfile(userId, isSelf);
+  const [view, setView] = useState<'PROFILE' | 'REPORT'>('PROFILE');
+  // Only a room this player is in too gives the report its room context.
+  const reportRoomId = room && room.players.some((p) => p.user_id === userId) ? room.room_id : null;
+  const report = useReportUser(userId, reportRoomId);
+  const reportSending = report.state.status === 'SENDING';
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const reportRef = useRef<HTMLButtonElement>(null);
+
+  // A view swap replaces the focused control: the report's heading takes focus, and
+  // coming back to the profile returns it to REPORT.
+  const previousView = useRef(view);
+  useEffect(() => {
+    if (previousView.current === view) return;
+    previousView.current = view;
+    (view === 'REPORT' ? titleRef : reportRef).current?.focus();
+  }, [view]);
 
   // A refusal over presence means the profile's `is_online` is stale: read it again.
   const onRefused = useCallback(
@@ -82,11 +104,21 @@ export function ProfileModal({
   return (
     <Dialog
       labelledBy={titleId}
-      closeLabel={t('profile.close')}
-      onClose={onClose}
+      closeLabel={t(view === 'REPORT' ? 'profile.report.back' : 'profile.close')}
+      onClose={view === 'REPORT' ? () => setView('PROFILE') : onClose}
+      closable={!reportSending}
       className={styles.card}
     >
-      {status === 'READY' && profile ? (
+      {view === 'REPORT' && profile ? (
+        <ReportView
+          username={profile.username}
+          state={report.state}
+          onSubmit={(reason, details) => void report.submit(reason, details)}
+          onBack={() => setView('PROFILE')}
+          titleId={titleId}
+          titleRef={titleRef}
+        />
+      ) : status === 'READY' && profile ? (
         <>
           <ProfileHeader profile={profile} titleId={titleId} />
           {!isSelf && friendship && (
@@ -100,6 +132,15 @@ export function ProfileModal({
           )}
           <ProfileStats profile={profile} />
           {isSelf && history}
+          {!isSelf && (
+            <ReportButton
+              buttonRef={reportRef}
+              reported={
+                report.state.status === 'SENT' || report.state.status === 'ALREADY_REPORTED'
+              }
+              onReport={() => setView('REPORT')}
+            />
+          )}
         </>
       ) : status === 'LOADING' ? (
         <ProfileSkeleton titleId={titleId} />
@@ -149,6 +190,31 @@ function ProfileHeader({ profile, titleId }: { profile: ProfileView; titleId: st
         </p>
       </div>
     </div>
+  );
+}
+
+/** REPORT at the foot of another player's profile; Reported once the server has it. */
+function ReportButton({
+  buttonRef,
+  reported,
+  onReport,
+}: {
+  buttonRef: RefObject<HTMLButtonElement | null>;
+  reported: boolean;
+  onReport: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <button
+      ref={buttonRef}
+      type="button"
+      onClick={() => !reported && onReport()}
+      aria-disabled={reported || undefined}
+      className={styles.report}
+    >
+      <Icon name={reported ? 'check' : 'flag'} />
+      {t(reported ? 'profile.report.reported' : 'profile.report.action')}
+    </button>
   );
 }
 

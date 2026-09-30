@@ -36,6 +36,8 @@ export type MockEndpoint =
   | 'endSession'
   | 'getOwnProfile'
   | 'updateOwnProfile'
+  | 'deleteOwnAccount'
+  | 'reportUser'
   | 'getPublicProfile'
   | 'uploadAvatar'
   | 'listAvatarPresets'

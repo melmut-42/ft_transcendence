@@ -73,6 +73,29 @@
 			"confirm": "Log Out",
 			"pending": "Logging out…",
 			"failed": "Couldn't log out. Try again."
+		},
+		"oauth": {
+			"or": "or",
+			"continue": "Continue with Google",
+			"redirecting": "Redirecting to Google…",
+			"error": {
+				"OAUTH_CANCELLED": {
+					"title": "Google sign-in cancelled",
+					"body": "You can try again, or log in with your email."
+				},
+				"OAUTH_STATE_INVALID": {
+					"title": "Google sign-in expired",
+					"body": "The sign-in took too long or was interrupted. Try again."
+				},
+				"OAUTH_EMAIL_UNVERIFIED": {
+					"title": "Email not verified",
+					"body": "Your Google account's email isn't verified. Verify it with Google, or log in with your email."
+				},
+				"OAUTH_PROVIDER_ERROR": {
+					"title": "Google sign-in failed",
+					"body": "We couldn't sign you in with Google. Try again in a moment."
+				}
+			}
 		}
 	},
 	"landing": {
@@ -99,7 +122,8 @@
 		"privacy": "Privacy Policy",
 		"terms": "Terms of Service",
 		"help": "Help",
-		"copyright": "© 2026 ft_transcendence team. Created for 42 İstanbul students (ft_transcendence). All rights reserved."
+		"copyright": "© 2026 ft_transcendence team. Created for 42 İstanbul students (ft_transcendence). All rights reserved.",
+		"accountDeleted": "Your account was deleted."
 	},
 	"legal": {
 		"wordmark": "Codenames Online",
@@ -698,6 +722,39 @@
 				"PLAYER_FORFEIT": "Forfeit"
 			},
 			"scoreLabel": "Final score: your team {{own}}, the other team {{other}}"
+		},
+		"report": {
+			"action": "Report player",
+			"reported": "Reported",
+			"back": "Back to profile",
+			"title": "Report {{username}}",
+			"subtitle": "Tell us what happened. The player won't know who reported them.",
+			"reasonLabel": "Reason",
+			"reasonHint": "Choose a reason to continue.",
+			"reason": {
+				"HARASSMENT": "Harassment or abuse",
+				"CHEATING": "Cheating",
+				"OFFENSIVE_USERNAME": "Offensive username",
+				"SPAM": "Spam",
+				"OTHER": "Something else"
+			},
+			"detailsLabel": "Details (optional)",
+			"detailsPlaceholder": "What happened, and when?",
+			"detailsCount": "{{count}} / {{max}}",
+			"cancel": "Cancel",
+			"submit": "Submit report",
+			"sending": "Sending…",
+			"done": "Done",
+			"outcome": {
+				"SENT": "Thanks. Your report about {{username}} was sent for review.",
+				"ALREADY_REPORTED": "You already reported {{username}} recently. Your earlier report is being reviewed."
+			},
+			"error": {
+				"NOT_FOUND": "{{username}}'s account no longer exists.",
+				"RATE_LIMITED": "Too many reports. Wait a moment, then try again.",
+				"INVALID": "The report couldn't be accepted. Check the reason and details.",
+				"FAILED": "The report couldn't be sent. Try again."
+			}
 		}
 	},
 	"chat": {
@@ -886,6 +943,22 @@
 			"cancel": "Cancel",
 			"save": "Save avatar",
 			"saving": "Saving…"
+		},
+		"deleteAccount": {
+			"button": "Delete account",
+			"title": "Delete Account?",
+			"body": "This permanently deletes your account, profile, friends, statistics and messages. It can't be undone.",
+			"inMatch": "You're in a match. Deleting your account also removes you from it.",
+			"confirmLabel": "Type <name>{{username}}</name> to confirm",
+			"confirmHint": "Your username, exactly as it appears in your profile.",
+			"cancel": "Cancel",
+			"confirm": "Delete",
+			"pending": "Deleting…",
+			"error": {
+				"MISMATCH": "That isn't your username. Type it exactly to confirm.",
+				"RATE_LIMITED": "Too many attempts. Wait a moment, then try again.",
+				"FAILED": "Couldn't delete your account. Try again."
+			}
 		}
 	}
 }

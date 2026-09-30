@@ -8,9 +8,10 @@
  * room the mock room socket connects to.
  */
 
-import { ROOM_CAPACITY } from '@shared/types';
+import { REPORT_DETAILS_MAX, REPORT_REASONS, ROOM_CAPACITY } from '@shared/types';
 import type {
   ApiErrorBody,
+  ReportUserResponse,
   CreateRoomResponse,
   Friend,
   FriendListResponse,
@@ -62,6 +63,8 @@ const LOOKUP_CODE_PATTERN = /^[A-Za-z0-9]{6}$/;
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 const ACCESS_TTL_MS = 15 * 60 * 1000;
+/** Window in which a repeat report of the same user is refused (24 hours in Bruno examples). */
+const REPORT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 /** A contract error response. Thrown by handlers, turned into an `{ error }` envelope. */
 class HttpError extends Error {
@@ -159,6 +162,9 @@ export class MockApiServer {
   private refreshValid = true;
   private rooms = new Map<number, MockRoomEntry>();
   private nextRoomId = 1001;
+  /** When the signed-in user last reported each user, by reported user ID. */
+  private reports = new Map<number, number>();
+  private nextReportId = 9001;
   private readonly routes: Route[];
 
   constructor(config: MockApiConfig) {
@@ -201,6 +207,8 @@ export class MockApiServer {
     this.rooms.forEach((_entry, id) => mockRooms.delete(id));
     this.rooms = new Map();
     this.nextRoomId = 1001;
+    this.reports = new Map();
+    this.nextReportId = 9001;
     this.seedRooms();
 
     const auth = this.config.auth;
@@ -623,6 +631,117 @@ export class MockApiServer {
           conflict: () =>
             new HttpError(409, 'USERNAME_TAKEN', "Username 'red_agent' is already registered.", {
               field: 'username',
+            }),
+        },
+      ),
+
+      route(
+        'deleteOwnAccount',
+        'DELETE',
+        /^\/users\/me$/,
+        true,
+        ({ options }) => {
+          const account = this.self();
+          const { confirm_username: typed } = bodyOf<{ confirm_username: string }>(options);
+          if (
+            typeof typed !== 'string' ||
+            typed.trim().toLowerCase() !== account.username.toLowerCase()
+          ) {
+            throw new HttpError(
+              422,
+              'CONFIRMATION_MISMATCH',
+              'confirm_username must match your current username.',
+              { field: 'confirm_username' },
+            );
+          }
+          // Leaving the room first, as the server does, so the others see the departure.
+          const roomId = this.activeRoomId(account.user_id);
+          if (roomId !== null) mockRooms.get(roomId)?.playerLeave(account.user_id);
+          this.accounts = this.accounts.filter((a) => a.user_id !== account.user_id);
+          this.friendIds = new Set();
+          this.sessionUserId = null;
+          this.refreshValid = false;
+          return noContent;
+        },
+        {
+          'validation-error': () =>
+            new HttpError(
+              422,
+              'CONFIRMATION_MISMATCH',
+              'confirm_username must match your current username.',
+              { field: 'confirm_username' },
+            ),
+        },
+      ),
+
+      route(
+        'reportUser',
+        'POST',
+        /^\/users\/(\d+)\/reports$/,
+        true,
+        ({ params, options }) => {
+          const reporterId = selfId();
+          const targetId = Number(params[0]);
+          if (!this.accounts.some((a) => a.user_id === targetId)) {
+            throw new HttpError(404, 'USER_NOT_FOUND', `User ${targetId} was not found.`, {
+              user_id: targetId,
+            });
+          }
+          if (targetId === reporterId) {
+            throw new HttpError(422, 'CANNOT_REPORT_SELF', 'You cannot report yourself.', {
+              user_id: targetId,
+            });
+          }
+          const body = bodyOf<{ reason: string; details: string; room_id: number }>(options);
+          const reason = REPORT_REASONS.find((value) => value === body.reason);
+          if (!reason)
+            throw validation(`reason must be one of ${REPORT_REASONS.join(', ')}.`, 'reason');
+          if (body.details !== undefined) {
+            if (
+              typeof body.details !== 'string' ||
+              body.details.trim().length > REPORT_DETAILS_MAX
+            ) {
+              throw validation(
+                `details must be at most ${REPORT_DETAILS_MAX} characters.`,
+                'details',
+              );
+            }
+          }
+          if (body.room_id !== undefined && !isPositiveInt(body.room_id)) {
+            throw validation('room_id must be a positive integer.', 'room_id');
+          }
+          const last = this.reports.get(targetId);
+          if (last !== undefined && Date.now() - last < REPORT_WINDOW_MS) {
+            throw new HttpError(
+              409,
+              'ALREADY_REPORTED',
+              `You already reported user ${targetId} recently.`,
+              {
+                user_id: targetId,
+                retry_after_seconds: Math.ceil((REPORT_WINDOW_MS - (Date.now() - last)) / 1000),
+              },
+            );
+          }
+          const createdAt = new Date();
+          this.reports.set(targetId, createdAt.getTime());
+          return created({
+            report_id: this.nextReportId++,
+            reported_user_id: targetId,
+            reason,
+            created_at: createdAt.toISOString(),
+          } satisfies ReportUserResponse);
+        },
+        {
+          'not-found': () =>
+            new HttpError(404, 'USER_NOT_FOUND', 'User 9999 was not found.', { user_id: 9999 }),
+          conflict: () =>
+            new HttpError(409, 'ALREADY_REPORTED', 'You already reported user 44 recently.', {
+              user_id: 44,
+              retry_after_seconds: 82800,
+            }),
+          'validation-error': () =>
+            new HttpError(422, 'CANNOT_REPORT_SELF', 'You cannot report yourself.', {
+              user_id: 42,
             }),
         },
       ),

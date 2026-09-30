@@ -109,6 +109,13 @@ export const hintAction: string =
   'ml-1 rounded-sm font-bold text-primary-sky underline-offset-2 hover:text-primary ' +
   'hover:underline';
 
+/** Report Player: a quiet link at the foot of another player's profile. */
+export const report: string =
+  'mx-auto inline-flex cursor-pointer items-center gap-[8px] rounded-sm text-md leading-[22px] ' +
+  'font-bold text-text-muted underline-offset-2 not-aria-disabled:hover:text-accent-red ' +
+  'not-aria-disabled:hover:underline aria-disabled:cursor-default md:text-sm ' +
+  'md:leading-[18px]';
+
 // ---- Stats ----
 
 export const stats: string = 'grid grid-cols-3 gap-[12px] md:gap-[13px]';

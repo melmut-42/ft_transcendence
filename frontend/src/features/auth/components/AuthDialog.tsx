@@ -10,8 +10,11 @@ import mascotArtwork from '@assets/auth/auth-mascot.svg';
 import { Dialog } from '@shared/ui';
 import { cn } from '@shared/utils';
 
+import type { AuthAlert as AuthAlertContent } from '../model/feedback';
+import { AuthAlert } from './AuthAlert';
 import * as styles from './AuthDialog.styles';
 import type { AuthMode } from './AuthDialog.types';
+import { GoogleSignInButton } from './GoogleSignInButton';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
 
@@ -22,6 +25,8 @@ export interface AuthDialogProps {
   initialMode: AuthMode;
   /** Closes the dialog; the page underneath stays where it was. */
   onClose: () => void;
+  /** Why the dialog opened by itself, such as a Google sign-in that failed. */
+  notice?: AuthAlertContent | null;
 }
 
 /**
@@ -29,11 +34,12 @@ export interface AuthDialogProps {
  *
  * One dialog holds both forms behind the Log In / Register tabs; switching keeps the
  * dialog open and starts the other form empty. Nothing here changes the route: only a
- * successful Log In or Sign Up moves on, to the Lobby. The shared `Dialog` shell supplies
+ * successful Log In or Sign Up moves on, to the Lobby. Continue with Google sits under both
+ * forms and leaves for Google instead. The shared `Dialog` shell supplies
  * the backdrop, close button and keyboard contract; this component draws the surface and
  * the design's artwork.
  */
-export function AuthDialog({ initialMode, onClose }: AuthDialogProps) {
+export function AuthDialog({ initialMode, onClose, notice = null }: AuthDialogProps) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const formRef = useRef<HTMLDivElement>(null);
@@ -90,6 +96,7 @@ export function AuthDialog({ initialMode, onClose }: AuthDialogProps) {
       </p>
 
       <div ref={formRef} className={styles.card}>
+        {notice && <AuthAlert alert={notice} className={styles.notice} />}
         <div role="tablist" aria-label={t('auth.modes')} className={styles.tabs}>
           <span
             aria-hidden="true"
@@ -119,6 +126,7 @@ export function AuthDialog({ initialMode, onClose }: AuthDialogProps) {
         <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-tab-${mode}`}>
           {mode === 'login' ? <LoginForm /> : <RegisterForm />}
         </div>
+        <GoogleSignInButton />
       </div>
 
       <p className={styles.prompt}>

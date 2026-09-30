@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import alienAvatar from '@assets/avatars/alien-avatar.svg';
 import aviatorFoxAvatar from '@assets/avatars/aviator-fox-avatar.svg';
@@ -18,9 +18,10 @@ import giveClueArtwork from '@assets/landing/landing-step-give-a-clue.svg';
 import guessTogetherArtwork from '@assets/landing/landing-step-guess-together.svg';
 import { AuthDialog } from '@features/auth/components/AuthDialog';
 import type { AuthMode } from '@features/auth/components/AuthDialog.types';
+import { oauthFailure } from '@features/auth/model/feedback';
 import { ROUTES } from '@shared/constants';
 import { useSessionStore } from '@shared/stores';
-import { Icon } from '@shared/ui';
+import { Icon, Toast, ToastStack } from '@shared/ui';
 import type { IconName } from '@shared/ui';
 import { cn } from '@shared/utils';
 
@@ -98,7 +99,21 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
   const { hash } = useLocation();
   const navigate = useNavigate();
   const authenticated = useSessionStore((state) => state.status === 'AUTHENTICATED');
-  const [authMode, setAuthMode] = useState<AuthMode | null>(linkedAuthMode ?? null);
+  const accountDeleted = useSessionStore((state) => state.accountDeleted);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // A Google sign-in that failed or was cancelled comes back as `?oauth_error=<code>`.
+  const [oauthNotice] = useState(() => oauthFailure(searchParams.get('oauth_error')));
+  const [authMode, setAuthMode] = useState<AuthMode | null>(
+    linkedAuthMode ?? (oauthNotice ? 'login' : null),
+  );
+
+  // The code is read once; it leaves the address bar so a reload does not repeat it.
+  useEffect(() => {
+    if (!searchParams.has('oauth_error')) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('oauth_error');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   // Links from other screens, such as How to Play on the legal pages, arrive with a hash.
   useEffect(() => {
@@ -246,7 +261,18 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
       <img src={edgeLeftArtwork} alt="" className={styles.edgeLeft} />
       <img src={edgeRightArtwork} alt="" className={styles.edgeRight} />
 
-      {authMode && <AuthDialog initialMode={authMode} onClose={closeAuth} />}
+      {authMode && <AuthDialog initialMode={authMode} onClose={closeAuth} notice={oauthNotice} />}
+      {accountDeleted && (
+        <ToastStack>
+          <Toast
+            tone="success"
+            icon="check"
+            onDismiss={() => useSessionStore.getState().acknowledgeAccountDeleted()}
+          >
+            {t('landing.accountDeleted')}
+          </Toast>
+        </ToastStack>
+      )}
     </div>
   );
 }

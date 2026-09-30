@@ -30,6 +30,28 @@ const alert = (key: string): AuthFailure => ({
   alert: { tone: 'error', title: `auth.feedback.${key}Title`, body: `auth.feedback.${key}Body` },
 });
 
+/** The `oauth_error` codes the Google callback redirects back with. */
+const OAUTH_ERRORS = [
+  'OAUTH_CANCELLED',
+  'OAUTH_STATE_INVALID',
+  'OAUTH_EMAIL_UNVERIFIED',
+  'OAUTH_PROVIDER_ERROR',
+] as const;
+
+/**
+ * The alert for a Google sign-in that came back with `?oauth_error=<code>`, or `null`
+ * without one. An unknown code reads as a provider failure.
+ */
+export function oauthFailure(code: string | null): AuthAlert | null {
+  if (!code) return null;
+  const known = OAUTH_ERRORS.find((value) => value === code) ?? 'OAUTH_PROVIDER_ERROR';
+  return {
+    tone: 'error',
+    title: `auth.oauth.error.${known}.title`,
+    body: `auth.oauth.error.${known}.body`,
+  };
+}
+
 export function authFailure(error: unknown): AuthFailure {
   if (!(error instanceof ApiError)) return alert('unavailable');
 

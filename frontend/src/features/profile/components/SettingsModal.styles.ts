@@ -127,6 +127,12 @@ export const logOut: string =
   'not-disabled:hover:bg-secondary-dark/5 not-disabled:hover:shadow-button-muted-hover ' +
   'md:h-[42px] md:rounded-[11px] md:text-[20px]';
 
+/** Delete Account: a quiet destructive link under Log Out, so it is never pressed by habit. */
+export const deleteAccount: string =
+  'mx-auto inline-flex cursor-pointer items-center gap-[8px] rounded-sm text-md leading-[22px] ' +
+  'font-bold text-accent-red underline-offset-2 not-disabled:hover:underline ' +
+  'disabled:cursor-default disabled:opacity-60 md:text-sm md:leading-[18px]';
+
 export const logOutError: string =
   'text-center text-md leading-[1.3] font-bold text-accent-red md:text-sm';
 

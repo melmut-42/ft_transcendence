@@ -73,6 +73,29 @@
 			"confirm": "Se déconnecter",
 			"pending": "Déconnexion…",
 			"failed": "Impossible de te déconnecter. Réessaie."
+		},
+		"oauth": {
+			"or": "ou",
+			"continue": "Continuer avec Google",
+			"redirecting": "Redirection vers Google…",
+			"error": {
+				"OAUTH_CANCELLED": {
+					"title": "Connexion Google annulée",
+					"body": "Vous pouvez réessayer ou vous connecter avec votre e-mail."
+				},
+				"OAUTH_STATE_INVALID": {
+					"title": "Connexion Google expirée",
+					"body": "La connexion a pris trop de temps ou a été interrompue. Réessayez."
+				},
+				"OAUTH_EMAIL_UNVERIFIED": {
+					"title": "E-mail non vérifié",
+					"body": "L'e-mail de votre compte Google n'est pas vérifié. Vérifiez-le chez Google ou connectez-vous avec votre e-mail."
+				},
+				"OAUTH_PROVIDER_ERROR": {
+					"title": "Échec de la connexion Google",
+					"body": "Impossible de vous connecter avec Google. Réessayez dans un instant."
+				}
+			}
 		}
 	},
 	"landing": {
@@ -99,7 +122,8 @@
 		"privacy": "Politique de confidentialité",
 		"terms": "Conditions d'utilisation",
 		"help": "Aide",
-		"copyright": "© 2026 équipe ft_transcendence. Créé pour les étudiants de 42 İstanbul (ft_transcendence). Tous droits réservés."
+		"copyright": "© 2026 équipe ft_transcendence. Créé pour les étudiants de 42 İstanbul (ft_transcendence). Tous droits réservés.",
+		"accountDeleted": "Votre compte a été supprimé."
 	},
 	"legal": {
 		"wordmark": "Codenames Online",
@@ -698,6 +722,39 @@
 				"PLAYER_FORFEIT": "Abandon"
 			},
 			"scoreLabel": "Score final : votre équipe {{own}}, l'autre équipe {{other}}"
+		},
+		"report": {
+			"action": "Signaler le joueur",
+			"reported": "Signalé",
+			"back": "Retour au profil",
+			"title": "Signaler {{username}}",
+			"subtitle": "Dites-nous ce qui s'est passé. Le joueur ne saura pas qui l'a signalé.",
+			"reasonLabel": "Motif",
+			"reasonHint": "Choisissez un motif pour continuer.",
+			"reason": {
+				"HARASSMENT": "Harcèlement ou insultes",
+				"CHEATING": "Triche",
+				"OFFENSIVE_USERNAME": "Nom d'utilisateur offensant",
+				"SPAM": "Spam",
+				"OTHER": "Autre chose"
+			},
+			"detailsLabel": "Détails (facultatif)",
+			"detailsPlaceholder": "Que s'est-il passé, et quand ?",
+			"detailsCount": "{{count}} / {{max}}",
+			"cancel": "Annuler",
+			"submit": "Envoyer le signalement",
+			"sending": "Envoi…",
+			"done": "Terminé",
+			"outcome": {
+				"SENT": "Merci. Votre signalement concernant {{username}} a été envoyé pour examen.",
+				"ALREADY_REPORTED": "Vous avez déjà signalé {{username}} récemment. Votre signalement précédent est en cours d'examen."
+			},
+			"error": {
+				"NOT_FOUND": "Le compte de {{username}} n'existe plus.",
+				"RATE_LIMITED": "Trop de signalements. Patientez un instant, puis réessayez.",
+				"INVALID": "Le signalement n'a pas été accepté. Vérifiez le motif et les détails.",
+				"FAILED": "Le signalement n'a pas pu être envoyé. Réessayez."
+			}
 		}
 	},
 	"chat": {
@@ -886,6 +943,22 @@
 			"cancel": "Annuler",
 			"save": "Enregistrer l'avatar",
 			"saving": "Enregistrement…"
+		},
+		"deleteAccount": {
+			"button": "Supprimer le compte",
+			"title": "Supprimer le compte ?",
+			"body": "Cette action supprime définitivement votre compte, votre profil, vos amis, vos statistiques et vos messages. Elle est irréversible.",
+			"inMatch": "Vous êtes en partie. Supprimer votre compte vous en retire aussi.",
+			"confirmLabel": "Tapez <name>{{username}}</name> pour confirmer",
+			"confirmHint": "Votre nom d'utilisateur, tel qu'il apparaît sur votre profil.",
+			"cancel": "Annuler",
+			"confirm": "Supprimer",
+			"pending": "Suppression…",
+			"error": {
+				"MISMATCH": "Ce n'est pas votre nom d'utilisateur. Tapez-le exactement pour confirmer.",
+				"RATE_LIMITED": "Trop de tentatives. Patientez un instant, puis réessayez.",
+				"FAILED": "Impossible de supprimer votre compte. Réessayez."
+			}
 		}
 	}
 }

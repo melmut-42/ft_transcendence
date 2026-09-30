@@ -31,9 +31,13 @@ interface SessionState {
    * guard then takes them to Landing instead of asking them to log in again.
    */
   loggedOut: boolean;
+  /** The session ended because the user deleted their own account; Landing says so once. */
+  accountDeleted: boolean;
 
   setSession: (session: SessionResponse) => void;
-  setAnonymous: (options?: { loggedOut?: boolean }) => void;
+  setAnonymous: (options?: { loggedOut?: boolean; accountDeleted?: boolean }) => void;
+  /** Landing has shown the account-deleted notice. */
+  acknowledgeAccountDeleted: () => void;
   setActiveRoomId: (roomId: number | null) => void;
   /** The username the server confirmed after the user renamed themselves. */
   setUsername: (username: string) => void;
@@ -45,6 +49,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   activeRoomId: null,
   sessionExpiresAt: null,
   loggedOut: false,
+  accountDeleted: false,
 
   setSession: (session) =>
     set({
@@ -53,16 +58,20 @@ export const useSessionStore = create<SessionState>((set) => ({
       activeRoomId: session.active_room_id,
       sessionExpiresAt: session.session_expires_at,
       loggedOut: false,
+      accountDeleted: false,
     }),
 
-  setAnonymous: ({ loggedOut = false } = {}) =>
+  setAnonymous: ({ loggedOut = false, accountDeleted = false } = {}) =>
     set({
       status: 'ANONYMOUS',
       user: null,
       activeRoomId: null,
       sessionExpiresAt: null,
-      loggedOut,
+      loggedOut: loggedOut || accountDeleted,
+      accountDeleted,
     }),
+
+  acknowledgeAccountDeleted: () => set({ accountDeleted: false }),
 
   setActiveRoomId: (activeRoomId) => set({ activeRoomId }),
 

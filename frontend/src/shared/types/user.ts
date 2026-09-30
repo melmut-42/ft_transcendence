@@ -61,6 +61,40 @@ export interface SelectAvatarPresetRequest {
   preset_id: string;
 }
 
+/** `DELETE /api/users/me` body: the current username, typed as confirmation. */
+export interface DeleteOwnAccountRequest {
+  confirm_username: string;
+}
+
+/** Report categories for `POST /api/users/{user_id}/reports`. */
+export const REPORT_REASONS = [
+  'HARASSMENT',
+  'CHEATING',
+  'OFFENSIVE_USERNAME',
+  'SPAM',
+  'OTHER',
+] as const;
+
+export type ReportReason = (typeof REPORT_REASONS)[number];
+
+/** Longest `details` text a report accepts, after trimming. */
+export const REPORT_DETAILS_MAX = 500;
+
+/** `POST /api/users/{user_id}/reports` body. */
+export interface ReportUserRequest {
+  reason: ReportReason;
+  details?: string;
+  /** The room it happened in, for context. */
+  room_id?: number;
+}
+
+export interface ReportUserResponse {
+  report_id: number;
+  reported_user_id: number;
+  reason: ReportReason;
+  created_at: string;
+}
+
 /** `GET /api/friends` entry, and the `POST /api/friends` response body. */
 export interface Friend {
   user_id: number;

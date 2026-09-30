@@ -1,19 +1,26 @@
 import { useState } from 'react';
 
+import { useDeleteAccount } from '@app/session/useDeleteAccount';
 import { useLogOut } from '@app/session/useLogOut';
 import { LogOutDialog } from '@features/auth/components/LogOutDialog';
+import { DeleteAccountDialog } from '@features/profile/components/DeleteAccountDialog';
 import { SettingsModal } from '@features/profile/components/SettingsModal';
 import { useRoomStore } from '@features/room/store/roomStore';
 import { useSessionStore } from '@shared/stores';
 
+type Confirmation = 'LOG_OUT' | 'DELETE_ACCOUNT' | null;
+
 /**
  * Settings with what it needs from other features, joined here at app level so no feature
- * imports another: Log Out from the session flow, and from the room store whether the user
- * is in a running match, where logging out forfeits and is confirmed first.
+ * imports another: Log Out and Delete Account from the session flow, and from the room
+ * store whether the user is in a running match, where logging out forfeits and is
+ * confirmed first. Delete Account is always confirmed.
  */
 export function SettingsPopup({ onClose }: { onClose: () => void }) {
   const { status, logOut } = useLogOut();
-  const [confirming, setConfirming] = useState(false);
+  const removal = useDeleteAccount();
+  const [confirming, setConfirming] = useState<Confirmation>(null);
+  const username = useSessionStore((state) => state.user?.username ?? '');
   const activeRoomId = useSessionStore((state) => state.activeRoomId);
   const inMatch = useRoomStore(
     (state) =>
@@ -22,22 +29,38 @@ export function SettingsPopup({ onClose }: { onClose: () => void }) {
       state.room.status === 'IN_GAME',
   );
 
+  const cancelDelete = () => {
+    removal.reset();
+    setConfirming(null);
+  };
+
   return (
     <>
       <SettingsModal
         onClose={onClose}
-        active={!confirming}
+        active={confirming === null}
         logOut={{
-          status: confirming ? 'IDLE' : status,
-          request: () => (inMatch ? setConfirming(true) : void logOut()),
+          status: confirming === 'LOG_OUT' ? 'IDLE' : status,
+          request: () => (inMatch ? setConfirming('LOG_OUT') : void logOut()),
         }}
+        deleteAccount={{ request: () => setConfirming('DELETE_ACCOUNT') }}
       />
-      {confirming && (
+      {confirming === 'LOG_OUT' && (
         <LogOutDialog
           pending={status === 'PENDING'}
           failed={status === 'FAILED'}
           onConfirm={() => void logOut()}
-          onCancel={() => setConfirming(false)}
+          onCancel={() => setConfirming(null)}
+        />
+      )}
+      {confirming === 'DELETE_ACCOUNT' && (
+        <DeleteAccountDialog
+          username={username}
+          inMatch={inMatch}
+          pending={removal.status === 'PENDING'}
+          failure={removal.failure}
+          onConfirm={(typed) => void removal.deleteAccount(typed)}
+          onCancel={cancelDelete}
         />
       )}
     </>
