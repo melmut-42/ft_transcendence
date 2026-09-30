@@ -1,6 +1,5 @@
 package game
 
-
 const (
 	BoardSize          int = 25
 	StartTeamCardsSize int = 9
@@ -8,15 +7,6 @@ const (
 	NeutralCardsSize   int = 7
 	AssassinCardsSize  int = 1
 )
-
-type Word struct {
-	Key          string            `json:"key"`
-	Translations map[string]string `json:"translations"`
-}
-
-type WordPack struct {
-	Words []Word `json:"words"`
-}
 
 type Card struct {
 	CardID   int       `json:"card_id"`
@@ -26,25 +16,12 @@ type Card struct {
 }
 
 type Board struct {
-	cards [BoardSize]Card
+	cards        [BoardSize]Card
+	startingTeam Team
 }
 
-func NewBoard(cards []Card) (*Board, error) {
-	if len(cards) != BoardSize {
-		return nil, ErrInvalidCard
-	}
-
-	board := &Board{}
-
-	for i, card := range cards {
-		if card.CardID != i+1 || card.Word == "" {
-			return nil, ErrInvalidCard
-		}
-
-		board.cards[i] = card
-	}
-
-	return board, nil
+func (b *Board) StartingTeam() Team {
+	return b.startingTeam
 }
 
 func (b *Board) Cards() []Card {
@@ -52,6 +29,20 @@ func (b *Board) Cards() []Card {
 	copy(cards, b.cards[:])
 
 	return cards
+}
+
+func NewBoard(wordPool []Word, language string) (*Board, error) {
+	cards, startingTeam, err := generateCards(wordPool, language)
+	if err != nil {
+		return nil, err
+	}
+
+	board := &Board{
+		startingTeam: startingTeam,
+	}
+	copy(board.cards[:], cards)
+
+	return board, nil
 }
 
 func (b *Board) Reveal(cardID int) (Card, error) {

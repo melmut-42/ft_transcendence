@@ -16,21 +16,22 @@ func loadTestWordPack(t *testing.T) WordPack {
 
 	var wordPack WordPack
 
-	err = json.Unmarshal(data, &wordPack)
-	if err != nil {
+	if err := json.Unmarshal(data, &wordPack); err != nil {
 		t.Fatalf("could not parse wordpack.json: %v", err)
 	}
 
 	return wordPack
 }
 
-func TestGenerateCardsWithRealWordPack(t *testing.T) {
+func TestNewBoardWithRealWordPack(t *testing.T) {
 	wordPack := loadTestWordPack(t)
 
-	cards, startingTeam, err := GenerateCards(wordPack.Words, "en")
+	board, err := NewBoard(wordPack.Words, "en")
 	if err != nil {
-		t.Fatalf("GenerateCards returned an error: %v", err)
+		t.Fatalf("NewBoard returned an error: %v", err)
 	}
+
+	cards := board.Cards()
 
 	if len(cards) != BoardSize {
 		t.Fatalf("expected %d cards, got %d", BoardSize, len(cards))
@@ -39,7 +40,15 @@ func TestGenerateCardsWithRealWordPack(t *testing.T) {
 	seenWords := make(map[string]bool)
 	colorCounts := make(map[CardColor]int)
 
-	for _, card := range cards {
+	for i, card := range cards {
+		if card.CardID != i+1 {
+			t.Errorf("expected CardID %d, got %d", i+1, card.CardID)
+		}
+
+		if card.Revealed {
+			t.Errorf("card %d should start unrevealed", card.CardID)
+		}
+
 		if seenWords[card.Word] {
 			t.Errorf("same word was selected twice: %s", card.Word)
 		}
@@ -51,35 +60,39 @@ func TestGenerateCardsWithRealWordPack(t *testing.T) {
 	startColor := CardColorRed
 	otherColor := CardColorBlue
 
-	if startingTeam == TeamBlue {
+	if board.StartingTeam() == TeamBlue {
 		startColor = CardColorBlue
 		otherColor = CardColorRed
 	}
 
-	if colorCounts[startColor] != 9 {
-		t.Errorf("starting team should have 9 cards, got %d", colorCounts[startColor])
+	if colorCounts[startColor] != StartTeamCardsSize {
+		t.Errorf("starting team should have %d cards, got %d",
+			StartTeamCardsSize, colorCounts[startColor])
 	}
 
-	if colorCounts[otherColor] != 8 {
-		t.Errorf("other team should have 8 cards, got %d", colorCounts[otherColor])
+	if colorCounts[otherColor] != OtherTeamCardsSize {
+		t.Errorf("other team should have %d cards, got %d",
+			OtherTeamCardsSize, colorCounts[otherColor])
 	}
 
-	if colorCounts[CardColorNeutral] != 7 {
-		t.Errorf("expected 7 neutral cards, got %d", colorCounts[CardColorNeutral])
+	if colorCounts[CardColorNeutral] != NeutralCardsSize {
+		t.Errorf("expected %d neutral cards, got %d",
+			NeutralCardsSize, colorCounts[CardColorNeutral])
 	}
 
-	if colorCounts[CardColorAssassin] != 1 {
-		t.Errorf("expected 1 assassin card, got %d", colorCounts[CardColorAssassin])
+	if colorCounts[CardColorAssassin] != AssassinCardsSize {
+		t.Errorf("expected %d assassin card, got %d",
+			AssassinCardsSize, colorCounts[CardColorAssassin])
 	}
-	t.Logf("Starting team: %v", startingTeam)
 
-for _, card := range cards {
-	t.Logf(
-		"CardID: %d | Word key: %s | Color: %v | Revealed: %t",
-		card.CardID,
-		card.Word,
-		card.Color,
-		card.Revealed,
-	)
-}
+	t.Logf("Starting team: %v", board.StartingTeam())
+	for _, card := range cards {
+		t.Logf(
+			"CardID: %2d | Word: %-15s | Color: %-7v | Revealed: %t",
+			card.CardID,
+			card.Word,
+			card.Color,
+			card.Revealed,
+		)
+	}
 }

@@ -1,23 +1,72 @@
 package game
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
 
-func pickWords(pool []Word) ([]Word) {
-	indexes := rand.Perm(len(pool))
-	selectedWords := make([]Word, BoardSize)
+type Word struct {
+	Key          string            `json:"key"`
+	Translations map[string]string `json:"translations"`
+}
 
-	for i, index := range indexes[:BoardSize] {
-		selectedWords[i] = pool[index]
+type WordPack struct {
+	Words []Word `json:"words"`
+}
+
+func validateWordPool(pool []Word, language string) error {
+	if len(pool) < BoardSize {
+		return fmt.Errorf("%w: have %d, need %d", ErrNotEnoughWords, len(pool), BoardSize)
 	}
 
-	return selectedWords
+	keys := make(map[string]struct{}, len(pool))
+	texts := make(map[string]string, len(pool))
+
+	for _, word := range pool {
+		if word.Key == "" {
+			return fmt.Errorf("%w: empty key", ErrInvalidWordPack)
+		}
+		if _, exists := keys[word.Key]; exists {
+			return fmt.Errorf("%w: duplicate key %q", ErrInvalidWordPack, word.Key)
+		}
+		keys[word.Key] = struct{}{}
+
+		text := word.Translations[language]
+		if text == "" {
+			return fmt.Errorf("%w: key %q has no %q translation", ErrInvalidWordPack, word.Key, language)
+		}
+		texts[text] = word.Key
+	}
+
+	return nil
+}
+
+func pickWords(pool []Word, language string) ([]Word, error) {
+	indexes := rand.Perm(len(pool))
+	seen := make(map[string]struct{}, BoardSize)
+	selectedWords := make([]Word, 0, BoardSize)
+
+	for _, index := range indexes {
+		word := pool[index]
+		text := word.Translations[language]
+		if _, exists := seen[text]; exists {
+			continue
+		}
+		seen[text] = struct{}{}
+		selectedWords = append(selectedWords, word)
+
+		if len(selectedWords) == BoardSize {
+			return selectedWords, nil
+		}
+	}
+
+	return nil, fmt.Errorf("%w, only %d unique texts for %q", ErrNotEnoughWords, len(selectedWords), language)
 }
 
 func randomTeam() Team {
 	if rand.Intn(2) == 0 {
 		return TeamRed
 	}
-
 	return TeamBlue
 }
 
@@ -51,12 +100,18 @@ func buildColors(startingTeam Team) []CardColor {
 	return colors
 }
 
-func GenerateCards(wordPool []Word, language string) ([]Card, Team, error) {
-	words := pickWords(wordPool)
+func generateCards(wordPool []Word, language string) ([]Card, Team, error) {
+	if err := validateWordPool(wordPool, language); err != nil {
+		return nil, "", err
+	}
+
+	words, err := pickWords(wordPool, language)
+	if err != nil {
+		return nil, "", err
+	}
 
 	startingTeam := randomTeam()
 	colors := buildColors(startingTeam)
-
 	cards := make([]Card, BoardSize)
 
 	for i, word := range words {
