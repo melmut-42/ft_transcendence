@@ -848,6 +848,10 @@
 				"FAILED": "Impossible d'enregistrer ton nom d'utilisateur. Réessaie."
 			}
 		},
+		"email": {
+			"label": "E-mail",
+			"hint": "Ton e-mail de connexion. Il ne peut pas être modifié ici."
+		},
 		"logOut": {
 			"button": "Se déconnecter",
 			"pending": "Déconnexion…",

@@ -7,6 +7,8 @@
 export interface OwnProfile {
   user_id: number;
   username: string;
+  /** Read-only; shown in Settings. */
+  email: string;
   avatar_url: string;
   level: number;
   wins: number;

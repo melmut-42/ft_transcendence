@@ -112,6 +112,9 @@ export const saveButton: string =
   `${primaryButton} h-[52px] w-[92px] rounded-[20px] text-2xl md:h-[45px] md:w-[120px] ` +
   'md:rounded-[16px] md:text-[18px]';
 
+/** The read-only email: muted, and no hover or focus change beyond the focus ring. */
+export const inputReadOnly: string = 'border-border bg-surface-muted text-text-slate';
+
 // ---- Account ----
 
 export const divider: string = 'h-[2px] w-full shrink-0 rounded-pill bg-surface-sunken';

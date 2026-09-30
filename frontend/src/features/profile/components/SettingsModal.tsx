@@ -51,6 +51,7 @@ export function SettingsModal({ onClose, logOut, active = true }: SettingsModalP
   const avatarNoteId = useId();
   const usernameId = useId();
   const usernameNoteId = useId();
+  const emailId = useId();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const uploadRef = useRef<HTMLButtonElement>(null);
   const pickRef = useRef<HTMLButtonElement>(null);
@@ -279,6 +280,28 @@ export function SettingsModal({ onClose, logOut, active = true }: SettingsModalP
               </p>
             )}
           </form>
+
+          {profile && (
+            <div className={styles.section}>
+              <label htmlFor={emailId} className={styles.label}>
+                {t('settings.email.label')}
+              </label>
+              <div className={styles.inputWrap}>
+                <Icon name="email" className={styles.inputIcon} />
+                <input
+                  id={emailId}
+                  type="email"
+                  value={profile.email}
+                  readOnly
+                  aria-describedby={`${emailId}-hint`}
+                  className={cn(styles.input, styles.inputReadOnly)}
+                />
+              </div>
+              <p id={`${emailId}-hint`} className={styles.hint}>
+                {t('settings.email.hint')}
+              </p>
+            </div>
+          )}
 
           <span aria-hidden="true" className={styles.divider} />
 

@@ -848,6 +848,10 @@
 				"FAILED": "Kullanıcı adın kaydedilemedi. Tekrar dene."
 			}
 		},
+		"email": {
+			"label": "E-posta",
+			"hint": "Giriş e-postan. Buradan değiştirilemez."
+		},
 		"logOut": {
 			"button": "Çıkış Yap",
 			"pending": "Çıkış yapılıyor…",

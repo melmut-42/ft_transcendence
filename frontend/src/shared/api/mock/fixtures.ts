@@ -201,6 +201,7 @@ export function toOwnProfile(account: MockAccount, activeRoomId: number | null):
   return {
     user_id: account.user_id,
     username: account.username,
+    email: account.email,
     avatar_url: account.avatar_url,
     level: account.level,
     wins: account.wins,
