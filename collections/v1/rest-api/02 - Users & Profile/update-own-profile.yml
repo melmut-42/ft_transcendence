@@ -62,6 +62,7 @@ examples:
             "data": {
               "user_id": 42,
               "username": "player_one_updated",
+              "email": "player.one@example.com",
               "avatar_url": "https://{{baseUrl}}/static/avatars/default/42.svg",
               "level": 4,
               "wins": 12,

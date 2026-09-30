@@ -14,7 +14,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Returns authenticated persistent statistics plus the current room link. Requires an active session.
+  Returns the owner's account details (including the read-only login email), persistent statistics, and the current room link. Requires an active session.
 
   ## Request parameters
 
@@ -29,6 +29,7 @@ docs: |-
   | --- | --- | ---: | ---: | --- | --- |
   | `data.user_id` | integer | yes | no | positive | Persistent user ID |
   | `data.username` | string | yes | no | username rule | Display username |
+  | `data.email` | string | yes | no | valid email | Login identifier; read-only, visible only to its owner |
   | `data.avatar_url` | string | yes | no | URL | Uploaded avatar, or the deterministic default if none uploaded |
   | `data.level` | integer | yes | no | `>= 1` | Persistent progression level |
   | `data.wins` | integer | yes | no | `>= 0` | Finished matches won |
@@ -54,6 +55,7 @@ examples:
             "data": {
               "user_id": 42,
               "username": "player_one",
+              "email": "player.one@example.com",
               "avatar_url": "https://{{baseUrl}}/static/avatars/default/42.svg",
               "level": 4,
               "wins": 12,
@@ -76,6 +78,7 @@ examples:
             "data": {
               "user_id": 42,
               "username": "player_one",
+              "email": "player.one@example.com",
               "avatar_url": "https://{{baseUrl}}/static/avatars/default/42.svg",
               "level": 4,
               "wins": 12,
