@@ -373,7 +373,23 @@
 			"failedTitle": "Couldn't connect to the room",
 			"failedBody": "Check your connection and try again.",
 			"reconnecting": "Reconnecting…",
-			"reconnectingBody": "Your seat is held while we reconnect you."
+			"reconnectingBody": {
+				"game": "We're holding your seat in the match. Stay on this page.",
+				"room": "We're holding your seat in the room. Stay on this page.",
+				"finished": "We're getting you back to the results. Stay on this page."
+			},
+			"secondsLeft": {
+				"game": "{{seconds}}s left before forfeit",
+				"room": "{{seconds}}s left to keep your seat"
+			},
+			"leave": {
+				"game": "Leave Match",
+				"room": "Leave Room",
+				"finished": "Back to Lobby"
+			},
+			"lostTitle": "Connection lost",
+			"lostBody": "You were away too long, so you left the room. Your account and stats are safe.",
+			"backToLobby": "Back to Lobby"
 		},
 		"leave": {
 			"action": "Leave Room",

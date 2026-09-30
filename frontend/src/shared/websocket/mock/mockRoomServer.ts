@@ -115,6 +115,13 @@ export class MockRoomServer implements MockServerBinding {
   private eventSeq = 0;
   private readonly endpoints = new Set<MockEndpoint>();
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
+  /** Running while `self` is away after a drop; ends in a removal or a forfeit. */
+  private graceTimer: ReturnType<typeof setTimeout> | null = null;
+  /**
+   * The seat the server holds for a dropped player, per the contract's defaults. Lower it
+   * from the console to reach the end of a grace period sooner.
+   */
+  graceMs = { room: 30_000, game: 60_000 };
   private readonly random: () => number;
 
   /**
@@ -150,12 +157,34 @@ export class MockRoomServer implements MockServerBinding {
 
   onOpen(endpoint: MockEndpoint): void {
     this.endpoints.add(endpoint);
+    this.stopGraceTimer();
     // The Gateway sends the authoritative snapshot on every (re)connect.
     endpoint.deliver(this.envelope('room.state', { room: this.projectRoom() }));
   }
 
-  onClose(endpoint: MockEndpoint): void {
+  /**
+   * A drop never changes membership at once: once `self`'s last socket is gone the seat is
+   * held for the grace period, then the member is removed (`WAITING`/`COUNTDOWN`) or the
+   * match ends by `PLAYER_FORFEIT` (`IN_GAME`), as the Gateway does.
+   */
+  onClose(endpoint: MockEndpoint, dropped: boolean): void {
     this.endpoints.delete(endpoint);
+    if (!dropped || this.endpoints.size > 0 || !this.find(this.self.user_id)) return;
+    const status = this.room.status;
+    if (status === 'FINISHED' || status === 'CLOSED') return;
+    this.stopGraceTimer();
+    const graceMs = status === 'IN_GAME' ? this.graceMs.game : this.graceMs.room;
+    this.graceTimer = setTimeout(() => {
+      this.graceTimer = null;
+      if (this.endpoints.size === 0 && this.find(this.self.user_id)) {
+        this.playerLeave(this.self.user_id);
+      }
+    }, graceMs);
+  }
+
+  /** The handshake is refused once `self` no longer belongs to the room. */
+  accepts(): boolean {
+    return this.room.status !== 'CLOSED' && this.find(this.self.user_id) !== undefined;
   }
 
   onCommand(endpoint: MockEndpoint, raw: unknown): void {
@@ -351,6 +380,13 @@ export class MockRoomServer implements MockServerBinding {
   /** Drop every socket for this room; the client reconnects and receives a fresh snapshot. */
   dropConnection(reconnectAfterMs?: number): void {
     [...this.endpoints].forEach((endpoint) => endpoint.simulateDrop(reconnectAfterMs));
+  }
+
+  private stopGraceTimer(): void {
+    if (this.graceTimer !== null) {
+      clearTimeout(this.graceTimer);
+      this.graceTimer = null;
+    }
   }
 
   /** Send the current snapshot to every socket, as the server does after recovery. */

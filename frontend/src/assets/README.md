@@ -22,3 +22,7 @@ word card components of `ui-design/ui.pen`: the patterned face of a hidden word 
 skull on the assassin card, and the trophy illustration of the Results card. The trophy
 and star glyphs in the trophy illustration are Font Awesome Free icons (CC BY 4.0), the
 same icon set the rest of the interface uses.
+
+`connection/` holds the badge of the Disconnected notice, drawn from the Disconnected page
+of `ui-design/ui.pen`: its circle, and the `wifi_off` glyph the design sets in Material
+Symbols Rounded at weight 700 (Apache License 2.0), at the design's size and colors.

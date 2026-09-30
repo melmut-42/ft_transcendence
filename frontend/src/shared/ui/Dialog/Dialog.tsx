@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
-import { useFocusTrap } from '@shared/hooks';
+import { useFocusTrap, useScrollLock } from '@shared/hooks';
 import { cn } from '@shared/utils';
 import { Icon } from '@shared/ui/Icon';
 
@@ -71,17 +71,7 @@ export function Dialog({
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(dialogRef);
-
-  useEffect(() => {
-    const { overflow, paddingRight } = document.body.style;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = 'hidden';
-    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
-    return () => {
-      document.body.style.overflow = overflow;
-      document.body.style.paddingRight = paddingRight;
-    };
-  }, []);
+  useScrollLock();
 
   useEffect(() => {
     if (!closable) return;

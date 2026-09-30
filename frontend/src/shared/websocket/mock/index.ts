@@ -22,10 +22,13 @@
  *   mockSockets.guess('NEUTRAL')                 // RED | BLUE | NEUTRAL | ASSASSIN
  *   mockSockets.room().passTurn()
  *   mockSockets.room().dropConnection(3000)      // RECONNECTING, then a fresh room.state
+ *   mockSockets.offline(20000)                   // network down for 20s (sockets and REST)
+ *   mockSockets.online()                         // network back; sockets reconnect
+ *   mockSockets.room().graceMs.game = 10000      // shorter seat hold for the next drop
  *   mockSockets.chat.inviteReceived({ user_id: 43, username: 'red_agent' }, 1002, 'QWER12')
  */
 
-import { WS_BASE_PATH, WS_CHAT_PATH } from '@shared/constants';
+import { RECONNECT, WS_BASE_PATH, WS_CHAT_PATH } from '@shared/constants';
 import type { CardColor } from '@shared/types';
 
 import { setTransportFactory } from '../transport';
@@ -33,14 +36,14 @@ import type { TransportFactory } from '../transport';
 import { MockChatServer } from './mockChatServer';
 import { MockRoomServer } from './mockRoomServer';
 import { MockTransport } from './mockTransport';
-import { mockRooms, mockSelfPlayer } from './registry';
+import { mockNetwork, mockRooms, mockSelfPlayer } from './registry';
 import { ROOM_SCENARIOS, applyRoomScenario, guessByColor, isRoomScenario } from './scenarios';
 import type { RoomScenario } from './scenarios';
 
 export { MOCK_BOTS, MockActionError, MockRoomServer } from './mockRoomServer';
 export type { MockPlayer } from './mockRoomServer';
 export { MockChatServer } from './mockChatServer';
-export { mockRooms, mockSelfPlayer } from './registry';
+export { mockNetwork, mockRooms, mockSelfPlayer, mockSession } from './registry';
 export { ROOM_SCENARIOS, applyRoomScenario, guessByColor } from './scenarios';
 export type { RoomScenario } from './scenarios';
 
@@ -59,6 +62,13 @@ export interface MockSockets {
    * open room socket reconnect to it, so the client receives the new `room.state`.
    */
   scenario(scenario: RoomScenario, roomId?: number): MockRoomServer;
+  /**
+   * Take the network down: every open socket drops and no socket or REST call gets
+   * through until `online()`, or until `forMs` has passed when it is given. The rooms keep
+   * running meanwhile, so other players' moves are missed and come back in the snapshot.
+   */
+  offline(forMs?: number): void;
+  online(): void;
   /** Active-team guess of the first unrevealed card of `color`. Returns the card id. */
   guess(color: CardColor, byUserId?: number): number;
   /** Restore the browser WebSocket transport for sockets created afterwards. */
@@ -76,6 +86,7 @@ export function installMockSockets(): MockSockets {
   const rooms = mockRooms;
   const chat = new MockChatServer();
   let lastRoomId: number | null = null;
+  let onlineTimer: ReturnType<typeof setTimeout> | undefined;
   const roomPattern = new RegExp(`^${WS_BASE_PATH}/rooms/(\\d+)$`);
 
   const factory: TransportFactory = (options) => {
@@ -89,8 +100,9 @@ export function installMockSockets(): MockSockets {
     const current = (): MockRoomServer => rooms.get(roomId) ?? freshRoom(roomId, 'empty');
     return new MockTransport(options, {
       onOpen: (endpoint) => current().onOpen(endpoint),
-      onClose: (endpoint) => current().onClose(endpoint),
+      onClose: (endpoint, dropped) => current().onClose(endpoint, dropped),
       onCommand: (endpoint, message) => current().onCommand(endpoint, message),
+      accepts: () => current().accepts(),
     });
   };
 
@@ -112,6 +124,17 @@ export function installMockSockets(): MockSockets {
       // on the next tick and land on the fresh one.
       rooms.get(id)?.dropConnection(0);
       return freshRoom(id, scenario);
+    },
+    offline(forMs) {
+      mockNetwork.online = false;
+      clearTimeout(onlineTimer);
+      rooms.forEach((server) => server.dropConnection(RECONNECT.initialDelayMs));
+      chat.dropConnection(RECONNECT.initialDelayMs);
+      if (forMs !== undefined) onlineTimer = setTimeout(() => api.online(), forMs);
+    },
+    online() {
+      clearTimeout(onlineTimer);
+      mockNetwork.online = true;
     },
     guess(color, byUserId) {
       return guessByColor(api.room(), color, byUserId);

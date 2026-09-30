@@ -15,6 +15,11 @@ import type { ManagedSocketOptions } from './managedSocket';
 export interface SocketTransport<TOutbound> {
   connect(): void;
   disconnect(): void;
+  /**
+   * Drop the current socket and open a new one at once, without passing through `CLOSED`:
+   * the status goes to `RECONNECTING` and then `OPEN`. Used to take a fresh snapshot.
+   */
+  reconnect(): void;
   /** `false` when the transport is not open. Nothing is queued. */
   send(message: TOutbound): boolean;
   getStatus(): ConnectionStatus;

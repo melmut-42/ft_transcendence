@@ -47,4 +47,27 @@ export const RECONNECT = {
   maxDelayMs: 5_000,
   /** `null` means keep retrying; the grace period decides the real deadline. */
   maxAttempts: null as number | null,
+  /** An open room socket that sends no `room.state` within this time is reconnected. */
+  snapshotTimeoutMs: 10_000,
+  /**
+   * While the room socket retries, at most one REST room snapshot per interval checks
+   * what a failed handshake cannot report: a room that is gone, a membership that ended
+   * or a session that needs a refresh.
+   */
+  probeIntervalMs: 3_000,
+  /** How long a first connection may keep failing before the room offers Try again. */
+  firstConnectTimeoutMs: 20_000,
+  /** A drop shorter than this recovers without flashing the Reconnecting overlay. */
+  overlayDelayMs: 400,
+} as const;
+
+/**
+ * The seat the server holds for a dropped player: 30s by default in `WAITING`/`COUNTDOWN`
+ * and 60s `IN_GAME`. After it the server removes the member or ends the match by
+ * `PLAYER_FORFEIT`, so the client stops trying and reports the room as lost. The client
+ * only counts from its own drop; the server's timer is the one that decides.
+ */
+export const GRACE_PERIOD_MS = {
+  room: 30_000,
+  game: 60_000,
 } as const;

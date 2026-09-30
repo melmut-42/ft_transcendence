@@ -8,11 +8,18 @@
  * result the server did not accept. One command runs at a time; a second press while one
  * is in flight is dropped. That lock only spares the server a repeated request — the
  * server serializes the room's commands itself.
+ *
+ * Nothing is sent while the room connection is down or still restoring its snapshot, and
+ * nothing is ever resent after a reconnect: a pick whose answer was lost with the socket
+ * may or may not have been played, and the fresh snapshot is what says which. A drop
+ * clears the pending pick and any message on screen, since both belong to a state that
+ * may no longer be current.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useRoomConnection } from '@app/connection/roomConnectionContext';
+import { useConnectionStore } from '@shared/stores';
 import { RoomCommandError } from '@shared/websocket';
 
 export type GameAction = 'clue' | 'guess' | 'pass';
@@ -66,6 +73,7 @@ function messageFor(error: unknown): string {
 
 export function useGameActions() {
   const connection = useRoomConnection();
+  const online = useConnectionStore((state) => state.room.status === 'OPEN');
   const [pending, setPending] = useState<GameAction | null>(null);
   /** The card whose pick is on its way to the server. */
   const [pickedCard, setPickedCard] = useState<number | null>(null);
@@ -80,9 +88,14 @@ export function useGameActions() {
     };
   }, []);
 
+  // A message about a state the connection has since lost would only mislead.
+  useEffect(() => {
+    if (!online) setFeedback(null);
+  }, [online]);
+
   const run = useCallback(
     async (action: GameAction, send: () => Promise<unknown>): Promise<boolean> => {
-      if (busy.current) return false;
+      if (busy.current || connection.getStatus() !== 'OPEN') return false;
       busy.current = true;
       setPending(action);
       setFeedback(null);
@@ -91,7 +104,10 @@ export function useGameActions() {
         return true;
       } catch (error) {
         if (error instanceof RoomCommandError && STALE_STATE.has(error.code)) connection.resync();
-        if (mounted.current) setFeedback({ action, message: messageFor(error) });
+        // A lost answer is not a refusal: the Reconnecting overlay covers it, and the
+        // snapshot shows whether the command was played.
+        const lost = error instanceof RoomCommandError && error.code === 'CONNECTION_LOST';
+        if (mounted.current && !lost) setFeedback({ action, message: messageFor(error) });
         return false;
       } finally {
         busy.current = false;
@@ -117,7 +133,7 @@ export function useGameActions() {
     ),
     guessCard: useCallback(
       (cardId: number) => {
-        if (busy.current) return;
+        if (busy.current || connection.getStatus() !== 'OPEN') return;
         setPickedCard(cardId);
         void run('guess', () => connection.request('game.card.guess', { card_id: cardId }));
       },

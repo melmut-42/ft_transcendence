@@ -3,11 +3,14 @@
  *
  * `GET /api/friends` carries live presence, read fresh on every call; the server does not
  * push presence changes, so the list is as current as its last load. It loads when Room
- * Discovery opens and again on Try again after a failure.
+ * Discovery opens, again on Try again after a failure, and again, without the loading
+ * placeholders, when the realtime connection comes back after a drop: whatever changed
+ * while it was down is read fresh rather than trusted from before.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useConnectionStore } from '@shared/stores';
 import type { Friend } from '@shared/types';
 
 import { listFriends } from '../api';
@@ -21,17 +24,20 @@ export function useOnlineFriends() {
   const [status, setStatus] = useState<OnlineFriendsStatus>('LOADING');
   const mounted = useRef(true);
 
-  const load = useCallback(async () => {
-    setStatus('LOADING');
-    try {
-      const { friends: list, friend_count: count } = await listFriends();
-      if (!mounted.current) return;
-      setFriends(list, count);
-      setStatus('READY');
-    } catch {
-      if (mounted.current) setStatus('ERROR');
-    }
-  }, [setFriends]);
+  const load = useCallback(
+    async (quiet = false) => {
+      if (!quiet) setStatus('LOADING');
+      try {
+        const { friends: list, friend_count: count } = await listFriends();
+        if (!mounted.current) return;
+        setFriends(list, count);
+        setStatus('READY');
+      } catch {
+        if (mounted.current && !quiet) setStatus('ERROR');
+      }
+    },
+    [setFriends],
+  );
 
   useEffect(() => {
     mounted.current = true;
@@ -41,7 +47,17 @@ export function useOnlineFriends() {
     };
   }, [load]);
 
+  useEffect(
+    () =>
+      useConnectionStore.subscribe((state, previous) => {
+        if (state.chat.status === 'OPEN' && previous.chat.status === 'RECONNECTING') {
+          void load(true);
+        }
+      }),
+    [load],
+  );
+
   const online: Friend[] = friends.filter((friend) => friend.is_online);
 
-  return { online, status, retry: load };
+  return { online, status, retry: useCallback(() => load(), [load]) };
 }

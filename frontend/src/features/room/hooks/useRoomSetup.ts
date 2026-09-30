@@ -7,10 +7,16 @@
  * command that loses a race (two players taking the same Spymaster seat) never shows a
  * result the server did not accept. One command runs at a time; a second press while one
  * is in flight is dropped.
+ *
+ * Nothing is sent while the room connection is down or still restoring its snapshot, and
+ * nothing is resent after a reconnect: whether a Ready pressed just before a drop counted
+ * is for the fresh snapshot to say. A drop also clears any message on screen.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useRoomConnection } from '@app/connection/roomConnectionContext';
+import { useConnectionStore } from '@shared/stores';
 import { RoomCommandError } from '@shared/websocket';
 import type { RoomRole, Team } from '@shared/types';
 
@@ -49,6 +55,8 @@ function messageFor(error: unknown): string {
 
 export function useRoomSetup() {
   const commands = useRoomCommands();
+  const connection = useRoomConnection();
+  const online = useConnectionStore((state) => state.room.status === 'OPEN');
   const [pending, setPending] = useState<SetupAction | null>(null);
   const [feedback, setFeedback] = useState<SetupFeedback | null>(null);
   const busy = useRef(false);
@@ -61,20 +69,30 @@ export function useRoomSetup() {
     };
   }, []);
 
-  const run = useCallback(async (action: SetupAction, send: () => Promise<unknown>) => {
-    if (busy.current) return;
-    busy.current = true;
-    setPending(action);
-    setFeedback(null);
-    try {
-      await send();
-    } catch (error) {
-      if (mounted.current) setFeedback({ action, message: messageFor(error) });
-    } finally {
-      busy.current = false;
-      if (mounted.current) setPending(null);
-    }
-  }, []);
+  // A message about a state the connection has since lost would only mislead.
+  useEffect(() => {
+    if (!online) setFeedback(null);
+  }, [online]);
+
+  const run = useCallback(
+    async (action: SetupAction, send: () => Promise<unknown>) => {
+      if (busy.current || connection.getStatus() !== 'OPEN') return;
+      busy.current = true;
+      setPending(action);
+      setFeedback(null);
+      try {
+        await send();
+      } catch (error) {
+        // A lost answer is not a refusal; the snapshot shows whether the command counted.
+        const lost = error instanceof RoomCommandError && error.code === 'CONNECTION_LOST';
+        if (mounted.current && !lost) setFeedback({ action, message: messageFor(error) });
+      } finally {
+        busy.current = false;
+        if (mounted.current) setPending(null);
+      }
+    },
+    [connection],
+  );
 
   return {
     pending,

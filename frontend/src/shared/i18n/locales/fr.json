@@ -373,7 +373,23 @@
 			"failedTitle": "Connexion au salon impossible",
 			"failedBody": "Vérifiez votre connexion et réessayez.",
 			"reconnecting": "Reconnexion…",
-			"reconnectingBody": "Votre place est gardée pendant la reconnexion."
+			"reconnectingBody": {
+				"game": "Nous gardons votre place dans la partie. Restez sur cette page.",
+				"room": "Nous gardons votre place dans le salon. Restez sur cette page.",
+				"finished": "Nous vous ramenons aux résultats. Restez sur cette page."
+			},
+			"secondsLeft": {
+				"game": "{{seconds}} s avant l'abandon",
+				"room": "{{seconds}} s pour garder votre place"
+			},
+			"leave": {
+				"game": "Quitter la partie",
+				"room": "Quitter le salon",
+				"finished": "Retour au lobby"
+			},
+			"lostTitle": "Connexion perdue",
+			"lostBody": "Vous êtes resté absent trop longtemps, vous avez donc quitté le salon. Votre compte et vos statistiques sont intacts.",
+			"backToLobby": "Retour au lobby"
 		},
 		"leave": {
 			"action": "Quitter le salon",

@@ -75,17 +75,22 @@ export class ManagedSocket<TInbound, TOutbound> implements SocketTransport<TOutb
     if (this.socket && (this.status === 'OPEN' || this.status === 'CONNECTING')) return;
 
     this.closedByClient = false;
+    this.clearRetry();
     this.setStatus(this.attempt === 0 ? 'CONNECTING' : 'RECONNECTING');
 
     const socket = new WebSocket(toWebSocketUrl(this.options.path));
     this.socket = socket;
 
+    // Every handler checks that its socket is still the current one: a socket replaced by
+    // `reconnect()` or closed by `disconnect()` may still report a late close.
     socket.onopen = () => {
+      if (this.socket !== socket) return;
       this.attempt = 0;
       this.setStatus('OPEN');
     };
 
     socket.onmessage = (event: MessageEvent<string>) => {
+      if (this.socket !== socket) return;
       try {
         const parsed = JSON.parse(event.data) as TInbound;
         if (devFlags.logWebSocketTraffic) {
@@ -98,6 +103,7 @@ export class ManagedSocket<TInbound, TOutbound> implements SocketTransport<TOutb
     };
 
     socket.onclose = (event: CloseEvent) => {
+      if (this.socket !== socket) return;
       this.socket = null;
       const reason = this.closedByClient
         ? 'CLIENT_DISCONNECT'
@@ -119,9 +125,15 @@ export class ManagedSocket<TInbound, TOutbound> implements SocketTransport<TOutb
     this.closedByClient = true;
     this.clearRetry();
     this.attempt = 0;
-    this.socket?.close();
-    this.socket = null;
+    this.release();
     this.setStatus('CLOSED', 'CLIENT_DISCONNECT');
+  }
+
+  reconnect(): void {
+    this.clearRetry();
+    this.release();
+    this.attempt = Math.max(this.attempt, 1);
+    this.connect();
   }
 
   /**
@@ -150,6 +162,13 @@ export class ManagedSocket<TInbound, TOutbound> implements SocketTransport<TOutb
     this.setStatus('RECONNECTING', reason);
     this.clearRetry();
     this.retryTimer = setTimeout(() => this.connect(), delay);
+  }
+
+  /** Close the current socket, if any, without letting it report back. */
+  private release(): void {
+    const socket = this.socket;
+    this.socket = null;
+    socket?.close();
   }
 
   private clearRetry(): void {

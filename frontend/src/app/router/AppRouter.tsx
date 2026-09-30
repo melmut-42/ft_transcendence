@@ -3,6 +3,7 @@ import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-rou
 import { ChatMount } from '@app/chat/ChatMount';
 import { ModalHost } from '@app/modal/ModalHost';
 import { RoomConnectionProvider } from '@app/connection/RoomConnectionProvider';
+import { DisconnectedNotice } from '@features/room/components/ConnectionOverlay';
 import { GameLayout } from '@layouts/GameLayout';
 import { LobbyLayout } from '@layouts/LobbyLayout';
 import { PublicLayout } from '@layouts/PublicLayout';
@@ -26,6 +27,7 @@ function AppShell() {
       <Outlet />
       <ModalHost />
       <ChatMount />
+      <DisconnectedNotice />
     </>
   );
 }

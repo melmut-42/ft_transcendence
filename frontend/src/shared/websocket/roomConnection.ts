@@ -8,9 +8,15 @@
  *
  * This module deliberately implements no game rule. It correlates `request_id`s,
  * tracks `event_id` ordering, and hands every event to its subscriber unchanged.
+ *
+ * The status it reports is `OPEN` only once the socket is open *and* the server's
+ * `room.state` snapshot for that socket has been handed on. Between the two, the client's
+ * state may be stale (events were missed while it was away), so the status stays
+ * `CONNECTING` or `RECONNECTING` and no command is sent. A socket that opens but sends no
+ * snapshot in time is reconnected.
  */
 
-import { wsRoomPath } from '@shared/constants';
+import { RECONNECT, wsRoomPath } from '@shared/constants';
 import { createRequestId } from '@shared/utils';
 import type {
   AckMessage,
@@ -69,6 +75,11 @@ export class RoomConnection {
   private readonly socket: SocketTransport<RoomCommand>;
   private readonly ordering = new EventOrderTracker();
   private readonly pending = new Map<string, PendingRequest>();
+  /** The status last reported to the handlers. */
+  private status: ConnectionStatus = 'IDLE';
+  /** The socket is open and its `room.state` has not arrived yet. */
+  private awaitingSnapshot = false;
+  private snapshotTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly roomId: number;
   private readonly handlers: RoomConnectionHandlers;
@@ -79,15 +90,7 @@ export class RoomConnection {
     this.socket = createTransport<RoomServerMessage, RoomCommand>({
       name: `room:${roomId}`,
       path: wsRoomPath(roomId),
-      onStatusChange: (status, reason) => {
-        if (status === 'CONNECTING' || status === 'RECONNECTING') {
-          // The next `room.state` is the recovery snapshot, so prior ordering is moot.
-          this.ordering.reset();
-        }
-        // An answer never arrives over a socket that closed; the snapshot says what happened.
-        if (status !== 'OPEN') this.rejectPending();
-        this.handlers.onStatusChange?.(status, reason);
-      },
+      onStatusChange: (status, reason) => this.onSocketStatus(status, reason),
       onMessage: (message) => this.dispatch(message),
     });
   }
@@ -100,8 +103,18 @@ export class RoomConnection {
     this.socket.disconnect();
   }
 
+  /**
+   * Stop for good with a reason the socket itself could not see. A browser is never told
+   * why a handshake failed, so a room that is gone, a membership that ended or a revoked
+   * session found out another way (a REST check) closes the connection through here.
+   */
+  close(reason: ConnectionCloseReason): void {
+    this.socket.disconnect();
+    this.report('CLOSED', reason);
+  }
+
   getStatus(): ConnectionStatus {
-    return this.socket.getStatus();
+    return this.status;
   }
 
   /**
@@ -110,8 +123,7 @@ export class RoomConnection {
    * shows local state is behind the server's.
    */
   resync(): void {
-    this.socket.disconnect();
-    this.socket.connect();
+    this.socket.reconnect();
   }
 
   /**
@@ -124,7 +136,7 @@ export class RoomConnection {
   ): string | null {
     const requestId = createRequestId();
     const envelope = { type, request_id: requestId, payload } as RoomCommand;
-    return this.socket.send(envelope) ? requestId : null;
+    return this.status === 'OPEN' && this.socket.send(envelope) ? requestId : null;
   }
 
   /**
@@ -140,11 +152,43 @@ export class RoomConnection {
       const requestId = createRequestId();
       this.pending.set(requestId, { resolve, reject });
       const envelope = { type, request_id: requestId, payload } as RoomCommand;
-      if (!this.socket.send(envelope)) {
+      if (this.status !== 'OPEN' || !this.socket.send(envelope)) {
         this.pending.delete(requestId);
         reject(new RoomCommandError('NOT_SENT', 'The room connection is not open.'));
       }
     });
+  }
+
+  private onSocketStatus(status: ConnectionStatus, reason?: ConnectionCloseReason): void {
+    if (status === 'CONNECTING' || status === 'RECONNECTING') {
+      // The next `room.state` is the recovery snapshot, so prior ordering is moot.
+      this.ordering.reset();
+    }
+    // An answer never arrives over a socket that closed; the snapshot says what happened.
+    if (status !== 'OPEN') this.rejectPending();
+
+    this.clearSnapshotTimer();
+    if (status === 'OPEN') {
+      // Held back until the snapshot arrives; until then this client may be behind.
+      this.awaitingSnapshot = true;
+      this.snapshotTimer = setTimeout(() => this.socket.reconnect(), RECONNECT.snapshotTimeoutMs);
+      return;
+    }
+    this.awaitingSnapshot = false;
+    this.report(status, reason);
+  }
+
+  private report(status: ConnectionStatus, reason?: ConnectionCloseReason): void {
+    if (status === this.status && reason === undefined) return;
+    this.status = status;
+    this.handlers.onStatusChange?.(status, reason);
+  }
+
+  private clearSnapshotTimer(): void {
+    if (this.snapshotTimer !== null) {
+      clearTimeout(this.snapshotTimer);
+      this.snapshotTimer = null;
+    }
   }
 
   private rejectPending(): void {
@@ -179,8 +223,16 @@ export class RoomConnection {
     if (message.type === 'room.state') {
       this.ordering.accept(message.event_id);
       this.handlers.onEvent?.(message);
+      if (this.awaitingSnapshot) {
+        // State is current again: only now may the UI act on it.
+        this.awaitingSnapshot = false;
+        this.clearSnapshotTimer();
+        this.report('OPEN');
+      }
       return;
     }
+    // Nothing but the snapshot applies to state that has not been restored yet.
+    if (this.awaitingSnapshot) return;
 
     if (!this.ordering.accept(message.event_id)) {
       this.handlers.onSnapshotRequired?.();

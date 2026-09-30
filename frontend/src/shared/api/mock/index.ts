@@ -14,7 +14,11 @@
  *   mockApi.config.latencyMs = 1000
  *   mockApi.config.outcomes.joinRoom = 'conflict'    // see `MockOutcome`
  *   mockApi.config.auth = 'logged-out'; mockApi.reset()
+ *   mockApi.server.expireAccess()                   // next 401 refreshes silently
+ *   mockApi.server.revokeSession()                  // refresh fails too: back to Log In
  */
+
+import { mockNetwork } from '@shared/websocket/mock';
 
 import { setRequestTransport } from '../client';
 import type { RequestTransport } from '../client';
@@ -46,6 +50,8 @@ export function installMockApi(config: MockApiConfig = defaultMockApiConfig()): 
   const transport: RequestTransport = async (path, options) => {
     await delay(config.latencyMs);
     if (options.signal?.aborted) throw new DOMException('The request was aborted.', 'AbortError');
+    // `mockSockets.offline()` takes REST down with the sockets.
+    if (!mockNetwork.online) throw new TypeError('Failed to fetch (mock network offline)');
     const response = server.handle(path, options);
     if (config.latencyMs > 0) {
       console.debug(`[mock api] ${options.method ?? 'GET'} ${path} -> ${response.status}`);

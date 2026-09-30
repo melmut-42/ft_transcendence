@@ -373,7 +373,23 @@
 			"failedTitle": "Odaya bağlanılamadı",
 			"failedBody": "Bağlantını kontrol edip tekrar dene.",
 			"reconnecting": "Yeniden bağlanılıyor…",
-			"reconnectingBody": "Yeniden bağlanırken yerin korunuyor."
+			"reconnectingBody": {
+				"game": "Maçtaki yerini tutuyoruz. Bu sayfada kal.",
+				"room": "Odadaki yerini tutuyoruz. Bu sayfada kal.",
+				"finished": "Seni sonuçlara geri götürüyoruz. Bu sayfada kal."
+			},
+			"secondsLeft": {
+				"game": "Hükmen yenilgiye {{seconds}} sn",
+				"room": "Yerini korumak için {{seconds}} sn"
+			},
+			"leave": {
+				"game": "Maçtan Çık",
+				"room": "Odadan Çık",
+				"finished": "Lobiye Dön"
+			},
+			"lostTitle": "Bağlantı koptu",
+			"lostBody": "Çok uzun süre uzak kaldığın için odadan ayrıldın. Hesabın ve istatistiklerin güvende.",
+			"backToLobby": "Lobiye Dön"
 		},
 		"leave": {
 			"action": "Odadan Çık",

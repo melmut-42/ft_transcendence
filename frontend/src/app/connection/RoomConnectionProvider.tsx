@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Navigate, Outlet, useParams } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 
 import { useGameStore } from '@features/game/store/gameStore';
+import { forgetRoomCode } from '@features/room/model/roomCode';
 import { useRoomStore } from '@features/room/store/roomStore';
 import { ROUTES } from '@shared/constants';
-import { useConnectionStore } from '@shared/stores';
+import { useConnectionStore, useSessionStore } from '@shared/stores';
 import { RoomConnection } from '@shared/websocket';
 
 import { RoomConnectionContext } from './roomConnectionContext';
+import { RoomRecovery } from './roomRecovery';
 
 /**
  * The one owner of the room WebSocket.
@@ -19,20 +21,49 @@ import { RoomConnectionContext } from './roomConnectionContext';
  * This provider owns transport lifecycle, publishes connection status, and forwards
  * every event to the room and game stores. Leaving the room unmounts it, which closes
  * the socket and clears both stores so no stale member state survives the exit.
+ *
+ * It also owns recovery (`RoomRecovery`): a drop keeps the room on screen under the
+ * Reconnecting overlay while the socket retries, and every reconnect rebuilds the room
+ * from the server's fresh snapshot. When the room cannot be restored in time, the
+ * player's room state is dropped and they go back to Room Discovery, where the
+ * Disconnected notice says what happened. Their session is kept: a lost socket is not a
+ * lost login.
  */
 export function RoomConnectionProvider() {
   const { roomId: roomIdParam } = useParams<{ roomId: string }>();
   const roomId = Number(roomIdParam);
-  const setRoomStatus = useConnectionStore((state) => state.setRoomStatus);
+  const navigate = useNavigate();
   const [connection, setConnection] = useState<RoomConnection | null>(null);
 
   const isValidRoomId = Number.isInteger(roomId) && roomId > 0;
 
   useEffect(() => {
     if (!isValidRoomId) return;
+    const { setRoomStatus, setRoomRecovery, setRoomLost } = useConnectionStore.getState();
+    // Entering a room answers any notice left from the last one.
+    setRoomLost(false);
+
+    const recovery = new RoomRecovery({
+      roomId,
+      userId: () => useSessionStore.getState().user?.user_id,
+      roomStatus: () => useRoomStore.getState().room?.status,
+      close: (reason) => instance.close(reason),
+      onRecovery: setRoomRecovery,
+      onLost: () => {
+        instance.disconnect();
+        forgetRoomCode(roomId);
+        // Cleared first, so the room's guard does not hold the way out for a confirmation.
+        useSessionStore.getState().setActiveRoomId(null);
+        setRoomLost(true);
+        navigate(ROUTES.lobby, { replace: true });
+      },
+    });
 
     const instance = new RoomConnection(roomId, {
-      onStatusChange: (status, reason) => setRoomStatus(status, reason),
+      onStatusChange: (status, reason) => {
+        recovery.handleStatus(status, reason);
+        setRoomStatus(status, reason);
+      },
       onEvent: (event) => {
         useRoomStore.getState().applyEvent(event);
         useGameStore.getState().applyEvent(event);
@@ -45,12 +76,14 @@ export function RoomConnectionProvider() {
     instance.connect();
 
     return () => {
+      recovery.dispose();
       instance.disconnect();
+      setRoomRecovery(null);
       useRoomStore.getState().clear();
       useGameStore.getState().clear();
       setConnection(null);
     };
-  }, [isValidRoomId, roomId, setRoomStatus]);
+  }, [isValidRoomId, navigate, roomId]);
 
   const value = useMemo(() => connection, [connection]);
 

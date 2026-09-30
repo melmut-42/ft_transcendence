@@ -10,8 +10,16 @@ const FOCUSABLE =
  *
  * This is what makes a dialog usable from the keyboard: Tab cycles within the dialog
  * instead of walking the page behind it.
+ *
+ * Focus lands on the first control, or on the container itself with
+ * `initialFocus: 'container'` — for an overlay that appears on its own, where a key the
+ * player was already pressing must not trigger its first button.
  */
-export function useFocusTrap(ref: RefObject<HTMLElement | null>, active = true): void {
+export function useFocusTrap(
+  ref: RefObject<HTMLElement | null>,
+  active = true,
+  initialFocus: 'first' | 'container' = 'first',
+): void {
   useEffect(() => {
     if (!active) return;
 
@@ -21,7 +29,8 @@ export function useFocusTrap(ref: RefObject<HTMLElement | null>, active = true):
     const previous = document.activeElement as HTMLElement | null;
     const focusables = () => Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE));
 
-    (focusables()[0] ?? container).focus();
+    const first = initialFocus === 'first' ? focusables()[0] : undefined;
+    (first ?? container).focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return;
@@ -50,5 +59,5 @@ export function useFocusTrap(ref: RefObject<HTMLElement | null>, active = true):
       document.removeEventListener('keydown', onKeyDown);
       previous?.focus();
     };
-  }, [ref, active]);
+  }, [ref, active, initialFocus]);
 }

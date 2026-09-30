@@ -30,7 +30,7 @@ import type {
   AvatarPresetListResponse,
   UserSearchResponse,
 } from '@shared/types';
-import { MockActionError, MockRoomServer, mockRooms } from '@shared/websocket/mock';
+import { MockActionError, MockRoomServer, mockRooms, mockSession } from '@shared/websocket/mock';
 import type { MockPlayer } from '@shared/websocket/mock';
 
 import type { ApiRequestOptions } from '../client';
@@ -152,6 +152,18 @@ export class MockApiServer {
     this.config = config;
     this.routes = this.buildRoutes();
     this.reset();
+    mockSession.authorized = () => this.isAuthenticated();
+  }
+
+  /** The access cookie expires; the next `401` refreshes it, as it would in production. */
+  expireAccess(): void {
+    this.accessValid = false;
+  }
+
+  /** Both cookies stop working, as after a revocation elsewhere: only Log In helps. */
+  revokeSession(): void {
+    this.accessValid = false;
+    this.refreshValid = false;
   }
 
   /** Restore the seed data and apply `config.auth`. */

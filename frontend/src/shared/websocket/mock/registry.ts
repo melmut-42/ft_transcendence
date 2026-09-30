@@ -21,3 +21,16 @@ export function mockSelfPlayer(): MockPlayer {
   const user = useSessionStore.getState().user;
   return user ? { user_id: user.user_id, username: user.username } : FALLBACK_SELF;
 }
+
+/**
+ * The mock network. While it is down every mock socket fails to reconnect and every mock
+ * REST call fails as a network error, as they would with the device offline.
+ */
+export const mockNetwork = { online: true };
+
+/**
+ * Whether the handshake's session cookie would be accepted. The mock REST server installs
+ * its own check here, so an expired access cookie refuses a socket until a refresh, as the
+ * Gateway's `401` on the upgrade does.
+ */
+export const mockSession = { authorized: (): boolean => true };

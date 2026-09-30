@@ -1,6 +1,6 @@
 import { cn } from '@shared/utils';
 
-export type LoadingDotsSize = 'sm' | 'md';
+export type LoadingDotsSize = 'sm' | 'md' | 'lg';
 
 export interface LoadingDotsProps {
   size?: LoadingDotsSize;
@@ -24,14 +24,16 @@ const dotTones = [
 const ringStyles: Record<LoadingDotsSize, string> = {
   sm: 'h-11 w-11',
   md: 'h-17 w-17',
+  lg: 'h-[84px] w-[84px]',
 };
 
 const dotStyles: Record<LoadingDotsSize, string> = {
   sm: 'h-2 w-2',
   md: 'h-3 w-3',
+  lg: 'h-[15px] w-[15px]',
 };
 
-const radius: Record<LoadingDotsSize, number> = { sm: 18, md: 28 };
+const radius: Record<LoadingDotsSize, number> = { sm: 18, md: 28, lg: 34.5 };
 
 /**
  * The project's loading indicator: eight colored dots around a circle, each fading in
