@@ -65,6 +65,14 @@
 			"rateLimitedBody": "Wait a moment, then try again.",
 			"unavailableTitle": "Something went wrong",
 			"unavailableBody": "We could not reach the server. Try again in a moment."
+		},
+		"logOut": {
+			"title": "Log Out?",
+			"body": "You're in a match. Logging out ends it as a forfeit for your team.",
+			"stay": "Stay",
+			"confirm": "Log Out",
+			"pending": "Logging out…",
+			"failed": "Couldn't log out. Try again."
 		}
 	},
 	"landing": {
@@ -275,9 +283,13 @@
 		"title": "Ready for the next clue?",
 		"subtitle": "Create a room or join your friends and start guessing.",
 		"profile": {
-			"open": "Open your profile, {{username}}",
 			"online": "Online",
-			"level": "Lvl {{level}}"
+			"level": "Lvl {{level}}",
+			"menu": {
+				"label": "Account menu, {{username}}",
+				"profile": "Profile",
+				"settings": "Settings"
+			}
 		},
 		"create": {
 			"title": "Create Room",
@@ -799,5 +811,77 @@
 		},
 		"unknownPlayer": "Player",
 		"retry": "Try again"
+	},
+	"settings": {
+		"title": "Settings",
+		"subtitle": "Manage your profile and account.",
+		"close": {
+			"SETTINGS": "Close settings",
+			"CROP": "Cancel cropping",
+			"PICK": "Cancel picking an avatar"
+		},
+		"saved": {
+			"title": "Profile updated",
+			"body": "Your changes are saved."
+		},
+		"avatar": {
+			"label": "Profile picture",
+			"current": "Your current avatar",
+			"upload": "Upload photo",
+			"pick": "Pick avatar",
+			"hint": "JPG, PNG or WEBP, up to 2 MB. Square images look best. Without an upload, your default avatar is used.",
+			"error": {
+				"INVALID_TYPE": "Use a JPG, PNG or WEBP image under 2 MB.",
+				"TOO_LARGE": "Use a JPG, PNG or WEBP image under 2 MB.",
+				"UNREADABLE": "This image couldn't be opened. Try another one.",
+				"UPLOAD_FAILED": "Upload failed. Try again."
+			}
+		},
+		"username": {
+			"label": "Username",
+			"save": "Save",
+			"saving": "Saving…",
+			"hint": "3–20 characters: letters, numbers and underscore. Must be unique.",
+			"error": {
+				"INVALID_USERNAME": "Use 3–20 letters, numbers or underscores.",
+				"USERNAME_TAKEN": "That username is already taken. Try another one.",
+				"FAILED": "Couldn't save your username. Try again."
+			}
+		},
+		"logOut": {
+			"button": "Log Out",
+			"pending": "Logging out…",
+			"failed": "Couldn't log out. Try again."
+		},
+		"legal": {
+			"navigation": "Legal",
+			"privacy": "Privacy Policy",
+			"terms": "Terms of Service",
+			"newTab": "(opens in a new tab)"
+		},
+		"crop": {
+			"title": "Crop Your Photo",
+			"subtitle": "Drag to reposition. Use the slider to zoom.",
+			"position": "Photo position. Drag it, or use the arrow keys to move it.",
+			"zoom": "Zoom",
+			"preview": "Preview — how your avatar appears in rooms and profiles",
+			"hint": "JPG, PNG or WEBP, up to 2 MB. <choose>Choose another file</choose> to replace the photo.",
+			"cancel": "Cancel",
+			"save": "Save photo",
+			"saving": "Uploading…"
+		},
+		"pick": {
+			"title": "Pick an Avatar",
+			"subtitle": "Choose a ready-made avatar.",
+			"option": "Avatar: {{name}}",
+			"loading": "Loading avatars",
+			"loadFailed": "The avatars couldn't load.",
+			"retry": "Try again",
+			"hint": "Your current avatar is replaced when you save. An uploaded photo it replaces is removed.",
+			"failed": "Couldn't save the avatar. Try again.",
+			"cancel": "Cancel",
+			"save": "Save avatar",
+			"saving": "Saving…"
+		}
 	}
 }

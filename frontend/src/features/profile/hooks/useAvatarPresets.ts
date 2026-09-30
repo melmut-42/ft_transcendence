@@ -6,7 +6,7 @@
  * it with `PUT /api/users/me/avatar`, and Cancel discards it.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ApiError } from '@shared/api';
 import type { AvatarPreset } from '@shared/types';
@@ -21,9 +21,11 @@ export function useAvatarPresets(currentAvatarUrl: string, onSaved: (avatarUrl: 
   const [chosenId, setChosenId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const busy = useRef(false);
 
   const load = useCallback(async () => {
     setStatus('LOADING');
+    setError(null);
     try {
       const { presets: list } = await listAvatarPresets();
       setPresets(list);
@@ -41,7 +43,8 @@ export function useAvatarPresets(currentAvatarUrl: string, onSaved: (avatarUrl: 
   const currentId = presets.find((p) => p.avatar_url === currentAvatarUrl)?.preset_id ?? null;
 
   const save = useCallback(async () => {
-    if (!chosenId || chosenId === currentId) return;
+    if (!chosenId || chosenId === currentId || busy.current) return;
+    busy.current = true;
     setSaving(true);
     setError(null);
     try {
@@ -51,6 +54,7 @@ export function useAvatarPresets(currentAvatarUrl: string, onSaved: (avatarUrl: 
     } catch (cause) {
       setError(cause as ApiError);
     } finally {
+      busy.current = false;
       setSaving(false);
     }
   }, [chosenId, currentId, onSaved]);

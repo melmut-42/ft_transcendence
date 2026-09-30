@@ -1,41 +1,43 @@
 /**
- * The signed-in user's own profile, from `GET /api/users/me`.
+ * The signed-in user's own profile, from the shared own-profile store.
  *
- * It feeds the profile summary in the Room Discovery header. Until it arrives, or if it
- * fails, the session's username is still known, so the header never goes blank.
+ * The first view that asks reads `GET /api/users/me`; every other view shares that read
+ * and every later change Settings makes. Until the profile arrives, or if it fails, the
+ * session's username is still known, so the profile menu never goes blank.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
-import type { OwnProfile } from '@shared/types';
+import { useSessionStore } from '@shared/stores';
 
-import { getOwnProfile } from '../api';
-
-export type OwnProfileStatus = 'LOADING' | 'READY' | 'ERROR';
+import { useOwnProfileStore } from '../store/ownProfileStore';
 
 export function useOwnProfile() {
-  const [profile, setProfile] = useState<OwnProfile | null>(null);
-  const [status, setStatus] = useState<OwnProfileStatus>('LOADING');
+  const userId = useSessionStore((state) => state.user?.user_id);
+  const { ownerId, profile, status, load } = useOwnProfileStore(
+    useShallow((state) => ({
+      ownerId: state.ownerId,
+      profile: state.profile,
+      status: state.status,
+      load: state.load,
+    })),
+  );
 
-  const load = useCallback(async (signal: { cancelled: boolean }) => {
-    setStatus('LOADING');
-    try {
-      const own = await getOwnProfile();
-      if (signal.cancelled) return;
-      setProfile(own);
-      setStatus('READY');
-    } catch {
-      if (!signal.cancelled) setStatus('ERROR');
-    }
-  }, []);
+  const current = userId !== undefined && ownerId === userId;
 
   useEffect(() => {
-    const signal = { cancelled: false };
-    void load(signal);
-    return () => {
-      signal.cancelled = true;
-    };
-  }, [load]);
+    if (userId !== undefined && (!current || status === 'IDLE')) void load(userId);
+  }, [current, load, status, userId]);
 
-  return { profile, status };
+  /** Read it again without the loading state, when what is shown may be stale. */
+  const refresh = useCallback(() => {
+    if (userId !== undefined) void load(userId, true);
+  }, [load, userId]);
+
+  return {
+    profile: current ? profile : null,
+    status: current && status !== 'IDLE' ? status : 'LOADING',
+    refresh,
+  } as const;
 }

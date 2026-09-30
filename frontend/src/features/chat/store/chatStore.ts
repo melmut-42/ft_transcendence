@@ -94,6 +94,8 @@ interface ChatState {
   openFailedPeerId: number | null;
 
   resetFor: (ownerId: number) => void;
+  /** Forget everything, on log out. */
+  clear: () => void;
   setReady: (ready: boolean) => void;
   setChannelsStatus: (status: ListStatus) => void;
   /** Replace the accessible channels with a fresh list; anything missing lost access. */
@@ -165,6 +167,7 @@ export const useChatStore = create<ChatState>((set) => ({
 
   resetFor: (ownerId) =>
     set((state) => (state.ownerId === ownerId ? state : { ...initial, ownerId })),
+  clear: () => set(initial),
 
   setReady: (ready) => set({ ready }),
   setChannelsStatus: (channelsStatus) => set({ channelsStatus }),

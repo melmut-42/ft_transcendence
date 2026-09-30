@@ -65,6 +65,14 @@
 		"rateLimitedBody": "Biraz bekleyip tekrar dene.",
 		"unavailableTitle": "Bir şeyler ters gitti",
 		"unavailableBody": "Sunucuya ulaşılamadı. Birazdan tekrar dene."
+	},
+	"logOut": {
+		"title": "Çıkış yapılsın mı?",
+		"body": "Bir maçtasın. Çıkış yaparsan maç takımın için hükmen mağlubiyetle biter.",
+		"stay": "Kal",
+		"confirm": "Çıkış Yap",
+		"pending": "Çıkış yapılıyor…",
+		"failed": "Çıkış yapılamadı. Tekrar dene."
 	}
   },
   "landing": {
@@ -275,9 +283,13 @@
 		"title": "Sıradaki ipucuna hazır mısın?",
 		"subtitle": "Bir oda oluştur ya da arkadaşlarına katıl ve tahmin etmeye başla.",
 		"profile": {
-			"open": "Profilini aç, {{username}}",
 			"online": "Çevrimiçi",
-			"level": "Sv. {{level}}"
+			"level": "Sv. {{level}}",
+			"menu": {
+				"label": "Hesap menüsü, {{username}}",
+				"profile": "Profil",
+				"settings": "Ayarlar"
+			}
 		},
 		"create": {
 			"title": "Oda Oluştur",
@@ -799,5 +811,77 @@
 		},
 		"unknownPlayer": "Oyuncu",
 		"retry": "Tekrar dene"
+	},
+	"settings": {
+		"title": "Ayarlar",
+		"subtitle": "Profilini ve hesabını yönet.",
+		"close": {
+			"SETTINGS": "Ayarları kapat",
+			"CROP": "Kırpmayı iptal et",
+			"PICK": "Avatar seçimini iptal et"
+		},
+		"saved": {
+			"title": "Profil güncellendi",
+			"body": "Değişikliklerin kaydedildi."
+		},
+		"avatar": {
+			"label": "Profil fotoğrafı",
+			"current": "Şu anki avatarın",
+			"upload": "Fotoğraf yükle",
+			"pick": "Avatar seç",
+			"hint": "JPG, PNG veya WEBP, en fazla 2 MB. Kare görseller en iyi sonucu verir. Fotoğraf yüklemezsen varsayılan avatarın kullanılır.",
+			"error": {
+				"INVALID_TYPE": "2 MB altında bir JPG, PNG veya WEBP görsel kullan.",
+				"TOO_LARGE": "2 MB altında bir JPG, PNG veya WEBP görsel kullan.",
+				"UNREADABLE": "Bu görsel açılamadı. Başka bir tane dene.",
+				"UPLOAD_FAILED": "Yükleme başarısız oldu. Tekrar dene."
+			}
+		},
+		"username": {
+			"label": "Kullanıcı adı",
+			"save": "Kaydet",
+			"saving": "Kaydediliyor…",
+			"hint": "3–20 karakter: harf, rakam ve alt çizgi. Benzersiz olmalı.",
+			"error": {
+				"INVALID_USERNAME": "3–20 harf, rakam veya alt çizgi kullan.",
+				"USERNAME_TAKEN": "Bu kullanıcı adı zaten alınmış. Başka bir tane dene.",
+				"FAILED": "Kullanıcı adın kaydedilemedi. Tekrar dene."
+			}
+		},
+		"logOut": {
+			"button": "Çıkış Yap",
+			"pending": "Çıkış yapılıyor…",
+			"failed": "Çıkış yapılamadı. Tekrar dene."
+		},
+		"legal": {
+			"navigation": "Yasal",
+			"privacy": "Gizlilik Politikası",
+			"terms": "Kullanım Koşulları",
+			"newTab": "(yeni sekmede açılır)"
+		},
+		"crop": {
+			"title": "Fotoğrafını Kırp",
+			"subtitle": "Konumlandırmak için sürükle. Yakınlaştırmak için kaydırıcıyı kullan.",
+			"position": "Fotoğraf konumu. Sürükle ya da ok tuşlarıyla taşı.",
+			"zoom": "Yakınlaştır",
+			"preview": "Önizleme — avatarın odalarda ve profillerde böyle görünür",
+			"hint": "JPG, PNG veya WEBP, en fazla 2 MB. Fotoğrafı değiştirmek için <choose>başka bir dosya seç</choose>.",
+			"cancel": "İptal",
+			"save": "Fotoğrafı kaydet",
+			"saving": "Yükleniyor…"
+		},
+		"pick": {
+			"title": "Bir Avatar Seç",
+			"subtitle": "Hazır bir avatar seç.",
+			"option": "Avatar: {{name}}",
+			"loading": "Avatarlar yükleniyor",
+			"loadFailed": "Avatarlar yüklenemedi.",
+			"retry": "Tekrar dene",
+			"hint": "Kaydettiğinde şu anki avatarın değişir. Yerine geçtiği yüklenmiş fotoğraf silinir.",
+			"failed": "Avatar kaydedilemedi. Tekrar dene.",
+			"cancel": "İptal",
+			"save": "Avatarı kaydet",
+			"saving": "Kaydediliyor…"
+		}
 	}
 }

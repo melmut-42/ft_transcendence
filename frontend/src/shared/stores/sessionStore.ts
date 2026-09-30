@@ -26,10 +26,17 @@ interface SessionState {
   user: SessionUser | null;
   activeRoomId: number | null;
   sessionExpiresAt: string | null;
+  /**
+   * The user ended the session themselves with Log Out, rather than losing it. The route
+   * guard then takes them to Landing instead of asking them to log in again.
+   */
+  loggedOut: boolean;
 
   setSession: (session: SessionResponse) => void;
-  setAnonymous: () => void;
+  setAnonymous: (options?: { loggedOut?: boolean }) => void;
   setActiveRoomId: (roomId: number | null) => void;
+  /** The username the server confirmed after the user renamed themselves. */
+  setUsername: (username: string) => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -37,6 +44,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   user: null,
   activeRoomId: null,
   sessionExpiresAt: null,
+  loggedOut: false,
 
   setSession: (session) =>
     set({
@@ -44,10 +52,20 @@ export const useSessionStore = create<SessionState>((set) => ({
       user: session.user,
       activeRoomId: session.active_room_id,
       sessionExpiresAt: session.session_expires_at,
+      loggedOut: false,
     }),
 
-  setAnonymous: () =>
-    set({ status: 'ANONYMOUS', user: null, activeRoomId: null, sessionExpiresAt: null }),
+  setAnonymous: ({ loggedOut = false } = {}) =>
+    set({
+      status: 'ANONYMOUS',
+      user: null,
+      activeRoomId: null,
+      sessionExpiresAt: null,
+      loggedOut,
+    }),
 
   setActiveRoomId: (activeRoomId) => set({ activeRoomId }),
+
+  setUsername: (username) =>
+    set((state) => (state.user ? { user: { ...state.user, username } } : state)),
 }));

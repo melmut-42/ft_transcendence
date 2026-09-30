@@ -87,6 +87,12 @@ export function panCrop(
   return clampCrop(image, viewport, { ...crop, x: crop.x + dx, y: crop.y + dy });
 }
 
+/** Where the image sits in the viewport, in viewport pixels, for drawing the crop. */
+export function displayRect(image: ImageSize, viewport: number, crop: CropState) {
+  const scale = coverScale(image, viewport) * crop.zoom;
+  return { x: crop.x, y: crop.y, width: image.width * scale, height: image.height * scale };
+}
+
 /** The square region of the source image that the viewport shows, in source pixels. */
 export function sourceRect(image: ImageSize, viewport: number, crop: CropState) {
   const scale = coverScale(image, viewport) * crop.zoom;

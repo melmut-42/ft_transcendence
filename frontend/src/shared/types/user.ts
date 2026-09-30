@@ -28,6 +28,12 @@ export interface PublicProfile {
   is_online: boolean;
 }
 
+/**
+ * Username rule shared by Register and `PATCH /api/users/me`: trimmed, 3–20 letters,
+ * digits or underscores. Uniqueness is case-insensitive and only the server can check it.
+ */
+export const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,20}$/;
+
 /** `PATCH /api/users/me` request body — `username` omitted means unchanged. */
 export interface UpdateOwnProfileRequest {
   username?: string;

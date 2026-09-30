@@ -10,7 +10,7 @@
  * the same message.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ApiError } from '@shared/api';
 
@@ -18,14 +18,8 @@ import { uploadAvatar } from '../api';
 import { checkAvatarFile, exportAvatar, initialCrop, panCrop, zoomCrop } from '../model/avatarCrop';
 import type { CropState, ImageSize } from '../model/avatarCrop';
 
+/** Why a photo was not used; each is a `settings.avatar.error.*` message. */
 export type AvatarError = 'INVALID_TYPE' | 'TOO_LARGE' | 'UNREADABLE' | 'UPLOAD_FAILED';
-
-export const AVATAR_ERROR_TEXT: Record<AvatarError, string> = {
-  INVALID_TYPE: 'Use a JPG, PNG or WEBP image.',
-  TOO_LARGE: 'The image must be 2 MB or smaller.',
-  UNREADABLE: 'This image could not be opened.',
-  UPLOAD_FAILED: 'Upload failed. Try again.',
-};
 
 interface Editing {
   source: HTMLImageElement & ImageSize;
@@ -37,6 +31,7 @@ export function useAvatarUpload(viewport: number, onUploaded: (avatarUrl: string
   const [editing, setEditing] = useState<Editing | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<AvatarError | null>(null);
+  const busy = useRef(false);
 
   useEffect(
     () => () => {
@@ -89,8 +84,10 @@ export function useAvatarUpload(viewport: number, onUploaded: (avatarUrl: string
     setError(null);
   }, []);
 
+  // One SAVE PHOTO sends one upload, however quickly it is pressed again.
   const confirm = useCallback(async () => {
-    if (!editing) return;
+    if (!editing || busy.current) return;
+    busy.current = true;
     setUploading(true);
     setError(null);
     try {
@@ -101,6 +98,7 @@ export function useAvatarUpload(viewport: number, onUploaded: (avatarUrl: string
     } catch (cause) {
       setError((cause as ApiError).code === 'INVALID_IMAGE' ? 'INVALID_TYPE' : 'UPLOAD_FAILED');
     } finally {
+      busy.current = false;
       setUploading(false);
     }
   }, [editing, onUploaded, viewport]);

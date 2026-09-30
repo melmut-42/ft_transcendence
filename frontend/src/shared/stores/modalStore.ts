@@ -1,15 +1,15 @@
 /**
  * App-level modal state.
  *
- * The profile is a modal, not a route, and it opens from Lobby, Room and Game. Routing
- * the request through this store is what keeps those features from importing each
- * other: a caller publishes an intent, and the app-level `ModalHost` renders it.
+ * Profile and Settings are modals, not routes, and they open from Lobby, Room and Game.
+ * Routing the request through this store is what keeps those features from importing
+ * each other: a caller publishes an intent, and the app-level `ModalHost` renders it.
  */
 
 import { create } from 'zustand';
 
 /** Extend as further app-level modals appear. */
-export type ModalRequest = { kind: 'profile'; userId: number };
+export type ModalRequest = { kind: 'profile'; userId: number } | { kind: 'settings' };
 
 interface ModalState {
   active: ModalRequest | null;
@@ -26,3 +26,6 @@ export const useModalStore = create<ModalState>((set) => ({
 /** Convenience for the common case, usable from any feature. */
 export const openProfileModal = (userId: number): void =>
   useModalStore.getState().open({ kind: 'profile', userId });
+
+/** Opens the signed-in user's Settings over the current screen. */
+export const openSettingsModal = (): void => useModalStore.getState().open({ kind: 'settings' });

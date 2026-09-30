@@ -65,6 +65,14 @@
 			"rateLimitedBody": "Patiente un instant, puis réessaie.",
 			"unavailableTitle": "Un problème est survenu",
 			"unavailableBody": "Impossible de joindre le serveur. Réessaie dans un instant."
+		},
+		"logOut": {
+			"title": "Se déconnecter ?",
+			"body": "Tu es en pleine partie. Te déconnecter la termine par un forfait pour ton équipe.",
+			"stay": "Rester",
+			"confirm": "Se déconnecter",
+			"pending": "Déconnexion…",
+			"failed": "Impossible de te déconnecter. Réessaie."
 		}
 	},
 	"landing": {
@@ -275,9 +283,13 @@
 		"title": "Prêt pour le prochain indice ?",
 		"subtitle": "Crée une salle ou rejoins tes amis et commence à deviner.",
 		"profile": {
-			"open": "Ouvrir ton profil, {{username}}",
 			"online": "En ligne",
-			"level": "Niv. {{level}}"
+			"level": "Niv. {{level}}",
+			"menu": {
+				"label": "Menu du compte, {{username}}",
+				"profile": "Profil",
+				"settings": "Paramètres"
+			}
 		},
 		"create": {
 			"title": "Créer une salle",
@@ -799,5 +811,77 @@
 		},
 		"unknownPlayer": "Joueur",
 		"retry": "Réessayer"
+	},
+	"settings": {
+		"title": "Paramètres",
+		"subtitle": "Gère ton profil et ton compte.",
+		"close": {
+			"SETTINGS": "Fermer les paramètres",
+			"CROP": "Annuler le recadrage",
+			"PICK": "Annuler le choix d'avatar"
+		},
+		"saved": {
+			"title": "Profil mis à jour",
+			"body": "Tes modifications sont enregistrées."
+		},
+		"avatar": {
+			"label": "Photo de profil",
+			"current": "Ton avatar actuel",
+			"upload": "Importer une photo",
+			"pick": "Choisir un avatar",
+			"hint": "JPG, PNG ou WEBP, 2 Mo maximum. Les images carrées rendent le mieux. Sans photo importée, ton avatar par défaut est utilisé.",
+			"error": {
+				"INVALID_TYPE": "Utilise une image JPG, PNG ou WEBP de moins de 2 Mo.",
+				"TOO_LARGE": "Utilise une image JPG, PNG ou WEBP de moins de 2 Mo.",
+				"UNREADABLE": "Cette image n'a pas pu être ouverte. Essaie une autre.",
+				"UPLOAD_FAILED": "L'envoi a échoué. Réessaie."
+			}
+		},
+		"username": {
+			"label": "Nom d'utilisateur",
+			"save": "Enregistrer",
+			"saving": "Enregistrement…",
+			"hint": "3 à 20 caractères : lettres, chiffres et tiret bas. Doit être unique.",
+			"error": {
+				"INVALID_USERNAME": "Utilise 3 à 20 lettres, chiffres ou tirets bas.",
+				"USERNAME_TAKEN": "Ce nom d'utilisateur est déjà pris. Essaie-en un autre.",
+				"FAILED": "Impossible d'enregistrer ton nom d'utilisateur. Réessaie."
+			}
+		},
+		"logOut": {
+			"button": "Se déconnecter",
+			"pending": "Déconnexion…",
+			"failed": "Impossible de te déconnecter. Réessaie."
+		},
+		"legal": {
+			"navigation": "Mentions légales",
+			"privacy": "Politique de confidentialité",
+			"terms": "Conditions d'utilisation",
+			"newTab": "(s'ouvre dans un nouvel onglet)"
+		},
+		"crop": {
+			"title": "Recadre ta photo",
+			"subtitle": "Fais glisser pour repositionner. Utilise le curseur pour zoomer.",
+			"position": "Position de la photo. Fais-la glisser ou utilise les flèches pour la déplacer.",
+			"zoom": "Zoom",
+			"preview": "Aperçu — ton avatar tel qu’il apparaît dans les salons et les profils",
+			"hint": "JPG, PNG ou WEBP, 2 Mo maximum. <choose>Choisis un autre fichier</choose> pour remplacer la photo.",
+			"cancel": "Annuler",
+			"save": "Enregistrer la photo",
+			"saving": "Envoi…"
+		},
+		"pick": {
+			"title": "Choisis un avatar",
+			"subtitle": "Choisis un avatar prêt à l’emploi.",
+			"option": "Avatar : {{name}}",
+			"loading": "Chargement des avatars",
+			"loadFailed": "Les avatars n'ont pas pu se charger.",
+			"retry": "Réessayer",
+			"hint": "Ton avatar actuel est remplacé quand tu enregistres. Une photo importée remplacée est supprimée.",
+			"failed": "Impossible d'enregistrer l'avatar. Réessaie.",
+			"cancel": "Annuler",
+			"save": "Enregistrer l'avatar",
+			"saving": "Enregistrement…"
+		}
 	}
 }

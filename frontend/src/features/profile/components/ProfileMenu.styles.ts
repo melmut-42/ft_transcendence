@@ -104,3 +104,21 @@ export const game = {
     'hidden shrink-0 pt-[10px] text-xl text-text-faint transition-transform duration-200 ' +
     'ease-pop motion-safe:group-hover/menu:translate-y-0.5 desktop:block',
 };
+
+// ---- Account menu ----
+
+/**
+ * The small menu the profile summary opens: Profile and Settings. The design system has
+ * no drawn dropdown, so it is built from its surface, radius, shadow and type tokens, and
+ * sits just below the summary that opened it.
+ */
+export const dropdown: string =
+  'fixed z-(--z-modal) flex min-w-[200px] flex-col gap-[4px] rounded-lg bg-surface p-[8px] ' +
+  'shadow-card motion-safe:animate-pop-in';
+
+export const dropdownItem: string =
+  'flex h-[44px] w-full cursor-pointer items-center gap-[12px] rounded-md px-[12px] ' +
+  'text-left text-lg leading-none font-bold text-text-ink transition-colors duration-100 ' +
+  'hover:bg-surface-muted focus-visible:bg-surface-muted';
+
+export const dropdownIcon: string = 'w-[20px] shrink-0 text-center text-lg text-text-slate';

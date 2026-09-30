@@ -6,10 +6,8 @@
  * A failed rule is reported as the translation key of its message.
  */
 
+import { USERNAME_PATTERN } from '@shared/types';
 import type { LoginRequest, RegisterRequest } from '@shared/types';
-
-/** Username: trimmed, 3–20 letters, digits or underscores. */
-export const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,20}$/;
 
 /** Email: something, an `@`, a domain with a dot, and no whitespace. */
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
