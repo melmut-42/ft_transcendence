@@ -611,5 +611,80 @@
   		"offline": "Çevrimdışısın. Bağlantı gelince tekrar dene.",
   		"generic": "Bir şeyler ters gitti. Tekrar dene."
   	}
-  }
+  },
+	"profile": {
+		"close": "Profili kapat",
+		"loading": "Profil yükleniyor",
+		"retry": "Tekrar dene",
+		"presence": {
+			"online": "Çevrimiçi",
+			"offline": "Çevrimdışı"
+		},
+		"stats": {
+			"wins": "Galibiyet",
+			"losses": "Mağlubiyet",
+			"level": "Seviye"
+		},
+		"friend": {
+			"add": "Arkadaş Ekle",
+			"adding": "Ekleniyor…",
+			"remove": "Arkadaşlıktan Çıkar",
+			"removing": "Çıkarılıyor…",
+			"loadFailed": "Arkadaş listen yüklenemedi.",
+			"failed": {
+				"ADDING": "Arkadaş eklenemedi. Tekrar dene.",
+				"REMOVING": "Arkadaşlıktan çıkarılamadı. Tekrar dene."
+			}
+		},
+		"invite": {
+			"button": {
+				"READY": "Davet Et",
+				"FAILED": "Davet Et",
+				"SENDING": "Davet ediliyor…",
+				"SENT": "Davet Gönderildi",
+				"UNAVAILABLE": "Davet Et"
+			},
+			"sent": "Davet gönderildi. {{username}} davetten odana katılabilir.",
+			"failed": "Davet gönderilemedi. Tekrar dene.",
+			"reason": {
+				"NO_ACTIVE_ROOM": "{{username}} adlı oyuncuyu davet etmek için bir odaya katıl ya da oda oluştur.",
+				"ROOM_NOT_JOINABLE": "Oyunun başladı. Davetler, oda oyuncu beklerken gönderilebilir.",
+				"ROOM_FULL": "Odan dolu.",
+				"IN_YOUR_ROOM": "{{username}} zaten odanda.",
+				"OFFLINE": "{{username}} çevrimdışı. Çevrimiçi olduğunda davet edebilirsin.",
+				"IN_ROOM": "{{username}} zaten başka bir odada.",
+				"NOT_FRIENDS": "{{username}} adlı oyuncuyu davet etmek için arkadaş olarak ekle."
+			}
+		},
+		"notFound": {
+			"title": "Oyuncu bulunamadı",
+			"body": "Bu hesap artık kullanılamıyor."
+		},
+		"error": {
+			"title": "Profil yüklenemedi.",
+			"body": "Bağlantını kontrol edip tekrar dene."
+		},
+		"history": {
+			"title": "Oyun Geçmişi",
+			"count_one": "Son {{count}} oyun",
+			"count_other": "Son {{count}} oyun",
+			"loading": "Oyun geçmişi yükleniyor",
+			"emptyTitle": "Oyun bulunamadı",
+			"emptyBody": "Biten maçlar sonucu, takımın, rolün ve rakiplerinle birlikte burada görünür.",
+			"errorTitle": "Oyun geçmişi yüklenemedi.",
+			"errorBody": "Bağlantını kontrol edip tekrar dene.",
+			"retry": "Tekrar dene",
+			"result": {
+				"WIN": "GALİBİYET",
+				"LOSS": "MAĞLUBİYET"
+			},
+			"opponents": "Rakipler: {{names}}",
+			"endReason": {
+				"ALL_TEAM_CARDS_REVEALED": "Tüm kartlar bulundu",
+				"ASSASSIN_REVEALED": "Suikastçı açıldı",
+				"PLAYER_FORFEIT": "Hükmen"
+			},
+			"scoreLabel": "Son skor: takımın {{own}}, rakip takım {{other}}"
+		}
+	}
 }

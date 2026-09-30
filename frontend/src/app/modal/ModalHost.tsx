@@ -1,5 +1,6 @@
 import { useModalStore } from '@shared/stores';
-import { ProfileModal } from '@features/profile/components/ProfileModal';
+
+import { ProfilePopup } from './ProfilePopup';
 
 /**
  * App-level modal host.
@@ -16,7 +17,8 @@ export function ModalHost() {
 
   switch (active.kind) {
     case 'profile':
-      return <ProfileModal userId={active.userId} onClose={close} />;
+      // Keyed by user, so opening another profile starts from its own loading state.
+      return <ProfilePopup key={active.userId} userId={active.userId} onClose={close} />;
     default:
       return null;
   }

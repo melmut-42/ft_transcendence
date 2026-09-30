@@ -1,34 +1,43 @@
 /**
- * INVITE action on another player's profile.
+ * INVITE on a friend's profile: invite them into the room the signed-in user is in now.
  *
- * Inviting needs an active room to invite into and an online target; the server checks
- * the rest (friendship, room `WAITING` and not full, target not already in a room) and
- * answers with a specific error code, which becomes the Unavailable reason.
+ * `room` is that room as its live snapshot has it, or `null` outside a room. The button's
+ * state is derived from it on every render, so a room that fills up, starts, or gains the
+ * friend as a member turns the button unavailable at once, and a reconnect's fresh
+ * snapshot re-decides it. The server checks everything again when the invite is sent
+ * (friendship, room `WAITING` and not full, the friend online and in no room) and its
+ * answer wins: a refusal becomes the Unavailable reason, which holds only while the room
+ * and the friend's presence stay as they were when it was given.
+ *
+ * Invite Sent is remembered per room (`sentInvitesStore`), so it does not follow the
+ * friend into another room. One request at a time: a press while one is in flight is
+ * ignored.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import type { ApiError } from '@shared/api';
-import { useSessionStore } from '@shared/stores';
-import type { PublicProfile } from '@shared/types';
+import type { Room } from '@shared/types';
 
 import { inviteFriend } from '../api';
+import { useInviteSent, useSentInvitesStore } from '../store/sentInvitesStore';
+import type { ProfileView } from './useProfile';
 
 export type InviteUnavailableReason =
-  | 'SELF'
   | 'NO_ACTIVE_ROOM'
-  | 'OFFLINE'
-  | 'NOT_FRIENDS'
-  | 'IN_ROOM'
+  | 'ROOM_NOT_JOINABLE'
   | 'ROOM_FULL'
-  | 'ROOM_NOT_JOINABLE';
+  | 'IN_YOUR_ROOM'
+  | 'OFFLINE'
+  | 'IN_ROOM'
+  | 'NOT_FRIENDS';
 
 export type InviteState =
-  | { status: 'IDLE' }
+  | { status: 'READY' }
   | { status: 'SENDING' }
   | { status: 'SENT' }
   | { status: 'UNAVAILABLE'; reason: InviteUnavailableReason }
-  | { status: 'FAILED'; error: ApiError };
+  | { status: 'FAILED' };
 
 const REASON_BY_CODE: Record<string, InviteUnavailableReason> = {
   USER_OFFLINE: 'OFFLINE',
@@ -36,45 +45,75 @@ const REASON_BY_CODE: Record<string, InviteUnavailableReason> = {
   USER_IN_ROOM: 'IN_ROOM',
   ROOM_FULL: 'ROOM_FULL',
   ROOM_NOT_JOINABLE: 'ROOM_NOT_JOINABLE',
+  ROOM_NOT_FOUND: 'NO_ACTIVE_ROOM',
+  NOT_ROOM_MEMBER: 'NO_ACTIVE_ROOM',
 };
 
-export const INVITE_REASON_TEXT: Record<InviteUnavailableReason, string> = {
-  SELF: 'This is your profile.',
-  NO_ACTIVE_ROOM: 'Join or create a room to invite players.',
-  OFFLINE: 'This player is offline.',
-  NOT_FRIENDS: 'Add this player as a friend to invite them.',
-  IN_ROOM: 'This player is already in a room.',
-  ROOM_FULL: 'Your room is full.',
-  ROOM_NOT_JOINABLE: 'Your room has already started.',
-};
+/** What a server refusal depended on; when any of it changes, the refusal no longer holds. */
+function contextOf(room: Room | null, friend: ProfileView): string {
+  return room
+    ? `${room.room_id}|${room.status}|${room.player_count}|${room.max_players}|${friend.is_online}`
+    : 'none';
+}
 
-export function useInviteToRoom(profile: PublicProfile | null) {
-  const me = useSessionStore((state) => state.user);
-  const activeRoomId = useSessionStore((state) => state.activeRoomId);
-  const [result, setResult] = useState<InviteState>({ status: 'IDLE' });
+/** The reason the room itself rules the invite out, before any request. */
+function roomReason(room: Room | null, friendId: number): InviteUnavailableReason | null {
+  if (!room || room.status === 'CLOSED') return 'NO_ACTIVE_ROOM';
+  if (room.players.some((p) => p.user_id === friendId)) return 'IN_YOUR_ROOM';
+  if (room.status !== 'WAITING') return 'ROOM_NOT_JOINABLE';
+  if (room.player_count >= room.max_players) return 'ROOM_FULL';
+  return null;
+}
 
-  let precondition: InviteUnavailableReason | null = null;
-  if (profile && me?.user_id === profile.user_id) precondition = 'SELF';
-  else if (activeRoomId === null) precondition = 'NO_ACTIVE_ROOM';
-  else if (profile && !profile.is_online) precondition = 'OFFLINE';
+export function useInviteToRoom(
+  friend: ProfileView,
+  room: Room | null,
+  /** Told when the server refuses, so the caller can re-read what it found stale. */
+  onRefused?: (reason: InviteUnavailableReason) => void,
+) {
+  const roomId = room?.room_id ?? null;
+  const sent = useInviteSent(roomId, friend.user_id);
+  const [sending, setSending] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [refusal, setRefusal] = useState<{ reason: InviteUnavailableReason; context: string }>();
+  const inFlight = useRef(false);
 
-  const state: InviteState =
-    precondition && result.status === 'IDLE'
-      ? { status: 'UNAVAILABLE', reason: precondition }
-      : result;
+  const context = contextOf(room, friend);
+  const blocked = roomReason(room, friend.user_id);
+
+  let state: InviteState;
+  if (sending) state = { status: 'SENDING' };
+  else if (blocked) state = { status: 'UNAVAILABLE', reason: blocked };
+  else if (sent) state = { status: 'SENT' };
+  else if (!friend.is_online) state = { status: 'UNAVAILABLE', reason: 'OFFLINE' };
+  else if (refusal && refusal.context === context) {
+    state = { status: 'UNAVAILABLE', reason: refusal.reason };
+  } else if (failed) state = { status: 'FAILED' };
+  else state = { status: 'READY' };
+
+  const canSend = state.status === 'READY' || state.status === 'FAILED';
 
   const invite = useCallback(async () => {
-    if (!profile || activeRoomId === null || precondition) return;
-    setResult({ status: 'SENDING' });
+    if (inFlight.current || !canSend || roomId === null) return;
+    inFlight.current = true;
+    setSending(true);
+    setFailed(false);
     try {
-      await inviteFriend(activeRoomId, profile.user_id);
-      setResult({ status: 'SENT' });
+      await inviteFriend(roomId, friend.user_id);
+      useSentInvitesStore.getState().markSent(roomId, friend.user_id);
     } catch (cause) {
-      const error = cause as ApiError;
-      const reason = REASON_BY_CODE[error.code];
-      setResult(reason ? { status: 'UNAVAILABLE', reason } : { status: 'FAILED', error });
+      const reason = REASON_BY_CODE[(cause as ApiError).code];
+      if (reason) {
+        setRefusal({ reason, context });
+        onRefused?.(reason);
+      } else {
+        setFailed(true);
+      }
+    } finally {
+      inFlight.current = false;
+      setSending(false);
     }
-  }, [activeRoomId, precondition, profile]);
+  }, [canSend, context, friend.user_id, onRefused, roomId]);
 
   return { state, invite };
 }

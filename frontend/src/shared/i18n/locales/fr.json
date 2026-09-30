@@ -611,5 +611,80 @@
 			"offline": "Vous êtes hors ligne. Réessayez une fois la connexion rétablie.",
 			"generic": "Un problème est survenu. Réessayez."
 		}
+	},
+	"profile": {
+		"close": "Fermer le profil",
+		"loading": "Chargement du profil",
+		"retry": "Réessayer",
+		"presence": {
+			"online": "En ligne",
+			"offline": "Hors ligne"
+		},
+		"stats": {
+			"wins": "Victoires",
+			"losses": "Défaites",
+			"level": "Niveau"
+		},
+		"friend": {
+			"add": "Ajouter",
+			"adding": "Ajout…",
+			"remove": "Retirer l'ami",
+			"removing": "Retrait…",
+			"loadFailed": "Votre liste d'amis n'a pas pu être chargée.",
+			"failed": {
+				"ADDING": "Impossible d'ajouter cet ami. Réessayez.",
+				"REMOVING": "Impossible de retirer cet ami. Réessayez."
+			}
+		},
+		"invite": {
+			"button": {
+				"READY": "Inviter",
+				"FAILED": "Inviter",
+				"SENDING": "Invitation…",
+				"SENT": "Invitation envoyée",
+				"UNAVAILABLE": "Inviter"
+			},
+			"sent": "Invitation envoyée. {{username}} peut rejoindre votre salon depuis l'invitation.",
+			"failed": "L'invitation n'a pas pu être envoyée. Réessayez.",
+			"reason": {
+				"NO_ACTIVE_ROOM": "Rejoignez ou créez un salon pour inviter {{username}}.",
+				"ROOM_NOT_JOINABLE": "Votre partie a commencé. Les invitations sont possibles tant que le salon attend des joueurs.",
+				"ROOM_FULL": "Votre salon est complet.",
+				"IN_YOUR_ROOM": "{{username}} est déjà dans votre salon.",
+				"OFFLINE": "{{username}} est hors ligne. L'invitation sera possible quand il ou elle sera en ligne.",
+				"IN_ROOM": "{{username}} est déjà dans un autre salon.",
+				"NOT_FRIENDS": "Ajoutez {{username}} en ami pour l'inviter."
+			}
+		},
+		"notFound": {
+			"title": "Joueur introuvable",
+			"body": "Ce compte n'est plus disponible."
+		},
+		"error": {
+			"title": "Le profil n'a pas pu être chargé.",
+			"body": "Vérifiez votre connexion et réessayez."
+		},
+		"history": {
+			"title": "Historique des parties",
+			"count_one": "Dernière partie",
+			"count_other": "{{count}} dernières parties",
+			"loading": "Chargement de l'historique des parties",
+			"emptyTitle": "Aucune partie trouvée",
+			"emptyBody": "Les parties terminées apparaissent ici avec le résultat, votre équipe, votre rôle et vos adversaires.",
+			"errorTitle": "L'historique des parties n'a pas pu être chargé.",
+			"errorBody": "Vérifiez votre connexion et réessayez.",
+			"retry": "Réessayer",
+			"result": {
+				"WIN": "VICTOIRE",
+				"LOSS": "DÉFAITE"
+			},
+			"opponents": "contre {{names}}",
+			"endReason": {
+				"ALL_TEAM_CARDS_REVEALED": "Toutes les cartes trouvées",
+				"ASSASSIN_REVEALED": "Assassin révélé",
+				"PLAYER_FORFEIT": "Abandon"
+			},
+			"scoreLabel": "Score final : votre équipe {{own}}, l'autre équipe {{other}}"
+		}
 	}
 }

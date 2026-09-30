@@ -611,5 +611,80 @@
 			"offline": "You're offline. Try again once the connection is back.",
 			"generic": "Something went wrong. Try again."
 		}
+	},
+	"profile": {
+		"close": "Close profile",
+		"loading": "Loading profile",
+		"retry": "Try again",
+		"presence": {
+			"online": "Online",
+			"offline": "Offline"
+		},
+		"stats": {
+			"wins": "Wins",
+			"losses": "Losses",
+			"level": "Level"
+		},
+		"friend": {
+			"add": "Add Friend",
+			"adding": "Adding…",
+			"remove": "Remove Friend",
+			"removing": "Removing…",
+			"loadFailed": "Your friends list couldn't load.",
+			"failed": {
+				"ADDING": "Couldn't add this friend. Try again.",
+				"REMOVING": "Couldn't remove this friend. Try again."
+			}
+		},
+		"invite": {
+			"button": {
+				"READY": "Invite",
+				"FAILED": "Invite",
+				"SENDING": "Inviting…",
+				"SENT": "Invite Sent",
+				"UNAVAILABLE": "Invite"
+			},
+			"sent": "Invite sent. {{username}} can join your room from the invitation.",
+			"failed": "The invite couldn't be sent. Try again.",
+			"reason": {
+				"NO_ACTIVE_ROOM": "Join or create a room to invite {{username}}.",
+				"ROOM_NOT_JOINABLE": "Your game has started. Invites work while the room is waiting for players.",
+				"ROOM_FULL": "Your room is full.",
+				"IN_YOUR_ROOM": "{{username}} is already in your room.",
+				"OFFLINE": "{{username}} is offline. Invite is available when they are online.",
+				"IN_ROOM": "{{username}} is already in another room.",
+				"NOT_FRIENDS": "Add {{username}} as a friend to invite them."
+			}
+		},
+		"notFound": {
+			"title": "Player not found",
+			"body": "This account is no longer available."
+		},
+		"error": {
+			"title": "Profile couldn't load.",
+			"body": "Check your connection and try again."
+		},
+		"history": {
+			"title": "Game History",
+			"count_one": "Last {{count}} game",
+			"count_other": "Last {{count}} games",
+			"loading": "Loading game history",
+			"emptyTitle": "No games found",
+			"emptyBody": "Finished matches appear here with the result, your team and role, and your opponents.",
+			"errorTitle": "Game history couldn't load.",
+			"errorBody": "Check your connection and try again.",
+			"retry": "Try again",
+			"result": {
+				"WIN": "WIN",
+				"LOSS": "LOSS"
+			},
+			"opponents": "vs {{names}}",
+			"endReason": {
+				"ALL_TEAM_CARDS_REVEALED": "All cards found",
+				"ASSASSIN_REVEALED": "Assassin revealed",
+				"PLAYER_FORFEIT": "Forfeit"
+			},
+			"scoreLabel": "Final score: your team {{own}}, the other team {{other}}"
+		}
 	}
 }
