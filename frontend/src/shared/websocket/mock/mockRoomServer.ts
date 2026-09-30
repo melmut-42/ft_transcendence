@@ -29,6 +29,7 @@ import type {
 } from '@shared/types';
 
 import type { MockEndpoint, MockServerBinding } from './mockTransport';
+import { mockRoomLifecycle } from './registry';
 
 const WORDS = [
   'OCEAN',
@@ -846,6 +847,7 @@ export class MockRoomServer implements MockServerBinding {
       const event = this.envelope(item.type, payload);
       this.endpoints.forEach((endpoint) => endpoint.deliver(event));
     }
+    if (batch.length > 0) mockRoomLifecycle.changed();
   }
 
   private envelope(type: string, payload: unknown): RoomServerEvent {

@@ -636,6 +636,7 @@
 				"REMOVING": "Couldn't remove this friend. Try again."
 			}
 		},
+		"message": "Message",
 		"invite": {
 			"button": {
 				"READY": "Invite",
@@ -686,5 +687,117 @@
 			},
 			"scoreLabel": "Final score: your team {{own}}, the other team {{other}}"
 		}
+	},
+	"chat": {
+		"launcher": {
+			"title": "Chat",
+			"label": "Open chat",
+			"labelUnread_one": "Open chat, {{count}} new message",
+			"labelUnread_other": "Open chat, {{count}} new messages",
+			"caption_one": "{{count}} new message",
+			"caption_other": "{{count}} new messages",
+			"captionNone": "No new messages"
+		},
+		"panel": {
+			"title": "Chats",
+			"close": "Close chat",
+			"back": "Back to chats"
+		},
+		"search": {
+			"label": "Search friends",
+			"placeholder": "Search friends"
+		},
+		"tabs": {
+			"label": "Conversations",
+			"ROOM": "Room",
+			"FRIENDS": "Friends"
+		},
+		"sections": {
+			"room": "In this room",
+			"friends": "Friends"
+		},
+		"room": {
+			"name": "Room chat",
+			"code": "Room {{code}}",
+			"preparing": "Room chat is getting ready…",
+			"closed": "Room chat is closed"
+		},
+		"list": {
+			"loading": "Loading chats…",
+			"channelsError": "Couldn't load your chats.",
+			"friendsError": "Couldn't load your friends.",
+			"noRoom": "Join a room to chat with its players.",
+			"noFriends": "Add friends to chat with them here.",
+			"noResults": "No one matches “{{query}}”.",
+			"noMessages": "No messages yet",
+			"fromYou": "You: {{text}}",
+			"fromPlayer": "{{name}}: {{text}}",
+			"addFriend": "Add as friend to start chatting",
+			"opening": "Opening chat…",
+			"openFailed": "Couldn't open this chat. Try again.",
+			"unread_one": "{{count}} new message",
+			"unread_other": "{{count}} new messages"
+		},
+		"presence": {
+			"online": "Online",
+			"offline": "Offline"
+		},
+		"age": {
+			"now": "now",
+			"MINUTES": "{{count}}m",
+			"HOURS": "{{count}}h",
+			"DAYS": "{{count}}d"
+		},
+		"day": {
+			"today": "Today",
+			"yesterday": "Yesterday"
+		},
+		"thread": {
+			"label": "Messages",
+			"loading": "Loading messages…",
+			"error": "Couldn't load these messages.",
+			"empty": "No messages yet. Say hi!",
+			"emptyRoom": "No messages yet. Say hi to your room!",
+			"olderLoading": "Loading earlier messages…",
+			"olderFailed": "Couldn't load earlier messages.",
+			"newMessages": "New messages",
+			"newFrom": "New message from {{name}}",
+			"newMessage": "New message",
+			"you": "You:"
+		},
+		"composer": {
+			"label": "Message",
+			"placeholder": "Write a message…",
+			"send": "Send message",
+			"offline": "Reconnecting… you can send again in a moment.",
+			"tooLong": "Messages can be up to {{max}} characters.",
+			"count": "{{count}}/{{max}}"
+		},
+		"pending": {
+			"sending": "Sending…",
+			"retry": "Retry",
+			"discard": "Remove",
+			"failed": {
+				"OFFLINE": "Not sent: you're offline.",
+				"TIMEOUT": "Not sent yet: the server didn't answer.",
+				"UNAVAILABLE": "Not sent: chat is unavailable right now.",
+				"REVOKED": "Not sent: you can't message this chat anymore.",
+				"INVALID": "Not sent: the message was rejected."
+			}
+		},
+		"access": {
+			"direct": "You're no longer friends. Add them as a friend to chat again.",
+			"viewProfile": "View profile",
+			"room": {
+				"default": "You can't use this room chat anymore.",
+				"GAME_FINISHED": "Room chat closed when the game ended.",
+				"ROOM_LEFT": "You left this room, so its chat is closed.",
+				"KICKED_BY_HOST": "You were removed from this room, so its chat is closed.",
+				"POST_GAME_TIMEOUT": "Room chat closed after the game.",
+				"ROOM_CLOSED": "This room has closed."
+			}
+		},
+		"unknownPlayer": "Player",
+		"retry": "Try again"
 	}
 }

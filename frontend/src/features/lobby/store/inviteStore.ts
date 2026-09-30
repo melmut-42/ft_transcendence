@@ -9,7 +9,8 @@ import { create } from 'zustand';
 import type { RoomInviteReceivedEvent } from '@shared/types';
 
 export interface RoomInvite {
-  event_id: string;
+  invite_id: string;
+  expires_at: string;
   room_id: number;
   room_code: string;
   from_user: { user_id: number; username: string };
@@ -20,7 +21,7 @@ interface InviteState {
   invites: RoomInvite[];
 
   receive: (event: RoomInviteReceivedEvent) => void;
-  dismiss: (eventId: string) => void;
+  dismiss: (inviteId: string) => void;
   clear: () => void;
 }
 
@@ -28,14 +29,22 @@ export const useInviteStore = create<InviteState>((set) => ({
   invites: [],
 
   receive: (event) =>
-    set(({ invites }) => ({
-      // A newer invitation to the same room replaces the older one.
-      invites: [
-        ...invites.filter((i) => i.room_id !== event.payload.room_id),
-        { event_id: event.event_id, sent_at: event.sent_at, ...event.payload },
-      ],
-    })),
-  dismiss: (eventId) =>
-    set(({ invites }) => ({ invites: invites.filter((i) => i.event_id !== eventId) })),
+    set(({ invites }) => {
+      const invite: RoomInvite = { sent_at: event.sent_at, ...event.payload };
+      // The gateway drops expired deliveries; one that expired in transit is dropped too.
+      if (Date.parse(invite.expires_at) <= Date.now()) return { invites };
+      // A redelivered invitation is the same `invite_id`; a newer one to the same room
+      // replaces the older.
+      return {
+        invites: [
+          ...invites.filter(
+            (i) => i.invite_id !== invite.invite_id && i.room_id !== invite.room_id,
+          ),
+          invite,
+        ],
+      };
+    }),
+  dismiss: (inviteId) =>
+    set(({ invites }) => ({ invites: invites.filter((i) => i.invite_id !== inviteId) })),
   clear: () => set({ invites: [] }),
 }));

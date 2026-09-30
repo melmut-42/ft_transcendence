@@ -636,6 +636,7 @@
 				"REMOVING": "Arkadaşlıktan çıkarılamadı. Tekrar dene."
 			}
 		},
+		"message": "Mesaj",
 		"invite": {
 			"button": {
 				"READY": "Davet Et",
@@ -686,5 +687,117 @@
 			},
 			"scoreLabel": "Son skor: takımın {{own}}, rakip takım {{other}}"
 		}
+	},
+	"chat": {
+		"launcher": {
+			"title": "Sohbet",
+			"label": "Sohbeti aç",
+			"labelUnread_one": "Sohbeti aç, {{count}} yeni mesaj",
+			"labelUnread_other": "Sohbeti aç, {{count}} yeni mesaj",
+			"caption_one": "{{count}} yeni mesaj",
+			"caption_other": "{{count}} yeni mesaj",
+			"captionNone": "Yeni mesaj yok"
+		},
+		"panel": {
+			"title": "Sohbetler",
+			"close": "Sohbeti kapat",
+			"back": "Sohbetlere dön"
+		},
+		"search": {
+			"label": "Arkadaş ara",
+			"placeholder": "Arkadaş ara"
+		},
+		"tabs": {
+			"label": "Sohbetler",
+			"ROOM": "Oda",
+			"FRIENDS": "Arkadaşlar"
+		},
+		"sections": {
+			"room": "Bu odada",
+			"friends": "Arkadaşlar"
+		},
+		"room": {
+			"name": "Oda sohbeti",
+			"code": "Oda {{code}}",
+			"preparing": "Oda sohbeti hazırlanıyor…",
+			"closed": "Oda sohbeti kapandı"
+		},
+		"list": {
+			"loading": "Sohbetler yükleniyor…",
+			"channelsError": "Sohbetlerin yüklenemedi.",
+			"friendsError": "Arkadaşların yüklenemedi.",
+			"noRoom": "Oyuncularıyla sohbet etmek için bir odaya katıl.",
+			"noFriends": "Burada sohbet etmek için arkadaş ekle.",
+			"noResults": "“{{query}}” ile eşleşen kimse yok.",
+			"noMessages": "Henüz mesaj yok",
+			"fromYou": "Sen: {{text}}",
+			"fromPlayer": "{{name}}: {{text}}",
+			"addFriend": "Sohbet etmek için arkadaş olarak ekle",
+			"opening": "Sohbet açılıyor…",
+			"openFailed": "Bu sohbet açılamadı. Tekrar dene.",
+			"unread_one": "{{count}} yeni mesaj",
+			"unread_other": "{{count}} yeni mesaj"
+		},
+		"presence": {
+			"online": "Çevrimiçi",
+			"offline": "Çevrimdışı"
+		},
+		"age": {
+			"now": "şimdi",
+			"MINUTES": "{{count}} dk",
+			"HOURS": "{{count}} sa",
+			"DAYS": "{{count}} g"
+		},
+		"day": {
+			"today": "Bugün",
+			"yesterday": "Dün"
+		},
+		"thread": {
+			"label": "Mesajlar",
+			"loading": "Mesajlar yükleniyor…",
+			"error": "Bu mesajlar yüklenemedi.",
+			"empty": "Henüz mesaj yok. Merhaba de!",
+			"emptyRoom": "Henüz mesaj yok. Odaya merhaba de!",
+			"olderLoading": "Önceki mesajlar yükleniyor…",
+			"olderFailed": "Önceki mesajlar yüklenemedi.",
+			"newMessages": "Yeni mesajlar",
+			"newFrom": "{{name}} adlı oyuncudan yeni mesaj",
+			"newMessage": "Yeni mesaj",
+			"you": "Sen:"
+		},
+		"composer": {
+			"label": "Mesaj",
+			"placeholder": "Bir mesaj yaz…",
+			"send": "Mesajı gönder",
+			"offline": "Yeniden bağlanılıyor… birazdan tekrar gönderebilirsin.",
+			"tooLong": "Mesajlar en fazla {{max}} karakter olabilir.",
+			"count": "{{count}}/{{max}}"
+		},
+		"pending": {
+			"sending": "Gönderiliyor…",
+			"retry": "Tekrar dene",
+			"discard": "Kaldır",
+			"failed": {
+				"OFFLINE": "Gönderilmedi: çevrimdışısın.",
+				"TIMEOUT": "Henüz gönderilmedi: sunucu yanıt vermedi.",
+				"UNAVAILABLE": "Gönderilmedi: sohbet şu anda kullanılamıyor.",
+				"REVOKED": "Gönderilmedi: bu sohbete artık yazamazsın.",
+				"INVALID": "Gönderilmedi: mesaj reddedildi."
+			}
+		},
+		"access": {
+			"direct": "Artık arkadaş değilsiniz. Tekrar sohbet etmek için arkadaş olarak ekle.",
+			"viewProfile": "Profili gör",
+			"room": {
+				"default": "Bu oda sohbetini artık kullanamazsın.",
+				"GAME_FINISHED": "Oyun bitince oda sohbeti kapandı.",
+				"ROOM_LEFT": "Bu odadan ayrıldın, sohbeti kapandı.",
+				"KICKED_BY_HOST": "Bu odadan çıkarıldın, sohbeti kapandı.",
+				"POST_GAME_TIMEOUT": "Oyundan sonra oda sohbeti kapandı.",
+				"ROOM_CLOSED": "Bu oda kapandı."
+			}
+		},
+		"unknownPlayer": "Oyuncu",
+		"retry": "Tekrar dene"
 	}
 }

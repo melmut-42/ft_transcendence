@@ -45,7 +45,12 @@ export type RestErrorCode =
   | 'INVALID_AVATAR_PRESET'
   | 'VALIDATION_ERROR'
   | 'RATE_LIMITED'
-  | 'SERVICE_UNAVAILABLE';
+  | 'SERVICE_UNAVAILABLE'
+  /* Chat REST v2 */
+  | 'NOT_PERMITTED'
+  | 'NOT_CHANNEL_MEMBER'
+  | 'CHANNEL_ACCESS_REVOKED'
+  | 'CHANNEL_NOT_FOUND';
 
 /**
  * UI-handling bucket each error falls into. Bruno's codes stay the authoritative

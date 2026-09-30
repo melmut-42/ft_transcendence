@@ -8,13 +8,17 @@ export type AvatarRing = 'none' | 'primary' | 'teamA' | 'teamB' | 'muted';
 
 export interface AvatarProps {
   /** Avatar image URL. Without one the placeholder face is drawn. */
-  src?: string;
+  src?: string | undefined;
   /** Player name, used as the image's alternative text. */
   name: string;
   size?: AvatarSize;
   ring?: AvatarRing;
   /** Draws the online dot. Leave it out when presence is unknown. */
-  online?: boolean;
+  online?: boolean | undefined;
+  /** Replaces the preset size, for a design that draws the avatar at another size. */
+  sizeClassName?: string;
+  /** Replaces the preset online-dot size to match `sizeClassName`. */
+  dotClassName?: string;
   className?: string;
 }
 
@@ -46,7 +50,16 @@ const ringStyles: Record<AvatarRing, string> = {
  * The dot is decoration — presence is already stated in the surrounding text — so it
  * carries no label of its own.
  */
-export function Avatar({ src, name, size = 'md', ring = 'none', online, className }: AvatarProps) {
+export function Avatar({
+  src,
+  name,
+  size = 'md',
+  ring = 'none',
+  online,
+  sizeClassName,
+  dotClassName,
+  className,
+}: AvatarProps) {
   return (
     <span className={cn('relative inline-block shrink-0', className)}>
       <span
@@ -54,7 +67,7 @@ export function Avatar({ src, name, size = 'md', ring = 'none', online, classNam
           'flex items-center justify-center overflow-hidden rounded-pill bg-accent-yellow-deep',
           'transition-[border-color,scale] duration-200 ease-pop',
           'motion-safe:group-hover/row:scale-105',
-          sizeStyles[size],
+          sizeClassName ?? sizeStyles[size],
           ringStyles[ring],
         )}
       >
@@ -71,7 +84,7 @@ export function Avatar({ src, name, size = 'md', ring = 'none', online, classNam
             'absolute right-0 bottom-0 rounded-pill border-(length:--stroke-heavy) border-surface',
             'transition-colors duration-200 ease-out',
             online ? 'bg-success-soft' : 'bg-text-disabled',
-            dotStyles[size],
+            dotClassName ?? dotStyles[size],
           )}
         />
       )}

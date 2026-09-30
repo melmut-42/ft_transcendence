@@ -30,7 +30,16 @@ import type {
   AvatarPresetListResponse,
   UserSearchResponse,
 } from '@shared/types';
-import { MockActionError, MockRoomServer, mockRooms, mockSession } from '@shared/websocket/mock';
+import { CHAT_API_PATH } from '@shared/constants';
+import {
+  MockActionError,
+  MockChannelError,
+  MockRoomServer,
+  mockChat,
+  mockDirectory,
+  mockRooms,
+  mockSession,
+} from '@shared/websocket/mock';
 import type { MockPlayer } from '@shared/websocket/mock';
 
 import type { ApiRequestOptions } from '../client';
@@ -133,6 +142,10 @@ const noContent: MockResult = { status: 204 };
 const bodyOf = <T>(options: ApiRequestOptions): Partial<T> =>
   typeof options.body === 'object' && options.body !== null ? (options.body as Partial<T>) : {};
 
+/** A Chat REST v2 path under `CHAT_API_PATH`, e.g. `/v2/channels/7001/messages`. */
+const chatPattern = (suffix: string): RegExp =>
+  new RegExp(`^${CHAT_API_PATH.replace(/\//g, '\\/')}${suffix}$`);
+
 const isPositiveInt = (value: unknown): value is number =>
   typeof value === 'number' && Number.isInteger(value) && value > 0;
 
@@ -153,6 +166,21 @@ export class MockApiServer {
     this.routes = this.buildRoutes();
     this.reset();
     mockSession.authorized = () => this.isAuthenticated();
+    // The mock Channel Service asks this server, as the real one asks User/Auth.
+    mockDirectory.selfId = () => this.sessionUserId ?? SELF_USER_ID;
+    mockDirectory.isFriend = (userId) => this.friendIds.has(userId);
+    mockDirectory.user = (userId) => {
+      const account = this.accounts.find((a) => a.user_id === userId);
+      return account
+        ? {
+            user_id: account.user_id,
+            username: account.username,
+            avatar_url: account.avatar_url,
+            is_online: account.is_online,
+          }
+        : null;
+    };
+    mockDirectory.roomCode = (roomId) => this.rooms.get(roomId)?.code ?? null;
   }
 
   /** The access cookie expires; the next `401` refreshes it, as it would in production. */
@@ -192,9 +220,17 @@ export class MockApiServer {
       try {
         this.applyForcedOutcome(route);
         if (route.auth && !this.isAuthenticated()) throw unauthorized();
-        return this.respond(route.handle({ params: match.slice(1), options }));
+        const response = this.respond(route.handle({ params: match.slice(1), options }));
+        // Room changes made over REST reach the mock Channel Service's lifecycle projection.
+        if (method !== 'GET') mockChat.syncRooms();
+        return response;
       } catch (error) {
         if (error instanceof HttpError) return this.respondError(error);
+        if (error instanceof MockChannelError) {
+          return this.respondError(
+            new HttpError(error.status, error.code as RestErrorCode, error.message, error.details),
+          );
+        }
         throw error;
       }
     }
@@ -761,6 +797,7 @@ export class MockApiServer {
             });
           }
           this.friendIds.add(userId);
+          mockChat.friendshipChanged(userId, true);
           return created({
             user_id: account.user_id,
             username: account.username,
@@ -789,6 +826,7 @@ export class MockApiServer {
               user_id: userId,
             });
           }
+          mockChat.friendshipChanged(userId, false);
           return noContent;
         },
         {
@@ -1014,6 +1052,63 @@ export class MockApiServer {
           conflict: () =>
             new HttpError(409, 'USER_OFFLINE', 'User 43 is not online.', { user_id: 43 }),
           'validation-error': () => validation('user_id must be a positive integer.', 'user_id'),
+        },
+      ),
+
+      /* ------------------------------ Chat REST v2 --------------------------- */
+
+      route('listChannels', 'GET', chatPattern(''), true, ({ options }) =>
+        ok(mockChat.listChannels({ limit: options.query?.limit, after: options.query?.after })),
+      ),
+
+      route(
+        'openDirectChannel',
+        'POST',
+        chatPattern('/direct'),
+        true,
+        ({ options }) => {
+          const { peer_user_id: peerUserId } = bodyOf<{ peer_user_id: number }>(options);
+          const { created: isNew, data } = mockChat.openDirect(peerUserId);
+          return isNew ? created(data) : ok(data);
+        },
+        {
+          forbidden: () =>
+            new HttpError(403, 'NOT_PERMITTED', 'Direct channels are available to friends only.', {
+              peer_user_id: 99,
+            }),
+          'not-found': () =>
+            new HttpError(404, 'USER_NOT_FOUND', 'User 9999 was not found.', { user_id: 9999 }),
+          'validation-error': () =>
+            validation('peer_user_id must be a positive integer.', 'peer_user_id'),
+        },
+      ),
+
+      route(
+        'messageHistory',
+        'GET',
+        chatPattern('/([^/]+)/messages'),
+        true,
+        ({ params, options }) => {
+          const channelId = Number(params[0]);
+          if (!Number.isInteger(channelId) || channelId <= 0) {
+            throw validation('channel_id must be a positive integer.', 'channel_id');
+          }
+          return ok(
+            mockChat.history(channelId, {
+              limit: options.query?.limit,
+              before: options.query?.before,
+            }),
+          );
+        },
+        {
+          forbidden: () =>
+            new HttpError(403, 'CHANNEL_ACCESS_REVOKED', 'Access to channel 7001 has ended.', {
+              channel_id: 7001,
+            }),
+          'not-found': () =>
+            new HttpError(404, 'CHANNEL_NOT_FOUND', 'Channel 9999 was not found.', {
+              channel_id: 9999,
+            }),
         },
       ),
     ];

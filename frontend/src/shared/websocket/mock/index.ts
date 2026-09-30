@@ -26,6 +26,8 @@
  *   mockSockets.online()                         // network back; sockets reconnect
  *   mockSockets.room().graceMs.game = 10000      // shorter seat hold for the next drop
  *   mockSockets.chat.inviteReceived({ user_id: 43, username: 'red_agent' }, 1002, 'QWER12')
+ *   mockSockets.chat.directMessage(43, 'hi!')    // a friend writes (more in mockChatServer.ts)
+ *   mockSockets.chat.roomMessage(48, 'ready?')    // a room player writes in the room chat
  */
 
 import { RECONNECT, WS_BASE_PATH, WS_CHAT_PATH } from '@shared/constants';
@@ -33,7 +35,8 @@ import type { CardColor } from '@shared/types';
 
 import { setTransportFactory } from '../transport';
 import type { TransportFactory } from '../transport';
-import { MockChatServer } from './mockChatServer';
+import { mockChat } from './mockChatServer';
+import type { MockChatServer } from './mockChatServer';
 import { MockRoomServer } from './mockRoomServer';
 import { MockTransport } from './mockTransport';
 import { mockNetwork, mockRooms, mockSelfPlayer } from './registry';
@@ -42,8 +45,8 @@ import type { RoomScenario } from './scenarios';
 
 export { MOCK_BOTS, MockActionError, MockRoomServer } from './mockRoomServer';
 export type { MockPlayer } from './mockRoomServer';
-export { MockChatServer } from './mockChatServer';
-export { mockNetwork, mockRooms, mockSelfPlayer, mockSession } from './registry';
+export { MockChannelError, MockChatServer, mockChat } from './mockChatServer';
+export { mockDirectory, mockNetwork, mockRooms, mockSelfPlayer, mockSession } from './registry';
 export { ROOM_SCENARIOS, applyRoomScenario, guessByColor } from './scenarios';
 export type { RoomScenario } from './scenarios';
 
@@ -84,7 +87,7 @@ function freshRoom(roomId: number, scenario: RoomScenario): MockRoomServer {
 
 export function installMockSockets(): MockSockets {
   const rooms = mockRooms;
-  const chat = new MockChatServer();
+  const chat = mockChat;
   let lastRoomId: number | null = null;
   let onlineTimer: ReturnType<typeof setTimeout> | undefined;
   const roomPattern = new RegExp(`^${WS_BASE_PATH}/rooms/(\\d+)$`);

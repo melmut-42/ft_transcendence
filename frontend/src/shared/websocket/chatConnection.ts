@@ -1,16 +1,19 @@
 /**
- * The per-user chat socket (`/ws/chat`), independent of any room.
+ * The per-user Chat Gateway socket (`/ws/v2/channels`), independent of any room.
  *
- * Same cookie-only authentication as the room socket. Basic chat is live-only: this
- * connection stores no history, because the contract defines none.
+ * Same cookie-only authentication as the room socket. The socket carries live messages,
+ * channel access changes and room invitations; it replays nothing on connect, so history
+ * and the channel list are read over Chat REST v2 after each `chat.ready`.
  */
 
 import { WS_CHAT_PATH } from '@shared/constants';
-import { createRequestId } from '@shared/utils';
 import type {
   AckMessage,
+  ChannelAccessChangedEvent,
+  ChannelAvailableEvent,
   ChatCommand,
-  ChatMessageNewEvent,
+  ChatMessageCreatedEvent,
+  ChatReadyEvent,
   ChatSendAck,
   ChatSendPayload,
   ChatServerMessage,
@@ -24,10 +27,14 @@ import type { SocketTransport } from './transport';
 
 export interface ChatConnectionHandlers {
   onStatusChange?: (status: ConnectionStatus, reason?: ConnectionCloseReason) => void;
-  onMessage?: (event: ChatMessageNewEvent) => void;
+  /** The gateway accepted the session; emitted once per (re)connection. */
+  onReady?: (event: ChatReadyEvent) => void;
+  onMessage?: (event: ChatMessageCreatedEvent) => void;
+  onChannelAvailable?: (event: ChannelAvailableEvent) => void;
+  onAccessChanged?: (event: ChannelAccessChangedEvent) => void;
   /** Live room invitation from a friend. Accepting it is an ordinary REST join. */
   onInvite?: (event: RoomInviteReceivedEvent) => void;
-  /** Carries `delivery_status`: `DELIVERED` or `RECIPIENT_OFFLINE`. */
+  /** Sent only after Channel Service authorized and persisted the message. */
   onAck?: (ack: AckMessage<ChatSendAck>) => void;
   onError?: (error: WsErrorMessage) => void;
 }
@@ -59,12 +66,13 @@ export class ChatConnection {
     return this.socket.getStatus();
   }
 
-  /** Returns the `request_id`, or `null` when the socket is not open. */
-  send(payload: ChatSendPayload): string | null {
-    const requestId = createRequestId();
-    return this.socket.send({ type: 'chat.message.send', request_id: requestId, payload })
-      ? requestId
-      : null;
+  /**
+   * Send one message under `requestId`. A retry of a message whose outcome is unknown
+   * reuses its `request_id`: Channel Service then returns the original result instead of
+   * storing the message twice. Returns `false` when the socket is not open.
+   */
+  send(payload: ChatSendPayload, requestId: string): boolean {
+    return this.socket.send({ type: 'chat.message.send', request_id: requestId, payload });
   }
 
   private dispatch(message: ChatServerMessage): void {
@@ -75,8 +83,17 @@ export class ChatConnection {
       case 'error':
         this.handlers.onError?.(message);
         return;
-      case 'chat.message.new':
+      case 'chat.ready':
+        this.handlers.onReady?.(message);
+        return;
+      case 'chat.message.created':
         this.handlers.onMessage?.(message);
+        return;
+      case 'chat.channel.available':
+        this.handlers.onChannelAvailable?.(message);
+        return;
+      case 'chat.channel.access_changed':
+        this.handlers.onAccessChanged?.(message);
         return;
       case 'room.invite.received':
         this.handlers.onInvite?.(message);

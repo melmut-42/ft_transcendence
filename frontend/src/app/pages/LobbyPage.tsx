@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import createRoomArtwork from '@assets/lobby/lobby-create-room.svg';
 import joinRoomArtwork from '@assets/lobby/lobby-join-room.svg';
 import mascotArtwork from '@assets/lobby/lobby-mascot.svg';
+import { ChatHeaderButton } from '@features/chat/components/ChatWidget';
 import { OnlinePlayers } from '@features/friends/components/OnlinePlayers';
 import { ProfileMenu } from '@features/profile/components/ProfileMenu';
 import { CreateRoomDialog } from '@features/room/components/CreateRoomDialog';
@@ -52,6 +53,9 @@ export function LobbyPage() {
       <div className={styles.column}>
         <header className={styles.header}>
           <ProfileMenu className={styles.profile} />
+          <span className={styles.chat}>
+            <ChatHeaderButton />
+          </span>
         </header>
 
         <img src={mascotArtwork} alt="" className={styles.mascot} />

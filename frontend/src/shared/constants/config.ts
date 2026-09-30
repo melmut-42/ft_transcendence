@@ -19,8 +19,17 @@ export const WS_BASE_PATH = import.meta.env.VITE_WS_BASE_PATH ?? '/ws';
 /** Per-room socket carrying both `room.*` and `game.*` events. */
 export const wsRoomPath = (roomId: number): string => `${WS_BASE_PATH}/rooms/${roomId}`;
 
-/** Per-user chat socket, independent of any room. */
-export const WS_CHAT_PATH = `${WS_BASE_PATH}/chat`;
+/**
+ * Chat v2 version segment. Chat is its own versioned contract (`chatApiVersion`): its
+ * REST calls go to `/api/v2/channels` and its socket to Chat Gateway at `/ws/v2/channels`.
+ */
+export const CHAT_API_VERSION = 'v2';
+
+/** Chat REST prefix, relative to `API_BASE_PATH`. */
+export const CHAT_API_PATH = `/${CHAT_API_VERSION}/channels`;
+
+/** Per-user Chat Gateway socket, independent of any room. */
+export const WS_CHAT_PATH = `${WS_BASE_PATH}/${CHAT_API_VERSION}/channels`;
 
 /** Absolute `ws(s)://` URL for a same-origin socket path. */
 export function toWebSocketUrl(path: string): string {

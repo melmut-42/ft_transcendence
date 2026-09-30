@@ -36,6 +36,8 @@ export interface ProfileModalProps {
   room: Room | null;
   /** Told when the server refuses an invite, so what it found stale can be read again. */
   onInviteRefused?: ((reason: InviteUnavailableReason) => void) | undefined;
+  /** Opens the direct chat with this player. Offered to friends only, as chat allows. */
+  onMessage?: (() => void) | undefined;
   /** The own profile's GAME HISTORY. */
   history?: ReactNode;
 }
@@ -61,6 +63,7 @@ export function ProfileModal({
   friendship,
   room,
   onInviteRefused,
+  onMessage,
   history,
 }: ProfileModalProps) {
   const { t } = useTranslation();
@@ -92,6 +95,7 @@ export function ProfileModal({
               friendship={friendship}
               room={room}
               onInviteRefused={onRefused}
+              onMessage={onMessage}
             />
           )}
           <ProfileStats profile={profile} />
@@ -173,11 +177,13 @@ function ProfileActions({
   friendship,
   room,
   onInviteRefused,
+  onMessage,
 }: {
   profile: ProfileView;
   friendship: FriendshipControl;
   room: Room | null;
   onInviteRefused?: ((reason: InviteUnavailableReason) => void) | undefined;
+  onMessage?: (() => void) | undefined;
 }) {
   const { t } = useTranslation();
   const hintId = useId();
@@ -215,6 +221,12 @@ function ProfileActions({
           >
             {invite.status === 'SENT' && <Icon name="check" />}
             {t(`profile.invite.button.${invite.status}`)}
+          </button>
+        )}
+        {/* Direct chat is friend-only, so Message is offered to friends only. */}
+        {isFriend && onMessage && (
+          <button type="button" onClick={onMessage} className={styles.message}>
+            {t('profile.message')}
           </button>
         )}
       </div>

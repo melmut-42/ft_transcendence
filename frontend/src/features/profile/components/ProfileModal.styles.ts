@@ -90,6 +90,11 @@ export const invite = {
   unavailable: `${inviteBase} border-disabled bg-disabled text-text-muted`,
 };
 
+/** Message: the outline blue button. */
+export const message: string =
+  `${actionBase} border-(length:--stroke-default) border-primary-deep bg-surface ` +
+  'text-primary-sky hover:bg-primary-sky/10';
+
 /** Takes no room while there is nothing to say, so no blank line sits under the buttons. */
 export const hintBase: string =
   'text-center text-md leading-[22px] font-regular empty:hidden md:text-sm md:leading-[18px]';

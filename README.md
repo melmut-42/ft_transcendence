@@ -116,6 +116,9 @@ mockSockets.chat.inviteReceived(
   1002,
   "QWER12",
 );
+mockSockets.chat.directMessage(43, "hi!"); // a friend writes a direct message
+mockSockets.chat.roomMessage(48, "ready?"); // a player writes in the room chat
+mockSockets.chat.failNext(); // the next send fails with SERVICE_UNAVAILABLE
 ```
 
 Each method throws a `MockActionError` carrying the contract error code when the action

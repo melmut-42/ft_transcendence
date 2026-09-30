@@ -6,7 +6,15 @@
  * on a same-origin upgrade. Nothing here carries a credential, by design.
  */
 
-import type { ChatMessageNewPayload, ChatSendAck, ChatSendPayload } from './chat';
+import type {
+  ChannelAccessChangedPayload,
+  ChannelAvailablePayload,
+  ChatMessageCreatedPayload,
+  ChatReadyPayload,
+  ChatSendAck,
+  ChatSendPayload,
+  RoomInvitePayload,
+} from './chat';
 import type { Score, Team } from './common';
 import type { CardColor, Clue, CurrentTurn, GameEndReason } from './game';
 import type { Room, RoomMember, RoomRole, RoomStatus } from './room';
@@ -111,7 +119,12 @@ export type WsErrorCode =
   | 'NO_GUESSES_REMAINING'
   | 'GAME_ALREADY_FINISHED'
   | 'NOT_PERMITTED'
-  | 'USER_NOT_FOUND';
+  | 'USER_NOT_FOUND'
+  /* Chat v2 */
+  | 'NOT_CHANNEL_MEMBER'
+  | 'CHANNEL_ACCESS_REVOKED'
+  | 'CHANNEL_NOT_FOUND'
+  | 'SERVICE_UNAVAILABLE';
 
 /** Action errors keep the connection open and never mutate room/game state. */
 export interface WsErrorMessage {
@@ -287,16 +300,34 @@ export interface ChatEventEnvelope<TType extends string, TPayload> {
   payload: TPayload;
 }
 
-export type ChatMessageNewEvent = ChatEventEnvelope<'chat.message.new', ChatMessageNewPayload>;
+export type ChatReadyEvent = ChatEventEnvelope<'chat.ready', ChatReadyPayload>;
 
-/** Live invitation from a friend, delivered on the chat socket and never stored. */
-export type RoomInviteReceivedEvent = ChatEventEnvelope<
-  'room.invite.received',
-  { room_id: number; room_code: string; from_user: { user_id: number; username: string } }
+export type ChatMessageCreatedEvent = ChatEventEnvelope<
+  'chat.message.created',
+  ChatMessageCreatedPayload
 >;
 
-export type ChatServerMessage =
-  ChatMessageNewEvent | RoomInviteReceivedEvent | AckMessage<ChatSendAck> | WsErrorMessage;
+export type ChannelAvailableEvent = ChatEventEnvelope<
+  'chat.channel.available',
+  ChannelAvailablePayload
+>;
+
+export type ChannelAccessChangedEvent = ChatEventEnvelope<
+  'chat.channel.access_changed',
+  ChannelAccessChangedPayload
+>;
+
+/** Live invitation from a friend, delivered on the chat socket and never stored. */
+export type RoomInviteReceivedEvent = ChatEventEnvelope<'room.invite.received', RoomInvitePayload>;
+
+export type ChatServerEvent =
+  | ChatReadyEvent
+  | ChatMessageCreatedEvent
+  | ChannelAvailableEvent
+  | ChannelAccessChangedEvent
+  | RoomInviteReceivedEvent;
+
+export type ChatServerMessage = ChatServerEvent | AckMessage<ChatSendAck> | WsErrorMessage;
 
 /**
  * Close codes the Gateway uses. `4401` means the session became explicitly invalid

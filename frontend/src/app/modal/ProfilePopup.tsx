@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { openDirectChat } from '@features/chat/hooks/useChat';
 import { useFriendship } from '@features/friends/hooks/useFriendship';
 import { ProfileModal } from '@features/profile/components/ProfileModal';
 import type { InviteUnavailableReason } from '@features/profile/hooks/useInviteToRoom';
@@ -10,7 +11,7 @@ import { useSessionStore } from '@shared/stores';
 /**
  * The Profile pop-up with everything it needs from other features, joined here at app
  * level so no feature imports another: the friendship from `friends`, the room the user
- * is in from the room store, and GAME HISTORY from `stats`.
+ * is in from the room store, GAME HISTORY from `stats`, and Message from `chat`.
  *
  * The room is the live snapshot of the user's active room, so invite eligibility follows
  * every `room.state`, including the fresh one after a reconnect. Outside a room it is
@@ -43,6 +44,12 @@ function OtherProfile({ userId, onClose }: { userId: number; onClose: () => void
     [rereadFriends],
   );
 
+  // Message opens the direct chat over the same screen; the pop-up steps aside for it.
+  const onMessage = useCallback(() => {
+    onClose();
+    openDirectChat(userId);
+  }, [onClose, userId]);
+
   return (
     <ProfileModal
       userId={userId}
@@ -51,6 +58,7 @@ function OtherProfile({ userId, onClose }: { userId: number; onClose: () => void
       friendship={friendship}
       room={room}
       onInviteRefused={onInviteRefused}
+      onMessage={onMessage}
     />
   );
 }

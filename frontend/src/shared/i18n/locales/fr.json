@@ -636,6 +636,7 @@
 				"REMOVING": "Impossible de retirer cet ami. Réessayez."
 			}
 		},
+		"message": "Message",
 		"invite": {
 			"button": {
 				"READY": "Inviter",
@@ -686,5 +687,117 @@
 			},
 			"scoreLabel": "Score final : votre équipe {{own}}, l'autre équipe {{other}}"
 		}
+	},
+	"chat": {
+		"launcher": {
+			"title": "Chat",
+			"label": "Ouvrir le chat",
+			"labelUnread_one": "Ouvrir le chat, {{count}} nouveau message",
+			"labelUnread_other": "Ouvrir le chat, {{count}} nouveaux messages",
+			"caption_one": "{{count}} nouveau message",
+			"caption_other": "{{count}} nouveaux messages",
+			"captionNone": "Aucun nouveau message"
+		},
+		"panel": {
+			"title": "Discussions",
+			"close": "Fermer le chat",
+			"back": "Retour aux discussions"
+		},
+		"search": {
+			"label": "Rechercher des amis",
+			"placeholder": "Rechercher des amis"
+		},
+		"tabs": {
+			"label": "Discussions",
+			"ROOM": "Salon",
+			"FRIENDS": "Amis"
+		},
+		"sections": {
+			"room": "Dans ce salon",
+			"friends": "Amis"
+		},
+		"room": {
+			"name": "Chat du salon",
+			"code": "Salon {{code}}",
+			"preparing": "Le chat du salon se prépare…",
+			"closed": "Le chat du salon est fermé"
+		},
+		"list": {
+			"loading": "Chargement des discussions…",
+			"channelsError": "Impossible de charger vos discussions.",
+			"friendsError": "Impossible de charger vos amis.",
+			"noRoom": "Rejoignez un salon pour discuter avec ses joueurs.",
+			"noFriends": "Ajoutez des amis pour discuter avec eux ici.",
+			"noResults": "Personne ne correspond à « {{query}} ».",
+			"noMessages": "Aucun message pour l’instant",
+			"fromYou": "Vous : {{text}}",
+			"fromPlayer": "{{name}} : {{text}}",
+			"addFriend": "Ajoutez en ami pour discuter",
+			"opening": "Ouverture du chat…",
+			"openFailed": "Impossible d’ouvrir ce chat. Réessayez.",
+			"unread_one": "{{count}} nouveau message",
+			"unread_other": "{{count}} nouveaux messages"
+		},
+		"presence": {
+			"online": "En ligne",
+			"offline": "Hors ligne"
+		},
+		"age": {
+			"now": "maintenant",
+			"MINUTES": "{{count}} min",
+			"HOURS": "{{count}} h",
+			"DAYS": "{{count}} j"
+		},
+		"day": {
+			"today": "Aujourd’hui",
+			"yesterday": "Hier"
+		},
+		"thread": {
+			"label": "Messages",
+			"loading": "Chargement des messages…",
+			"error": "Impossible de charger ces messages.",
+			"empty": "Aucun message pour l’instant. Dites bonjour !",
+			"emptyRoom": "Aucun message pour l’instant. Dites bonjour au salon !",
+			"olderLoading": "Chargement des messages précédents…",
+			"olderFailed": "Impossible de charger les messages précédents.",
+			"newMessages": "Nouveaux messages",
+			"newFrom": "Nouveau message de {{name}}",
+			"newMessage": "Nouveau message",
+			"you": "Vous :"
+		},
+		"composer": {
+			"label": "Message",
+			"placeholder": "Écrire un message…",
+			"send": "Envoyer le message",
+			"offline": "Reconnexion… vous pourrez envoyer dans un instant.",
+			"tooLong": "Un message peut contenir jusqu’à {{max}} caractères.",
+			"count": "{{count}}/{{max}}"
+		},
+		"pending": {
+			"sending": "Envoi…",
+			"retry": "Réessayer",
+			"discard": "Retirer",
+			"failed": {
+				"OFFLINE": "Non envoyé : vous êtes hors ligne.",
+				"TIMEOUT": "Pas encore envoyé : le serveur n’a pas répondu.",
+				"UNAVAILABLE": "Non envoyé : le chat est indisponible pour le moment.",
+				"REVOKED": "Non envoyé : vous ne pouvez plus écrire dans ce chat.",
+				"INVALID": "Non envoyé : le message a été refusé."
+			}
+		},
+		"access": {
+			"direct": "Vous n’êtes plus amis. Ajoutez ce joueur en ami pour discuter à nouveau.",
+			"viewProfile": "Voir le profil",
+			"room": {
+				"default": "Vous ne pouvez plus utiliser ce chat de salon.",
+				"GAME_FINISHED": "Le chat du salon s’est fermé à la fin de la partie.",
+				"ROOM_LEFT": "Vous avez quitté ce salon, son chat est donc fermé.",
+				"KICKED_BY_HOST": "Vous avez été retiré de ce salon, son chat est donc fermé.",
+				"POST_GAME_TIMEOUT": "Le chat du salon s’est fermé après la partie.",
+				"ROOM_CLOSED": "Ce salon est fermé."
+			}
+		},
+		"unknownPlayer": "Joueur",
+		"retry": "Réessayer"
 	}
 }

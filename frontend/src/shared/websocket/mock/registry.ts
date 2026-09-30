@@ -8,6 +8,7 @@
  */
 
 import { useSessionStore } from '@shared/stores';
+import type { ChannelPeer } from '@shared/types';
 
 import type { MockRoomServer } from './mockRoomServer';
 import type { MockPlayer } from './mockRoomServer';
@@ -34,3 +35,28 @@ export const mockNetwork = { online: true };
  * Gateway's `401` on the upgrade does.
  */
 export const mockSession = { authorized: (): boolean => true };
+
+/**
+ * Told after a room's membership or status changed, so the mock Channel Service can follow
+ * the room lifecycle as the real one follows Game Session's outbox.
+ */
+export const mockRoomLifecycle = { changed: (): void => {} };
+
+/**
+ * What the mock Channel Service asks the owners of users and rooms, as the real one asks
+ * User/Auth and Game Session. The mock REST server installs the real answers; without it
+ * nobody is a friend.
+ */
+export interface MockDirectory {
+  selfId(): number;
+  isFriend(userId: number): boolean;
+  user(userId: number): ChannelPeer | null;
+  roomCode(roomId: number): string | null;
+}
+
+export const mockDirectory: MockDirectory = {
+  selfId: () => mockSelfPlayer().user_id,
+  isFriend: () => false,
+  user: () => null,
+  roomCode: () => null,
+};
