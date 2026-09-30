@@ -1,11 +1,11 @@
 /**
  * The Players Online list in Room Discovery: the user's friends who are online now.
  *
- * `GET /api/friends` carries live presence, read fresh on every call; the server does not
- * push presence changes, so the list is as current as its last load. It loads when Room
- * Discovery opens, again on Try again after a failure, and again, without the loading
- * placeholders, when the realtime connection comes back after a drop: whatever changed
- * while it was down is read fresh rather than trusted from before.
+ * `GET /api/friends` carries live presence, read fresh on every call, every page of it; the
+ * server does not push presence changes, so the list is as current as its last load. It
+ * loads when Room Discovery opens, again on Try again after a failure, and again, without
+ * the loading placeholders, when the realtime connection comes back after a drop: whatever
+ * changed while it was down is read fresh rather than trusted from before.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -13,7 +13,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useConnectionStore } from '@shared/stores';
 import type { Friend } from '@shared/types';
 
-import { listFriends } from '../api';
+import { listAllFriends } from '../api';
 import { useFriendsStore } from '../store/friendsStore';
 
 export type OnlineFriendsStatus = 'LOADING' | 'READY' | 'ERROR';
@@ -28,9 +28,9 @@ export function useOnlineFriends() {
     async (quiet = false) => {
       if (!quiet) setStatus('LOADING');
       try {
-        const { friends: list, friend_count: count } = await listFriends();
+        const { friends: list, friendCount } = await listAllFriends();
         if (!mounted.current) return;
-        setFriends(list, count);
+        setFriends(list, friendCount);
         setStatus('READY');
       } catch {
         if (mounted.current && !quiet) setStatus('ERROR');

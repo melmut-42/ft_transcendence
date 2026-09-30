@@ -708,16 +708,35 @@ export class MockApiServer {
 
       /* --------------------------------- friends ----------------------------- */
 
-      route('listFriends', 'GET', /^\/friends$/, true, () => {
-        const friends: Friend[] = this.accounts
+      route('listFriends', 'GET', /^\/friends$/, true, ({ options }) => {
+        const limit = Number(options.query?.limit ?? 50);
+        const offset = Number(options.query?.offset ?? 0);
+        if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+          throw validation('limit must be an integer from 1 through 100.', 'limit');
+        }
+        if (!Number.isInteger(offset) || offset < 0) {
+          throw validation('offset must be a non-negative integer.', 'offset');
+        }
+        const all: Friend[] = this.accounts
           .filter((a) => this.friendIds.has(a.user_id))
+          .sort(
+            (a, b) =>
+              a.username.toLowerCase().localeCompare(b.username.toLowerCase()) ||
+              a.user_id - b.user_id,
+          )
           .map((a) => ({
             user_id: a.user_id,
             username: a.username,
             avatar_url: a.avatar_url,
             is_online: a.is_online,
           }));
-        return ok({ friend_count: friends.length, friends } satisfies FriendListResponse);
+        return ok({
+          friend_count: all.length,
+          limit,
+          offset,
+          has_more: offset + limit < all.length,
+          friends: all.slice(offset, offset + limit),
+        } satisfies FriendListResponse);
       }),
 
       route(

@@ -61,10 +61,28 @@ export interface Friend {
   is_online: boolean;
 }
 
+/** `GET /api/friends` — one page, ordered case-insensitively by `username`, then `user_id`. */
 export interface FriendListResponse {
   friend_count: number;
+  /** Applied page size, `1..100`. */
+  limit: number;
+  /** Applied offset. */
+  offset: number;
+  /** Whether another page follows this one. */
+  has_more: boolean;
   friends: Friend[];
 }
+
+/**
+ * `GET /api/friends` query parameters. A type alias, like `MatchHistoryQuery`, so it can
+ * be passed straight to the REST client's `query` option.
+ */
+export type FriendListQuery = {
+  /** `1..100`, default `50`. */
+  limit?: number;
+  /** `>= 0`, default `0`. */
+  offset?: number;
+};
 
 export interface AddFriendRequest {
   user_id: number;
