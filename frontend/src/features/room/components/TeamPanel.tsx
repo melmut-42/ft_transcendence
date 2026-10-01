@@ -19,6 +19,26 @@ interface MemberProps {
   selfId: number | undefined;
   /** Whether this client's room connection is open, which is the only presence known. */
   selfOnline: boolean;
+  /** The Room Owner's Kick; left out for everyone else. */
+  onKick?: ((member: RoomMember) => void) | undefined;
+}
+
+/** The host's Kick beside a member's card or chip; never for the host themself. */
+function KickButton({ member, selfId, onKick }: Pick<MemberProps, 'member' | 'selfId' | 'onKick'>) {
+  const { t } = useTranslation();
+  if (!onKick || member.user_id === selfId) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => onKick(member)}
+      aria-haspopup="dialog"
+      aria-label={t('room.kick.action', { username: member.username })}
+      title={t('room.kick.action', { username: member.username })}
+      className={styles.kick}
+    >
+      <Icon name="kick" />
+    </button>
+  );
 }
 
 function MemberAvatar({
@@ -47,53 +67,56 @@ function MemberAvatar({
  * out as a label with its own mark, never shown by color alone. The card opens the
  * player's profile over the room.
  */
-export function PlayerCard({ member, avatarFor, selfId, selfOnline }: MemberProps) {
+export function PlayerCard({ member, avatarFor, selfId, selfOnline, onKick }: MemberProps) {
   const { t } = useTranslation();
   const isSelf = member.user_id === selfId;
   const tone = member.ready ? 'ready' : 'waiting';
 
   return (
-    <button
-      type="button"
-      onClick={() => openProfileModal(member.user_id)}
-      aria-haspopup="dialog"
-      aria-label={t('room.ready.card', {
-        username: member.username,
-        role: t(`room.ready.role.${member.role}`),
-        status: t(`room.ready.status.${tone}`),
-        host: member.is_host ? t('room.ready.hostSuffix') : '',
-        you: isSelf ? t('room.ready.youSuffix') : '',
-      })}
-      className={cn(styles.card, isSelf && member.team && styles.selfTone[member.team])}
-    >
-      <span className={styles.avatarFrame}>
-        <MemberAvatar url={avatarFor(member.user_id)} className={styles.avatar} />
-        {isSelf && selfOnline && <span aria-hidden="true" className={styles.onlineDot} />}
-      </span>
+    <div className={styles.kickable}>
+      <button
+        type="button"
+        onClick={() => openProfileModal(member.user_id)}
+        aria-haspopup="dialog"
+        aria-label={t('room.ready.card', {
+          username: member.username,
+          role: t(`room.ready.role.${member.role}`),
+          status: t(`room.ready.status.${tone}`),
+          host: member.is_host ? t('room.ready.hostSuffix') : '',
+          you: isSelf ? t('room.ready.youSuffix') : '',
+        })}
+        className={cn(styles.card, isSelf && member.team && styles.selfTone[member.team])}
+      >
+        <span className={styles.avatarFrame}>
+          <MemberAvatar url={avatarFor(member.user_id)} className={styles.avatar} />
+          {isSelf && selfOnline && <span aria-hidden="true" className={styles.onlineDot} />}
+        </span>
 
-      <span aria-hidden="true" className={styles.details}>
-        <span className={styles.nameRow}>
-          <span title={member.username} className={styles.name}>
-            {member.username}
+        <span aria-hidden="true" className={styles.details}>
+          <span className={styles.nameRow}>
+            <span title={member.username} className={styles.name}>
+              {member.username}
+            </span>
+            {member.is_host && <span className={styles.hostBadge}>{t('room.ready.host')}</span>}
           </span>
-          {member.is_host && <span className={styles.hostBadge}>{t('room.ready.host')}</span>}
+          <span className={styles.roleBadge}>
+            <Icon
+              name={member.role === 'SPYMASTER' ? 'profile' : 'search'}
+              className={styles.roleIcon}
+            />
+            {t(`room.ready.role.${member.role}`)}
+          </span>
         </span>
-        <span className={styles.roleBadge}>
-          <Icon
-            name={member.role === 'SPYMASTER' ? 'profile' : 'search'}
-            className={styles.roleIcon}
-          />
-          {t(`room.ready.role.${member.role}`)}
-        </span>
-      </span>
 
-      <span aria-hidden="true" className={cn(styles.readyBadge, styles.readyTone[tone])}>
-        <span className={cn(styles.readyMark, styles.readyMarkTone[tone])}>
-          <Icon name={member.ready ? 'check' : 'timer'} />
+        <span aria-hidden="true" className={cn(styles.readyBadge, styles.readyTone[tone])}>
+          <span className={cn(styles.readyMark, styles.readyMarkTone[tone])}>
+            <Icon name={member.ready ? 'check' : 'timer'} />
+          </span>
+          {t(`room.ready.status.${tone}`)}
         </span>
-        {t(`room.ready.status.${tone}`)}
-      </span>
-    </button>
+      </button>
+      <KickButton member={member} selfId={selfId} onKick={onKick} />
+    </div>
   );
 }
 
@@ -145,10 +168,14 @@ export function TeamPanel({
 export function Spectators({
   members,
   avatarFor,
+  selfId,
+  onKick,
   className,
 }: {
   members: RoomMember[];
   avatarFor: AvatarLookup;
+  selfId: number | undefined;
+  onKick?: ((member: RoomMember) => void) | undefined;
   className?: string;
 }) {
   const { t } = useTranslation();
@@ -162,7 +189,7 @@ export function Spectators({
       </h2>
       <ul className={styles.choosingList}>
         {members.map((m) => (
-          <li key={m.user_id} className="min-w-0">
+          <li key={m.user_id} className={styles.kickable}>
             <button
               type="button"
               onClick={() => openProfileModal(m.user_id)}
@@ -177,6 +204,7 @@ export function Spectators({
               />
               <span className={styles.chipName}>{m.username}</span>
             </button>
+            <KickButton member={m} selfId={selfId} onKick={onKick} />
           </li>
         ))}
       </ul>

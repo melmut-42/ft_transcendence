@@ -35,6 +35,8 @@ export const hint: string =
 
 export const capacity: string = 'desktop:mt-[13px]';
 
+export const settings: string = 'desktop:mt-[8px]';
+
 // ---- Hero (desktop) ----
 
 export const hero: string = 'relative hidden desktop:mt-[13px] desktop:block desktop:h-[167px]';

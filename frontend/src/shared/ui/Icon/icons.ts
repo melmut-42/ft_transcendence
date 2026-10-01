@@ -76,6 +76,7 @@ export const ICONS = {
   hint: faLightbulb,
   host: faCrown,
   key: faKey,
+  kick: faUserSlash,
   leave: faDoorOpen,
   lock: faLock,
   login: faRightToBracket,

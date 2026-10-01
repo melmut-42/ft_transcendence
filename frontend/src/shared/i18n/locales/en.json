@@ -539,7 +539,7 @@
 				"teamFirst": "Choose a team, then a role. Until then you're watching.",
 				"spymasterTaken": "{{username}} is this team's Spymaster.",
 				"locked": "The match is starting, so your setup is locked.",
-				"hostOnly": "Only the host can change the room size.",
+				"hostOnly": "Only the room owner can change the room size.",
 				"ready": {
 					"TEAM_REQUIRED": "Choose a team first.",
 					"ROLE_REQUIRED": "Choose a role first.",
@@ -553,7 +553,7 @@
 				"teamRequired": "Choose a team first.",
 				"roleRequired": "Choose a role first.",
 				"locked": "The match is starting, so your setup can't change now.",
-				"notHost": "Only the host can change the room size.",
+				"notHost": "Only the room owner can change the room settings.",
 				"capacity": "The room can't be smaller than the players in it.",
 				"offline": "You're offline. Try again once you're reconnected.",
 				"generic": "That didn't work. Try again.",
@@ -568,6 +568,7 @@
 			"closed": "That room has closed.",
 			"removed": "You are no longer a member of that room.",
 			"legacy": "You're still in a room from an older version of the game, which can't be opened here. It closes on its own once it ends.",
+			"kicked": "The room owner removed you from the room.",
 			"postGameTimeout": "You didn't choose in time, so you left the room after the match."
 		},
 		"invites": {
@@ -577,6 +578,30 @@
 			"joining": "Joining…",
 			"dismiss": "Dismiss",
 			"closed": "This room has closed."
+		},
+		"settings": {
+			"timer": "Turn timer",
+			"language": "Words",
+			"noLimit": "No limit",
+			"seconds_one": "{{count}} second",
+			"seconds_other": "{{count}} seconds",
+			"ownerYou": "You're the room owner. You can remove players and change the room size.",
+			"ownerOnly": "Only the room owner can change the room settings."
+		},
+		"kick": {
+			"action": "Remove {{username}} from the room",
+			"fromProfile": "Remove from Room",
+			"title": "Remove {{username}}?",
+			"body": "{{username}} leaves the room. They can join again with the room code.",
+			"bodyInGame": "{{username}} leaves the match now. If their team is left without a Spymaster or an Operative, the game pauses, and the room closes unless someone takes the seat in time.",
+			"confirm": "Remove",
+			"kicking": "Removing…",
+			"errors": {
+				"notHost": "You're no longer the room owner.",
+				"gone": "That player has already left.",
+				"self": "You can't remove yourself. Use Leave instead.",
+				"closed": "This room has closed."
+			}
 		}
 	},
 	"game": {

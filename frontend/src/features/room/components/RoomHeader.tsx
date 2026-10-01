@@ -54,6 +54,58 @@ export function RoomCode({ code, className }: { code: string; className?: string
 }
 
 /**
+ * The turn timer and the word language. Both belong to the Room Owner, but their allowed
+ * values are not agreed yet, so the server takes no change to either: they are shown as the
+ * room reports them, and nothing offers a value the contract does not define. Everyone is
+ * told who may change the room's settings.
+ */
+export function RoomSettingsInfo({
+  room,
+  userId,
+  className,
+}: {
+  room: Room;
+  userId: number;
+  className?: string;
+}) {
+  const { t, i18n } = useTranslation();
+  const language = languageName(room.language, i18n.language);
+  const isHost = room.host_user_id === userId;
+
+  return (
+    <div className={cn(styles.settings, className)}>
+      <div className={styles.settingRow}>
+        <span className={styles.settingChip}>
+          <Icon name="timer" />
+          <span className={styles.settingLabel}>{t('room.settings.timer')}</span>
+          {room.turn_timer_seconds === null
+            ? t('room.settings.noLimit')
+            : t('room.settings.seconds', { count: room.turn_timer_seconds })}
+        </span>
+        <span className={styles.settingChip}>
+          <Icon name="rules" />
+          <span className={styles.settingLabel}>{t('room.settings.language')}</span>
+          {language}
+        </span>
+      </div>
+      <p className={styles.ownerNote}>
+        <Icon name={isHost ? 'host' : 'lock'} />
+        {t(isHost ? 'room.settings.ownerYou' : 'room.settings.ownerOnly')}
+      </p>
+    </div>
+  );
+}
+
+/** The language's own name in the interface language, or the server's code if unknown. */
+function languageName(code: string, locale: string): string {
+  try {
+    return new Intl.DisplayNames([locale], { type: 'language' }).of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+/**
  * MAX PLAYERS and the player count. Only the host changes the size, only while the room
  * waits, and never below the players already in it; the server applies the change for
  * everyone with `room.settings.updated`. Everyone else sees the stepper locked.

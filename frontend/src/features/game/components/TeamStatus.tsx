@@ -9,16 +9,27 @@ import { cn } from '@shared/utils';
 import type { TeamLineup } from '../model/lineup';
 import * as styles from './TeamStatus.styles';
 
-/** Resolves a member's avatar; the room snapshot itself carries none. */
+/** Resolves a member's avatar from the member list, or from their profile as a fallback. */
 export type AvatarLookup = (userId: number) => string | null;
 
-function Player({ member, avatarFor }: { member: RoomMember; avatarFor: AvatarLookup }) {
+/** The Room Owner's Kick, for every player but themself; absent for everyone else. */
+export type KickLookup = ((member: RoomMember) => void) | undefined;
+
+function Player({
+  member,
+  avatarFor,
+  onKick,
+}: {
+  member: RoomMember;
+  avatarFor: AvatarLookup;
+  onKick: KickLookup;
+}) {
   const { t } = useTranslation();
   const url = avatarFor(member.user_id);
   const [failed, setFailed] = useState<string | null>(null);
 
   return (
-    <li>
+    <li className={styles.kickable}>
       <button
         type="button"
         onClick={() => openProfileModal(member.user_id)}
@@ -37,21 +48,36 @@ function Player({ member, avatarFor }: { member: RoomMember; avatarFor: AvatarLo
           {member.username}
         </span>
       </button>
+      {onKick && (
+        <button
+          type="button"
+          onClick={() => onKick(member)}
+          aria-haspopup="dialog"
+          aria-label={t('room.kick.action', { username: member.username })}
+          title={t('room.kick.action', { username: member.username })}
+          className={styles.kick}
+        >
+          <Icon name="kick" />
+        </button>
+      )}
     </li>
   );
 }
 
 /**
  * A team's lineup beside the desktop board: its Operatives, then its Spymaster. Each
- * player opens their profile over the game.
+ * player opens their profile over the game; the Room Owner can also remove any of them.
  */
 export function TeamStatusCard({
   lineup,
   avatarFor,
+  kickFor,
   className,
 }: {
   lineup: TeamLineup;
   avatarFor: AvatarLookup;
+  /** The Room Owner's Kick for one player; `undefined` where it does not apply. */
+  kickFor?: (member: RoomMember) => KickLookup;
   className?: string;
 }) {
   const { t } = useTranslation();
@@ -63,14 +89,24 @@ export function TeamStatusCard({
       <h3 className={cn(styles.roleLabel, tone.label)}>{t('game.roster.operatives')}</h3>
       <ul className={styles.players}>
         {lineup.operatives.map((member) => (
-          <Player key={member.user_id} member={member} avatarFor={avatarFor} />
+          <Player
+            key={member.user_id}
+            member={member}
+            avatarFor={avatarFor}
+            onKick={kickFor?.(member)}
+          />
         ))}
       </ul>
       <div aria-hidden="true" className={styles.divider} />
       <h3 className={cn(styles.roleLabel, tone.label)}>{t('game.roster.spymaster')}</h3>
       <ul className={styles.players}>
         {lineup.spymasters.map((member) => (
-          <Player key={member.user_id} member={member} avatarFor={avatarFor} />
+          <Player
+            key={member.user_id}
+            member={member}
+            avatarFor={avatarFor}
+            onKick={kickFor?.(member)}
+          />
         ))}
       </ul>
     </section>

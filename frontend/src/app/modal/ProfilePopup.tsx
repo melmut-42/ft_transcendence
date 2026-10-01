@@ -11,7 +11,8 @@ import { useSessionStore } from '@shared/stores';
 /**
  * The Profile pop-up with everything it needs from other features, joined here at app
  * level so no feature imports another: the friendship from `friends`, the room the user
- * is in from the room store, GAME HISTORY from `stats`, and Message from `chat`.
+ * is in from the room store, GAME HISTORY from `stats`, Message from `chat`, and the Room
+ * Owner's Remove from Room, which the room screen confirms.
  *
  * The room is the live snapshot of the user's active room, so invite eligibility follows
  * every `room.state`, including the fresh one after a reconnect. Outside a room it is
@@ -50,6 +51,18 @@ function OtherProfile({ userId, onClose }: { userId: number; onClose: () => void
     openDirectChat(userId);
   }, [onClose, userId]);
 
+  // The Room Owner removes a member: the room screen behind asks to confirm it.
+  const selfId = useSessionStore((state) => state.user?.user_id);
+  const canKick =
+    room !== null &&
+    room.status !== 'CLOSED' &&
+    room.host_user_id === selfId &&
+    room.players.some((p) => p.user_id === userId);
+  const onKick = useCallback(() => {
+    onClose();
+    useRoomStore.getState().requestKick(userId);
+  }, [onClose, userId]);
+
   return (
     <ProfileModal
       userId={userId}
@@ -59,6 +72,7 @@ function OtherProfile({ userId, onClose }: { userId: number; onClose: () => void
       room={room}
       onInviteRefused={onInviteRefused}
       onMessage={onMessage}
+      onKick={canKick ? onKick : undefined}
     />
   );
 }

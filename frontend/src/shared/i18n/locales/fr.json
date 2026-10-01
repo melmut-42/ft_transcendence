@@ -539,7 +539,7 @@
 				"teamFirst": "Choisissez une équipe, puis un rôle. En attendant, vous regardez.",
 				"spymasterTaken": "{{username}} est le maître-espion de cette équipe.",
 				"locked": "La partie commence, votre configuration est verrouillée.",
-				"hostOnly": "Seul l'hôte peut changer la taille du salon.",
+				"hostOnly": "Seul le propriétaire du salon peut changer sa taille.",
 				"ready": {
 					"TEAM_REQUIRED": "Choisissez d'abord une équipe.",
 					"ROLE_REQUIRED": "Choisissez d'abord un rôle.",
@@ -553,7 +553,7 @@
 				"teamRequired": "Choisissez d'abord une équipe.",
 				"roleRequired": "Choisissez d'abord un rôle.",
 				"locked": "La partie commence, votre configuration ne peut plus changer.",
-				"notHost": "Seul l'hôte peut changer la taille du salon.",
+				"notHost": "Seul le propriétaire du salon peut changer ses réglages.",
 				"capacity": "Le salon ne peut pas être plus petit que le nombre de joueurs présents.",
 				"offline": "Vous êtes hors ligne. Réessayez une fois reconnecté.",
 				"generic": "Ça n'a pas marché. Réessayez.",
@@ -568,6 +568,7 @@
 			"closed": "Ce salon est fermé.",
 			"removed": "Tu n'es plus membre de ce salon.",
 			"legacy": "Vous êtes encore dans un salon d'une ancienne version du jeu, qui ne peut pas être ouvert ici. Il se fermera de lui-même à la fin.",
+			"kicked": "Le propriétaire du salon vous a retiré du salon.",
 			"postGameTimeout": "Vous n'avez pas choisi à temps : vous avez quitté le salon après la partie."
 		},
 		"invites": {
@@ -577,6 +578,30 @@
 			"joining": "Connexion…",
 			"dismiss": "Ignorer",
 			"closed": "Ce salon est fermé."
+		},
+		"settings": {
+			"timer": "Minuteur",
+			"language": "Mots",
+			"noLimit": "Sans limite",
+			"seconds_one": "{{count}} seconde",
+			"seconds_other": "{{count}} secondes",
+			"ownerYou": "Vous êtes le propriétaire du salon. Vous pouvez retirer des joueurs et changer la taille du salon.",
+			"ownerOnly": "Seul le propriétaire du salon peut changer ses réglages."
+		},
+		"kick": {
+			"action": "Retirer {{username}} du salon",
+			"fromProfile": "Retirer du salon",
+			"title": "Retirer {{username}} ?",
+			"body": "{{username}} quitte le salon. Il pourra revenir avec le code du salon.",
+			"bodyInGame": "{{username}} quitte la partie maintenant. Si son équipe se retrouve sans maître-espion ou sans agent, la partie est mise en pause et le salon ferme si personne ne prend la place à temps.",
+			"confirm": "Retirer",
+			"kicking": "Retrait…",
+			"errors": {
+				"notHost": "Vous n'êtes plus le propriétaire du salon.",
+				"gone": "Ce joueur est déjà parti.",
+				"self": "Vous ne pouvez pas vous retirer vous-même. Utilisez Quitter.",
+				"closed": "Ce salon a fermé."
+			}
 		}
 	},
 	"game": {

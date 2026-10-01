@@ -27,6 +27,16 @@ export const player: string =
   'transition-[scale] duration-100 ease-in motion-safe:hover:scale-105 ' +
   'motion-safe:active:scale-95';
 
+/** Holds a player and, for the Room Owner, the Kick button on their avatar's corner. */
+export const kickable: string = 'relative';
+
+export const kick: string =
+  'absolute -top-[4px] -right-[4px] z-10 inline-flex size-[22px] cursor-pointer ' +
+  'items-center justify-center rounded-pill border-(length:--stroke-default) ' +
+  'border-secondary-dark bg-surface text-[10px] text-accent-red shadow-button-muted ' +
+  'transition-[scale,background-color] duration-100 ease-in hover:bg-secondary-dark/5 ' +
+  'motion-safe:hover:scale-105 motion-safe:active:scale-95';
+
 export const avatar: string =
   'flex h-[43px] w-[43px] items-center justify-center overflow-hidden rounded-pill ' +
   'bg-surface-muted shadow-avatar';

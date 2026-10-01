@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Dialog } from '@shared/ui';
 import { cn } from '@shared/utils';
 
+import type { KickMember } from '../hooks/useKickMember';
 import type { LeaveStatus } from '../hooks/useLeaveRoom';
 import type { LeaveAction } from '../model/leave';
 import * as styles from './RoomOverlays.styles';
@@ -75,6 +76,66 @@ export function LeaveRoomDialog({
           className={cn(styles.leaveButton, styles.leaveTone)}
         >
           {t(leaving ? 'room.leave.leaving' : `room.leave.${kind}.confirm`)}
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
+/**
+ * The Room Owner's Kick confirmation. Cancel, the safe choice, sits on the left. The member
+ * leaves when the server says so; until then the dialog shows the kick in progress, and a
+ * refusal stays here. Removing a player from a running match says what it may cost the
+ * match: their team may be left short, which pauses the game and can close the room.
+ */
+export function KickDialog({ kick, inMatch }: { kick: KickMember; inMatch: boolean }) {
+  const { t } = useTranslation();
+  const titleId = useId();
+  const bodyId = useId();
+  const { target } = kick;
+  if (!target) return null;
+  const kicking = kick.status === 'KICKING';
+  const playing = inMatch && target.role !== 'SPECTATOR';
+
+  return (
+    <Dialog
+      role="alertdialog"
+      labelledBy={titleId}
+      describedBy={bodyId}
+      closeLabel={t('common.cancel')}
+      onClose={kick.close}
+      closable={!kicking}
+      showCloseButton={false}
+      className={styles.leave}
+    >
+      <h2 id={titleId} className={styles.leaveTitle}>
+        {t('room.kick.title', { username: target.username })}
+      </h2>
+      <p id={bodyId} className={styles.leaveBody}>
+        {t(playing ? 'room.kick.bodyInGame' : 'room.kick.body', { username: target.username })}
+      </p>
+      {kick.failure && (
+        <p role="alert" className={styles.leaveError}>
+          {t(kick.failure)}
+        </p>
+      )}
+      <div className={styles.leaveActions}>
+        <button
+          type="button"
+          onClick={kick.close}
+          disabled={kicking}
+          className={cn(styles.leaveButton, styles.stayTone)}
+        >
+          {t('common.cancel')}
+        </button>
+        <button
+          type="button"
+          onClick={() => void kick.confirm()}
+          disabled={kicking}
+          aria-busy={kicking}
+          className={cn(styles.leaveButton, styles.leaveTone)}
+        >
+          {t(kicking ? 'room.kick.kicking' : 'room.kick.confirm')}
         </button>
       </div>
     </Dialog>

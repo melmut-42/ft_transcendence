@@ -40,6 +40,8 @@ export interface ProfileModalProps {
   onInviteRefused?: ((reason: InviteUnavailableReason) => void) | undefined;
   /** Opens the direct chat with this player. Offered to friends only, as chat allows. */
   onMessage?: (() => void) | undefined;
+  /** The Room Owner's Kick for a member of their room; absent for everyone else. */
+  onKick?: (() => void) | undefined;
   /** The own profile's GAME HISTORY. */
   history?: ReactNode;
 }
@@ -57,7 +59,8 @@ export interface ProfileModalProps {
  *
  * Another player's profile also offers REPORT at its foot. The report form takes the
  * profile's place inside the same pop-up, and Close steps back from it to the profile. It
- * is never offered on the user's own profile.
+ * is never offered on the user's own profile. For the Room Owner, a member of their room's
+ * profile also offers REMOVE FROM ROOM there, which asks the room to confirm the kick.
  *
  * It is mounted once per user (`key`), so while one player's profile loads nothing of the
  * previous one can show.
@@ -70,6 +73,7 @@ export function ProfileModal({
   room,
   onInviteRefused,
   onMessage,
+  onKick,
   history,
 }: ProfileModalProps) {
   const { t } = useTranslation();
@@ -132,6 +136,12 @@ export function ProfileModal({
           )}
           <ProfileStats profile={profile} />
           {isSelf && history}
+          {!isSelf && onKick && (
+            <button type="button" onClick={onKick} aria-haspopup="dialog" className={styles.report}>
+              <Icon name="kick" />
+              {t('room.kick.fromProfile')}
+            </button>
+          )}
           {!isSelf && (
             <ReportButton
               buttonRef={reportRef}

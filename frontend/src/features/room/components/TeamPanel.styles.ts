@@ -120,6 +120,18 @@ export const emptyAvatar: string =
 export const emptyLabel: string =
   'truncate text-lg leading-none font-black text-text-muted md:text-2xl desktop:text-[18px]';
 
+// ---- Kick (the host only) ----
+
+/** Holds a card or chip and, for the host, the Kick button beside it. */
+export const kickable: string = 'relative min-w-0';
+
+/** A small round coral control on the card's corner, apart from the card's own press. */
+export const kick: string =
+  `${buttonInteraction} absolute -top-[6px] -right-[6px] z-10 inline-flex size-[30px] ` +
+  'items-center justify-center rounded-pill border-(length:--stroke-default) ' +
+  'border-secondary-dark bg-surface text-[13px] text-accent-red shadow-button-muted ' +
+  'not-disabled:hover:bg-secondary-dark/5 not-disabled:hover:shadow-button-muted-hover';
+
 // ---- Spectators ----
 
 export const choosing: string = 'flex flex-col gap-2 desktop:gap-[10px]';

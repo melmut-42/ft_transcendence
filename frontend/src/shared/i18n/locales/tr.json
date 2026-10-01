@@ -539,7 +539,7 @@
 				"teamFirst": "Önce bir takım, sonra bir rol seç. O zamana kadar izliyorsun.",
 				"spymasterTaken": "Bu takımın Ajan Şefi {{username}}.",
 				"locked": "Maç başlıyor, kurulumun kilitlendi.",
-				"hostOnly": "Oda boyutunu yalnızca kurucu değiştirebilir.",
+				"hostOnly": "Oda boyutunu yalnızca oda sahibi değiştirebilir.",
 				"ready": {
 					"TEAM_REQUIRED": "Önce bir takım seç.",
 					"ROLE_REQUIRED": "Önce bir rol seç.",
@@ -553,7 +553,7 @@
 				"teamRequired": "Önce bir takım seç.",
 				"roleRequired": "Önce bir rol seç.",
 				"locked": "Maç başlıyor, kurulumun artık değişemez.",
-				"notHost": "Oda boyutunu yalnızca kurucu değiştirebilir.",
+				"notHost": "Oda ayarlarını yalnızca oda sahibi değiştirebilir.",
 				"capacity": "Oda, içindeki oyuncu sayısından küçük olamaz.",
 				"offline": "Çevrimdışısın. Yeniden bağlanınca tekrar dene.",
 				"generic": "Olmadı. Tekrar dene.",
@@ -568,6 +568,7 @@
 			"closed": "O oda kapandı.",
 			"removed": "Artık o odanın üyesi değilsin.",
 			"legacy": "Oyunun eski bir sürümüne ait bir odadasın ve bu oda burada açılamıyor. Oda bitince kendiliğinden kapanır.",
+			"kicked": "Oda sahibi seni odadan çıkardı.",
 			"postGameTimeout": "Zamanında seçim yapmadığın için maçtan sonra odadan ayrıldın."
 		},
 		"invites": {
@@ -577,6 +578,30 @@
 			"joining": "Katılınıyor…",
 			"dismiss": "Kapat",
 			"closed": "Bu oda kapandı."
+		},
+		"settings": {
+			"timer": "Tur süresi",
+			"language": "Kelimeler",
+			"noLimit": "Sınırsız",
+			"seconds_one": "{{count}} saniye",
+			"seconds_other": "{{count}} saniye",
+			"ownerYou": "Oda sahibi sensin. Oyuncuları çıkarabilir ve oda boyutunu değiştirebilirsin.",
+			"ownerOnly": "Oda ayarlarını yalnızca oda sahibi değiştirebilir."
+		},
+		"kick": {
+			"action": "{{username}} adlı oyuncuyu odadan çıkar",
+			"fromProfile": "Odadan Çıkar",
+			"title": "{{username}} çıkarılsın mı?",
+			"body": "{{username}} odadan çıkar. Oda koduyla yeniden katılabilir.",
+			"bodyInGame": "{{username}} maçtan hemen çıkar. Takımı Ajan Şefi ya da Ajan olmadan kalırsa oyun duraklar ve yerini zamanında kimse almazsa oda kapanır.",
+			"confirm": "Çıkar",
+			"kicking": "Çıkarılıyor…",
+			"errors": {
+				"notHost": "Artık oda sahibi değilsin.",
+				"gone": "Bu oyuncu zaten ayrıldı.",
+				"self": "Kendini çıkaramazsın. Bunun yerine Çık seçeneğini kullan.",
+				"closed": "Bu oda kapandı."
+			}
 		}
 	},
 	"game": {

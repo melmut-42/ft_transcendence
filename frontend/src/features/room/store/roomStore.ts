@@ -40,10 +40,16 @@ interface RoomState {
    */
   clockOffsetMs: number;
   exit: RoomExit | null;
+  /**
+   * A member the Room Owner asked to remove from somewhere outside the room screen (their
+   * profile pop-up). The room screen picks it up and asks for confirmation.
+   */
+  kickRequest: number | null;
 
   applySnapshot: (room: Room) => void;
   /** Apply one room-stream event. `game.*` deltas belong to the game store. */
   applyEvent: (event: RoomServerEvent) => void;
+  requestKick: (userId: number | null) => void;
   clear: () => void;
 }
 
@@ -53,6 +59,7 @@ const initial = {
   countdownCancellation: null,
   clockOffsetMs: 0,
   exit: null,
+  kickRequest: null,
 } satisfies Partial<RoomState>;
 
 export const useRoomStore = create<RoomState>((set, get) => ({
@@ -167,6 +174,8 @@ export const useRoomStore = create<RoomState>((set, get) => ({
         return;
     }
   },
+
+  requestKick: (kickRequest) => set({ kickRequest }),
 
   clear: () => set(initial),
 }));

@@ -26,7 +26,9 @@ import { useGameActions } from '@features/game/hooks/useGameActions';
 import { gameStage, isGameOver } from '@features/game/model/gameView';
 import { lineupOf } from '@features/game/model/lineup';
 import type { GameStage } from '@features/game/model/gameView';
+import { KickDialog } from '@features/room/components/RoomOverlays';
 import { Spectators } from '@features/room/components/TeamPanel';
+import { useKickMember } from '@features/room/hooks/useKickMember';
 import { useReturnToLobby } from '@features/room/hooks/useReturnToLobby';
 import { useRoomStore } from '@features/room/store/roomStore';
 import { useSecondsUntil } from '@shared/hooks';
@@ -183,6 +185,7 @@ export function GameScreen({
   const userId = useSessionStore((state) => state.user?.user_id);
   const clockOffsetMs = useRoomStore((state) => state.clockOffsetMs);
   const actions = useGameActions();
+  const kick = useKickMember();
   const back = useReturnToLobby();
   const { dismissFeedback } = actions;
 
@@ -200,6 +203,11 @@ export function GameScreen({
   const red = useMemo(() => lineupOf(participants, 'RED'), [participants]);
   const blue = useMemo(() => lineupOf(participants, 'BLUE'), [participants]);
   const spectators = room.players.filter((p) => p.role === 'SPECTATOR');
+
+  const isHost = userId !== undefined && room.host_user_id === userId;
+  const onKick = isHost ? kick.request : undefined;
+  const kickFor = (member: RoomMember) =>
+    isHost && member.user_id !== userId ? kick.request : undefined;
 
   const over = isGameOver(game);
   const result: MatchResult | null =
@@ -266,7 +274,12 @@ export function GameScreen({
               spymasterLayout ? styles.bodySpymaster : styles.bodyOperative,
             )}
           >
-            <TeamStatusCard lineup={red} avatarFor={avatarFor} className={styles.teamCard} />
+            <TeamStatusCard
+              lineup={red}
+              avatarFor={avatarFor}
+              kickFor={kickFor}
+              className={styles.teamCard}
+            />
             <div
               className={cn(
                 styles.column,
@@ -288,7 +301,12 @@ export function GameScreen({
               <ActionFeedback actions={actions} action="guess" className={styles.guessFeedback} />
               <GameBoard game={game} stage={stage} role={seat.role} actions={actions} />
             </div>
-            <TeamStatusCard lineup={blue} avatarFor={avatarFor} className={styles.teamCard} />
+            <TeamStatusCard
+              lineup={blue}
+              avatarFor={avatarFor}
+              kickFor={kickFor}
+              className={styles.teamCard}
+            />
           </div>
         </div>
 
@@ -296,7 +314,13 @@ export function GameScreen({
           <TeamSummary lineup={red} />
           <TeamSummary lineup={blue} />
         </div>
-        <Spectators members={spectators} avatarFor={avatarFor} className={styles.spectators} />
+        <Spectators
+          members={spectators}
+          avatarFor={avatarFor}
+          selfId={userId}
+          onKick={onKick}
+          className={styles.spectators}
+        />
       </div>
 
       {resultsOpen && result && decision && (
@@ -306,6 +330,7 @@ export function GameScreen({
           onViewBoard={() => setResultsDismissed(game.game_id)}
         />
       )}
+      {!overlaysHidden && <KickDialog kick={kick} inMatch={room.status === 'IN_GAME'} />}
     </main>
   );
 }

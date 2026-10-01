@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import mascotArtwork from '@assets/ready-room/ready-room-mascot.svg';
 import { ProfileMenu } from '@features/profile/components/ProfileMenu';
 import { usePlayerAvatars } from '@features/profile/hooks/usePlayerAvatars';
-import { RoomCapacity, RoomCode } from '@features/room/components/RoomHeader';
-import { CountdownOverlay } from '@features/room/components/RoomOverlays';
+import { RoomCapacity, RoomCode, RoomSettingsInfo } from '@features/room/components/RoomHeader';
+import { CountdownOverlay, KickDialog } from '@features/room/components/RoomOverlays';
 import {
   ReadyButton,
   SetupDialog,
@@ -14,6 +14,7 @@ import {
   SetupSummary,
 } from '@features/room/components/SetupPanel';
 import { Spectators, TeamPanel } from '@features/room/components/TeamPanel';
+import { useKickMember } from '@features/room/hooks/useKickMember';
 import { useRoomSetup } from '@features/room/hooks/useRoomSetup';
 import {
   findMember,
@@ -86,7 +87,8 @@ function CountdownCancelledNotice() {
  * The Ready Room: the staging screen between Room Discovery and the board.
  *
  * Everyone arrives as a spectator. Players claim a team and a role, then press Ready; whoever
- * stays out watches. Every value on screen comes from the
+ * stays out watches. The Room Owner (the host) can remove any other member and owns the
+ * room's settings; everyone else sees the same values read-only. Every value on screen comes from the
  * room snapshot the server keeps current over the room socket, so a player who joins,
  * leaves or changes their setup appears for everyone without a reload, and a refresh or a
  * reconnect rebuilds the same screen from a fresh snapshot. There is no start button: the
@@ -99,6 +101,7 @@ export function ReadyRoom({ room, onLeave }: { room: Room; onLeave: () => void }
   const socketOpen = useConnectionStore((state) => state.room.status === 'OPEN');
   const secondsRemaining = useRoomStore((state) => state.secondsRemaining);
   const setup = useRoomSetup();
+  const kick = useKickMember();
   const [setupOpen, setSetupOpen] = useState(false);
 
   const me: RoomMember | null = findMember(room, userId);
@@ -109,7 +112,8 @@ export function ReadyRoom({ room, onLeave }: { room: Room; onLeave: () => void }
   const host = room.host_user_id === null ? null : findMember(room, room.host_user_id);
   const phase = roomPhase(room);
   const locked = setupLocked(room);
-  const member = { avatarFor, selfId: userId, selfOnline: socketOpen };
+  const onKick = userId !== undefined && room.host_user_id === userId ? kick.request : undefined;
+  const member = { avatarFor, selfId: userId, selfOnline: socketOpen, onKick };
 
   // The countdown locks the setup, so a dialog left open would only offer dead controls.
   useEffect(() => {
@@ -133,6 +137,7 @@ export function ReadyRoom({ room, onLeave }: { room: Room; onLeave: () => void }
           {userId !== undefined && (
             <>
               <RoomCapacity room={room} userId={userId} setup={setup} className={styles.capacity} />
+              <RoomSettingsInfo room={room} userId={userId} className={styles.settings} />
             </>
           )}
 
@@ -157,6 +162,8 @@ export function ReadyRoom({ room, onLeave }: { room: Room; onLeave: () => void }
           <Spectators
             members={teams.spectators}
             avatarFor={avatarFor}
+            selfId={userId}
+            onKick={onKick}
             className={styles.choosing}
           />
 
@@ -190,6 +197,7 @@ export function ReadyRoom({ room, onLeave }: { room: Room; onLeave: () => void }
         <SetupDialog room={room} me={me} setup={setup} onClose={() => setSetupOpen(false)} />
       )}
       {room.status === 'COUNTDOWN' && <CountdownOverlay seconds={secondsRemaining} />}
+      <KickDialog kick={kick} inMatch={false} />
       <CountdownCancelledNotice />
     </main>
   );

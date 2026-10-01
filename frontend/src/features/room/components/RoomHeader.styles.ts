@@ -2,7 +2,7 @@ import { buttonInteraction } from '@shared/ui';
 
 /**
  * Class recipes for the head of the Ready Room: the room code with its copy button and the
- * room size settings. Phones and tablets are the base; `desktop:` is the desktop design at
+ * room settings. Phones and tablets are the base; `desktop:` is the desktop design at
  * 80% of its size.
  */
 
@@ -57,3 +57,22 @@ export const countTone = {
   open: 'bg-primary-sky',
   full: 'bg-secondary-deep',
 };
+
+// ---- Other settings ----
+
+/** The turn timer and word language, read-only until their values are agreed. */
+export const settings: string = 'flex flex-col items-center gap-[8px] desktop:gap-[6px]';
+
+export const settingRow: string =
+  'flex flex-wrap items-center justify-center gap-[10px] desktop:gap-[8px]';
+
+export const settingChip: string =
+  'inline-flex h-[32px] items-center gap-[8px] rounded-pill bg-surface-muted px-[14px] ' +
+  'text-md leading-none font-bold text-text-slate desktop:h-[26px] desktop:px-[11px] ' +
+  'desktop:text-[13px]';
+
+export const settingLabel: string = 'font-black tracking-[0.4px] text-text-muted uppercase';
+
+export const ownerNote: string =
+  'inline-flex items-center gap-[6px] text-md leading-[18px] font-bold text-text-muted ' +
+  'desktop:text-[13px] desktop:leading-[16px]';
