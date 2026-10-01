@@ -42,7 +42,7 @@ export const round: string =
 export const roundFloating: string =
   'fixed right-[16px] bottom-[16px] z-(--z-chat) desktop:right-[15px] desktop:bottom-[20px] ' +
   'desktop:size-[62px] desktop:bg-primary-sky desktop:text-[32px] ' +
-  'desktop:shadow-[0_4px_7px_#3531292e]';
+  'desktop:shadow-[0_4px_7px_var(--color-shadow-launcher)]';
 
 export const roundBadge: string =
   'absolute -top-[4px] -right-[4px] flex size-[22px] items-center justify-center rounded-pill ' +
