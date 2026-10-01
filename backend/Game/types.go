@@ -1,6 +1,5 @@
 package game
 
-
 type Team string
 
 const (
@@ -66,4 +65,3 @@ type GuessResult struct {
 	Winner       *Team       `json:"winner"`
 	EndReason    *EndReason  `json:"end_reason"`
 }
-

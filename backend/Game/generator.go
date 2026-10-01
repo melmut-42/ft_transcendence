@@ -41,8 +41,8 @@ func validateWordPool(pool []Word, language string) error {
 	return nil
 }
 
-func pickWords(pool []Word, language string) ([]Word, error) {
-	indexes := rand.Perm(len(pool))
+func pickWords(pool []Word, language string, r *rand.Rand) ([]Word, error) {
+	indexes := r.Perm(len(pool))
 	seen := make(map[string]struct{}, BoardSize)
 	selectedWords := make([]Word, 0, BoardSize)
 
@@ -63,8 +63,8 @@ func pickWords(pool []Word, language string) ([]Word, error) {
 	return nil, fmt.Errorf("%w, only %d unique texts for %q", ErrNotEnoughWords, len(selectedWords), language)
 }
 
-func randomTeam() Team {
-	if rand.Intn(2) == 0 {
+func randomTeam(r *rand.Rand) Team {
+	if r.Intn(2) == 0 {
 		return TeamRed
 	}
 	return TeamBlue
@@ -77,7 +77,7 @@ func appendColors(colors []CardColor, color CardColor, count int) []CardColor {
 	return colors
 }
 
-func buildColors(startingTeam Team) []CardColor {
+func buildColors(startingTeam Team, r *rand.Rand) []CardColor {
 	startColor := CardColorRed
 	otherColor := CardColorBlue
 
@@ -93,25 +93,25 @@ func buildColors(startingTeam Team) []CardColor {
 	colors = appendColors(colors, CardColorNeutral, NeutralCardsSize)
 	colors = appendColors(colors, CardColorAssassin, AssassinCardsSize)
 
-	rand.Shuffle(len(colors), func(i, j int) {
+	r.Shuffle(len(colors), func(i, j int) {
 		colors[i], colors[j] = colors[j], colors[i]
 	})
 
 	return colors
 }
 
-func generateCards(wordPool []Word, language string) ([]Card, Team, error) {
+func generateCards(wordPool []Word, language string, r *rand.Rand) ([]Card, Team, error) {
 	if err := validateWordPool(wordPool, language); err != nil {
 		return nil, "", err
 	}
 
-	words, err := pickWords(wordPool, language)
+	words, err := pickWords(wordPool, language, r)
 	if err != nil {
 		return nil, "", err
 	}
 
-	startingTeam := randomTeam()
-	colors := buildColors(startingTeam)
+	startingTeam := randomTeam(r)
+	colors := buildColors(startingTeam, r)
 	cards := make([]Card, BoardSize)
 
 	for i, word := range words {
