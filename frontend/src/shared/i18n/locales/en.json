@@ -376,21 +376,23 @@
 			"status": {
 				"waiting": "WAITING",
 				"full": "FULL",
-				"started": "STARTED"
+				"inGame": "IN GAME",
+				"closed": "NOT OPEN"
 			},
 			"submit": "Join Room",
 			"joining": "Joining",
 			"opening": "Opening lobby",
 			"full": "Room Full",
-			"started": "Game Started",
 			"joinedTitle": "You're in!",
 			"joinedBody": "Opening the room lobby…",
 			"errors": {
 				"format": "Enter the six letters and digits of the room code.",
 				"notFound": "No room found with this code. Check it and try again.",
 				"full": "This room is full.",
-				"started": "This game has already started."
-			}
+				"notJoinable": "This room isn't taking new players right now."
+			},
+			"spectate": "Join to Watch",
+			"notJoinable": "Not Open"
 		},
 		"feedback": {
 			"createFailedTitle": "Couldn't create the room",
@@ -414,8 +416,9 @@
 				"finished": "We're getting you back to the results. Stay on this page."
 			},
 			"secondsLeft": {
-				"game": "{{seconds}}s left before forfeit",
-				"room": "{{seconds}}s left to keep your seat"
+				"game": "{{seconds}}s left to keep your seat",
+				"room": "{{seconds}}s left to keep your seat",
+				"finished": "{{seconds}}s left to decide"
 			},
 			"leave": {
 				"game": "Leave Match",
@@ -434,11 +437,12 @@
 			"room": {
 				"title": "Leave Room?",
 				"body": "You will leave this room and lose your team and role. Your seat opens for another player.",
-				"confirm": "Leave Room"
+				"confirm": "Leave Room",
+				"bodySpectator": "You'll leave this room and return to the lobby."
 			},
 			"game": {
 				"title": "Leave Game?",
-				"body": "You will leave this match and return to the lobby. Your team forfeits the match.",
+				"body": "You'll leave this match and return to the lobby.",
 				"confirm": "Leave Game"
 			}
 		},
@@ -450,7 +454,8 @@
 				"PLAYER_UNREADY": "Countdown stopped: {{username}} is no longer ready.",
 				"PLAYER_LEFT": "Countdown stopped: {{username}} left the room.",
 				"TEAM_CHANGED": "Countdown stopped: {{username}} changed team.",
-				"ROLE_CHANGED": "Countdown stopped: {{username}} changed role."
+				"ROLE_CHANGED": "Countdown stopped: {{username}} changed role.",
+				"PLAYER_KICKED": "Countdown stopped: {{username}} was removed from the room."
 			}
 		},
 		"ready": {
@@ -476,6 +481,10 @@
 				"COUNTDOWN": {
 					"title": "Get Ready!",
 					"body": "Everyone is ready. The match is about to begin."
+				},
+				"POST_GAME": {
+					"title": "Waiting for the Last Result…",
+					"body": "Players still viewing the last result: {{pending}}. The next match can start once everyone is back."
 				}
 			},
 			"team": {
@@ -497,14 +506,13 @@
 			"role": {
 				"SPYMASTER": "Spymaster",
 				"OPERATIVE": "Operative",
-				"none": "No role yet"
+				"SPECTATOR": "Spectator"
 			},
 			"status": {
 				"ready": "Ready!",
 				"waiting": "Waiting"
 			},
 			"emptySeat": "Waiting for player…",
-			"choosing": "Choosing a team",
 			"setupTitle": "Your Setup",
 			"chooseTeam": "Choose Your Team",
 			"chooseRole": "Choose Your Role",
@@ -528,15 +536,17 @@
 			"change": "Change",
 			"choose": "Choose",
 			"hints": {
-				"teamFirst": "Choose a team first.",
+				"teamFirst": "Choose a team, then a role. Until then you're watching.",
 				"spymasterTaken": "{{username}} is this team's Spymaster.",
 				"locked": "The match is starting, so your setup is locked.",
 				"hostOnly": "Only the host can change the room size.",
 				"ready": {
 					"TEAM_REQUIRED": "Choose a team first.",
 					"ROLE_REQUIRED": "Choose a role first.",
-					"LOCKED": "The match is starting."
-				}
+					"LOCKED": "The match is starting.",
+					"POST_GAME_PENDING": "Some players are still viewing the last result."
+				},
+				"claim": "Choose a role to join the {{team}} team."
 			},
 			"errors": {
 				"roleConflict": "Another player just took this team's Spymaster seat.",
@@ -546,14 +556,19 @@
 				"notHost": "Only the host can change the room size.",
 				"capacity": "The room can't be smaller than the players in it.",
 				"offline": "You're offline. Try again once you're reconnected.",
-				"generic": "That didn't work. Try again."
-			}
+				"generic": "That didn't work. Try again.",
+				"postGamePending": "Wait until everyone is back from the last result."
+			},
+			"spectators": "Spectators",
+			"spectate": "Watch instead"
 		},
 		"recovery": {
 			"notMember": "You are no longer in that room.",
 			"returned": "You are still in a room, so we took you back to it.",
 			"closed": "That room has closed.",
-			"removed": "You are no longer a member of that room."
+			"removed": "You are no longer a member of that room.",
+			"legacy": "You're still in a room from an older version of the game, which can't be opened here. It closes on its own once it ends.",
+			"postGameTimeout": "You didn't choose in time, so you left the room after the match."
 		},
 		"invites": {
 			"title": "{{username}} invited you to play",
@@ -580,7 +595,8 @@
 		},
 		"turn": {
 			"title": "<team>{{team}}</team> Team's Turn",
-			"over": "Match Over"
+			"over": "Match Over",
+			"paused": "Game Paused"
 		},
 		"instruction": {
 			"CLUE": "You are the Spymaster. Give your team a clue.",
@@ -609,7 +625,10 @@
 			"opponentGuessing": "{{team}} Team Is Guessing",
 			"opponentClue": "{{team}} Spymaster Is Choosing",
 			"opponentBody": "Wait for your turn. Cards can't be picked right now.",
-			"spymasterOpponentBody": "Wait for your turn to give a clue."
+			"spymasterOpponentBody": "Wait for your turn to give a clue.",
+			"spectatingBody": "You're watching this match. Take a free seat when one opens.",
+			"pausedTitle": "Waiting for Players…",
+			"pausedBody": "A team is missing a player. Play resumes when the seat is taken."
 		},
 		"pass": {
 			"action": "Pass",
@@ -640,13 +659,15 @@
 			"wins": "{{team}} Team Wins!",
 			"reason": {
 				"ALL_TEAM_CARDS_REVEALED": "{{team}} revealed their last agent.",
-				"ASSASSIN_REVEALED": "{{team}} revealed the assassin.",
-				"PLAYER_FORFEIT": "{{team}} forfeited the match.",
-				"PLAYER_FORFEIT_NAMED": "{{username}} left the match. {{team}} forfeits."
+				"ASSASSIN_REVEALED": "{{team}} revealed the assassin."
 			},
 			"backToLobby": "Back to Lobby",
 			"viewBoard": "View Final Board",
-			"showResults": "Show Results"
+			"showResults": "Show Results",
+			"exit": "Exit Room",
+			"returning": "Returning…",
+			"returnFailed": "Couldn't go back to the lobby. Try again.",
+			"deadline": "{{seconds}}s left to choose. Players who stay undecided leave the room."
 		},
 		"errors": {
 			"invalidClue": "The clue must be one word of up to 30 letters.",

@@ -15,10 +15,10 @@ import { Dialog, LoadingDots } from '@shared/ui';
 import { useLeaveRoom } from '../hooks/useLeaveRoom';
 import * as styles from './ConnectionOverlay.styles';
 
-/** The copy that fits what the player stands to lose: a match, a seat, or nothing. */
+/** The copy that fits what the player stands to lose: a match, a seat, or a result. */
 function recoveryKind(status: RoomStatus): 'game' | 'room' | 'finished' {
   if (status === 'IN_GAME') return 'game';
-  if (status === 'FINISHED') return 'finished';
+  if (status === 'POST_GAME') return 'finished';
   return 'room';
 }
 
@@ -115,12 +115,10 @@ function ReconnectingCard({ recovery }: { recovery: RoomRecovery }) {
         <p id={bodyId} className={styles.body}>
           {t(`room.connection.reconnectingBody.${kind}`)}
         </p>
-        {kind !== 'finished' && (
-          // Counts down every second, so it is read on demand rather than announced.
-          <p className={styles.chip}>
-            {t(`room.connection.secondsLeft.${kind}`, { seconds: secondsLeft })}
-          </p>
-        )}
+        {/* Counts down every second, so it is read on demand rather than announced. */}
+        <p className={styles.chip}>
+          {t(`room.connection.secondsLeft.${kind}`, { seconds: secondsLeft })}
+        </p>
         {leave.status === 'FAILED' && (
           <p role="alert" className={styles.error}>
             {t('room.leave.failed')}
@@ -148,7 +146,8 @@ function ReconnectingCard({ recovery }: { recovery: RoomRecovery }) {
  * Reconnecting overlay.
  *
  * The server reserves the seat for a grace period (30s in `WAITING`/`COUNTDOWN`, 60s
- * `IN_GAME`), so a drop shows this overlay over the room, which stays on screen behind it,
+ * `IN_GAME`; on a match result, the result's own decision deadline), so a drop shows this
+ * overlay over the room, which stays on screen behind it,
  * and the connection retries on its own — it does not bounce the user to the Lobby. The
  * chip counts down the seat's time from the drop; the server's own timer is the one that
  * decides. Recovery is always a fresh `room.state` snapshot, never an event replay, and

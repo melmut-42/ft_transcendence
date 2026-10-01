@@ -1,5 +1,6 @@
 /**
- * In-memory REST server speaking the Bruno `rest-api` contract.
+ * In-memory REST server speaking the Bruno `rest-api` contract, with rooms on the Game v2
+ * contract (`v2/game-rest-api`).
  *
  * It answers every binding in `features/*\/api` with the documented status code and
  * the documented `{ data }` / `{ error }` envelope, applies the documented validation
@@ -12,7 +13,6 @@ import { REPORT_DETAILS_MAX, REPORT_REASONS, ROOM_CAPACITY } from '@shared/types
 import type {
   ApiErrorBody,
   ReportUserResponse,
-  CreateRoomResponse,
   Friend,
   FriendListResponse,
   HealthResponse,
@@ -31,7 +31,7 @@ import type {
   AvatarPresetListResponse,
   UserSearchResponse,
 } from '@shared/types';
-import { CHAT_API_PATH } from '@shared/constants';
+import { CHAT_API_PATH, ROOM_API_PATH } from '@shared/constants';
 import {
   MockActionError,
   MockChannelError,
@@ -140,6 +140,7 @@ interface MockRoomEntry {
 
 const ok = (data: unknown): MockResult => ({ status: 200, data });
 const created = (data: unknown): MockResult => ({ status: 201, data });
+const accepted = (data: unknown): MockResult => ({ status: 202, data });
 const noContent: MockResult = { status: 204 };
 
 const bodyOf = <T>(options: ApiRequestOptions): Partial<T> =>
@@ -148,6 +149,10 @@ const bodyOf = <T>(options: ApiRequestOptions): Partial<T> =>
 /** A Chat REST v2 path under `CHAT_API_PATH`, e.g. `/v2/channels/7001/messages`. */
 const chatPattern = (suffix: string): RegExp =>
   new RegExp(`^${CHAT_API_PATH.replace(/\//g, '\\/')}${suffix}$`);
+
+/** A Game REST v2 path under `ROOM_API_PATH`, e.g. `/v2/rooms/1001/members`. */
+const roomPattern = (suffix: string): RegExp =>
+  new RegExp(`^${ROOM_API_PATH.replace(/\//g, '\\/')}${suffix}$`);
 
 const isPositiveInt = (value: unknown): value is number =>
   typeof value === 'number' && Number.isInteger(value) && value > 0;
@@ -165,6 +170,7 @@ export class MockApiServer {
   /** When the signed-in user last reported each user, by reported user ID. */
   private reports = new Map<number, number>();
   private nextReportId = 9001;
+  private nextInviteId = 10;
   private readonly routes: Route[];
 
   constructor(config: MockApiConfig) {
@@ -287,6 +293,7 @@ export class MockApiServer {
     return {
       user_id: account?.user_id ?? SELF_USER_ID,
       username: account?.username ?? 'player_one',
+      ...(account ? { avatar_url: account.avatar_url } : {}),
     };
   }
 
@@ -307,21 +314,24 @@ export class MockApiServer {
     const players = (ids: readonly number[]): MockPlayer[] =>
       ids.map((id) => {
         const account = this.accounts.find((a) => a.user_id === id);
-        return { user_id: id, username: account?.username ?? `user_${id}` };
+        return {
+          user_id: id,
+          username: account?.username ?? `user_${id}`,
+          ...(account ? { avatar_url: account.avatar_url } : {}),
+        };
       });
     const [wizard, rita] = SEED_ROOM_MEMBERS.waiting;
     const [shark, reader, lucky, echo] = SEED_ROOM_MEMBERS.playing;
 
     // A waiting room with free seats, reachable by code `QWER12`.
     const waiting = this.addRoom('QWER12', 8, players(SEED_ROOM_MEMBERS.waiting));
-    waiting.selectTeam(wizard, 'BLUE');
-    waiting.selectRole(wizard, 'SPYMASTER');
-    waiting.selectTeam(rita, 'RED');
+    waiting.selectRole(wizard, 'SPYMASTER', 'BLUE');
+    waiting.selectRole(rita, 'OPERATIVE', 'RED');
 
     // Full: 4 of 4 players.
     this.addRoom('FULL44', 4, players(SEED_ROOM_MEMBERS.full));
 
-    // Already playing, so not joinable.
+    // Already playing: joining it means watching as a spectator.
     const playing = this.addRoom('BUSY77', 8, players(SEED_ROOM_MEMBERS.playing));
     const seats = [
       [shark, 'RED', 'SPYMASTER'],
@@ -329,16 +339,13 @@ export class MockApiServer {
       [lucky, 'BLUE', 'SPYMASTER'],
       [echo, 'BLUE', 'OPERATIVE'],
     ] as const;
-    for (const [userId, team, role] of seats) {
-      playing.selectTeam(userId, team);
-      playing.selectRole(userId, role);
-    }
+    for (const [userId, team, role] of seats) playing.selectRole(userId, role, team);
     playing.startGame('BLUE');
   }
 
   private addRoom(code: string, maxPlayers: number, members: MockPlayer[]): MockRoomServer {
     const roomId = this.nextRoomId++;
-    const server = new MockRoomServer(roomId, this.selfPlayer(), maxPlayers, members);
+    const server = new MockRoomServer(roomId, this.selfPlayer(), maxPlayers, members, code);
     this.rooms.set(roomId, { code, server });
     mockRooms.set(roomId, server);
     return server;
@@ -358,8 +365,7 @@ export class MockApiServer {
   /** The room this user belongs to, from the shared registry (sockets may have changed it). */
   private activeRoomId(userId: number): number | null {
     for (const [roomId, server] of mockRooms) {
-      const status = server.snapshot().status;
-      if (status !== 'CLOSED' && status !== 'FINISHED' && server.hasMember(userId)) return roomId;
+      if (server.snapshot().status !== 'CLOSED' && server.hasMember(userId)) return roomId;
     }
     return null;
   }
@@ -564,6 +570,7 @@ export class MockApiServer {
         return ok({
           user: { user_id: account.user_id, username: account.username },
           active_room_id: this.activeRoomId(account.user_id),
+          active_room_api_version: this.activeRoomId(account.user_id) === null ? null : 'v2',
           session_expires_at: this.expiry(),
         } satisfies SessionResponse);
       }),
@@ -571,8 +578,8 @@ export class MockApiServer {
       route('endSession', 'DELETE', /^\/auth\/session$/, true, () => {
         const userId = selfId();
         const roomId = this.activeRoomId(userId);
-        // Logout during IN_GAME forfeits, exactly like leaving the room.
-        if (roomId !== null) mockRooms.get(roomId)?.playerLeave(userId);
+        // Logout leaves the room; during a match it counts as leaving it.
+        if (roomId !== null) mockRooms.get(roomId)?.playerLeave(userId, 'SESSION_ENDED');
         this.sessionUserId = null;
         this.refreshValid = false;
         return noContent;
@@ -656,7 +663,8 @@ export class MockApiServer {
           }
           // Leaving the room first, as the server does, so the others see the departure.
           const roomId = this.activeRoomId(account.user_id);
-          if (roomId !== null) mockRooms.get(roomId)?.playerLeave(account.user_id);
+          if (roomId !== null)
+            mockRooms.get(roomId)?.playerLeave(account.user_id, 'ACCOUNT_DELETED');
           this.accounts = this.accounts.filter((a) => a.user_id !== account.user_id);
           this.friendIds = new Set();
           this.sessionUserId = null;
@@ -983,7 +991,7 @@ export class MockApiServer {
       route(
         'createRoom',
         'POST',
-        /^\/rooms$/,
+        roomPattern(''),
         true,
         ({ options }) => {
           const me = selfId();
@@ -1012,7 +1020,7 @@ export class MockApiServer {
           }
           const code = this.newRoomCode();
           const server = this.addRoom(code, maxPlayers, [this.selfPlayer()]);
-          return created({ ...server.snapshot(), room_code: code } satisfies CreateRoomResponse);
+          return created(server.snapshot() satisfies Room);
         },
         {
           conflict: () =>
@@ -1020,14 +1028,14 @@ export class MockApiServer {
               room_id: 1001,
             }),
           'validation-error': () =>
-            validation('max_players must be an integer from 4 through 8.', 'max_players'),
+            validation('max_players must be an integer from 4 through 20.', 'max_players'),
         },
       ),
 
       route(
         'lookupRoom',
         'GET',
-        /^\/rooms\/lookup\/([^/]+)$/,
+        roomPattern('/lookup/([^/]+)'),
         true,
         ({ params }) => {
           const code = decodeURIComponent(params[0] ?? '');
@@ -1035,18 +1043,20 @@ export class MockApiServer {
             throw validation('room_code must match ^[A-Za-z0-9]{6}$.', 'room_code');
           }
           const entry = this.roomByCode(code);
-          const room = entry?.server.snapshot();
-          if (!entry || !room || room.status === 'CLOSED' || room.status === 'FINISHED') {
+          const room = entry?.server.state();
+          if (!entry || !room || room.status === 'CLOSED') {
             throw new HttpError(404, 'ROOM_NOT_FOUND', `No active room matches code ${code}.`, {
               room_code: code,
             });
           }
+          const full = room.player_count >= room.max_players;
           return ok({
             room_id: room.room_id,
             room_code: entry.code,
             status: room.status,
             player_count: room.player_count,
             max_players: room.max_players,
+            joinable: room.status === 'WAITING' && !full && entry.server.joinable(),
           } satisfies RoomLookupResponse);
         },
         {
@@ -1062,7 +1072,7 @@ export class MockApiServer {
       route(
         'joinRoom',
         'POST',
-        /^\/rooms\/([^/]+)\/members$/,
+        roomPattern('/([^/]+)/members'),
         true,
         ({ params }) => {
           const roomId = this.parseRoomId(params[0]);
@@ -1077,13 +1087,15 @@ export class MockApiServer {
               { room_id: active },
             );
           }
-          const room = server.snapshot();
-          if (room.status !== 'WAITING') throw notJoinable(room);
+          const room = server.state();
+          if (!server.joinable()) throw notJoinable(room);
           if (room.player_count >= room.max_players) throw roomFull(room);
           try {
             server.playerJoin(me);
           } catch (error) {
-            if (error instanceof MockActionError) throw roomFull(room);
+            if (error instanceof MockActionError && error.code === 'ROOM_FULL')
+              throw roomFull(room);
+            if (error instanceof MockActionError) throw notJoinable(room);
             throw error;
           }
           return created(server.snapshot() satisfies Room);
@@ -1103,7 +1115,7 @@ export class MockApiServer {
       route(
         'getRoom',
         'GET',
-        /^\/rooms\/([^/]+)$/,
+        roomPattern('/([^/]+)'),
         true,
         ({ params }) => {
           const roomId = this.parseRoomId(params[0]);
@@ -1121,14 +1133,14 @@ export class MockApiServer {
       route(
         'leaveRoom',
         'DELETE',
-        /^\/rooms\/([^/]+)\/members\/me$/,
+        roomPattern('/([^/]+)/members/me'),
         true,
         ({ params }) => {
           const roomId = this.parseRoomId(params[0]);
           const server = this.requireRoom(roomId);
           if (!server.hasMember(selfId())) throw notMember(roomId, selfId());
-          // IN_GAME is not an error: leaving forfeits the match.
-          server.playerLeave(selfId());
+          // IN_GAME is not an error: the server rechecks both teams' staffing.
+          server.playerLeave(selfId(), 'EXITED');
           return noContent;
         },
         {
@@ -1140,7 +1152,7 @@ export class MockApiServer {
       route(
         'inviteFriend',
         'POST',
-        /^\/rooms\/([^/]+)\/invites$/,
+        roomPattern('/([^/]+)/invites'),
         true,
         ({ params, options }) => {
           const roomId = this.parseRoomId(params[0]);
@@ -1162,13 +1174,16 @@ export class MockApiServer {
               user_id: userId,
             });
           }
-          const room = server.snapshot();
-          if (room.status !== 'WAITING') throw notJoinable(room);
+          const room = server.state();
+          if (room.status !== 'WAITING' || !server.joinable()) throw notJoinable(room);
           if (room.player_count >= room.max_players) throw roomFull(room);
           if (!friend.is_online) {
-            throw new HttpError(409, 'USER_OFFLINE', `User ${userId} is not online.`, {
-              user_id: userId,
-            });
+            throw new HttpError(
+              409,
+              'USER_OFFLINE',
+              `User ${userId} has no active Chat Gateway v2 connection.`,
+              { user_id: userId },
+            );
           }
           if (this.activeRoomId(userId) !== null) {
             throw new HttpError(
@@ -1181,11 +1196,14 @@ export class MockApiServer {
             );
           }
           const entry = this.rooms.get(roomId);
-          return created({
+          const acceptedAt = new Date();
+          return accepted({
+            invite_id: `inv_${String(this.nextInviteId++).padStart(4, '0')}`,
             room_id: roomId,
-            room_code: entry?.code ?? '',
+            room_code: entry?.code ?? room.room_code,
             to_user_id: userId,
-            sent_at: new Date().toISOString(),
+            accepted_at: acceptedAt.toISOString(),
+            expires_at: new Date(acceptedAt.getTime() + 30_000).toISOString(),
           } satisfies InviteFriendResponse);
         },
         {
@@ -1193,7 +1211,14 @@ export class MockApiServer {
           'not-found': () =>
             new HttpError(404, 'NOT_FRIENDS', 'User 9999 is not a friend.', { user_id: 9999 }),
           conflict: () =>
-            new HttpError(409, 'USER_OFFLINE', 'User 43 is not online.', { user_id: 43 }),
+            new HttpError(
+              409,
+              'USER_OFFLINE',
+              'User 43 has no active Chat Gateway v2 connection.',
+              {
+                user_id: 43,
+              },
+            ),
           'validation-error': () => validation('user_id must be a positive integer.', 'user_id'),
         },
       ),

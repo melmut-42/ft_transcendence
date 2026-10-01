@@ -49,6 +49,9 @@ export interface RefreshResponse {
   access_token_expires_at: string;
 }
 
+/** The room contract versions a membership can belong to. */
+export type RoomApiVersion = 'v1' | 'v2';
+
 /** `GET /api/auth/session` — the route-recovery bootstrap call. */
 export interface SessionResponse {
   user: {
@@ -57,5 +60,10 @@ export interface SessionResponse {
   };
   /** Derived live from Game Session's membership index; `null` when not in a room. */
   active_room_id: number | null;
+  /**
+   * The room contract the active room speaks, so recovery pairs the right REST and socket
+   * versions. `null` exactly when `active_room_id` is `null`.
+   */
+  active_room_api_version: RoomApiVersion | null;
   session_expires_at: string;
 }

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 
 import { useGameStore } from '@features/game/store/gameStore';
-import { forgetRoomCode } from '@features/room/model/roomCode';
 import { useRoomStore } from '@features/room/store/roomStore';
 import { ROUTES } from '@shared/constants';
 import { useConnectionStore, useSessionStore } from '@shared/stores';
@@ -47,11 +46,18 @@ export function RoomConnectionProvider() {
       roomId,
       userId: () => useSessionStore.getState().user?.user_id,
       roomStatus: () => useRoomStore.getState().room?.status,
+      postGameDeadline: () => {
+        const { room, clockOffsetMs } = useRoomStore.getState();
+        const self = room?.players.find(
+          (p) => p.user_id === useSessionStore.getState().user?.user_id,
+        );
+        if (self?.state !== 'POST_GAME' || !room?.post_game) return null;
+        return Date.parse(room.post_game.deadline_at) - clockOffsetMs;
+      },
       close: (reason) => instance.close(reason),
       onRecovery: setRoomRecovery,
       onLost: () => {
         instance.disconnect();
-        forgetRoomCode(roomId);
         // Cleared first, so the room's guard does not hold the way out for a confirmation.
         useSessionStore.getState().setActiveRoomId(null);
         setRoomLost(true);

@@ -3,7 +3,7 @@ import { buttonInteraction } from '@shared/ui';
 
 /**
  * Class recipes for the Ready Room team panels, player cards, empty seats and the players
- * still choosing a team.
+ * spectating.
  *
  * Mobile (390px) is the base and `md:` the tablet layout (834px); `desktop:` is the 1920×1080
  * composition drawn at 80% of the design's size, like the rest of the desktop pages.
@@ -84,8 +84,6 @@ export const roleBadge: string =
   'md:h-[30px] md:min-w-[140px] md:rounded-[15px] md:pl-[10px] md:text-lg ' +
   'desktop:h-[28px] desktop:min-w-[124px] desktop:rounded-[14px] desktop:text-[16px]';
 
-export const roleBadgeEmpty: string = 'text-text-muted';
-
 export const roleIcon: string = 'text-[12px] md:text-[15px] desktop:text-[14px]';
 
 export const readyBadge: string =
@@ -122,7 +120,7 @@ export const emptyAvatar: string =
 export const emptyLabel: string =
   'truncate text-lg leading-none font-black text-text-muted md:text-2xl desktop:text-[18px]';
 
-// ---- Players still choosing a team ----
+// ---- Spectators ----
 
 export const choosing: string = 'flex flex-col gap-2 desktop:gap-[10px]';
 

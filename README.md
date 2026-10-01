@@ -71,7 +71,9 @@ review rule.
 
 ## Contract sources
 
-- REST and WebSocket contracts: the `bruno` branch (`bruno/collections/`).
+- REST and WebSocket contracts: the `bruno` branch (`bruno/collections/`). Rooms and
+  games use the Game v2 contract as a pair: REST at `/api/v2/rooms` and the room socket
+  at `/ws/v2/rooms/{room_id}`. Chat uses Chat v2; identity, profile and friends use v1.
 - Visual reference: the `ui-design` branch. Mockups are a visual reference for layout,
   color and typography. They are not a behavioral contract; where a mockup and the Bruno
   contract disagree, the contract wins.
@@ -85,7 +87,8 @@ updated first.
 - Authentication is cookie-only. Never read, store or attach a session token; the
   session cookie is the only credential, on REST and on both sockets.
 - The backend is authoritative for every game rule. The frontend never computes a
-  winner — only `game.ended` or a `FINISHED` snapshot is terminal.
+  winner — only `game.ended` or a snapshot of the completed game is terminal, and a
+  cancelled game has no winner.
 - Room and Game share one WebSocket, owned by `app/connection/RoomConnectionProvider`.
   Neither feature opens its own socket.
 - Reconnect recovery is a fresh `room.state` snapshot, never an event replay.
@@ -103,13 +106,17 @@ through a dynamic import guarded by `import.meta.env.DEV`, so production builds 
 contain it. Once a room page connects, drive other players from the browser console:
 
 ```js
-mockSockets.room().playerJoin({ user_id: 7, username: "red_agent" });
-mockSockets.room().selectTeam(7, "BLUE");
+mockSockets.room().playerJoin({ user_id: 7, username: "red_agent" }); // joins as spectator
+mockSockets.room().selectRole(7, "OPERATIVE", "BLUE"); // claims a team and role together
 mockSockets.room().updateSettings(6); // host capacity change
+mockSockets.room().kick(7); // the host removes a member
 mockSockets.room().configureStartable("SPYMASTER"); // fill both teams, start countdown
 mockSockets.room().submitClue("ocean", 2);
 mockSockets.room().guessCard(5);
-mockSockets.room().playerLeave(7); // IN_GAME: PLAYER_FORFEIT
+mockSockets.room().playerLeave(7); // IN_GAME: may pause the game for staffing
+mockSockets.room().staffingMs = 15000; // shorter room-shutdown deadline next time
+mockSockets.room().returnToLobby(7); // a player leaves the match result
+mockSockets.scenario("paused"); // also: spectating, spectator-claim, game-over, …
 mockSockets.room().dropConnection(); // reconnect + fresh room.state
 mockSockets.chat.inviteReceived(
   { user_id: 7, username: "red_agent" },

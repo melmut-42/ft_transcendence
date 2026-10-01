@@ -8,7 +8,7 @@
  * - **The seat's deadline.** A drop from a live room starts the server's grace period. The
  *   client counts the same period from its own drop, publishes the deadline for the
  *   Reconnecting overlay, and gives up when it passes: by then the server has removed the
- *   member or ended the match by forfeit.
+ *   member. On a match result the deadline is the result's own, which a drop never extends.
  * - **Why a handshake fails.** A browser is never told the HTTP status of a refused
  *   WebSocket upgrade, so a room that is gone, a membership that ended and an expired
  *   access cookie all look like a network drop. While the socket retries, a REST room
@@ -35,6 +35,11 @@ export interface RoomRecoveryOptions {
   userId: () => number | undefined;
   /** The room's status as the client last saw it. */
   roomStatus: () => RoomStatus | undefined;
+  /**
+   * When this player's result decision runs out, on this device's clock, or `null` when
+   * they are not on a result. A drop never extends it, so it replaces the grace period.
+   */
+  postGameDeadline: () => number | null;
   /** Stop the connection for a reason the socket could not report itself. */
   close: (reason: ConnectionCloseReason) => void;
   /** The recovery in progress, or `null` when there is none. */
@@ -94,8 +99,9 @@ export class RoomRecovery {
   private startRecovery(): void {
     if (this.recovering) return;
     this.recovering = true;
-    const roomStatus = this.options.roomStatus() ?? 'WAITING';
-    const deadline = Date.now() + gracePeriodFor(roomStatus);
+    const postGame = this.options.postGameDeadline();
+    const roomStatus = postGame !== null ? 'POST_GAME' : (this.options.roomStatus() ?? 'WAITING');
+    const deadline = postGame ?? Date.now() + gracePeriodFor(roomStatus);
     this.options.onRecovery({ deadline, roomStatus });
     this.deadlineTimer = setTimeout(() => this.lose(), deadline - Date.now());
   }

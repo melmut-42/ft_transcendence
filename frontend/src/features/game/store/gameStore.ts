@@ -3,27 +3,26 @@
  * this recipient.
  *
  * Two rules this store exists to enforce:
- *   - the frontend never computes a winner; only `game.ended` or a `FINISHED` snapshot
- *     is terminal;
- *   - an Operative's projection has `color: null` on unrevealed cards, and no code may
- *     treat that absence as something to fill in.
+ *   - the frontend never computes a winner; only `game.ended` or a snapshot of the
+ *     completed game is terminal, and a cancelled game has no winner at all;
+ *   - an Operative's or a spectator's projection has `color: null` on unrevealed cards,
+ *     and no code may treat that absence as something to fill in.
  *
  * It is fed from the same room connection as the room store — Game opens no socket.
  */
 
 import { create } from 'zustand';
 
-import type { CurrentTurn, Game, RoomServerEvent } from '@shared/types';
+import type { CurrentTurn, Game, RoomServerEvent, StaffingDeparture } from '@shared/types';
 
 interface GameState {
   game: Game | null;
   /**
-   * Who left a match that ended in `PLAYER_FORFEIT`, from the `game.ended` event. The
-   * snapshot does not carry it, so after a reload the result is shown without the name.
+   * Who left and why, from the `game.staffing.required` that paused the game. A snapshot
+   * does not carry it, so after a reload the pause is explained without the name.
    */
-  forfeitedBy: number | null;
+  departure: StaffingDeparture | null;
 
-  applyGame: (game: Game | null) => void;
   /** Apply one room-stream event; non-game events are ignored. */
   applyEvent: (event: RoomServerEvent) => void;
   clear: () => void;
@@ -42,19 +41,18 @@ function nextTurn(previous: CurrentTurn, update: Partial<CurrentTurn>): CurrentT
 
 export const useGameStore = create<GameState>((set, get) => ({
   game: null,
-  forfeitedBy: null,
-
-  applyGame: (game) => set({ game }),
+  departure: null,
 
   applyEvent: (event) => {
     const { game } = get();
     switch (event.type) {
       case 'room.state':
-      case 'game.started':
-      case 'game.state': {
+      case 'game.started': {
         const next = event.payload.room.game;
+        // The departure belongs to the pause it explains; it goes once the pause does.
+        const paused = next?.current_turn.phase === 'PAUSED_FOR_PLAYERS';
         const sameGame = next !== null && next.game_id === game?.game_id;
-        set({ game: next, forfeitedBy: sameGame ? get().forfeitedBy : null });
+        set({ game: next, departure: paused && sameGame ? get().departure : null });
         return;
       }
       case 'game.clue.submitted': {
@@ -105,25 +103,55 @@ export const useGameStore = create<GameState>((set, get) => ({
         if (!game) return;
         const { revealed_card: revealed } = event.payload;
         set({
-          forfeitedBy: event.payload.abandoned_by_user_id ?? null,
           game: {
             ...game,
+            status: event.payload.game_status,
             winner: event.payload.winner,
             end_reason: event.payload.end_reason,
             score: event.payload.score,
             finished_at: event.payload.finished_at,
             current_turn: { ...game.current_turn, phase: 'GAME_OVER' },
-            board: revealed
-              ? game.board.map((c) => (c.card_id === revealed.card_id ? revealed : c))
-              : game.board,
+            board: game.board.map((c) => (c.card_id === revealed.card_id ? revealed : c)),
           },
         });
         return;
       }
+      case 'game.staffing.required':
+        if (!game) return;
+        set({
+          departure: event.payload.departure,
+          game: {
+            ...game,
+            staffing: event.payload.staffing,
+            current_turn: { ...game.current_turn, phase: 'PAUSED_FOR_PLAYERS' },
+          },
+        });
+        return;
+      case 'game.staffing.restored': {
+        if (!game) return;
+        const next: Game = { ...game, current_turn: event.payload.current_turn };
+        delete next.staffing;
+        set({ game: next, departure: null });
+        return;
+      }
+      case 'game.cancelled':
+        if (!game) return;
+        set({
+          game: {
+            ...game,
+            status: event.payload.game_status,
+            winner: null,
+            end_reason: event.payload.end_reason,
+            score: event.payload.score,
+            finished_at: event.payload.finished_at,
+            current_turn: { ...game.current_turn, phase: 'GAME_OVER' },
+          },
+        });
+        return;
       default:
         return;
     }
   },
 
-  clear: () => set({ game: null, forfeitedBy: null }),
+  clear: () => set({ game: null, departure: null }),
 }));

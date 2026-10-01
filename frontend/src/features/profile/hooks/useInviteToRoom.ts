@@ -5,7 +5,8 @@
  * state is derived from it on every render, so a room that fills up, starts, or gains the
  * friend as a member turns the button unavailable at once, and a reconnect's fresh
  * snapshot re-decides it. The server checks everything again when the invite is sent
- * (friendship, room `WAITING` and not full, the friend online and in no room) and its
+ * (friendship, room `WAITING` with nobody still on a result and not full, the friend
+ * connected to chat and in no room) and its
  * answer wins: a refusal becomes the Unavailable reason, which holds only while the room
  * and the friend's presence stay as they were when it was given.
  *
@@ -52,7 +53,7 @@ const REASON_BY_CODE: Record<string, InviteUnavailableReason> = {
 /** What a server refusal depended on; when any of it changes, the refusal no longer holds. */
 function contextOf(room: Room | null, friend: ProfileView): string {
   return room
-    ? `${room.room_id}|${room.status}|${room.player_count}|${room.max_players}|${friend.is_online}`
+    ? `${room.room_id}|${room.status}|${room.post_game ? 1 : 0}|${room.player_count}|${room.max_players}|${friend.is_online}`
     : 'none';
 }
 
@@ -60,7 +61,8 @@ function contextOf(room: Room | null, friend: ProfileView): string {
 function roomReason(room: Room | null, friendId: number): InviteUnavailableReason | null {
   if (!room || room.status === 'CLOSED') return 'NO_ACTIVE_ROOM';
   if (room.players.some((p) => p.user_id === friendId)) return 'IN_YOUR_ROOM';
-  if (room.status !== 'WAITING') return 'ROOM_NOT_JOINABLE';
+  // A room is invitable only while it waits and nobody is still on the last result.
+  if (room.status !== 'WAITING' || room.post_game) return 'ROOM_NOT_JOINABLE';
   if (room.player_count >= room.max_players) return 'ROOM_FULL';
   return null;
 }

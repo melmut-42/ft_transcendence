@@ -68,6 +68,10 @@ export const guessFeedback: string = 'text-center empty:hidden';
 
 export const summaries: string = 'mt-auto flex gap-[10px] pt-[20px] desktop:hidden';
 
+/** Spectators under the board, at every size. */
+export const spectators: string =
+  'mt-[16px] desktop:mx-auto desktop:mt-[20px] desktop:max-w-[960px]';
+
 // ---- Game over panel ----
 
 /** The finished match's panel grows to hold its two actions under the result. */

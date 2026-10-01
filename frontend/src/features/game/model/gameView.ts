@@ -20,20 +20,33 @@ export interface Seat {
  * - `CLUE_SENT`: the Spymaster whose clue the Operatives are playing.
  * - `WAITING_FOR_CLUE`: an active-team Operative while their Spymaster chooses a clue.
  * - `GUESSING`: an active-team Operative picking cards.
- * - `OPPONENT_TURN`: anyone whose team is not playing.
+ * - `OPPONENT_TURN`: a player whose team is not playing.
+ * - `SPECTATING`: a spectator watching the match.
+ * - `PAUSED`: everyone, while the game waits for a team's missing player.
  * - `GAME_OVER`: the match has a result.
  */
 export type GameStage =
-  'CLUE' | 'CLUE_SENT' | 'WAITING_FOR_CLUE' | 'GUESSING' | 'OPPONENT_TURN' | 'GAME_OVER';
+  | 'CLUE'
+  | 'CLUE_SENT'
+  | 'WAITING_FOR_CLUE'
+  | 'GUESSING'
+  | 'OPPONENT_TURN'
+  | 'SPECTATING'
+  | 'PAUSED'
+  | 'GAME_OVER';
 
 export function isGameOver(game: Game): boolean {
-  return game.winner !== null || game.current_turn.phase === 'GAME_OVER';
+  return (
+    game.status !== 'IN_PROGRESS' || game.winner !== null || game.current_turn.phase === 'GAME_OVER'
+  );
 }
 
 export function gameStage(game: Game, seat: Seat): GameStage {
   if (isGameOver(game)) return 'GAME_OVER';
   const { team, phase } = game.current_turn;
-  if (!seat.team || seat.team !== team || !seat.role) return 'OPPONENT_TURN';
+  if (phase === 'PAUSED_FOR_PLAYERS') return 'PAUSED';
+  if (seat.role === 'SPECTATOR' || !seat.team || !seat.role) return 'SPECTATING';
+  if (seat.team !== team) return 'OPPONENT_TURN';
   if (seat.role === 'SPYMASTER') return phase === 'WAITING_FOR_CLUE' ? 'CLUE' : 'CLUE_SENT';
   return phase === 'GUESSING' ? 'GUESSING' : 'WAITING_FOR_CLUE';
 }
@@ -51,7 +64,8 @@ export function isPickable(card: Card, game: Game, stage: GameStage): boolean {
 /**
  * How strongly a card is drawn, matching the designed boards. A Spymaster's revealed cards
  * fall back to 40% so the cards still in play stand out, and they soften to 80% while
- * the Operatives play the clue; an Operative who cannot pick sees the board at 55%.
+ * the Operatives play the clue; an Operative or a spectator who cannot pick sees the board
+ * at 55%.
  */
 export type CardEmphasis = 'full' | 'soft' | 'muted' | 'faded';
 

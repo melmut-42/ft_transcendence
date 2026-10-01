@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBlocker } from 'react-router-dom';
 
@@ -7,8 +7,8 @@ import { endSignedInState } from '@app/session/endSignedInState';
 import { useGameStore } from '@features/game/store/gameStore';
 import { LeaveRoomDialog } from '@features/room/components/RoomOverlays';
 import { useLeaveRoom } from '@features/room/hooks/useLeaveRoom';
-import { forgetRoomCode, recallRoomCode } from '@features/room/model/roomCode';
 import { useRoomStore } from '@features/room/store/roomStore';
+import type { RoomExit } from '@features/room/store/roomStore';
 import { showToast, useConnectionStore, useSessionStore } from '@shared/stores';
 import { ErrorState, LoadingState } from '@shared/ui';
 
@@ -16,21 +16,26 @@ import { GameScreen } from './GameScreen';
 import { ReadyRoom } from './ReadyRoom';
 import * as styles from './ReadyRoom.styles';
 
+const EXIT_NOTICE: Partial<Record<RoomExit, string>> = {
+  POST_GAME_TIMEOUT: 'room.recovery.postGameTimeout',
+};
+
 /**
- * The room route. It shows the screen that matches the server's `room.status` — the Ready
- * Room while the room waits or counts down, the Game Board once the game starts and its
- * result once it ends — so a refresh lands on the right screen from the fresh snapshot,
- * never from navigation history.
+ * The room route. It shows the screen that matches the player's own state in the server's
+ * snapshot — the Ready Room while they are in the room's lobby, the Game Board while they
+ * play or watch a match, and its result until they decide — so a refresh lands on the
+ * right screen from the fresh snapshot, never from navigation history. After a match the
+ * room may already be waiting for the next one while this player is still on the result.
  *
  * Until the first snapshot arrives the route shows a loading state rather than an empty
- * room. A room that closed, or that the player no longer belongs to, clears the room from
- * the session; route recovery then takes the player to Room Discovery, where a toast says
- * what happened.
+ * room. A room that closed, or that the player no longer belongs to (they were removed by
+ * the host, or did not decide on a result in time), clears the room from the session;
+ * route recovery then takes the player to Room Discovery, where a toast says what happened.
  *
  * Leaving is always explicit. LEAVE ROOM and LEAVE GAME ask first and tell the server, and
  * a Back or any other navigation away from the room is held for the same confirmation, so
- * nobody leaves a seat taken by nobody. A finished match has nothing left to confirm, so
- * leaving it, by Back to Lobby or by Back, tells the server and goes straight to the Lobby.
+ * nobody leaves a seat taken by nobody. A result has nothing left to confirm, so leaving
+ * it, by Exit or by Back, tells the server and goes straight to the Lobby.
  */
 export function RoomPage() {
   const { t } = useTranslation();
@@ -40,13 +45,13 @@ export function RoomPage() {
   const game = useGameStore((state) => state.game);
   const socket = useConnectionStore((state) => state.room);
   const leave = useLeaveRoom();
-  const [roomCode] = useState(() => recallRoomCode(roomId));
+  const exit = useRoomStore((state) => state.exit);
 
   const userId = useSessionStore((state) => state.user?.user_id);
+  const me = room?.players.find((p) => p.user_id === userId) ?? null;
   // A snapshot without the player means the server no longer counts them in the room; while
   // they are leaving on purpose, that is the leave itself arriving first.
-  const removed =
-    room !== null && leave.status !== 'LEAVING' && !room.players.some((p) => p.user_id === userId);
+  const removed = room !== null && leave.status !== 'LEAVING' && me === null;
   const closed =
     room?.status === 'CLOSED' ||
     (socket.status === 'CLOSED' && socket.closeReason === 'ROOM_NOT_FOUND');
@@ -65,15 +70,15 @@ export function RoomPage() {
   // The membership is over: say why, and let route recovery take the player to the Lobby.
   useEffect(() => {
     if (!unavailable) return;
-    forgetRoomCode(roomId);
     if (useSessionStore.getState().activeRoomId !== roomId) return;
     showToast({
-      message: closed ? 'room.recovery.closed' : 'room.recovery.removed',
+      message:
+        (exit && EXIT_NOTICE[exit]) ?? (closed ? 'room.recovery.closed' : 'room.recovery.removed'),
       tone: 'error',
       icon: 'warning',
     });
     useSessionStore.getState().setActiveRoomId(null);
-  }, [closed, roomId, unavailable]);
+  }, [closed, exit, roomId, unavailable]);
 
   // A revoked session cannot reconnect; the route guard takes the user to Log In.
   useEffect(() => {
@@ -84,12 +89,12 @@ export function RoomPage() {
   const { request: requestLeave, action: leaveAction } = leave;
   const blocked = blocker.state === 'blocked';
   useEffect(() => {
-    if (!blocked || leaveAction.confirmation) return;
+    if (!blocked || leaveAction.confirm) return;
     blocker.reset?.();
     requestLeave();
-  }, [blocked, blocker, leaveAction.confirmation, requestLeave]);
+  }, [blocked, blocker, leaveAction.confirm, requestLeave]);
 
-  const leaveOpen = leaveAction.confirmation
+  const leaveOpen = leaveAction.confirm
     ? leave.status !== 'IDLE' || blocked
     : leave.status === 'FAILED';
   const cancelLeave = () => {
@@ -125,8 +130,8 @@ export function RoomPage() {
           <LoadingState label={t('room.loading')} />
         </main>
       );
-  } else if (room.status === 'WAITING' || room.status === 'COUNTDOWN') {
-    screen = <ReadyRoom room={room} roomCode={roomCode} onLeave={leave.request} />;
+  } else if (me?.state === 'IN_LOBBY') {
+    screen = <ReadyRoom room={room} onLeave={leave.request} />;
   } else if (game) {
     screen = (
       <GameScreen
@@ -134,6 +139,7 @@ export function RoomPage() {
         game={game}
         leaving={leave.status === 'LEAVING'}
         onLeave={leave.request}
+        overlaysHidden={leaveOpen}
       />
     );
   } else {

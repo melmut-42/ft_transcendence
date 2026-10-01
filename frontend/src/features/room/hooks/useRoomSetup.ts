@@ -1,6 +1,9 @@
 /**
- * The Ready Room's own commands — team, role, ready and room size — with the feedback the
- * controls show while one is in flight and after the server turns one down.
+ * The Ready Room's own commands — team, role, spectating, ready and room size — with the
+ * feedback the controls show while one is in flight and after the server turns one down.
+ *
+ * A spectator picks a team first and a role second, but the server takes both in one
+ * command, so the picked team is held here as a draft (`draftTeam`) until the role is chosen.
  *
  * Nothing changes on screen when a command is sent. The member's new team, role or ready
  * state appears when the server's `room.player.updated` and `room.state` arrive, so a
@@ -18,7 +21,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRoomConnection } from '@app/connection/roomConnectionContext';
 import { useConnectionStore } from '@shared/stores';
 import { RoomCommandError } from '@shared/websocket';
-import type { RoomRole, Team } from '@shared/types';
+import type { PlayingRole, Team } from '@shared/types';
 
 import { useRoomCommands } from './useRoomCommands';
 
@@ -41,6 +44,8 @@ function messageFor(error: unknown): string {
       return 'room.ready.errors.roleRequired';
     case 'INVALID_ROOM_STATE':
       return 'room.ready.errors.locked';
+    case 'POST_GAME_PENDING':
+      return 'room.ready.errors.postGamePending';
     case 'NOT_HOST':
       return 'room.ready.errors.notHost';
     case 'INVALID_PAYLOAD':
@@ -59,6 +64,7 @@ export function useRoomSetup() {
   const online = useConnectionStore((state) => state.room.status === 'OPEN');
   const [pending, setPending] = useState<SetupAction | null>(null);
   const [feedback, setFeedback] = useState<SetupFeedback | null>(null);
+  const [draftTeam, setDraftTeam] = useState<Team | null>(null);
   const busy = useRef(false);
   const mounted = useRef(true);
 
@@ -97,21 +103,25 @@ export function useRoomSetup() {
   return {
     pending,
     feedback,
+    draftTeam,
+    setDraftTeam,
     dismissFeedback: useCallback(() => setFeedback(null), []),
     selectTeam: useCallback(
       (team: Team) => run('team', () => commands.selectTeam(team)),
       [commands, run],
     ),
     selectRole: useCallback(
-      (role: RoomRole) => run('role', () => commands.selectRole(role)),
+      (team: Team, role: PlayingRole) => run('role', () => commands.selectRole(team, role)),
       [commands, run],
     ),
+    spectate: useCallback(() => run('role', () => commands.spectate()), [commands, run]),
     setReady: useCallback(
       (ready: boolean) => run('ready', () => commands.setReady(ready)),
       [commands, run],
     ),
     updateMaxPlayers: useCallback(
-      (maxPlayers: number) => run('capacity', () => commands.updateMaxPlayers(maxPlayers)),
+      (maxPlayers: number) =>
+        run('capacity', () => commands.updateSettings({ max_players: maxPlayers })),
       [commands, run],
     ),
   };

@@ -65,7 +65,7 @@ export function joinFailure(error: unknown): EntryFailure {
     case 'ROOM_FULL':
       return { kind: 'field', message: 'room.join.errors.full' };
     case 'ROOM_NOT_JOINABLE':
-      return { kind: 'field', message: 'room.join.errors.started' };
+      return { kind: 'field', message: 'room.join.errors.notJoinable' };
     case 'RATE_LIMITED':
       return { kind: 'alert', alert: alert('rateLimited') };
     default:

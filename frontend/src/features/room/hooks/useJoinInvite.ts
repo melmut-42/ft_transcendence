@@ -1,5 +1,5 @@
 /**
- * Join from a room invitation: the ordinary `POST /api/rooms/{room_id}/members`.
+ * Join from a room invitation: the ordinary `POST /api/v2/rooms/{room_id}/members`.
  *
  * An invitation is not a pass. The server applies every normal join check, so a room that
  * filled up, started or closed since the invitation was sent answers like any other join,
@@ -31,14 +31,14 @@ export function useJoinInvite() {
   }, []);
 
   const join = useCallback(
-    async (roomId: number, roomCode: string): Promise<boolean> => {
+    async (roomId: number): Promise<boolean> => {
       if (pending.current) return false;
       pending.current = true;
       setStatus('JOINING');
       setFailure(null);
       try {
         const room = await joinRoom(roomId);
-        if (mounted.current) enter(room, roomCode);
+        if (mounted.current) enter(room);
         return true;
       } catch (error) {
         if (!mounted.current) return false;

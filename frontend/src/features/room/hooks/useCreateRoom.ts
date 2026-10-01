@@ -1,5 +1,5 @@
 /**
- * Create Room: one `POST /api/rooms` with the chosen capacity.
+ * Create Room: one `POST /api/v2/rooms` with the chosen capacity.
  *
  * A second submit while the request is in flight is dropped before it reaches the
  * network, so a double click never creates two rooms. The dialog only moves on once the
@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ROOM_CAPACITY } from '@shared/types';
-import type { CreateRoomResponse } from '@shared/types';
+import type { Room } from '@shared/types';
 
 import { createRoom } from '../api';
 import { createFailure } from '../model/entry';
@@ -27,7 +27,7 @@ export function useCreateRoom() {
   const [maxPlayers, setMaxPlayers] = useState<number>(ROOM_CAPACITY.default);
   const [status, setStatus] = useState<CreateRoomStatus>('IDLE');
   const [failure, setFailure] = useState<BannerFailure | null>(null);
-  const [created, setCreated] = useState<CreateRoomResponse | null>(null);
+  const [created, setCreated] = useState<Room | null>(null);
   const pending = useRef(false);
   const mounted = useRef(true);
   const entered = useRef(false);
@@ -42,7 +42,7 @@ export function useCreateRoom() {
   const enterCreated = useCallback(() => {
     if (!created || entered.current) return;
     entered.current = true;
-    enter(created, created.room_code);
+    enter(created);
   }, [created, enter]);
 
   useEffect(() => {

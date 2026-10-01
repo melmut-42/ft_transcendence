@@ -13,15 +13,13 @@ import { roomPath } from '@shared/constants';
 import { useSessionStore } from '@shared/stores';
 import type { Room } from '@shared/types';
 
-import { rememberRoomCode } from '../model/roomCode';
 import { useRoomStore } from '../store/roomStore';
 
 export function useEnterRoom() {
   const navigate = useNavigate();
 
   return useCallback(
-    (room: Room, roomCode: string) => {
-      rememberRoomCode(room.room_id, roomCode);
+    (room: Room) => {
       useRoomStore.getState().applySnapshot(room);
       useSessionStore.getState().setActiveRoomId(room.room_id);
       navigate(roomPath(room.room_id));

@@ -9,7 +9,7 @@ import { cn } from '@shared/utils';
 import type { TeamRoster } from '../model/readyRoom';
 import * as styles from './TeamPanel.styles';
 
-/** Resolves a member's avatar; the room snapshot itself carries none. */
+/** Resolves a member's avatar from the member list, or from their profile as a fallback. */
 export type AvatarLookup = (userId: number) => string | null;
 
 interface MemberProps {
@@ -59,7 +59,7 @@ export function PlayerCard({ member, avatarFor, selfId, selfOnline }: MemberProp
       aria-haspopup="dialog"
       aria-label={t('room.ready.card', {
         username: member.username,
-        role: t(member.role ? `room.ready.role.${member.role}` : 'room.ready.role.none'),
+        role: t(`room.ready.role.${member.role}`),
         status: t(`room.ready.status.${tone}`),
         host: member.is_host ? t('room.ready.hostSuffix') : '',
         you: isSelf ? t('room.ready.youSuffix') : '',
@@ -78,14 +78,12 @@ export function PlayerCard({ member, avatarFor, selfId, selfOnline }: MemberProp
           </span>
           {member.is_host && <span className={styles.hostBadge}>{t('room.ready.host')}</span>}
         </span>
-        <span className={cn(styles.roleBadge, !member.role && styles.roleBadgeEmpty)}>
-          {member.role && (
-            <Icon
-              name={member.role === 'SPYMASTER' ? 'profile' : 'search'}
-              className={styles.roleIcon}
-            />
-          )}
-          {t(member.role ? `room.ready.role.${member.role}` : 'room.ready.role.none')}
+        <span className={styles.roleBadge}>
+          <Icon
+            name={member.role === 'SPYMASTER' ? 'profile' : 'search'}
+            className={styles.roleIcon}
+          />
+          {t(`room.ready.role.${member.role}`)}
         </span>
       </span>
 
@@ -140,8 +138,11 @@ export function TeamPanel({
   );
 }
 
-/** Members who joined but have not picked a team yet, so nobody in the room is hidden. */
-export function ChoosingPlayers({
+/**
+ * Spectators: everyone who joined and has not claimed a seat, or chose to watch, so nobody
+ * in the room is hidden.
+ */
+export function Spectators({
   members,
   avatarFor,
   className,
@@ -157,7 +158,7 @@ export function ChoosingPlayers({
   return (
     <section aria-labelledby={titleId} className={cn(styles.choosing, className)}>
       <h2 id={titleId} className={styles.choosingTitle}>
-        {t('room.ready.choosing')}
+        {t('room.ready.spectators')}
       </h2>
       <ul className={styles.choosingList}>
         {members.map((m) => (

@@ -55,7 +55,7 @@ export function RoomInvitation({ roomId, roomCode, fromUsername, onDismiss }: Ro
         <button
           type="button"
           onClick={() => {
-            if (!joining) void join(roomId, roomCode).then((joined) => joined && onDismiss());
+            if (!joining) void join(roomId).then((joined) => joined && onDismiss());
           }}
           aria-disabled={joining || undefined}
           aria-busy={joining || undefined}

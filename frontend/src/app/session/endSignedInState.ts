@@ -4,7 +4,6 @@ import { useGameStore } from '@features/game/store/gameStore';
 import { useInviteStore } from '@features/lobby/store/inviteStore';
 import { useOwnProfileStore } from '@features/profile/store/ownProfileStore';
 import { useSentInvitesStore } from '@features/profile/store/sentInvitesStore';
-import { forgetRoomCode } from '@features/room/model/roomCode';
 import { useRoomStore } from '@features/room/store/roomStore';
 import { useConnectionStore, useModalStore, useSessionStore } from '@shared/stores';
 
@@ -26,8 +25,6 @@ export type SessionEnd = 'LOGGED_OUT' | 'ACCOUNT_DELETED' | 'EXPIRED';
  */
 export function endSignedInState(end: SessionEnd = 'LOGGED_OUT') {
   const session = useSessionStore.getState();
-  // An expired session may still hold its seat, so the room's code is kept for the return.
-  if (session.activeRoomId !== null && end !== 'EXPIRED') forgetRoomCode(session.activeRoomId);
   useModalStore.getState().close();
   useRoomStore.getState().clear();
   useGameStore.getState().clear();

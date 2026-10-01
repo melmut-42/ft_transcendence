@@ -6,10 +6,15 @@
  */
 
 import type { Score, Team } from './common';
-import type { GameEndReason } from './game';
-import type { RoomRole } from './room';
+import type { PlayingRole } from './room';
 
 export type MatchResult = 'WIN' | 'LOSS';
+
+/**
+ * How a recorded match ended. History also holds matches from before the Game v2 room
+ * flow, which a leaving player could still forfeit; a cancelled match is never recorded.
+ */
+export type MatchEndReason = 'ALL_TEAM_CARDS_REVEALED' | 'ASSASSIN_REVEALED' | 'PLAYER_FORFEIT';
 
 export interface MatchOpponent {
   user_id: number;
@@ -22,10 +27,10 @@ export interface MatchHistoryEntry {
   /** This user's team in the match. */
   team: Team;
   /** This user's role in the match. */
-  role: RoomRole;
+  role: PlayingRole;
   opponents: MatchOpponent[];
   result: MatchResult;
-  end_reason: GameEndReason;
+  end_reason: MatchEndReason;
   score: Score;
   finished_at: string;
 }

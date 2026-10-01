@@ -1,6 +1,9 @@
 /**
- * Join Room by code: `GET /api/rooms/lookup/{room_code}`, then
- * `POST /api/rooms/{room_id}/members`.
+ * Join Room by code: `GET /api/v2/rooms/lookup/{room_code}`, then
+ * `POST /api/v2/rooms/{room_id}/members`.
+ *
+ * A room that is counting down or playing still takes players: they join as spectators and
+ * may claim a free seat from inside.
  *
  * As soon as the field holds a well-formed code, the lookup runs and the dialog previews
  * the room's occupancy and status. The preview only decides what the dialog offers; Join
@@ -16,7 +19,7 @@ import { ROOM_CODE_PATTERN } from '@shared/types';
 import type { RoomLookupResponse } from '@shared/types';
 
 import { joinRoom, lookupRoomByCode } from '../api';
-import { joinAvailability } from '../model/capacity';
+import { canJoin, joinAvailability } from '../model/capacity';
 import type { JoinAvailability } from '../model/capacity';
 import { joinFailure } from '../model/entry';
 import type { EntryFailure } from '../model/entry';
@@ -108,7 +111,7 @@ export function useJoinRoom() {
     const request = generation.current;
     const room = preview ?? (await lookUp(code, request));
     if (!mounted.current) return;
-    if (!room || joinAvailability(room) !== 'JOINABLE') {
+    if (!room || !canJoin(joinAvailability(room))) {
       pending.current = false;
       if (room) setStatus('IDLE');
       return;
@@ -120,7 +123,7 @@ export function useJoinRoom() {
       if (!mounted.current) return;
       setStatus('JOINED');
       await new Promise((resolve) => setTimeout(resolve, ENTRY_CONFIRMATION_MS));
-      if (mounted.current) enter(joined, room.room_code);
+      if (mounted.current) enter(joined);
     } catch (error) {
       if (!mounted.current) return;
       pending.current = false;

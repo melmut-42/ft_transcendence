@@ -1,43 +1,29 @@
 /**
- * Leave semantics. Before the match starts the action is LEAVE ROOM, which gives up the
- * member's team, role and seat; while the match runs it is LEAVE GAME, which forfeits
- * for the member's team (`PLAYER_FORFEIT`). Both ask for confirmation. Once the match is
- * over there is nothing left to give up, so BACK TO LOBBY leaves the finished room at once.
- * All three call the same REST `Leave room` endpoint.
+ * Leave semantics. All of them call the same REST `Leave room` endpoint.
+ *
+ * - LEAVE ROOM before the match starts gives up the member's team, role and seat.
+ * - LEAVE GAME while the match runs, as a Spymaster or an Operative, takes the player out
+ *   of the match; the server then checks whether their team is still staffed.
+ * - A spectator holds no seat, so their LEAVE ROOM only stops them watching.
+ * - On a result screen nothing is at stake: EXIT leaves the room at once.
+ *
+ * Every leave that costs something asks first.
  */
 
-import type { RoomStatus } from '@shared/types';
+import type { Room, RoomMember } from '@shared/types';
+
+export type LeaveKind = 'LEAVE_ROOM' | 'LEAVE_SPECTATING' | 'LEAVE_GAME' | 'EXIT';
 
 export interface LeaveAction {
-  kind: 'LEAVE_ROOM' | 'LEAVE_GAME';
-  label: 'LEAVE ROOM' | 'LEAVE GAME' | 'BACK TO LOBBY';
-  confirmation: { title: string; body: string; confirmLabel: string; cancelLabel: string } | null;
+  kind: LeaveKind;
+  /** Whether the player confirms first. */
+  confirm: boolean;
 }
 
-export function leaveActionFor(status: RoomStatus): LeaveAction {
-  if (status === 'IN_GAME') {
-    return {
-      kind: 'LEAVE_GAME',
-      label: 'LEAVE GAME',
-      confirmation: {
-        title: 'Leave Game?',
-        body: 'You will leave this match and return to the lobby. Your team forfeits the match.',
-        confirmLabel: 'LEAVE GAME',
-        cancelLabel: 'STAY',
-      },
-    };
+export function leaveActionFor(room: Room | null, me: RoomMember | null): LeaveAction {
+  if (me?.state === 'POST_GAME') return { kind: 'EXIT', confirm: false };
+  if (room?.status === 'IN_GAME' && me?.state === 'IN_GAME' && me.role !== 'SPECTATOR') {
+    return { kind: 'LEAVE_GAME', confirm: true };
   }
-  if (status === 'FINISHED') {
-    return { kind: 'LEAVE_ROOM', label: 'BACK TO LOBBY', confirmation: null };
-  }
-  return {
-    kind: 'LEAVE_ROOM',
-    label: 'LEAVE ROOM',
-    confirmation: {
-      title: 'Leave Room?',
-      body: 'You will lose your team and role. Your seat opens for another player.',
-      confirmLabel: 'LEAVE ROOM',
-      cancelLabel: 'STAY',
-    },
-  };
+  return { kind: me?.role === 'SPECTATOR' ? 'LEAVE_SPECTATING' : 'LEAVE_ROOM', confirm: true };
 }

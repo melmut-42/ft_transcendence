@@ -96,8 +96,9 @@ export const game = {
     'sr-only desktop:not-sr-only desktop:truncate desktop:text-[22px] desktop:leading-none ' +
     'desktop:font-black desktop:text-text-ink',
   badge:
-    'inline-flex h-[32px] min-w-[112px] items-center justify-center rounded-lg ' +
-    'bg-primary-muted px-[12px] text-md leading-none font-black text-surface uppercase ' +
+    'inline-flex h-[32px] items-center justify-center rounded-lg bg-primary-muted ' +
+    'px-[10px] text-sm leading-none font-black whitespace-nowrap text-surface uppercase ' +
+    'min-[400px]:min-w-[112px] min-[400px]:px-[12px] min-[400px]:text-md ' +
     'md:min-w-[143px] md:text-lg ' +
     'desktop:h-[26px] desktop:min-w-[114px] desktop:rounded-[13px] desktop:text-[14px]',
   chevron:

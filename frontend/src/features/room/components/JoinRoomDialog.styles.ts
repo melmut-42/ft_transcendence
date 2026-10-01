@@ -71,6 +71,7 @@ export const badgeBase: string =
 
 export const badgeTone = {
   JOINABLE: 'bg-accent-mint-deep',
+  IN_PROGRESS: 'bg-primary',
   FULL: 'bg-secondary-deep',
   NOT_JOINABLE: 'bg-text-disabled',
 };

@@ -88,6 +88,12 @@ export const takenBadge: string =
 export const hint: string =
   'mt-[12px] text-center text-[15px] leading-[18px] font-regular text-text-muted';
 
+/** Watch instead: a quiet text action under the roles, so a seat is not dropped by habit. */
+export const spectate: string =
+  'mx-auto mt-[10px] inline-flex cursor-pointer items-center gap-[8px] rounded-sm ' +
+  'text-[15px] leading-[18px] font-bold text-primary-sky underline-offset-2 ' +
+  'not-disabled:hover:underline disabled:cursor-not-allowed disabled:opacity-60';
+
 // ---- Ready ----
 
 export const ready: string =

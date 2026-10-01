@@ -13,10 +13,12 @@ import {
   SetupPanel,
   SetupSummary,
 } from '@features/room/components/SetupPanel';
-import { ChoosingPlayers, TeamPanel } from '@features/room/components/TeamPanel';
+import { Spectators, TeamPanel } from '@features/room/components/TeamPanel';
 import { useRoomSetup } from '@features/room/hooks/useRoomSetup';
 import {
   findMember,
+  participantCount,
+  postGamePending,
   readyCount,
   rosters,
   roomPhase,
@@ -83,22 +85,15 @@ function CountdownCancelledNotice() {
 /**
  * The Ready Room: the staging screen between Room Discovery and the board.
  *
- * Players choose a team and a role, then press Ready. Every value on screen comes from the
+ * Everyone arrives as a spectator. Players claim a team and a role, then press Ready; whoever
+ * stays out watches. Every value on screen comes from the
  * room snapshot the server keeps current over the room socket, so a player who joins,
  * leaves or changes their setup appears for everyone without a reload, and a refresh or a
  * reconnect rebuilds the same screen from a fresh snapshot. There is no start button: the
  * server starts the countdown itself once its start predicate holds, and the room moves to
  * the board when the server announces the game.
  */
-export function ReadyRoom({
-  room,
-  roomCode,
-  onLeave,
-}: {
-  room: Room;
-  roomCode: string | null;
-  onLeave: () => void;
-}) {
+export function ReadyRoom({ room, onLeave }: { room: Room; onLeave: () => void }) {
   const { t } = useTranslation();
   const userId = useSessionStore((state) => state.user?.user_id);
   const socketOpen = useConnectionStore((state) => state.room.status === 'OPEN');
@@ -108,8 +103,10 @@ export function ReadyRoom({
 
   const me: RoomMember | null = findMember(room, userId);
   const teams = useMemo(() => rosters(room), [room]);
-  const avatarFor = usePlayerAvatars(room.players.map((p) => p.user_id));
-  const host = findMember(room, room.host_user_id);
+  const profileAvatar = usePlayerAvatars(room.players.map((p) => p.user_id));
+  const avatarFor = (id: number) =>
+    room.players.find((p) => p.user_id === id)?.avatar_url || profileAvatar(id);
+  const host = room.host_user_id === null ? null : findMember(room, room.host_user_id);
   const phase = roomPhase(room);
   const locked = setupLocked(room);
   const member = { avatarFor, selfId: userId, selfOnline: socketOpen };
@@ -122,7 +119,7 @@ export function ReadyRoom({
   const counter =
     isFull(room) && room.status === 'WAITING'
       ? t('room.ready.counterFull', { count: room.player_count, max: room.max_players })
-      : t('room.ready.counter', { ready: readyCount(room), count: room.player_count });
+      : t('room.ready.counter', { ready: readyCount(room), count: participantCount(room) });
 
   return (
     <main className={styles.page}>
@@ -131,14 +128,12 @@ export function ReadyRoom({
           <h1 className={styles.title}>
             {host ? t('room.ready.title', { host: host.username }) : t('room.ready.titleFallback')}
           </h1>
-          {roomCode && (
-            <>
-              <RoomCode code={roomCode} className={styles.code} />
-              <p className={styles.hint}>{t('room.ready.shareHint')}</p>
-            </>
-          )}
+          <RoomCode code={room.room_code} className={styles.code} />
+          <p className={styles.hint}>{t('room.ready.shareHint')}</p>
           {userId !== undefined && (
-            <RoomCapacity room={room} userId={userId} setup={setup} className={styles.capacity} />
+            <>
+              <RoomCapacity room={room} userId={userId} setup={setup} className={styles.capacity} />
+            </>
           )}
 
           {me && <SetupSummary me={me} onChange={() => setSetupOpen(true)} disabled={locked} />}
@@ -150,6 +145,7 @@ export function ReadyRoom({
               {t(`room.ready.phase.${phase}.body`, {
                 count: room.player_count,
                 max: room.max_players,
+                pending: postGamePending(room).length,
               })}
             </p>
           </div>
@@ -158,8 +154,8 @@ export function ReadyRoom({
             <TeamPanel roster={teams.red} className={styles.team} {...member} />
             <TeamPanel roster={teams.blue} className={styles.team} {...member} />
           </div>
-          <ChoosingPlayers
-            members={teams.unassigned}
+          <Spectators
+            members={teams.spectators}
             avatarFor={avatarFor}
             className={styles.choosing}
           />

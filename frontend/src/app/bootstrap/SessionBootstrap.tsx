@@ -24,7 +24,8 @@ import { LoadingState } from '@shared/ui';
  *
  * `active_room_id` from that response is the authoritative route-recovery input — the
  * screen after a refresh is derived from server membership, never from the reloaded URL
- * (`RoomRouteGuard`, `LobbyRouteGuard`).
+ * (`RoomRouteGuard`, `LobbyRouteGuard`). It is paired with `active_room_api_version`: this
+ * client restores only a Game v2 room, and explains a room it cannot open.
  */
 export function SessionBootstrap({ children }: { children: ReactNode }) {
   const { t } = useTranslation();

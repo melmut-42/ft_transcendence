@@ -26,19 +26,32 @@ export interface RoomSettingsAccess {
   reason: 'NOT_HOST' | 'NOT_WAITING' | null;
 }
 
+/** Only the host changes the settings, while the room waits and the host is in its lobby. */
 export function roomSettingsAccess(room: Room, userId: number): RoomSettingsAccess {
   if (room.host_user_id !== userId) return { editable: false, reason: 'NOT_HOST' };
-  if (room.status !== 'WAITING') return { editable: false, reason: 'NOT_WAITING' };
+  const host = room.players.find((p) => p.user_id === userId);
+  if (room.status !== 'WAITING' || host?.state !== 'IN_LOBBY') {
+    return { editable: false, reason: 'NOT_WAITING' };
+  }
   return { editable: true, reason: null };
 }
 
-/** Join-dialog verdict from a code lookup, before the Join request is sent. */
-export type JoinAvailability = 'JOINABLE' | 'FULL' | 'NOT_JOINABLE';
+/**
+ * Join-dialog verdict from a code lookup, before the Join request is sent. A room that is
+ * counting down or playing still takes players, who join it as spectators
+ * (`IN_PROGRESS`); one whose members are still on a result takes nobody.
+ */
+export type JoinAvailability = 'JOINABLE' | 'IN_PROGRESS' | 'FULL' | 'NOT_JOINABLE';
 
 export function joinAvailability(lookup: RoomLookupResponse): JoinAvailability {
-  if (lookup.status !== 'WAITING') return 'NOT_JOINABLE';
-  return isRoomFull(lookup) ? 'FULL' : 'JOINABLE';
+  if (isRoomFull(lookup)) return 'FULL';
+  if (lookup.status === 'COUNTDOWN' || lookup.status === 'IN_GAME') return 'IN_PROGRESS';
+  return lookup.joinable ? 'JOINABLE' : 'NOT_JOINABLE';
 }
+
+/** Whether Join may be sent for this verdict; the server decides again. */
+export const canJoin = (availability: JoinAvailability): boolean =>
+  availability === 'JOINABLE' || availability === 'IN_PROGRESS';
 
 function range(from: number, to: number): number[] {
   return Array.from({ length: Math.max(0, to - from + 1) }, (_, i) => from + i);

@@ -18,6 +18,11 @@
  *   mockSockets.scenario('operative-turn')       // fresh room in that scenario
  *   mockSockets.room().playerJoin({ user_id: 47, username: 'night_owl' })
  *   mockSockets.room().configureStartable('SPYMASTER')
+ *   mockSockets.room().selectRole(47, 'OPERATIVE', 'BLUE')  // a spectator claims a seat
+ *   mockSockets.room().kick(43)                  // the host removes a member
+ *   mockSockets.room().playerLeave(43)           // mid-match: may pause for staffing
+ *   mockSockets.room().staffingMs = 15000        // shorter shutdown deadline next time
+ *   mockSockets.room().returnToLobby(43)         // a player leaves the result
  *   mockSockets.room().submitClue('ocean', 2)
  *   mockSockets.guess('NEUTRAL')                 // RED | BLUE | NEUTRAL | ASSASSIN
  *   mockSockets.room().passTurn()
@@ -30,7 +35,7 @@
  *   mockSockets.chat.roomMessage(48, 'ready?')    // a room player writes in the room chat
  */
 
-import { RECONNECT, WS_BASE_PATH, WS_CHAT_PATH } from '@shared/constants';
+import { GAME_API_VERSION, RECONNECT, WS_BASE_PATH, WS_CHAT_PATH } from '@shared/constants';
 import type { CardColor } from '@shared/types';
 
 import { setTransportFactory } from '../transport';
@@ -79,7 +84,9 @@ export interface MockSockets {
 }
 
 function freshRoom(roomId: number, scenario: RoomScenario): MockRoomServer {
-  const server = new MockRoomServer(roomId, mockSelfPlayer());
+  // A scenario replaces the room's state, not its shareable code.
+  const code = mockRooms.get(roomId)?.roomCode;
+  const server = new MockRoomServer(roomId, mockSelfPlayer(), undefined, undefined, code);
   applyRoomScenario(server, scenario);
   mockRooms.set(roomId, server);
   return server;
@@ -90,7 +97,7 @@ export function installMockSockets(): MockSockets {
   const chat = mockChat;
   let lastRoomId: number | null = null;
   let onlineTimer: ReturnType<typeof setTimeout> | undefined;
-  const roomPattern = new RegExp(`^${WS_BASE_PATH}/rooms/(\\d+)$`);
+  const roomPattern = new RegExp(`^${WS_BASE_PATH}/${GAME_API_VERSION}/rooms/(\\d+)$`);
 
   const factory: TransportFactory = (options) => {
     if (options.path === WS_CHAT_PATH) return new MockTransport(options, chat);

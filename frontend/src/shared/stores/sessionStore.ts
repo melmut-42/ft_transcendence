@@ -4,6 +4,8 @@
  * It holds no credential: both session cookies are HttpOnly and unreadable from JS.
  * `activeRoomId` mirrors `GET /api/auth/session`, which derives it live from room
  * membership, and is what route recovery on refresh reads instead of trusting the URL.
+ * This client speaks only the Game v2 room contract, so a membership the session pairs
+ * with the v1 contract is not one it can open (`isOpenableRoom`).
  *
  * Actions here are state transitions only. The REST calls that produce them belong to
  * `features/auth/api`.
@@ -12,6 +14,15 @@
 import { create } from 'zustand';
 
 import type { SessionResponse } from '@shared/types';
+
+import { showToast } from './toastStore';
+
+/**
+ * Whether this client can open the session's active room. The REST and socket contracts
+ * of one room are always used as a pair, and this client pairs only Game v2.
+ */
+export const isOpenableRoom = (session: SessionResponse): boolean =>
+  session.active_room_id !== null && session.active_room_api_version !== 'v1';
 
 /** `UNKNOWN` until bootstrap finishes — route guards must not redirect before then. */
 export type SessionStatus = 'UNKNOWN' | 'AUTHENTICATED' | 'ANONYMOUS';
@@ -63,16 +74,21 @@ export const useSessionStore = create<SessionState>((set) => ({
   accountDeleted: false,
   sessionExpired: false,
 
-  setSession: (session) =>
+  setSession: (session) => {
+    // A room on the older room contract cannot be opened here; say so when it is found.
+    if (session.active_room_id !== null && !isOpenableRoom(session)) {
+      showToast({ message: 'room.recovery.legacy', tone: 'error', icon: 'warning' });
+    }
     set({
       status: 'AUTHENTICATED',
       user: session.user,
-      activeRoomId: session.active_room_id,
+      activeRoomId: isOpenableRoom(session) ? session.active_room_id : null,
       sessionExpiresAt: session.session_expires_at,
       loggedOut: false,
       accountDeleted: false,
       sessionExpired: false,
-    }),
+    });
+  },
 
   setAnonymous: ({ loggedOut = false, accountDeleted = false, sessionExpired = false } = {}) =>
     set({

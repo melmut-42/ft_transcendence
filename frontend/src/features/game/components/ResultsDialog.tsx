@@ -13,8 +13,17 @@ export interface MatchResult {
   winner: Team;
   reason: GameEndReason | null;
   score: Score;
-  /** The player whose leaving forfeited the match, when the server named one. */
-  forfeitedBy: string | null;
+}
+
+/** What the player can do on a result, and how long they have to decide. */
+export interface ResultDecision {
+  /** Whole seconds left before the server removes undecided players; `null` if unknown. */
+  secondsLeft: number | null;
+  returning: boolean;
+  returnFailed: boolean;
+  leaving: boolean;
+  onBackToLobby: () => void;
+  onExit: () => void;
 }
 
 /** Why the match ended, in the words of the Results card. */
@@ -27,17 +36,6 @@ export function ResultReason({ result }: { result: MatchResult }) {
       return <>{t('game.results.reason.ALL_TEAM_CARDS_REVEALED', { team: winner })}</>;
     case 'ASSASSIN_REVEALED':
       return <>{t('game.results.reason.ASSASSIN_REVEALED', { team: loser })}</>;
-    case 'PLAYER_FORFEIT':
-      return result.forfeitedBy ? (
-        <>
-          {t('game.results.reason.PLAYER_FORFEIT_NAMED', {
-            team: loser,
-            username: result.forfeitedBy,
-          })}
-        </>
-      ) : (
-        <>{t('game.results.reason.PLAYER_FORFEIT', { team: loser })}</>
-      );
     default:
       return null;
   }
@@ -50,25 +48,50 @@ export function WinnerHeadline({ winner }: { winner: Team }) {
 }
 
 /**
+ * How long is left to decide, and a failed Back to Lobby. Read on demand rather than
+ * announced every second.
+ */
+export function DecisionNote({ decision }: { decision: ResultDecision }) {
+  const { t } = useTranslation();
+  return (
+    <>
+      {decision.secondsLeft !== null && (
+        <p className={styles.deadline}>
+          {t('game.results.deadline', { seconds: decision.secondsLeft })}
+        </p>
+      )}
+      {decision.returnFailed && (
+        <p role="alert" className={styles.error}>
+          {t('game.results.returnFailed')}
+        </p>
+      )}
+    </>
+  );
+}
+
+/**
  * MATCH OVER. It opens over the board the moment the server announces the result, names
  * the winning team and why the match ended, and shows each team's revealed cards. Every
- * value is the server's: nothing here decides a winner. Back to Lobby leaves the finished
- * room; View Final Board closes the card and leaves the board on screen.
+ * value is the server's: nothing here decides a winner.
+ *
+ * Each player decides on their own, before the server's deadline: Back to Lobby keeps them
+ * in the room for the next match, Exit leaves it. Whoever has not decided by the deadline
+ * is taken out of the room. View Final Board closes the card and leaves the board on
+ * screen.
  */
 export function ResultsDialog({
   result,
-  leaving,
-  onBackToLobby,
+  decision,
   onViewBoard,
 }: {
   result: MatchResult;
-  leaving: boolean;
-  onBackToLobby: () => void;
+  decision: ResultDecision;
   onViewBoard: () => void;
 }) {
   const { t } = useTranslation();
   const titleId = useId();
   const reasonId = useId();
+  const busy = decision.returning || decision.leaving;
 
   return (
     <Dialog
@@ -77,7 +100,7 @@ export function ResultsDialog({
       describedBy={reasonId}
       closeLabel={t('game.results.viewBoard')}
       onClose={onViewBoard}
-      closable={!leaving}
+      closable={!busy}
       showCloseButton={false}
       className={styles.card}
     >
@@ -105,20 +128,30 @@ export function ResultsDialog({
           </span>
         ))}
       </p>
+      <DecisionNote decision={decision} />
       <div className={styles.actions}>
         <button
           type="button"
-          onClick={onBackToLobby}
-          disabled={leaving}
-          aria-busy={leaving || undefined}
+          onClick={decision.onBackToLobby}
+          disabled={busy}
+          aria-busy={decision.returning || undefined}
           className={styles.primary}
         >
-          {t(leaving ? 'room.leave.leaving' : 'game.results.backToLobby')}
+          {t(decision.returning ? 'game.results.returning' : 'game.results.backToLobby')}
         </button>
-        <button type="button" onClick={onViewBoard} disabled={leaving} className={styles.secondary}>
+        <button type="button" onClick={onViewBoard} disabled={busy} className={styles.secondary}>
           {t('game.results.viewBoard')}
         </button>
       </div>
+      <button
+        type="button"
+        onClick={decision.onExit}
+        disabled={busy}
+        aria-busy={decision.leaving || undefined}
+        className={styles.exit}
+      >
+        {t(decision.leaving ? 'room.leave.leaving' : 'game.results.exit')}
+      </button>
     </Dialog>
   );
 }

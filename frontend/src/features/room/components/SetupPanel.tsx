@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import operativeArtwork from '@assets/ready-room/role-operative.svg';
 import spymasterArtwork from '@assets/ready-room/role-spymaster.svg';
-import type { Room, RoomMember, RoomRole, Team } from '@shared/types';
+import type { PlayingRole, Room, RoomMember, Team } from '@shared/types';
 import { Dialog, Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
@@ -13,7 +13,7 @@ import { roleSelection } from '../model/roles';
 import * as styles from './SetupPanel.styles';
 
 const TEAMS: Team[] = ['RED', 'BLUE'];
-const ROLE_ARTWORK: Record<RoomRole, string> = {
+const ROLE_ARTWORK: Record<PlayingRole, string> = {
   SPYMASTER: spymasterArtwork,
   OPERATIVE: operativeArtwork,
 };
@@ -25,17 +25,27 @@ interface SetupProps {
 }
 
 /**
- * Your Setup: choose a team, then a role. A team comes first, each team has one Spymaster,
- * and changes stop once the countdown starts; the server enforces all three and the panel
- * only explains them. A choice shows as made when the server reports it, never before.
+ * Your Setup: choose a team, then a role. Everyone starts out watching; picking a team marks
+ * it as the draft, and picking a role then claims both in one request. A participant changes
+ * team or role directly, or goes back to watching. Each team has one Spymaster, and changes
+ * stop once the countdown starts; the server enforces all of it and the panel only explains
+ * it. A seat shows as taken when the server reports it, never before.
  */
 export function SetupPanel({ room, me, setup, className }: SetupProps & { className?: string }) {
   const { t } = useTranslation();
   const teamLabelId = useId();
   const roleLabelId = useId();
   const locked = setupLocked(room);
-  const roles = roleSelection(room, me.user_id);
+  const roles = roleSelection(room, me.user_id, setup.draftTeam);
   const busy = setup.pending !== null;
+  const spectating = me.role === 'SPECTATOR';
+  const team = roles?.team ?? null;
+
+  const chooseTeam = (next: Team) => {
+    if (busy || next === team) return;
+    if (spectating) setup.setDraftTeam(next);
+    else void setup.selectTeam(next);
+  };
 
   return (
     <div className={cn(styles.panel, className)}>
@@ -43,21 +53,21 @@ export function SetupPanel({ room, me, setup, className }: SetupProps & { classN
         {t('room.ready.chooseTeam')}
       </h3>
       <div role="group" aria-labelledby={teamLabelId} className={styles.teams}>
-        {TEAMS.map((team) => {
-          const selected = me.team === team;
+        {TEAMS.map((option) => {
+          const selected = team === option;
           return (
             <button
-              key={team}
+              key={option}
               type="button"
               aria-pressed={selected}
               aria-busy={setup.pending === 'team'}
               disabled={locked}
-              onClick={() => !busy && !selected && void setup.selectTeam(team)}
-              className={cn(styles.teamButton, styles.teamTone[team])}
+              onClick={() => chooseTeam(option)}
+              className={cn(styles.teamButton, styles.teamTone[option])}
             >
-              {t(`room.ready.teamButton.${team}`)}
+              {t(`room.ready.teamButton.${option}`)}
               {selected && (
-                <span aria-hidden="true" className={cn(styles.check, styles.checkTone[team])}>
+                <span aria-hidden="true" className={cn(styles.check, styles.checkTone[option])}>
                   <Icon name="check" />
                 </span>
               )}
@@ -80,11 +90,13 @@ export function SetupPanel({ room, me, setup, className }: SetupProps & { classN
               aria-busy={setup.pending === 'role'}
               aria-describedby={option.reason ? `${roleLabelId}-hint` : undefined}
               disabled={!option.available || locked}
-              onClick={() => !busy && !option.selected && void setup.selectRole(option.role)}
+              onClick={() =>
+                !busy && !option.selected && team && void setup.selectRole(team, option.role)
+              }
               className={cn(
                 styles.roleCard,
-                option.selected && me.team && styles.roleCardSelected,
-                option.selected && me.team && styles.roleCardSelectedTone[me.team],
+                option.selected && team && styles.roleCardSelected,
+                option.selected && team && styles.roleCardSelectedTone[team],
                 taken && styles.roleCardUnavailable,
               )}
             >
@@ -107,8 +119,8 @@ export function SetupPanel({ room, me, setup, className }: SetupProps & { classN
                 </span>
               </span>
               {taken && <span className={styles.takenBadge}>{t('room.ready.taken')}</span>}
-              {option.selected && me.team && (
-                <span aria-hidden="true" className={cn(styles.check, styles.checkTone[me.team])}>
+              {option.selected && team && (
+                <span aria-hidden="true" className={cn(styles.check, styles.checkTone[team])}>
                   <Icon name="check" />
                 </span>
               )}
@@ -116,19 +128,45 @@ export function SetupPanel({ room, me, setup, className }: SetupProps & { classN
           );
         })}
       </div>
-      <RoleHint room={room} me={me} id={`${roleLabelId}-hint`} />
+      <RoleHint room={room} me={me} draftTeam={setup.draftTeam} id={`${roleLabelId}-hint`} />
+      {!spectating && (
+        <button
+          type="button"
+          aria-busy={setup.pending === 'role'}
+          disabled={locked}
+          onClick={() => !busy && void setup.spectate()}
+          className={styles.spectate}
+        >
+          <Icon name="spectate" />
+          {t('room.ready.spectate')}
+        </button>
+      )}
     </div>
   );
 }
 
-/** Why the role cards are unavailable, when they are. */
-function RoleHint({ room, me, id }: { room: Room; me: RoomMember; id: string }) {
+/** Why the role cards are unavailable, or what choosing one does. */
+function RoleHint({
+  room,
+  me,
+  draftTeam,
+  id,
+}: {
+  room: Room;
+  me: RoomMember;
+  draftTeam: Team | null;
+  id: string;
+}) {
   const { t } = useTranslation();
-  const holder = roleSelection(room, me.user_id)?.options[0].occupiedBy;
+  const selection = roleSelection(room, me.user_id, draftTeam);
+  const holder = selection?.options[0].occupiedBy;
   let text: string | null = null;
   if (setupLocked(room)) text = t('room.ready.hints.locked');
-  else if (!me.team) text = t('room.ready.hints.teamFirst');
+  else if (!selection?.team) text = t('room.ready.hints.teamFirst');
   else if (holder) text = t('room.ready.hints.spymasterTaken', { username: holder.username });
+  else if (selection.spectating) {
+    text = t('room.ready.hints.claim', { team: t(`room.ready.teamShort.${selection.team}`) });
+  }
   if (!text) return null;
   return (
     <p id={id} className={styles.hint}>
@@ -212,8 +250,8 @@ export function SetupSummary({
 }) {
   const { t } = useTranslation();
   const parts = [
-    me.team ? t(`room.ready.teamShort.${me.team}`) : t('room.ready.noTeam'),
-    me.role ? t(`room.ready.role.${me.role}`) : null,
+    me.team ? t(`room.ready.teamShort.${me.team}`) : null,
+    t(`room.ready.role.${me.role}`),
     me.is_host ? t('room.ready.host') : null,
   ].filter(Boolean);
 
@@ -227,7 +265,7 @@ export function SetupSummary({
         aria-haspopup="dialog"
         className={styles.summaryChange}
       >
-        {t(me.team ? 'room.ready.change' : 'room.ready.choose')}
+        {t(me.role === 'SPECTATOR' ? 'room.ready.choose' : 'room.ready.change')}
       </button>
     </div>
   );

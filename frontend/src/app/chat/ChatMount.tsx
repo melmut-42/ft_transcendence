@@ -106,7 +106,7 @@ function ConnectedChat({ selfUserId, onLobby }: { selfUserId: number; onLobby: b
       place={
         onLobby
           ? 'LOBBY'
-          : room?.status === 'WAITING' || room?.status === 'COUNTDOWN'
+          : room?.players.find((p) => p.user_id === selfUserId)?.state === 'IN_LOBBY'
             ? 'READY_ROOM'
             : 'GAME'
       }

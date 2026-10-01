@@ -376,21 +376,23 @@
 			"status": {
 				"waiting": "BEKLİYOR",
 				"full": "DOLU",
-				"started": "BAŞLADI"
+				"inGame": "OYUNDA",
+				"closed": "KAPALI"
 			},
 			"submit": "Odaya Katıl",
 			"joining": "Katılınıyor",
 			"opening": "Lobi açılıyor",
 			"full": "Oda Dolu",
-			"started": "Oyun Başladı",
 			"joinedTitle": "Odadasın!",
 			"joinedBody": "Oda lobisi açılıyor…",
 			"errors": {
 				"format": "Oda kodunun altı harf ve rakamını gir.",
 				"notFound": "Bu kodla bir oda bulunamadı. Kodu kontrol edip tekrar dene.",
 				"full": "Bu oda dolu.",
-				"started": "Bu oyun çoktan başladı."
-			}
+				"notJoinable": "Bu oda şu anda yeni oyuncu almıyor."
+			},
+			"spectate": "İzlemek İçin Katıl",
+			"notJoinable": "Kapalı"
 		},
 		"feedback": {
 			"createFailedTitle": "Oda oluşturulamadı",
@@ -414,8 +416,9 @@
 				"finished": "Seni sonuçlara geri götürüyoruz. Bu sayfada kal."
 			},
 			"secondsLeft": {
-				"game": "Hükmen yenilgiye {{seconds}} sn",
-				"room": "Yerini korumak için {{seconds}} sn"
+				"game": "Yerini korumak için {{seconds}} sn",
+				"room": "Yerini korumak için {{seconds}} sn",
+				"finished": "Karar vermek için {{seconds}} sn"
 			},
 			"leave": {
 				"game": "Maçtan Çık",
@@ -434,11 +437,12 @@
 			"room": {
 				"title": "Odadan çıkılsın mı?",
 				"body": "Bu odadan çıkacak, takımını ve rolünü kaybedeceksin. Yerin başka bir oyuncuya açılır.",
-				"confirm": "Odadan Çık"
+				"confirm": "Odadan Çık",
+				"bodySpectator": "Bu odadan çıkıp lobiye döneceksin."
 			},
 			"game": {
 				"title": "Oyundan çıkılsın mı?",
-				"body": "Bu maçtan çıkıp lobiye döneceksin. Takımın maçı hükmen kaybeder.",
+				"body": "Bu maçtan çıkıp lobiye döneceksin.",
 				"confirm": "Oyundan Çık"
 			}
 		},
@@ -450,7 +454,8 @@
 				"PLAYER_UNREADY": "Geri sayım durdu: {{username}} artık hazır değil.",
 				"PLAYER_LEFT": "Geri sayım durdu: {{username}} odadan çıktı.",
 				"TEAM_CHANGED": "Geri sayım durdu: {{username}} takım değiştirdi.",
-				"ROLE_CHANGED": "Geri sayım durdu: {{username}} rol değiştirdi."
+				"ROLE_CHANGED": "Geri sayım durdu: {{username}} rol değiştirdi.",
+				"PLAYER_KICKED": "Geri sayım durdu: {{username}} odadan çıkarıldı."
 			}
 		},
 		"ready": {
@@ -476,6 +481,10 @@
 				"COUNTDOWN": {
 					"title": "Hazır ol!",
 					"body": "Herkes hazır. Maç başlamak üzere."
+				},
+				"POST_GAME": {
+					"title": "Son Sonuç Bekleniyor…",
+					"body": "Hâlâ son sonuca bakan oyuncu sayısı: {{pending}}. Herkes döndüğünde sıradaki maç başlayabilir."
 				}
 			},
 			"team": {
@@ -497,14 +506,13 @@
 			"role": {
 				"SPYMASTER": "Ajan Şefi",
 				"OPERATIVE": "Ajan",
-				"none": "Henüz rol yok"
+				"SPECTATOR": "İzleyici"
 			},
 			"status": {
 				"ready": "Hazır!",
 				"waiting": "Bekliyor"
 			},
 			"emptySeat": "Oyuncu bekleniyor…",
-			"choosing": "Takım seçiyor",
 			"setupTitle": "Kurulumun",
 			"chooseTeam": "Takımını Seç",
 			"chooseRole": "Rolünü Seç",
@@ -528,15 +536,17 @@
 			"change": "Değiştir",
 			"choose": "Seç",
 			"hints": {
-				"teamFirst": "Önce bir takım seç.",
+				"teamFirst": "Önce bir takım, sonra bir rol seç. O zamana kadar izliyorsun.",
 				"spymasterTaken": "Bu takımın Ajan Şefi {{username}}.",
 				"locked": "Maç başlıyor, kurulumun kilitlendi.",
 				"hostOnly": "Oda boyutunu yalnızca kurucu değiştirebilir.",
 				"ready": {
 					"TEAM_REQUIRED": "Önce bir takım seç.",
 					"ROLE_REQUIRED": "Önce bir rol seç.",
-					"LOCKED": "Maç başlıyor."
-				}
+					"LOCKED": "Maç başlıyor.",
+					"POST_GAME_PENDING": "Bazı oyuncular hâlâ son sonuca bakıyor."
+				},
+				"claim": "{{team}} takımına katılmak için bir rol seç."
 			},
 			"errors": {
 				"roleConflict": "Başka bir oyuncu az önce bu takımın Ajan Şefi yerini aldı.",
@@ -546,14 +556,19 @@
 				"notHost": "Oda boyutunu yalnızca kurucu değiştirebilir.",
 				"capacity": "Oda, içindeki oyuncu sayısından küçük olamaz.",
 				"offline": "Çevrimdışısın. Yeniden bağlanınca tekrar dene.",
-				"generic": "Olmadı. Tekrar dene."
-			}
+				"generic": "Olmadı. Tekrar dene.",
+				"postGamePending": "Herkes son sonuçtan dönene kadar bekle."
+			},
+			"spectators": "İzleyiciler",
+			"spectate": "Bunun yerine izle"
 		},
 		"recovery": {
 			"notMember": "Artık o odada değilsin.",
 			"returned": "Hâlâ bir odadasın, seni oraya geri götürdük.",
 			"closed": "O oda kapandı.",
-			"removed": "Artık o odanın üyesi değilsin."
+			"removed": "Artık o odanın üyesi değilsin.",
+			"legacy": "Oyunun eski bir sürümüne ait bir odadasın ve bu oda burada açılamıyor. Oda bitince kendiliğinden kapanır.",
+			"postGameTimeout": "Zamanında seçim yapmadığın için maçtan sonra odadan ayrıldın."
 		},
 		"invites": {
 			"title": "{{username}} seni oyuna davet etti",
@@ -580,7 +595,8 @@
 		},
 		"turn": {
 			"title": "Sıra <team>{{team}}</team> Takımda",
-			"over": "Maç Bitti"
+			"over": "Maç Bitti",
+			"paused": "Oyun Duraklatıldı"
 		},
 		"instruction": {
 			"CLUE": "Casus Şefisin. Takımına bir ipucu ver.",
@@ -609,7 +625,10 @@
 			"opponentGuessing": "{{team}} Takım Tahmin Ediyor",
 			"opponentClue": "{{team}} Casus Şef Düşünüyor",
 			"opponentBody": "Sıranı bekle. Şu anda kart seçilemez.",
-			"spymasterOpponentBody": "İpucu vermek için sıranı bekle."
+			"spymasterOpponentBody": "İpucu vermek için sıranı bekle.",
+			"spectatingBody": "Bu maçı izliyorsun. Boş bir yer açılınca onu alabilirsin.",
+			"pausedTitle": "Oyuncu Bekleniyor…",
+			"pausedBody": "Bir takımın oyuncusu eksik. Yer alındığında oyun devam eder."
 		},
 		"pass": {
 			"action": "Pas",
@@ -640,13 +659,15 @@
 			"wins": "{{team}} Takım Kazandı!",
 			"reason": {
 				"ALL_TEAM_CARDS_REVEALED": "{{team}} son ajanını açtı.",
-				"ASSASSIN_REVEALED": "{{team}} suikastçıyı açtı.",
-				"PLAYER_FORFEIT": "{{team}} maçı hükmen kaybetti.",
-				"PLAYER_FORFEIT_NAMED": "{{username}} maçtan ayrıldı. {{team}} hükmen kaybetti."
+				"ASSASSIN_REVEALED": "{{team}} suikastçıyı açtı."
 			},
 			"backToLobby": "Lobiye Dön",
 			"viewBoard": "Son Tahtayı Gör",
-			"showResults": "Sonuçları Gör"
+			"showResults": "Sonuçları Gör",
+			"exit": "Odadan Çık",
+			"returning": "Dönülüyor…",
+			"returnFailed": "Lobiye dönülemedi. Tekrar dene.",
+			"deadline": "Seçmek için {{seconds}} sn kaldı. Karar vermeyen oyuncular odadan çıkar."
 		},
 		"errors": {
 			"invalidClue": "İpucu en fazla 30 harflik tek bir kelime olmalı.",

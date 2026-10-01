@@ -8,7 +8,7 @@ import * as styles from './TurnHeading.styles';
 
 /**
  * RED TEAM'S TURN — whose turn it is, from the server's `current_turn`. Once the match is
- * over it names the winner instead. On the desktop board only the team's name takes the
+ * over it names the winner instead, and while the game waits for players it says so. On the desktop board only the team's name takes the
  * team's color; phones and tablets color the whole line.
  */
 export function TurnHeading({ game, className }: { game: Game; className?: string }) {
@@ -22,6 +22,8 @@ export function TurnHeading({ game, className }: { game: Game; className?: strin
         <span className={styles.wideTone[team]}>
           {t('game.results.wins', { team: t(`game.team.${team}`) })}
         </span>
+      ) : game.current_turn.phase === 'PAUSED_FOR_PLAYERS' ? (
+        t('game.turn.paused')
       ) : (
         <Trans
           i18nKey="game.turn.title"

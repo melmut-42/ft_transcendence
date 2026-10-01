@@ -91,6 +91,8 @@ interface StoredChannel {
 interface RoomAccess {
   active: boolean;
   windows: { from: number; to: number | null }[];
+  /** Why access last changed; a result's closed window reopens on Back to Lobby. */
+  lastReason?: ChannelAccessReason;
 }
 
 type LedgerEntry = { hash: string; reply: AckMessage<ChatSendAck> | WsErrorMessage };
@@ -351,11 +353,14 @@ export class MockChatServer implements MockServerBinding {
   syncRooms(): void {
     const self = this.selfId();
     for (const [roomId, server] of mockRooms) {
-      const room = server.snapshot();
-      const member = server.hasMember(self);
+      const room = server.state();
+      const me = room.players.find((p) => p.user_id === self);
+      const member = me !== undefined;
+      // ROOM access follows the member's own state: the lobby while the room waits or
+      // counts down, the match while it runs; a result screen has none.
       const active =
-        member &&
-        (room.status === 'WAITING' || room.status === 'COUNTDOWN' || room.status === 'IN_GAME');
+        (me?.state === 'IN_LOBBY' && (room.status === 'WAITING' || room.status === 'COUNTDOWN')) ||
+        (me?.state === 'IN_GAME' && room.status === 'IN_GAME');
       const access = this.roomAccess.get(roomId);
       if (!access) {
         if (!active) continue;
@@ -372,7 +377,13 @@ export class MockChatServer implements MockServerBinding {
       }
       if (access.active === active) continue;
       const channel = this.roomChannel(roomId);
-      if (active) {
+      if (active && access.lastReason === 'GAME_FINISHED') {
+        // Back to Lobby opens a new visibility window in the same membership epoch.
+        access.windows.push({ from: this.seqOf(), to: null });
+        access.active = true;
+        access.lastReason = 'BACK_TO_LOBBY';
+        this.accessEvent('chat.channel.access_changed', channel, true, 'BACK_TO_LOBBY');
+      } else if (active) {
         // A rejoin starts a new membership epoch: nothing from before is visible.
         this.roomAccess.set(roomId, { active: true, windows: [{ from: this.seqOf(), to: null }] });
         this.accessEvent('chat.channel.available', channel, true, 'ROOM_JOINED');
@@ -382,6 +393,7 @@ export class MockChatServer implements MockServerBinding {
         access.active = false;
         const reason: ChannelAccessReason =
           room.status === 'CLOSED' ? 'ROOM_CLOSED' : !member ? 'ROOM_LEFT' : 'GAME_FINISHED';
+        access.lastReason = reason;
         this.accessEvent('chat.channel.access_changed', channel, false, reason);
       }
     }

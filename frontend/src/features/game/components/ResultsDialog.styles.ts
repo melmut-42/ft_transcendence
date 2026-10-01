@@ -62,3 +62,16 @@ export const secondary: string =
   'border-(length:--stroke-default) border-primary-deep bg-surface px-[20px] text-xl ' +
   'leading-none font-bold text-primary-sky not-disabled:hover:bg-primary/10 ' +
   'disabled:opacity-50 desktop:w-[224px] desktop:text-[19px]';
+
+/** Exit: a quiet text action under the buttons, so leaving the room is never a reflex. */
+export const exit: string =
+  'mx-auto mt-[14px] inline-flex cursor-pointer items-center rounded-sm text-lg ' +
+  'leading-[22px] font-bold text-accent-red underline-offset-2 not-disabled:hover:underline ' +
+  'disabled:cursor-default disabled:opacity-60 desktop:text-[16px]';
+
+export const deadline: string =
+  'mb-[16px] text-center text-md leading-[18px] font-bold text-text-muted tabular-nums ' +
+  'desktop:text-[14px]';
+
+export const error: string =
+  'mb-[12px] text-center text-md leading-[18px] font-bold text-accent-red desktop:text-[14px]';

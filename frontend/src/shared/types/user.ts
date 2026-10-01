@@ -3,6 +3,8 @@
  * and `05 - Friends/`.
  */
 
+import type { RoomApiVersion } from './auth';
+
 /** `GET /api/users/me`, `PATCH /api/users/me`. */
 export interface OwnProfile {
   user_id: number;
@@ -14,7 +16,10 @@ export interface OwnProfile {
   wins: number;
   losses: number;
   matches_played: number;
+  /** Persistent total from leaving running matches as a participant. */
+  penalty_points: number;
   active_room_id: number | null;
+  active_room_api_version: RoomApiVersion | null;
   created_at: string;
 }
 

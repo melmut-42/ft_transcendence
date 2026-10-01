@@ -376,21 +376,23 @@
 			"status": {
 				"waiting": "EN ATTENTE",
 				"full": "PLEINE",
-				"started": "COMMENCÉE"
+				"inGame": "EN JEU",
+				"closed": "FERMÉ"
 			},
 			"submit": "Rejoindre",
 			"joining": "Connexion",
 			"opening": "Ouverture du salon",
 			"full": "Salle pleine",
-			"started": "Partie commencée",
 			"joinedTitle": "Tu es dans la salle !",
 			"joinedBody": "Ouverture du salon de la salle…",
 			"errors": {
 				"format": "Saisis les six lettres et chiffres du code de la salle.",
 				"notFound": "Aucune salle ne correspond à ce code. Vérifie-le et réessaie.",
 				"full": "Cette salle est pleine.",
-				"started": "Cette partie a déjà commencé."
-			}
+				"notJoinable": "Ce salon n'accepte pas de nouveaux joueurs pour le moment."
+			},
+			"spectate": "Rejoindre pour regarder",
+			"notJoinable": "Fermé"
 		},
 		"feedback": {
 			"createFailedTitle": "Impossible de créer la salle",
@@ -414,8 +416,9 @@
 				"finished": "Nous vous ramenons aux résultats. Restez sur cette page."
 			},
 			"secondsLeft": {
-				"game": "{{seconds}} s avant l'abandon",
-				"room": "{{seconds}} s pour garder votre place"
+				"game": "{{seconds}} s pour garder votre place",
+				"room": "{{seconds}} s pour garder votre place",
+				"finished": "{{seconds}} s pour décider"
 			},
 			"leave": {
 				"game": "Quitter la partie",
@@ -434,11 +437,12 @@
 			"room": {
 				"title": "Quitter le salon ?",
 				"body": "Vous quitterez ce salon et perdrez votre équipe et votre rôle. Votre place sera libérée pour un autre joueur.",
-				"confirm": "Quitter le salon"
+				"confirm": "Quitter le salon",
+				"bodySpectator": "Vous quitterez ce salon et reviendrez au lobby."
 			},
 			"game": {
 				"title": "Quitter la partie ?",
-				"body": "Vous quitterez cette partie et reviendrez au salon. Votre équipe déclare forfait.",
+				"body": "Vous quitterez cette partie et reviendrez au salon.",
 				"confirm": "Quitter la partie"
 			}
 		},
@@ -450,7 +454,8 @@
 				"PLAYER_UNREADY": "Compte à rebours arrêté : {{username}} n'est plus prêt.",
 				"PLAYER_LEFT": "Compte à rebours arrêté : {{username}} a quitté le salon.",
 				"TEAM_CHANGED": "Compte à rebours arrêté : {{username}} a changé d'équipe.",
-				"ROLE_CHANGED": "Compte à rebours arrêté : {{username}} a changé de rôle."
+				"ROLE_CHANGED": "Compte à rebours arrêté : {{username}} a changé de rôle.",
+				"PLAYER_KICKED": "Compte à rebours arrêté : {{username}} a été retiré du salon."
 			}
 		},
 		"ready": {
@@ -476,6 +481,10 @@
 				"COUNTDOWN": {
 					"title": "Préparez-vous !",
 					"body": "Tout le monde est prêt. La partie va commencer."
+				},
+				"POST_GAME": {
+					"title": "En attente du dernier résultat…",
+					"body": "Joueurs qui regardent encore le dernier résultat : {{pending}}. La prochaine partie pourra commencer quand tout le monde sera revenu."
 				}
 			},
 			"team": {
@@ -497,14 +506,13 @@
 			"role": {
 				"SPYMASTER": "Maître-espion",
 				"OPERATIVE": "Agent",
-				"none": "Pas encore de rôle"
+				"SPECTATOR": "Spectateur"
 			},
 			"status": {
 				"ready": "Prêt !",
 				"waiting": "En attente"
 			},
 			"emptySeat": "En attente d'un joueur…",
-			"choosing": "Choisissent une équipe",
 			"setupTitle": "Votre configuration",
 			"chooseTeam": "Choisissez votre équipe",
 			"chooseRole": "Choisissez votre rôle",
@@ -528,15 +536,17 @@
 			"change": "Modifier",
 			"choose": "Choisir",
 			"hints": {
-				"teamFirst": "Choisissez d'abord une équipe.",
+				"teamFirst": "Choisissez une équipe, puis un rôle. En attendant, vous regardez.",
 				"spymasterTaken": "{{username}} est le maître-espion de cette équipe.",
 				"locked": "La partie commence, votre configuration est verrouillée.",
 				"hostOnly": "Seul l'hôte peut changer la taille du salon.",
 				"ready": {
 					"TEAM_REQUIRED": "Choisissez d'abord une équipe.",
 					"ROLE_REQUIRED": "Choisissez d'abord un rôle.",
-					"LOCKED": "La partie commence."
-				}
+					"LOCKED": "La partie commence.",
+					"POST_GAME_PENDING": "Des joueurs regardent encore le dernier résultat."
+				},
+				"claim": "Choisissez un rôle pour rejoindre l'équipe {{team}}."
 			},
 			"errors": {
 				"roleConflict": "Un autre joueur vient de prendre la place de maître-espion de cette équipe.",
@@ -546,14 +556,19 @@
 				"notHost": "Seul l'hôte peut changer la taille du salon.",
 				"capacity": "Le salon ne peut pas être plus petit que le nombre de joueurs présents.",
 				"offline": "Vous êtes hors ligne. Réessayez une fois reconnecté.",
-				"generic": "Ça n'a pas marché. Réessayez."
-			}
+				"generic": "Ça n'a pas marché. Réessayez.",
+				"postGamePending": "Attendez que tout le monde soit revenu du dernier résultat."
+			},
+			"spectators": "Spectateurs",
+			"spectate": "Regarder plutôt"
 		},
 		"recovery": {
 			"notMember": "Tu ne fais plus partie de ce salon.",
 			"returned": "Tu es encore dans un salon, on t'y a ramené.",
 			"closed": "Ce salon est fermé.",
-			"removed": "Tu n'es plus membre de ce salon."
+			"removed": "Tu n'es plus membre de ce salon.",
+			"legacy": "Vous êtes encore dans un salon d'une ancienne version du jeu, qui ne peut pas être ouvert ici. Il se fermera de lui-même à la fin.",
+			"postGameTimeout": "Vous n'avez pas choisi à temps : vous avez quitté le salon après la partie."
 		},
 		"invites": {
 			"title": "{{username}} t'invite à jouer",
@@ -580,7 +595,8 @@
 		},
 		"turn": {
 			"title": "Au tour de l'équipe <team>{{team}}</team>",
-			"over": "Partie terminée"
+			"over": "Partie terminée",
+			"paused": "Partie en pause"
 		},
 		"instruction": {
 			"CLUE": "Vous êtes l'Espion en chef. Donnez un indice à votre équipe.",
@@ -609,7 +625,10 @@
 			"opponentGuessing": "L'équipe {{team}} devine",
 			"opponentClue": "L'Espion en chef {{team}} réfléchit",
 			"opponentBody": "Attendez votre tour. Les cartes ne peuvent pas être choisies maintenant.",
-			"spymasterOpponentBody": "Attendez votre tour pour donner un indice."
+			"spymasterOpponentBody": "Attendez votre tour pour donner un indice.",
+			"spectatingBody": "Vous regardez cette partie. Prenez une place libre quand il y en a une.",
+			"pausedTitle": "En attente de joueurs…",
+			"pausedBody": "Il manque un joueur à une équipe. La partie reprend quand la place est prise."
 		},
 		"pass": {
 			"action": "Passer",
@@ -640,13 +659,15 @@
 			"wins": "L'équipe {{team}} gagne !",
 			"reason": {
 				"ALL_TEAM_CARDS_REVEALED": "L'équipe {{team}} a révélé son dernier agent.",
-				"ASSASSIN_REVEALED": "L'équipe {{team}} a révélé l'assassin.",
-				"PLAYER_FORFEIT": "L'équipe {{team}} déclare forfait.",
-				"PLAYER_FORFEIT_NAMED": "{{username}} a quitté la partie. L'équipe {{team}} déclare forfait."
+				"ASSASSIN_REVEALED": "L'équipe {{team}} a révélé l'assassin."
 			},
 			"backToLobby": "Retour au salon",
 			"viewBoard": "Voir le plateau final",
-			"showResults": "Voir les résultats"
+			"showResults": "Voir les résultats",
+			"exit": "Quitter le salon",
+			"returning": "Retour…",
+			"returnFailed": "Impossible de revenir au salon. Réessayez.",
+			"deadline": "Encore {{seconds}} s pour choisir. Les joueurs indécis quittent le salon."
 		},
 		"errors": {
 			"invalidClue": "L'indice doit être un seul mot de 30 lettres au plus.",

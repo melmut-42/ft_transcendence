@@ -8,6 +8,7 @@
 
 import { create } from 'zustand';
 
+import { useSessionStore } from '@shared/stores';
 import type { CountdownCancelReason, Room, RoomServerEvent } from '@shared/types';
 
 /** The last countdown the server cancelled, and who caused it, for the waiting view. */
@@ -20,11 +21,25 @@ export interface CountdownCancellation {
   eventId: string;
 }
 
+/**
+ * Why the server ended this player's membership, told just before it closed the socket:
+ * the host removed them, their result screen timed out, or the room shut down because a
+ * team stayed short of players.
+ */
+export type RoomExit = 'KICKED' | 'POST_GAME_TIMEOUT' | 'INSUFFICIENT_PLAYERS';
+
 interface RoomState {
   room: Room | null;
   /** Server-driven countdown value; the frontend never runs its own start timer. */
   secondsRemaining: number | null;
   countdownCancellation: CountdownCancellation | null;
+  /**
+   * The server's clock minus this device's, from the latest event's `sent_at`. Deadlines
+   * the server sends as absolute times are counted down with it, so a device whose clock
+   * is off still shows the server's remaining time.
+   */
+  clockOffsetMs: number;
+  exit: RoomExit | null;
 
   applySnapshot: (room: Room) => void;
   /** Apply one room-stream event. `game.*` deltas belong to the game store. */
@@ -32,20 +47,32 @@ interface RoomState {
   clear: () => void;
 }
 
-export const useRoomStore = create<RoomState>((set, get) => ({
+const initial = {
   room: null,
   secondsRemaining: null,
   countdownCancellation: null,
+  clockOffsetMs: 0,
+  exit: null,
+} satisfies Partial<RoomState>;
+
+export const useRoomStore = create<RoomState>((set, get) => ({
+  ...initial,
 
   applySnapshot: (room) =>
     set({ room, secondsRemaining: room.countdown?.seconds_remaining ?? null }),
 
   applyEvent: (event) => {
+    const sentAt = Date.parse(event.sent_at);
+    if (!Number.isNaN(sentAt)) set({ clockOffsetMs: sentAt - Date.now() });
+
     const { room } = get();
+    const patch = (next: Partial<Room>) => {
+      if (room) set({ room: { ...room, ...next } });
+    };
+
     switch (event.type) {
       case 'room.state':
       case 'game.started':
-      case 'game.state':
         get().applySnapshot(event.payload.room);
         return;
       case 'room.countdown.started':
@@ -67,44 +94,79 @@ export const useRoomStore = create<RoomState>((set, get) => ({
         });
         return;
       }
-      case 'room.settings.updated':
-        if (room) set({ room: { ...room, max_players: event.payload.max_players } });
+      case 'room.settings.updated': {
+        const { max_players, turn_timer_seconds, language, player_count } = event.payload;
+        patch({ max_players, turn_timer_seconds, language, player_count });
         return;
-      case 'room.player.updated':
-        if (room) {
-          const { player } = event.payload;
-          set({
-            room: {
-              ...room,
-              status: event.payload.room_status,
-              startable: event.payload.startable,
-              players: room.players.map((p) => (p.user_id === player.user_id ? player : p)),
-            },
-          });
+      }
+      case 'room.player.updated': {
+        if (!room) return;
+        const { player } = event.payload;
+        patch({
+          status: event.payload.room_status,
+          startable: event.payload.startable,
+          players: room.players.map((p) => (p.user_id === player.user_id ? player : p)),
+        });
+        return;
+      }
+      case 'room.player.joined':
+      case 'room.player.left': {
+        // Membership deltas are followed by a `room.state` snapshot, which carries the
+        // authoritative member list; only the count, status and host are applied early.
+        patch({
+          player_count: event.payload.player_count,
+          status: event.payload.room_status,
+          host_user_id: event.payload.host_user_id,
+        });
+        if (event.type === 'room.player.left') {
+          const self = useSessionStore.getState().user?.user_id;
+          if (event.payload.player.user_id !== self) return;
+          if (event.payload.reason === 'KICKED_BY_HOST') set({ exit: 'KICKED' });
+          if (event.payload.reason === 'POST_GAME_TIMEOUT') set({ exit: 'POST_GAME_TIMEOUT' });
         }
         return;
-      case 'room.player.joined':
-      case 'room.player.left':
-        // Membership deltas are followed by a `room.state` snapshot, which carries the
-        // authoritative member list; only the count and status are applied early.
+      }
+      case 'room.player.returned_to_lobby':
+        patch({ status: event.payload.room_status });
+        return;
+      case 'room.post_game.started':
+        patch({
+          status: 'POST_GAME',
+          post_game: {
+            deadline_at: event.payload.deadline_at,
+            pending_user_ids: event.payload.pending_user_ids,
+          },
+        });
+        return;
+      case 'room.post_game.completed':
         if (room) {
-          set({
-            room: {
-              ...room,
-              player_count: event.payload.player_count,
-              status: event.payload.room_status,
-              host_user_id: event.payload.host_user_id ?? room.host_user_id,
-            },
-          });
+          const next: Room = { ...room, status: event.payload.room_status };
+          delete next.post_game;
+          set({ room: next });
         }
         return;
       case 'game.ended':
-        if (room) set({ room: { ...room, status: 'FINISHED' } });
+        patch({
+          status: 'POST_GAME',
+          post_game: {
+            deadline_at: event.payload.post_game_deadline_at,
+            pending_user_ids: room?.players.map((p) => p.user_id) ?? [],
+          },
+        });
+        return;
+      case 'game.cancelled':
+        // `room.closed` follows; the reason is known already, before the room goes.
+        patch({ status: 'CLOSED' });
+        set({ exit: 'INSUFFICIENT_PLAYERS' });
+        return;
+      case 'room.closed':
+        patch({ status: 'CLOSED' });
+        set({ exit: event.payload.reason });
         return;
       default:
         return;
     }
   },
 
-  clear: () => set({ room: null, secondsRemaining: null, countdownCancellation: null }),
+  clear: () => set(initial),
 }));

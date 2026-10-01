@@ -29,7 +29,11 @@ export function LeaveRoomDialog({
   const { t } = useTranslation();
   const titleId = useId();
   const bodyId = useId();
-  const kind = action.kind === 'LEAVE_GAME' ? 'game' : 'room';
+  const kind = action.kind.startsWith('LEAVE_GAME') ? 'game' : 'room';
+  const body =
+    action.kind === 'LEAVE_SPECTATING'
+      ? 'room.leave.room.bodySpectator'
+      : `room.leave.${kind}.body`;
   const leaving = status === 'LEAVING';
 
   return (
@@ -47,7 +51,7 @@ export function LeaveRoomDialog({
         {t(`room.leave.${kind}.title`)}
       </h2>
       <p id={bodyId} className={styles.leaveBody}>
-        {t(`room.leave.${kind}.body`)}
+        {t(body)}
       </p>
       {failed && (
         <p role="alert" className={styles.leaveError}>

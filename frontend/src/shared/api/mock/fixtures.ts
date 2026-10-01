@@ -207,7 +207,9 @@ export function toOwnProfile(account: MockAccount, activeRoomId: number | null):
     wins: account.wins,
     losses: account.losses,
     matches_played: account.matches_played,
+    penalty_points: 0,
     active_room_id: activeRoomId,
+    active_room_api_version: activeRoomId === null ? null : 'v2',
     created_at: account.created_at,
   };
 }

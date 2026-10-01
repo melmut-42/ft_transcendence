@@ -16,8 +16,19 @@ export const API_BASE_PATH = import.meta.env.VITE_API_BASE_PATH ?? '/api';
 /** Same-origin WebSocket prefix. */
 export const WS_BASE_PATH = import.meta.env.VITE_WS_BASE_PATH ?? '/ws';
 
+/**
+ * Game v2 version segment. Rooms and games use one contract as a pair: REST at
+ * `/api/v2/rooms` with the room socket at `/ws/v2/rooms/{room_id}`. A session never mixes
+ * it with the v1 room contract.
+ */
+export const GAME_API_VERSION = 'v2';
+
+/** Room REST prefix, relative to `API_BASE_PATH`. */
+export const ROOM_API_PATH = `/${GAME_API_VERSION}/rooms`;
+
 /** Per-room socket carrying both `room.*` and `game.*` events. */
-export const wsRoomPath = (roomId: number): string => `${WS_BASE_PATH}/rooms/${roomId}`;
+export const wsRoomPath = (roomId: number): string =>
+  `${WS_BASE_PATH}/${GAME_API_VERSION}/rooms/${roomId}`;
 
 /**
  * Chat v2 version segment. Chat is its own versioned contract (`chatApiVersion`): its
@@ -72,9 +83,10 @@ export const RECONNECT = {
 
 /**
  * The seat the server holds for a dropped player: 30s by default in `WAITING`/`COUNTDOWN`
- * and 60s `IN_GAME`. After it the server removes the member or ends the match by
- * `PLAYER_FORFEIT`, so the client stops trying and reports the room as lost. The client
- * only counts from its own drop; the server's timer is the one that decides.
+ * and 60s `IN_GAME`. After it the server removes the member (and, during a match, checks
+ * whether both teams are still staffed), so the client stops trying and reports the room
+ * as lost. The client only counts from its own drop; the server's timer is the one that
+ * decides. A result screen has no such seat: its decision deadline runs on regardless.
  */
 export const GRACE_PERIOD_MS = {
   room: 30_000,
