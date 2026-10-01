@@ -554,6 +554,14 @@
 			"returned": "Tu es encore dans un salon, on t'y a ramené.",
 			"closed": "Ce salon est fermé.",
 			"removed": "Tu n'es plus membre de ce salon."
+		},
+		"invites": {
+			"title": "{{username}} t'invite à jouer",
+			"body": "Code du salon",
+			"join": "Rejoindre",
+			"joining": "Connexion…",
+			"dismiss": "Ignorer",
+			"closed": "Ce salon est fermé."
 		}
 	},
 	"game": {
@@ -968,6 +976,43 @@
 		"language": {
 			"label": "Langue",
 			"hint": "Le jeu change de langue immédiatement. Ton choix est enregistré sur cet appareil."
+		}
+	},
+	"friends": {
+		"title": "Amis",
+		"subtitle": "Tes amis et des joueurs à ajouter.",
+		"count_one": "{{count}} ami",
+		"count_other": "{{count}} amis",
+		"openLabel_one": "Amis, {{count}} ami",
+		"openLabel_other": "Amis, {{count}} amis",
+		"listTitle": "Tes amis",
+		"loading": "Chargement de tes amis",
+		"errorTitle": "Impossible de charger tes amis",
+		"errorBody": "Vérifie ta connexion, puis réessaie.",
+		"emptyTitle": "Pas encore d'amis",
+		"emptyBody": "Recherche un nom d'utilisateur ci-dessus pour ajouter ton premier ami.",
+		"online": "en ligne",
+		"offline": "hors ligne",
+		"search": {
+			"label": "Rechercher des joueurs par nom d'utilisateur",
+			"placeholder": "Rechercher un nom d'utilisateur",
+			"hint": "{{max}} caractères maximum. L'amitié est immédiate : rien à accepter.",
+			"resultsTitle": "Résultats de la recherche",
+			"resultCount_one": "{{count}} joueur trouvé",
+			"resultCount_other": "{{count}} joueurs trouvés",
+			"searching": "Recherche de joueurs",
+			"errorTitle": "La recherche a échoué",
+			"errorBody": "Vérifie ta connexion, puis réessaie.",
+			"emptyTitle": "Aucun joueur trouvé",
+			"emptyBody": "Aucun nom d'utilisateur ne contient « {{term}} ».",
+			"alreadyFriend": "Ami",
+			"add": "Ajouter",
+			"adding": "Ajout…",
+			"addLabel": "Ajouter {{username}} en ami",
+			"addNotFound": "Ce joueur n'existe plus.",
+			"addFailed": "Impossible d'ajouter ce joueur. Réessaie.",
+			"more": "Afficher plus",
+			"loadingMore": "Chargement…"
 		}
 	}
 }

@@ -10,6 +10,7 @@ import type {
   Friend,
   FriendListQuery,
   FriendListResponse,
+  UserSearchQuery,
   UserSearchResponse,
 } from '@shared/types';
 
@@ -39,6 +40,9 @@ export const addFriend = (body: AddFriendRequest): Promise<Friend> =>
 export const removeFriend = (userId: number): Promise<void> =>
   apiRequest(`/friends/${userId}`, { method: 'DELETE' });
 
-/** Username substring search for friend discovery, 1..20 characters. */
-export const searchUsers = (query: string): Promise<UserSearchResponse> =>
-  apiRequest('/users/search', { query: { q: query } });
+/** Username substring search for friend discovery: one page, `q` trimmed to 1..20 characters. */
+export const searchUsers = (
+  query: UserSearchQuery,
+  signal?: AbortSignal,
+): Promise<UserSearchResponse> =>
+  apiRequest('/users/search', { query, ...(signal ? { signal } : {}) });

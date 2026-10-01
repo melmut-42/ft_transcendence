@@ -554,6 +554,14 @@
 			"returned": "You are still in a room, so we took you back to it.",
 			"closed": "That room has closed.",
 			"removed": "You are no longer a member of that room."
+		},
+		"invites": {
+			"title": "{{username}} invited you to play",
+			"body": "Room code",
+			"join": "Join",
+			"joining": "Joining…",
+			"dismiss": "Dismiss",
+			"closed": "This room has closed."
 		}
 	},
 	"game": {
@@ -968,6 +976,43 @@
 		"language": {
 			"label": "Language",
 			"hint": "The game switches language at once. Your choice is saved on this device."
+		}
+	},
+	"friends": {
+		"title": "Friends",
+		"subtitle": "Your friends and players to add.",
+		"count_one": "{{count}} friend",
+		"count_other": "{{count}} friends",
+		"openLabel_one": "Friends, {{count}} friend",
+		"openLabel_other": "Friends, {{count}} friends",
+		"listTitle": "Your friends",
+		"loading": "Loading your friends",
+		"errorTitle": "Couldn't load your friends",
+		"errorBody": "Check your connection, then try again.",
+		"emptyTitle": "No friends yet",
+		"emptyBody": "Search for a username above to add your first friend.",
+		"online": "online",
+		"offline": "offline",
+		"search": {
+			"label": "Search players by username",
+			"placeholder": "Search by username",
+			"hint": "Up to {{max}} characters. Friendship is instant: there is nothing to accept.",
+			"resultsTitle": "Search results",
+			"resultCount_one": "{{count}} player found",
+			"resultCount_other": "{{count}} players found",
+			"searching": "Searching players",
+			"errorTitle": "Search failed",
+			"errorBody": "Check your connection, then try again.",
+			"emptyTitle": "No players found",
+			"emptyBody": "No username contains “{{term}}”.",
+			"alreadyFriend": "Friend",
+			"add": "Add",
+			"adding": "Adding…",
+			"addLabel": "Add {{username}} as a friend",
+			"addNotFound": "This player no longer exists.",
+			"addFailed": "Couldn't add this player. Try again.",
+			"more": "Show more",
+			"loadingMore": "Loading…"
 		}
 	}
 }

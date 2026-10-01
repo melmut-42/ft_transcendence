@@ -8,7 +8,14 @@ import { buttonInteraction } from '@shared/ui';
  * Show More, at 80% of the design's size like the rest of the desktop page.
  */
 
-export const heading: string = 'flex items-center justify-center gap-[7px] desktop:justify-start';
+export const heading: string =
+  'relative flex flex-wrap items-center justify-center gap-[7px] desktop:justify-start';
+
+/**
+ * Friends: beside the centered heading on phones, at the row's far end from tablets on,
+ * whatever the heading's own alignment.
+ */
+export const friendsButton: string = 'md:absolute md:right-0 desktop:static desktop:ml-auto';
 
 export const title: string =
   'text-2xl leading-[37px] font-black text-text-ink normal-case desktop:text-[33px] ' +

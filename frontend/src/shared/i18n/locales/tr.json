@@ -554,6 +554,14 @@
 			"returned": "Hâlâ bir odadasın, seni oraya geri götürdük.",
 			"closed": "O oda kapandı.",
 			"removed": "Artık o odanın üyesi değilsin."
+		},
+		"invites": {
+			"title": "{{username}} seni oyuna davet etti",
+			"body": "Oda kodu",
+			"join": "Katıl",
+			"joining": "Katılınıyor…",
+			"dismiss": "Kapat",
+			"closed": "Bu oda kapandı."
 		}
 	},
 	"game": {
@@ -968,6 +976,43 @@
 		"language": {
 			"label": "Dil",
 			"hint": "Oyun dili hemen değişir. Seçimin bu cihazda kaydedilir."
+		}
+	},
+	"friends": {
+		"title": "Arkadaşlar",
+		"subtitle": "Arkadaşların ve ekleyebileceğin oyuncular.",
+		"count_one": "{{count}} arkadaş",
+		"count_other": "{{count}} arkadaş",
+		"openLabel_one": "Arkadaşlar, {{count}} arkadaş",
+		"openLabel_other": "Arkadaşlar, {{count}} arkadaş",
+		"listTitle": "Arkadaşların",
+		"loading": "Arkadaşların yükleniyor",
+		"errorTitle": "Arkadaşların yüklenemedi",
+		"errorBody": "Bağlantını kontrol edip tekrar dene.",
+		"emptyTitle": "Henüz arkadaşın yok",
+		"emptyBody": "İlk arkadaşını eklemek için yukarıda bir kullanıcı adı ara.",
+		"online": "çevrimiçi",
+		"offline": "çevrimdışı",
+		"search": {
+			"label": "Oyuncuları kullanıcı adına göre ara",
+			"placeholder": "Kullanıcı adı ara",
+			"hint": "En fazla {{max}} karakter. Arkadaşlık anında kurulur, onay gerekmez.",
+			"resultsTitle": "Arama sonuçları",
+			"resultCount_one": "{{count}} oyuncu bulundu",
+			"resultCount_other": "{{count}} oyuncu bulundu",
+			"searching": "Oyuncular aranıyor",
+			"errorTitle": "Arama başarısız oldu",
+			"errorBody": "Bağlantını kontrol edip tekrar dene.",
+			"emptyTitle": "Oyuncu bulunamadı",
+			"emptyBody": "Hiçbir kullanıcı adı “{{term}}” içermiyor.",
+			"alreadyFriend": "Arkadaş",
+			"add": "Ekle",
+			"adding": "Ekleniyor…",
+			"addLabel": "{{username}} adlı oyuncuyu arkadaş olarak ekle",
+			"addNotFound": "Bu oyuncu artık mevcut değil.",
+			"addFailed": "Bu oyuncu eklenemedi. Tekrar dene.",
+			"more": "Daha fazla göster",
+			"loadingMore": "Yükleniyor…"
 		}
 	}
 }

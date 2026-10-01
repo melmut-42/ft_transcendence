@@ -138,6 +138,29 @@ export interface UserSearchResult {
   is_friend: boolean;
 }
 
+/**
+ * `GET /api/users/search` — one page of matches, ranked by username prefix, then
+ * case-insensitive username, then `user_id`.
+ */
 export interface UserSearchResponse {
   results: UserSearchResult[];
+  /** Applied page size, `1..50`. */
+  limit: number;
+  /** Applied offset. */
+  offset: number;
+  /** Whether another page follows this one. */
+  has_more: boolean;
 }
+
+/** `GET /api/users/search` query parameters. */
+export type UserSearchQuery = {
+  /** Trimmed, `1..20` characters, matched case-insensitively anywhere in the username. */
+  q: string;
+  /** `1..50`, default `20`. */
+  limit?: number;
+  /** `>= 0`, default `0`. */
+  offset?: number;
+};
+
+/** The contract's bounds for a search term, after trimming. */
+export const USER_SEARCH_QUERY = { minLength: 1, maxLength: 20 } as const;

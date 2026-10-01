@@ -8,6 +8,9 @@ import type { IconName } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import { useOnlineFriends } from '../hooks/useOnlineFriends';
+import { useFriendsStore } from '../store/friendsStore';
+import { FriendsDialog } from './FriendsDialog';
+import { openButton, openCount } from './FriendsDialog.styles';
 import * as styles from './OnlinePlayers.styles';
 
 /** Cards the desktop row shows before Show More. */
@@ -29,13 +32,16 @@ export interface OnlinePlayersProps {
  * Loading shows placeholder cards and the loading ring beside the heading, so the section
  * keeps its place; an empty list says so and offers Invite Friends, and a failed load says
  * so and offers Try again. Desktop shows four cards and Show More; mobile and tablet scroll
- * the whole row sideways.
+ * the whole row sideways. Friends, beside the heading, opens the whole friend list and the
+ * username search.
  */
 export function OnlinePlayers({ onInvite, className }: OnlinePlayersProps) {
   const { t } = useTranslation();
   const id = useId();
   const { online, status, retry } = useOnlineFriends();
   const [expanded, setExpanded] = useState(false);
+  const [friendsOpen, setFriendsOpen] = useState(false);
+  const friendCount = useFriendsStore((state) => state.friendCount);
   const loading = status === 'LOADING';
 
   return (
@@ -45,6 +51,23 @@ export function OnlinePlayers({ onInvite, className }: OnlinePlayersProps) {
           {t('lobby.players.title')}
         </h2>
         {loading && <LoadingDots label={t('lobby.players.loading')} className={styles.loader} />}
+        <button
+          type="button"
+          onClick={() => setFriendsOpen(true)}
+          aria-haspopup="dialog"
+          aria-label={
+            status === 'READY' ? t('friends.openLabel', { count: friendCount }) : t('friends.title')
+          }
+          className={cn(openButton, styles.friendsButton)}
+        >
+          <Icon name="team" />
+          {t('friends.title')}
+          {status === 'READY' && (
+            <span aria-hidden="true" className={openCount}>
+              {friendCount}
+            </span>
+          )}
+        </button>
       </div>
 
       {loading && (
@@ -108,6 +131,8 @@ export function OnlinePlayers({ onInvite, className }: OnlinePlayersProps) {
           )}
         </ul>
       )}
+
+      {friendsOpen && <FriendsDialog onClose={() => setFriendsOpen(false)} />}
     </section>
   );
 }

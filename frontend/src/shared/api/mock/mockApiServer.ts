@@ -749,16 +749,40 @@ export class MockApiServer {
       route('searchUsers', 'GET', /^\/users\/search$/, true, ({ options }) => {
         const q = String(options.query?.q ?? '').trim();
         if (q.length < 1 || q.length > 20) throw validation('q must be 1..20 characters.', 'q');
+        const limit = Number(options.query?.limit ?? 20);
+        const offset = Number(options.query?.offset ?? 0);
+        if (!Number.isInteger(limit) || limit < 1 || limit > 50) {
+          throw validation('limit must be an integer from 1 through 50.', 'limit');
+        }
+        if (!Number.isInteger(offset) || offset < 0) {
+          throw validation('offset must be a non-negative integer.', 'offset');
+        }
         const me = selfId();
-        const results = this.accounts
-          .filter((a) => a.user_id !== me && a.username.toLowerCase().includes(q.toLowerCase()))
-          .map((a) => ({
-            user_id: a.user_id,
-            username: a.username,
-            avatar_url: a.avatar_url,
-            is_friend: this.friendIds.has(a.user_id),
-          }));
-        return ok({ results } satisfies UserSearchResponse);
+        const needle = q.toLowerCase();
+        const matches = this.accounts
+          .filter((a) => a.user_id !== me && a.username.toLowerCase().includes(needle))
+          .sort((a, b) => {
+            const prefix =
+              Number(!a.username.toLowerCase().startsWith(needle)) -
+              Number(!b.username.toLowerCase().startsWith(needle));
+            return (
+              prefix ||
+              a.username.toLowerCase().localeCompare(b.username.toLowerCase()) ||
+              a.user_id - b.user_id
+            );
+          });
+        const results = matches.slice(offset, offset + limit).map((a) => ({
+          user_id: a.user_id,
+          username: a.username,
+          avatar_url: a.avatar_url,
+          is_friend: this.friendIds.has(a.user_id),
+        }));
+        return ok({
+          results,
+          limit,
+          offset,
+          has_more: offset + results.length < matches.length,
+        } satisfies UserSearchResponse);
       }),
 
       route('matchHistory', 'GET', /^\/users\/me\/matches$/, true, ({ options }) => {
