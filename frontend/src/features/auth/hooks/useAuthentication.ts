@@ -10,13 +10,13 @@
  */
 
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { ROUTES } from '@shared/constants';
 import { useSessionStore } from '@shared/stores';
 import type { LoginRequest, RegisterRequest, SessionResponse } from '@shared/types';
 
 import { fetchSession, login, registerAccount } from '../api';
+import { returnPath } from '../model/returnPath';
 
 export interface Authenticated {
   username: string;
@@ -25,6 +25,7 @@ export interface Authenticated {
 
 export function useAuthentication() {
   const navigate = useNavigate();
+  const { state: locationState } = useLocation();
 
   const logIn = useCallback(async (credentials: LoginRequest): Promise<Authenticated> => {
     const { user } = await login(credentials);
@@ -36,13 +37,16 @@ export function useAuthentication() {
     return { username: user.username, session: await fetchSession() };
   }, []);
 
-  /** Store the session and land on the Lobby. */
+  /**
+   * Store the session and go on to the route the user asked for, or the Lobby. Route
+   * recovery then sends a room member into their room.
+   */
   const enter = useCallback(
     (session: SessionResponse) => {
       useSessionStore.getState().setSession(session);
-      navigate(ROUTES.lobby, { replace: true });
+      navigate(returnPath(locationState), { replace: true });
     },
-    [navigate],
+    [locationState, navigate],
   );
 
   return { logIn, register, enter };

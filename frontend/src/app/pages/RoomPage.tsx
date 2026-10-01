@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBlocker, useNavigate } from 'react-router-dom';
+import { useBlocker } from 'react-router-dom';
 
 import { useRoomConnection } from '@app/connection/roomConnectionContext';
 import { endSignedInState } from '@app/session/endSignedInState';
@@ -9,34 +9,12 @@ import { LeaveRoomDialog } from '@features/room/components/RoomOverlays';
 import { useLeaveRoom } from '@features/room/hooks/useLeaveRoom';
 import { forgetRoomCode, recallRoomCode } from '@features/room/model/roomCode';
 import { useRoomStore } from '@features/room/store/roomStore';
-import { ROUTES } from '@shared/constants';
-import { useConnectionStore, useSessionStore } from '@shared/stores';
+import { showToast, useConnectionStore, useSessionStore } from '@shared/stores';
 import { ErrorState, LoadingState } from '@shared/ui';
 
 import { GameScreen } from './GameScreen';
 import { ReadyRoom } from './ReadyRoom';
 import * as styles from './ReadyRoom.styles';
-
-/** The room is gone for this player: it closed, or they are no longer a member. */
-function RoomUnavailable() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  return (
-    <main className={styles.state}>
-      <div role="alert" className={styles.stateCard}>
-        <h1 className="text-3xl font-black normal-case">{t('room.unavailable.title')}</h1>
-        <p className="text-lg font-regular text-text-muted">{t('room.unavailable.body')}</p>
-        <button
-          type="button"
-          onClick={() => navigate(ROUTES.lobby, { replace: true })}
-          className={styles.stateAction}
-        >
-          {t('room.unavailable.action')}
-        </button>
-      </div>
-    </main>
-  );
-}
 
 /**
  * The room route. It shows the screen that matches the server's `room.status` — the Ready
@@ -46,7 +24,8 @@ function RoomUnavailable() {
  *
  * Until the first snapshot arrives the route shows a loading state rather than an empty
  * room. A room that closed, or that the player no longer belongs to, clears the room from
- * the session and offers the way back to Room Discovery.
+ * the session; route recovery then takes the player to Room Discovery, where a toast says
+ * what happened.
  *
  * Leaving is always explicit. LEAVE ROOM and LEAVE GAME ask first and tell the server, and
  * a Back or any other navigation away from the room is held for the same confirmation, so
@@ -68,11 +47,11 @@ export function RoomPage() {
   // they are leaving on purpose, that is the leave itself arriving first.
   const removed =
     room !== null && leave.status !== 'LEAVING' && !room.players.some((p) => p.user_id === userId);
-  const unavailable =
-    removed ||
+  const closed =
     room?.status === 'CLOSED' ||
-    (socket.status === 'CLOSED' &&
-      (socket.closeReason === 'ROOM_NOT_FOUND' || socket.closeReason === 'NOT_ROOM_MEMBER'));
+    (socket.status === 'CLOSED' && socket.closeReason === 'ROOM_NOT_FOUND');
+  const unavailable =
+    closed || removed || (socket.status === 'CLOSED' && socket.closeReason === 'NOT_ROOM_MEMBER');
   const sessionEnded = socket.status === 'CLOSED' && socket.closeReason === 'SESSION_INVALID';
 
   const blocker = useBlocker(({ currentLocation, nextLocation }) => {
@@ -83,13 +62,18 @@ export function RoomPage() {
     return member && status !== undefined && status !== 'CLOSED';
   });
 
+  // The membership is over: say why, and let route recovery take the player to the Lobby.
   useEffect(() => {
     if (!unavailable) return;
     forgetRoomCode(roomId);
-    if (useSessionStore.getState().activeRoomId === roomId) {
-      useSessionStore.getState().setActiveRoomId(null);
-    }
-  }, [roomId, unavailable]);
+    if (useSessionStore.getState().activeRoomId !== roomId) return;
+    showToast({
+      message: closed ? 'room.recovery.closed' : 'room.recovery.removed',
+      tone: 'error',
+      icon: 'warning',
+    });
+    useSessionStore.getState().setActiveRoomId(null);
+  }, [closed, roomId, unavailable]);
 
   // A revoked session cannot reconnect; the route guard takes the user to Log In.
   useEffect(() => {
@@ -120,7 +104,11 @@ export function RoomPage() {
 
   let screen;
   if (unavailable) {
-    screen = <RoomUnavailable />;
+    screen = (
+      <main className={styles.state}>
+        <LoadingState label={t('room.loading')} />
+      </main>
+    );
   } else if (!room) {
     screen =
       socket.status === 'CLOSED' && !sessionEnded ? (

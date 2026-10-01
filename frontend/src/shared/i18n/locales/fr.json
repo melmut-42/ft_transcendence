@@ -404,11 +404,6 @@
 			"returnToRoom": "Aller à ma salle"
 		},
 		"loading": "Chargement du salon…",
-		"unavailable": {
-			"title": "Ce salon n'est plus disponible",
-			"body": "Il a été fermé, ou vous n'en faites plus partie.",
-			"action": "Retour à la recherche de salons"
-		},
 		"connection": {
 			"failedTitle": "Connexion au salon impossible",
 			"failedBody": "Vérifiez votre connexion et réessayez.",
@@ -553,6 +548,12 @@
 				"offline": "Vous êtes hors ligne. Réessayez une fois reconnecté.",
 				"generic": "Ça n'a pas marché. Réessayez."
 			}
+		},
+		"recovery": {
+			"notMember": "Tu ne fais plus partie de ce salon.",
+			"returned": "Tu es encore dans un salon, on t'y a ramené.",
+			"closed": "Ce salon est fermé.",
+			"removed": "Tu n'es plus membre de ce salon."
 		}
 	},
 	"game": {

@@ -23,8 +23,8 @@ import { LoadingState } from '@shared/ui';
  * state, since there was no session to lose.
  *
  * `active_room_id` from that response is the authoritative route-recovery input — the
- * screen after a refresh is derived from server membership, never from the reloaded URL.
- * Deriving and navigating to that screen is routing work built on top of this gate.
+ * screen after a refresh is derived from server membership, never from the reloaded URL
+ * (`RoomRouteGuard`, `LobbyRouteGuard`).
  */
 export function SessionBootstrap({ children }: { children: ReactNode }) {
   const { t } = useTranslation();

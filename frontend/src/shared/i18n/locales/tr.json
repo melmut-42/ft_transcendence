@@ -404,11 +404,6 @@
 			"returnToRoom": "Odama git"
 		},
 		"loading": "Oda yükleniyor…",
-		"unavailable": {
-			"title": "Bu oda artık kullanılamıyor",
-			"body": "Oda kapandı ya da artık oyuncularından biri değilsin.",
-			"action": "Oda Keşfine dön"
-		},
 		"connection": {
 			"failedTitle": "Odaya bağlanılamadı",
 			"failedBody": "Bağlantını kontrol edip tekrar dene.",
@@ -553,6 +548,12 @@
 				"offline": "Çevrimdışısın. Yeniden bağlanınca tekrar dene.",
 				"generic": "Olmadı. Tekrar dene."
 			}
+		},
+		"recovery": {
+			"notMember": "Artık o odada değilsin.",
+			"returned": "Hâlâ bir odadasın, seni oraya geri götürdük.",
+			"closed": "O oda kapandı.",
+			"removed": "Artık o odanın üyesi değilsin."
 		}
 	},
 	"game": {

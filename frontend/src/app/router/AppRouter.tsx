@@ -2,6 +2,7 @@ import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-rou
 
 import { ChatMount } from '@app/chat/ChatMount';
 import { ModalHost } from '@app/modal/ModalHost';
+import { AppToasts } from '@app/notices/AppToasts';
 import { RoomConnectionProvider } from '@app/connection/RoomConnectionProvider';
 import { DisconnectedNotice } from '@features/room/components/ConnectionOverlay';
 import { GameLayout } from '@layouts/GameLayout';
@@ -19,6 +20,7 @@ import { TermsPage } from '@app/pages/TermsPage';
 
 import { RequireAnonymous } from './RequireAnonymous';
 import { RequireAuth } from './RequireAuth';
+import { LobbyRouteGuard, RoomRouteGuard } from './RouteRecovery';
 
 /** App-level mounts: available from every layout, imported by no feature. */
 function AppShell() {
@@ -28,6 +30,7 @@ function AppShell() {
       <ModalHost />
       <ChatMount />
       <DisconnectedNotice />
+      <AppToasts />
     </>
   );
 }
@@ -35,9 +38,9 @@ function AppShell() {
 /**
  * Route table.
  *
- * Public: landing, login, register, privacy, terms. Authenticated: lobby, room. Landing
- * and the two legal pages render outside `PublicLayout` because they draw their own header
- * and footer. Login and register are the Landing page with its Log In / Sign Up dialog open.
+ * Public: landing, login, register, privacy, terms. Authenticated: lobby, room, both held
+ * to the server's room membership by the route-recovery guards. Landing and the two legal
+ * pages render outside `PublicLayout` because they draw their own header and footer. Login and register are the Landing page with its Log In / Sign Up dialog open.
  * Profile is a modal rendered by `ModalHost`, not a route — so it never changes the
  * underlying screen and stays reachable from Lobby, Room and Game alike.
  *
@@ -75,15 +78,33 @@ const router = createBrowserRouter([
       {
         element: <RequireAuth />,
         children: [
-          { element: <LobbyLayout />, children: [{ path: ROUTES.lobby, element: <LobbyPage /> }] },
+          /*
+            Route recovery holds both routes to the server's room membership: a member is
+            sent into their room, anyone else to the Lobby.
+          */
+          {
+            element: <LobbyRouteGuard />,
+            children: [
+              {
+                element: <LobbyLayout />,
+                children: [{ path: ROUTES.lobby, element: <LobbyPage /> }],
+              },
+            ],
+          },
           /*
             Room and Game share one authoritative WebSocket, so the provider that owns
             it wraps the whole room route rather than living inside either feature.
           */
           {
-            element: <RoomConnectionProvider />,
+            path: ROUTES.room,
+            element: <RoomRouteGuard />,
             children: [
-              { element: <GameLayout />, children: [{ path: ROUTES.room, element: <RoomPage /> }] },
+              {
+                element: <RoomConnectionProvider />,
+                children: [
+                  { element: <GameLayout />, children: [{ index: true, element: <RoomPage /> }] },
+                ],
+              },
             ],
           },
         ],

@@ -404,11 +404,6 @@
 			"returnToRoom": "Go to my room"
 		},
 		"loading": "Loading the room…",
-		"unavailable": {
-			"title": "This room is no longer available",
-			"body": "It closed, or you are no longer one of its players.",
-			"action": "Back to Room Discovery"
-		},
 		"connection": {
 			"failedTitle": "Couldn't connect to the room",
 			"failedBody": "Check your connection and try again.",
@@ -553,6 +548,12 @@
 				"offline": "You're offline. Try again once you're reconnected.",
 				"generic": "That didn't work. Try again."
 			}
+		},
+		"recovery": {
+			"notMember": "You are no longer in that room.",
+			"returned": "You are still in a room, so we took you back to it.",
+			"closed": "That room has closed.",
+			"removed": "You are no longer a member of that room."
 		}
 	},
 	"game": {

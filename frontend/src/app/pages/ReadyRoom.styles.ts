@@ -109,13 +109,4 @@ export const leaveIcon: string = 'text-[0.9em]';
 
 export const state: string = 'flex flex-1 items-center justify-center px-3 py-6';
 
-export const stateCard: string =
-  'flex w-full max-w-[440px] flex-col items-center gap-3 rounded-xl bg-surface p-4 ' +
-  'text-center shadow-panel';
-
-export const stateAction: string =
-  `${buttonInteraction} inline-flex h-12 items-center justify-center gap-2 rounded-lg ` +
-  'bg-primary px-4 text-xl leading-none font-bold text-surface shadow-button-primary ' +
-  'not-disabled:hover:bg-primary-bright not-disabled:hover:shadow-button-primary-hover';
-
 export const toasts: string = 'desktop:pr-[388px]';
