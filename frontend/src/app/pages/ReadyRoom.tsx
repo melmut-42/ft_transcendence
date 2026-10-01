@@ -65,7 +65,12 @@ function CountdownCancelledNotice() {
   return (
     <ToastStack>
       <div className={styles.toasts}>
-        <Toast tone="neutral" icon="timer" onDismiss={() => setDismissed(cancellation.eventId)}>
+        <Toast
+          tone="neutral"
+          icon="timer"
+          onDismiss={() => setDismissed(cancellation.eventId)}
+          dismissLabel={t('common.dismiss')}
+        >
           {t(`room.countdown.cancelled.${cancellation.reason}`, {
             username: cancellation.username ?? t('room.countdown.someone'),
           })}

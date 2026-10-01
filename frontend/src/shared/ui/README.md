@@ -12,6 +12,10 @@ Rules:
 - A component accepts `className` and merges it last with `cn()` from `shared/utils`, so
   the caller can adjust layout without overriding the recipe.
 - Nothing here calls REST or WebSocket, reads a domain store, or imports a feature.
+- No user-facing text is written here. Every label a primitive shows or announces — a
+  close or dismiss button's name, Try again, an empty seat, the HOST and READY badges —
+  comes in through props, already translated by the caller with `t()`. A loading ring
+  without a `label` is decorative and hidden from assistive technology.
 - A new shared component starts feature-local and moves here once a second feature
   needs it.
 

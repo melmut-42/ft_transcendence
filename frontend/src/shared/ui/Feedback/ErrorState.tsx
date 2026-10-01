@@ -2,16 +2,17 @@ import { cn } from '@shared/utils';
 import { Button } from '@shared/ui/Button';
 import { Icon } from '@shared/ui/Icon';
 
-export interface ErrorStateProps {
+interface ErrorStateBase {
   /** What failed, in the user's terms. */
   title: string;
   /** What the user can do about it. */
   description?: string;
-  /** Retry handler. Without one no action is offered. */
-  onRetry?: () => void;
-  retryLabel?: string;
   className?: string;
 }
+
+/** Retry is optional; when it is offered, its translated label comes with it. */
+export type ErrorStateProps = ErrorStateBase &
+  ({ onRetry: () => void; retryLabel: string } | { onRetry?: undefined; retryLabel?: undefined });
 
 /**
  * The one way a feature reports a failed load. It is an assertive live region, because
@@ -21,7 +22,7 @@ export function ErrorState({
   title,
   description,
   onRetry,
-  retryLabel = 'Try again',
+  retryLabel,
   className,
 }: ErrorStateProps) {
   return (

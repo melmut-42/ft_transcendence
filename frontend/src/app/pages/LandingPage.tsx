@@ -268,6 +268,7 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
             tone="success"
             icon="check"
             onDismiss={() => useSessionStore.getState().acknowledgeAccountDeleted()}
+            dismissLabel={t('common.dismiss')}
           >
             {t('landing.accountDeleted')}
           </Toast>

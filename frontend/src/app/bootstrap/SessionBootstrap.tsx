@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { fetchSession, refreshSession } from '@features/auth/api';
 import { ApiError, setRefreshHandler } from '@shared/api';
 import { useSessionStore } from '@shared/stores';
+import { LoadingState } from '@shared/ui';
 
 /**
  * Session bootstrap gate.
@@ -19,6 +21,7 @@ import { useSessionStore } from '@shared/stores';
  * Deriving and navigating to that screen is routing work built on top of this gate.
  */
 export function SessionBootstrap({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const status = useSessionStore((state) => state.status);
 
   useEffect(() => {
@@ -54,7 +57,7 @@ export function SessionBootstrap({ children }: { children: ReactNode }) {
   }, []);
 
   if (status === 'UNKNOWN') {
-    return <p role="status">Loading…</p>;
+    return <LoadingState label={t('common.loading')} className="min-h-screen" />;
   }
 
   return <>{children}</>;

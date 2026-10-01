@@ -4,7 +4,10 @@ export type LoadingDotsSize = 'sm' | 'md' | 'lg';
 
 export interface LoadingDotsProps {
   size?: LoadingDotsSize;
-  /** What is loading, announced to assistive technology. */
+  /**
+   * What is loading, announced to assistive technology. Without one the ring is
+   * decorative and hidden from it, for a ring that sits beside its own visible text.
+   */
   label?: string;
   className?: string;
 }
@@ -40,11 +43,10 @@ const radius: Record<LoadingDotsSize, number> = { sm: 18, md: 28, lg: 34.5 };
  * turn. Under `prefers-reduced-motion` the fade stops and the ring stays as a static
  * indicator, which the base stylesheet takes care of.
  */
-export function LoadingDots({ size = 'md', label = 'Loading', className }: LoadingDotsProps) {
+export function LoadingDots({ size = 'md', label, className }: LoadingDotsProps) {
   return (
     <span
-      role="status"
-      aria-label={label}
+      {...(label ? { role: 'status', 'aria-label': label } : { 'aria-hidden': true })}
       className={cn('relative inline-block shrink-0', ringStyles[size], className)}
     >
       {dotTones.map((tone, index) => (

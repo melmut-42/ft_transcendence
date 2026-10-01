@@ -6,15 +6,23 @@ import { Icon, type IconName } from '@shared/ui/Icon';
 
 export type ToastTone = 'neutral' | 'success' | 'error';
 
-export interface ToastProps {
+interface ToastBase {
   /** The message. Short enough to read in the few seconds the toast is up. */
   children: ReactNode;
   tone?: ToastTone;
-  icon?: IconName;
-  /** Present when the toast can be dismissed by hand. */
-  onDismiss?: () => void;
+  icon?: IconName | undefined;
   className?: string;
 }
+
+/**
+ * Present when the toast can be dismissed by hand, together with the translated name of
+ * its dismiss button.
+ */
+export type ToastProps = ToastBase &
+  (
+    | { onDismiss: () => void; dismissLabel: string }
+    | { onDismiss?: undefined; dismissLabel?: undefined }
+  );
 
 const toneStyles: Record<ToastTone, string> = {
   neutral: 'bg-surface text-text-black',
@@ -27,7 +35,14 @@ const toneStyles: Record<ToastTone, string> = {
  * without interrupting whatever the user is doing, and it rises into place so a second
  * toast is visibly a new one.
  */
-export function Toast({ children, tone = 'neutral', icon, onDismiss, className }: ToastProps) {
+export function Toast({
+  children,
+  tone = 'neutral',
+  icon,
+  onDismiss,
+  dismissLabel,
+  className,
+}: ToastProps) {
   return (
     <div
       role="status"
@@ -49,7 +64,7 @@ export function Toast({ children, tone = 'neutral', icon, onDismiss, className }
           variant={tone === 'neutral' ? 'muted' : 'neutral'}
           size="sm"
           onClick={onDismiss}
-          aria-label="Dismiss"
+          aria-label={dismissLabel}
           className={cn(tone !== 'neutral' && 'text-surface')}
         />
       )}

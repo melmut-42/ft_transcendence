@@ -22,10 +22,11 @@ import {
 } from '@shared/ui';
 
 /**
- * Primitive gallery.
+ * Primitive gallery, for development builds only.
  *
  * Every component in `shared/ui` is rendered here in its main states, so a change to a
- * recipe can be checked in one place and at every width.
+ * recipe can be checked in one place and at every width. Its sample copy is developer
+ * fixture text, so the route is not registered in production builds.
  */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -139,8 +140,9 @@ export function UIElements() {
         <PlayerRow
           name="Player One"
           online
-          host
-          ready
+          host="Host"
+          ready="Ready"
+          emptyLabel="Waiting for player…"
           role={{ label: 'Operative', icon: 'search' }}
           className="max-w-xl"
         />
@@ -149,10 +151,11 @@ export function UIElements() {
           online={false}
           compact
           ring="teamB"
+          emptyLabel="Waiting for player…"
           role={{ label: 'Spymaster', icon: 'key' }}
           className="max-w-md"
         />
-        <PlayerRow className="max-w-xl" />
+        <PlayerRow emptyLabel="Waiting for player…" className="max-w-xl" />
       </Section>
 
       <Section title="Board">
@@ -188,7 +191,9 @@ export function UIElements() {
             Game starting in 5 seconds.
           </Alert>
         </div>
-        <Toast onDismiss={() => undefined}>Player joined!</Toast>
+        <Toast onDismiss={() => undefined} dismissLabel="Dismiss">
+          Player joined!
+        </Toast>
         <Toast tone="success" icon="check">
           Clue accepted
         </Toast>
@@ -204,6 +209,7 @@ export function UIElements() {
           title="Could not load rooms"
           description="Check your connection and try again."
           onRetry={() => undefined}
+          retryLabel="Try again"
         />
       </Section>
 
@@ -217,6 +223,7 @@ export function UIElements() {
       {modalOpen && (
         <Modal
           title="Player profile"
+          closeLabel="Close"
           onClose={() => setModalOpen(false)}
           footer={<Button onClick={() => setModalOpen(false)}>Close</Button>}
         >
@@ -228,6 +235,7 @@ export function UIElements() {
         <Modal
           title="Leave game?"
           align="center"
+          closeLabel="Close"
           onClose={() => setConfirmOpen(false)}
           footer={
             <>

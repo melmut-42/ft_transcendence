@@ -5,7 +5,8 @@
 		"cancel": "İptal",
 		"close": "Kapat",
 		"retry": "Tekrar dene",
-		"back": "Geri"
+		"back": "Geri",
+		"dismiss": "Kapat"
 	},
 	"i18n": {
 		"ready": "Çok dilli altyapı çalışıyor."

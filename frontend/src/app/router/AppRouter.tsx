@@ -67,7 +67,10 @@ const router = createBrowserRouter([
       { path: ROUTES.privacy, element: <PrivacyPage /> },
       { path: ROUTES.terms, element: <TermsPage /> },
 
-      { element: <PublicLayout />, children: [{ path: '/ui', element: <UIElements /> }] },
+      // The primitive gallery is a development tool, absent from production builds.
+      ...(import.meta.env.DEV
+        ? [{ element: <PublicLayout />, children: [{ path: '/ui', element: <UIElements /> }] }]
+        : []),
 
       {
         element: <RequireAuth />,

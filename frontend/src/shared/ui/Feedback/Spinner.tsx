@@ -4,7 +4,10 @@ export type SpinnerSize = 'sm' | 'md' | 'lg';
 
 export interface SpinnerProps {
   size?: SpinnerSize;
-  /** What is loading, announced to assistive technology. */
+  /**
+   * What is loading, announced to assistive technology. Without one the ring is
+   * decorative and hidden from it, for a spinner that sits beside its own visible text.
+   */
   label?: string;
   className?: string;
 }
@@ -22,8 +25,7 @@ const sizeStyles: Record<SpinnerSize, string> = {
 export function Spinner({ size = 'md', label, className }: SpinnerProps) {
   return (
     <span
-      role="status"
-      aria-label={label ?? 'Loading'}
+      {...(label ? { role: 'status', 'aria-label': label } : { 'aria-hidden': true })}
       className={cn(
         'inline-block shrink-0 animate-spin rounded-pill border-surface-sunken border-t-primary',
         sizeStyles[size],

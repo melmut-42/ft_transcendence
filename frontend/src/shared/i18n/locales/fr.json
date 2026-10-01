@@ -5,7 +5,8 @@
 		"cancel": "Annuler",
 		"close": "Fermer",
 		"retry": "Réessayer",
-		"back": "Retour"
+		"back": "Retour",
+		"dismiss": "Fermer"
 	},
 	"i18n": {
 		"ready": "L'infrastructure multilingue fonctionne."

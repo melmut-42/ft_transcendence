@@ -13,12 +13,14 @@ export interface PlayerRowProps {
   ring?: AvatarRing;
   /** Role label with its glyph, e.g. Operative. */
   role?: { label: string; icon: IconName };
-  host?: boolean;
-  ready?: boolean;
+  /** Translated HOST badge text; the badge shows only when it is set. */
+  host?: string | undefined;
+  /** Translated READY badge text; the badge shows only when it is set. */
+  ready?: string | undefined;
   /** Compact height, for the in-game team panels. */
   compact?: boolean;
-  /** Placeholder text for an empty seat. */
-  emptyLabel?: string;
+  /** Translated placeholder text for an empty seat. */
+  emptyLabel: string;
   /** Lifts the row on hover, for a row the user can act on. */
   interactive?: boolean;
   className?: string;
@@ -37,10 +39,10 @@ export function PlayerRow({
   online,
   ring = 'none',
   role,
-  host = false,
-  ready = false,
+  host,
+  ready,
   compact = false,
-  emptyLabel = 'Waiting for player…',
+  emptyLabel,
   interactive = false,
   className,
   children,
@@ -98,12 +100,12 @@ export function PlayerRow({
       <div className={cn('ml-auto flex shrink-0 items-center', compact ? 'gap-1' : 'gap-2')}>
         {host && !empty && (
           <Badge variant="host" size={badgeSize}>
-            Host
+            {host}
           </Badge>
         )}
         {ready && !empty && (
           <Badge variant="ready" size={badgeSize} icon="check" circleIcon>
-            Ready
+            {ready}
           </Badge>
         )}
         {children}

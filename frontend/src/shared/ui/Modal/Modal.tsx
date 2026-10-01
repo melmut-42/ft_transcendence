@@ -12,6 +12,8 @@ export interface ModalProps {
   /** Action row at the foot of the dialog. The committing action goes last. */
   footer?: ReactNode;
   onClose: () => void;
+  /** Translated name of the close button. */
+  closeLabel: string;
   /** Hides the close button and ignores Escape, for a dialog that demands a choice. */
   required?: boolean;
   /** Centers the title and body, as the confirmation dialog does. */
@@ -31,6 +33,7 @@ export function Modal({
   children,
   footer,
   onClose,
+  closeLabel,
   required = false,
   align = 'start',
   className,
@@ -84,7 +87,7 @@ export function Modal({
               variant="muted"
               size="sm"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={closeLabel}
               className={cn(align === 'center' && 'absolute top-4 right-4')}
             />
           )}
