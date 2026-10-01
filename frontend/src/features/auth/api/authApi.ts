@@ -48,5 +48,8 @@ export const fetchSession = (): Promise<SessionResponse> => apiRequest('/auth/se
 export const googleSignInUrl = (returnTo: string): string =>
   `${API_BASE_PATH}/auth/oauth/google/authorize?${new URLSearchParams({ return_to: returnTo })}`;
 
-/** Revokes both credentials. Legal in every room status; forfeits an `IN_GAME` match. */
+/**
+ * Revokes both credentials. Legal in every room status; during a running match it counts
+ * as the player leaving it.
+ */
 export const endSession = (): Promise<void> => apiRequest('/auth/session', { method: 'DELETE' });

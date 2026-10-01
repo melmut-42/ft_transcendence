@@ -19,6 +19,7 @@ import * as styles from './ReadyRoom.styles';
 const EXIT_NOTICE: Partial<Record<RoomExit, string>> = {
   KICKED: 'room.recovery.kicked',
   POST_GAME_TIMEOUT: 'room.recovery.postGameTimeout',
+  INSUFFICIENT_PLAYERS: 'room.recovery.insufficientPlayers',
 };
 
 /**

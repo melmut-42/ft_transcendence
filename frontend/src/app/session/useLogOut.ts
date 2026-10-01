@@ -13,7 +13,8 @@ export type LogOutStatus = 'IDLE' | 'PENDING' | 'FAILED';
  *   DELETE /api/auth/session -> clear private state -> anonymous session -> Landing
  *
  * The server revokes both session cookies, closes this session's sockets and, during a
- * match, settles it as a forfeit; the account, friends and statistics stay. Only once it
+ * match the user plays in, counts it as leaving the match (a leave penalty); the account,
+ * friends and statistics stay. Only once it
  * has answered does the client let go (`endSignedInState`). A session the server no longer
  * knows (`401`) is already logged out. Any other failure keeps the user signed in and says
  * so. One press sends one request.

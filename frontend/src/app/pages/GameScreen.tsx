@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ProfileMenu } from '@features/profile/components/ProfileMenu';
@@ -20,21 +20,26 @@ import {
 } from '@features/game/components/ResultsDialog';
 import type { MatchResult, ResultDecision } from '@features/game/components/ResultsDialog';
 import { ScoreBoard } from '@features/game/components/ScoreBoard';
+import { StaffingDialog } from '@features/game/components/StaffingDialog';
+import type { SeatClaim } from '@features/game/components/StaffingDialog';
 import { TeamStatusCard, TeamSummary } from '@features/game/components/TeamStatus';
 import { TurnHeading } from '@features/game/components/TurnHeading';
 import { useGameActions } from '@features/game/hooks/useGameActions';
 import { gameStage, isGameOver } from '@features/game/model/gameView';
 import { lineupOf } from '@features/game/model/lineup';
 import type { GameStage } from '@features/game/model/gameView';
+import { useGameStore } from '@features/game/store/gameStore';
 import { KickDialog } from '@features/room/components/RoomOverlays';
 import { Spectators } from '@features/room/components/TeamPanel';
 import { useKickMember } from '@features/room/hooks/useKickMember';
 import { useReturnToLobby } from '@features/room/hooks/useReturnToLobby';
+import { useRoomCommands } from '@features/room/hooks/useRoomCommands';
 import { useRoomStore } from '@features/room/store/roomStore';
 import { useSecondsUntil } from '@shared/hooks';
 import { useSessionStore } from '@shared/stores';
-import type { Game, Room, RoomMember, RoomRole } from '@shared/types';
+import type { Game, PlayingRole, Room, RoomMember, RoomRole, Team } from '@shared/types';
 import { Icon } from '@shared/ui';
+import { RoomCommandError } from '@shared/websocket';
 import { cn } from '@shared/utils';
 
 import * as styles from './GameScreen.styles';
@@ -152,6 +157,50 @@ function StagePanel({
   }
 }
 
+/** Messages for a seat claim the server turned down. */
+function claimFailure(error: unknown): string | null {
+  if (!(error instanceof RoomCommandError)) return 'room.ready.errors.generic';
+  switch (error.code) {
+    case 'CONNECTION_LOST':
+      return null;
+    case 'ROLE_CONFLICT':
+      return 'room.ready.errors.roleConflict';
+    case 'INVALID_ROOM_STATE':
+      return 'game.staffing.claimClosed';
+    case 'NOT_SENT':
+      return 'room.ready.errors.offline';
+    default:
+      return 'room.ready.errors.generic';
+  }
+}
+
+/** A spectator's claim of a free seat during the pause, with its feedback. */
+function useSeatClaim(): SeatClaim {
+  const commands = useRoomCommands();
+  const [pending, setPending] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+  const busy = useRef(false);
+
+  const onClaim = useCallback(
+    (team: Team, role: PlayingRole) => {
+      if (busy.current) return;
+      busy.current = true;
+      setPending(true);
+      setFailure(null);
+      commands
+        .selectRole(team, role)
+        .catch((error: unknown) => setFailure(claimFailure(error)))
+        .finally(() => {
+          busy.current = false;
+          setPending(false);
+        });
+    },
+    [commands],
+  );
+
+  return { onClaim, pending, failure };
+}
+
 /**
  * The Game Board: one screen for every state of the match, for Spymasters, Operatives and
  * spectators alike. What it draws follows the server's game state and the player's own
@@ -160,8 +209,10 @@ function StagePanel({
  * and the screen changes only when the server's events arrive, so all players converge on
  * the same match. A refresh or a reconnect rebuilds it from the fresh snapshot.
  *
- * Once the match has a result, each player decides on their own: Back to Lobby or Exit,
- * before the server's deadline.
+ * When a team loses its only Spymaster or its last Operative, the server pauses the match
+ * and the Game Paused dialog counts down to the room's shutdown; a spectator can take the
+ * free seat from there. Once the match has a result, each player decides on their own:
+ * Back to Lobby or Exit, before the server's deadline.
  *
  * Desktop draws the 1920×1080 design at 80%: the scoreboard hangs from the top edge, the
  * team cards flank the clue panel and the board. Phones and tablets stack the heading,
@@ -183,9 +234,11 @@ export function GameScreen({
 }) {
   const { t } = useTranslation();
   const userId = useSessionStore((state) => state.user?.user_id);
+  const departure = useGameStore((state) => state.departure);
   const clockOffsetMs = useRoomStore((state) => state.clockOffsetMs);
   const actions = useGameActions();
   const kick = useKickMember();
+  const claim = useSeatClaim();
   const back = useReturnToLobby();
   const { dismissFeedback } = actions;
 
@@ -234,6 +287,7 @@ export function GameScreen({
   const [resultsDismissed, setResultsDismissed] = useState<number | null>(null);
   const resultsOpen =
     result !== null && decision !== null && resultsDismissed !== game.game_id && !overlaysHidden;
+  const paused = stage === 'PAUSED' && game.staffing !== undefined;
 
   // A server answer belongs to the turn it was sent in; a new turn starts clean.
   const turnKey = `${game.current_turn.team}:${game.current_turn.phase}`;
@@ -328,6 +382,15 @@ export function GameScreen({
           result={result}
           decision={decision}
           onViewBoard={() => setResultsDismissed(game.game_id)}
+        />
+      )}
+      {paused && game.staffing && !overlaysHidden && !kick.target && (
+        <StaffingDialog
+          staffing={game.staffing}
+          departure={departure}
+          clockOffsetMs={clockOffsetMs}
+          claim={seat.role === 'SPECTATOR' ? claim : null}
+          onLeave={onLeave}
         />
       )}
       {!overlaysHidden && <KickDialog kick={kick} inMatch={room.status === 'IN_GAME'} />}

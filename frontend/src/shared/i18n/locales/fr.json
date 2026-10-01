@@ -72,7 +72,10 @@
 		},
 		"logOut": {
 			"title": "Se déconnecter ?",
-			"body": "Tu es en pleine partie. Te déconnecter la termine par un forfait pour ton équipe.",
+			"body": {
+				"SPYMASTER": "Tu es maître-espion dans une partie en cours. Te déconnecter te fait quitter la partie et ajoute une pénalité d'abandon à ton profil, plus lourde pour un maître-espion. Si personne ne prend ta place à temps, le salon ferme.",
+				"OPERATIVE": "Tu joues dans une partie en cours. Te déconnecter te fait quitter la partie et ajoute une pénalité d'abandon à ton profil. Si ton équipe n'a pas d'autre agent et que personne ne prend ta place à temps, le salon ferme."
+			},
 			"stay": "Rester",
 			"confirm": "Se déconnecter",
 			"pending": "Déconnexion…",
@@ -442,7 +445,10 @@
 			},
 			"game": {
 				"title": "Quitter la partie ?",
-				"body": "Vous quitterez cette partie et reviendrez au salon.",
+				"body": {
+					"SPYMASTER": "Vous quitterez cette partie et reviendrez au salon. Quitter une partie en cours ajoute une pénalité d'abandon à votre profil, plus lourde pour un maître-espion. Si personne ne prend votre place à temps, le salon ferme pour tout le monde.",
+					"OPERATIVE": "Vous quitterez cette partie et reviendrez au salon. Quitter une partie en cours ajoute une pénalité d'abandon à votre profil. Si votre équipe n'a pas d'autre agent et que personne ne prend votre place à temps, le salon ferme pour tout le monde."
+				},
 				"confirm": "Quitter la partie"
 			}
 		},
@@ -569,7 +575,8 @@
 			"removed": "Tu n'es plus membre de ce salon.",
 			"legacy": "Vous êtes encore dans un salon d'une ancienne version du jeu, qui ne peut pas être ouvert ici. Il se fermera de lui-même à la fin.",
 			"kicked": "Le propriétaire du salon vous a retiré du salon.",
-			"postGameTimeout": "Vous n'avez pas choisi à temps : vous avez quitté le salon après la partie."
+			"postGameTimeout": "Vous n'avez pas choisi à temps : vous avez quitté le salon après la partie.",
+			"insufficientPlayers": "Le salon a fermé : une équipe est restée sans un joueur nécessaire. La partie ne compte pas."
 		},
 		"invites": {
 			"title": "{{username}} t'invite à jouer",
@@ -705,6 +712,31 @@
 			"finished": "La partie est déjà terminée.",
 			"offline": "Vous êtes hors ligne. Réessayez une fois la connexion rétablie.",
 			"generic": "Un problème est survenu. Réessayez."
+		},
+		"staffing": {
+			"title": "Partie en pause",
+			"body": "Si personne ne prend la place à temps, le salon ferme et tout le monde revient au lobby.",
+			"needs": {
+				"SPYMASTER": "{{team}} a besoin d'un maître-espion",
+				"OPERATIVE": "{{team}} a besoin d'un agent",
+				"BOTH": "{{team}} a besoin d'un maître-espion et d'un agent"
+			},
+			"closesIn": "Le salon ferme dans",
+			"role": {
+				"SPYMASTER": "maître-espion",
+				"OPERATIVE": "agent"
+			},
+			"departure": {
+				"EXITED": "{{username}} ({{role}}, {{team}}) a quitté la partie.",
+				"SESSION_ENDED": "{{username}} ({{role}}, {{team}}) s'est déconnecté.",
+				"DISCONNECTED": "{{username}} ({{role}}, {{team}}) a perdu la connexion.",
+				"KICKED_BY_HOST": "Le propriétaire du salon a retiré {{username}} ({{role}}, {{team}}).",
+				"ACCOUNT_DELETED": "{{username}} ({{role}}, {{team}}) a supprimé son compte.",
+				"unknown": "Une équipe a perdu un joueur nécessaire."
+			},
+			"claimTitle": "Prendre une place libre",
+			"claim": "{{role}} {{team}}",
+			"claimClosed": "Cette place ne peut pas être prise pour le moment."
 		}
 	},
 	"profile": {
@@ -1009,7 +1041,7 @@
 			"button": "Supprimer le compte",
 			"title": "Supprimer le compte ?",
 			"body": "Cette action supprime définitivement votre compte, votre profil, vos amis, vos statistiques et vos messages. Elle est irréversible.",
-			"inMatch": "Vous êtes en partie. Supprimer votre compte vous en retire aussi.",
+			"inMatch": "Tu joues une partie. Supprimer ton compte t'en retire. Si ton équipe se retrouve incomplète et que personne ne prend ta place à temps, le salon ferme.",
 			"confirmLabel": "Tapez <name>{{username}}</name> pour confirmer",
 			"confirmHint": "Votre nom d'utilisateur, tel qu'il apparaît sur votre profil.",
 			"cancel": "Annuler",

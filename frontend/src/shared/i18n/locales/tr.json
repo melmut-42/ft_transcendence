@@ -72,7 +72,10 @@
 		},
 		"logOut": {
 			"title": "Çıkış yapılsın mı?",
-			"body": "Bir maçtasın. Çıkış yaparsan maç takımın için hükmen mağlubiyetle biter.",
+			"body": {
+				"SPYMASTER": "Devam eden bir maçta Ajan Şefisin. Çıkış yaparsan maçtan ayrılırsın ve profiline bir ayrılma cezası eklenir; bu ceza Ajan Şefi için daha ağırdır. Yerini zamanında kimse almazsa oda kapanır.",
+				"OPERATIVE": "Devam eden bir maçta oynuyorsun. Çıkış yaparsan maçtan ayrılırsın ve profiline bir ayrılma cezası eklenir. Takımında başka Ajan yoksa ve yerini zamanında kimse almazsa oda kapanır."
+			},
 			"stay": "Kal",
 			"confirm": "Çıkış Yap",
 			"pending": "Çıkış yapılıyor…",
@@ -442,7 +445,10 @@
 			},
 			"game": {
 				"title": "Oyundan çıkılsın mı?",
-				"body": "Bu maçtan çıkıp lobiye döneceksin.",
+				"body": {
+					"SPYMASTER": "Bu maçtan çıkıp lobiye döneceksin. Devam eden bir maçtan ayrılmak profiline bir ayrılma cezası ekler; bu ceza Ajan Şefi için daha ağırdır. Yerini zamanında kimse almazsa oda herkes için kapanır.",
+					"OPERATIVE": "Bu maçtan çıkıp lobiye döneceksin. Devam eden bir maçtan ayrılmak profiline bir ayrılma cezası ekler. Takımında başka Ajan yoksa ve yerini zamanında kimse almazsa oda herkes için kapanır."
+				},
 				"confirm": "Oyundan Çık"
 			}
 		},
@@ -569,7 +575,8 @@
 			"removed": "Artık o odanın üyesi değilsin.",
 			"legacy": "Oyunun eski bir sürümüne ait bir odadasın ve bu oda burada açılamıyor. Oda bitince kendiliğinden kapanır.",
 			"kicked": "Oda sahibi seni odadan çıkardı.",
-			"postGameTimeout": "Zamanında seçim yapmadığın için maçtan sonra odadan ayrıldın."
+			"postGameTimeout": "Zamanında seçim yapmadığın için maçtan sonra odadan ayrıldın.",
+			"insufficientPlayers": "Oda kapandı: bir takım gereken oyuncusu olmadan kaldı. Maç sayılmadı."
 		},
 		"invites": {
 			"title": "{{username}} seni oyuna davet etti",
@@ -705,6 +712,31 @@
 			"finished": "Maç zaten bitti.",
 			"offline": "Çevrimdışısın. Bağlantı gelince tekrar dene.",
 			"generic": "Bir şeyler ters gitti. Tekrar dene."
+		},
+		"staffing": {
+			"title": "Oyun Duraklatıldı",
+			"body": "Yeri zamanında kimse almazsa oda kapanır ve herkes lobiye döner.",
+			"needs": {
+				"SPYMASTER": "{{team}} için Ajan Şefi gerekli",
+				"OPERATIVE": "{{team}} için Ajan gerekli",
+				"BOTH": "{{team}} için Ajan Şefi ve Ajan gerekli"
+			},
+			"closesIn": "Odanın kapanmasına",
+			"role": {
+				"SPYMASTER": "Ajan Şefi",
+				"OPERATIVE": "Ajan"
+			},
+			"departure": {
+				"EXITED": "{{team}} {{role}} {{username}} maçtan ayrıldı.",
+				"SESSION_ENDED": "{{team}} {{role}} {{username}} çıkış yaptı.",
+				"DISCONNECTED": "{{team}} {{role}} {{username}} bağlantısını kaybetti.",
+				"KICKED_BY_HOST": "Oda sahibi {{team}} {{role}} {{username}} adlı oyuncuyu çıkardı.",
+				"ACCOUNT_DELETED": "{{team}} {{role}} {{username}} hesabını sildi.",
+				"unknown": "Bir takım gereken bir oyuncusunu kaybetti."
+			},
+			"claimTitle": "Boş bir yer al",
+			"claim": "{{team}} {{role}}",
+			"claimClosed": "Bu yer şu anda alınamıyor."
 		}
 	},
 	"profile": {
@@ -1009,7 +1041,7 @@
 			"button": "Hesabı sil",
 			"title": "Hesap Silinsin mi?",
 			"body": "Bu işlem hesabını, profilini, arkadaşlarını, istatistiklerini ve mesajlarını kalıcı olarak siler. Geri alınamaz.",
-			"inMatch": "Bir maçtasın. Hesabını silmek seni maçtan da çıkarır.",
+			"inMatch": "Bir maçta oynuyorsun. Hesabını silmek seni maçtan çıkarır. Takımın eksik kalırsa ve yerini zamanında kimse almazsa oda kapanır.",
 			"confirmLabel": "Onaylamak için <name>{{username}}</name> yaz",
 			"confirmHint": "Kullanıcı adın, profilinde göründüğü gibi.",
 			"cancel": "Vazgeç",

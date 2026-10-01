@@ -72,7 +72,10 @@
 		},
 		"logOut": {
 			"title": "Log Out?",
-			"body": "You're in a match. Logging out ends it as a forfeit for your team.",
+			"body": {
+				"SPYMASTER": "You're the Spymaster in a running match. Logging out leaves it and adds a leave penalty to your profile, heavier for a Spymaster. If nobody takes your seat in time, the room closes.",
+				"OPERATIVE": "You're playing in a running match. Logging out leaves it and adds a leave penalty to your profile. If your team has no other Operative and nobody takes your seat in time, the room closes."
+			},
 			"stay": "Stay",
 			"confirm": "Log Out",
 			"pending": "Logging out…",
@@ -442,7 +445,10 @@
 			},
 			"game": {
 				"title": "Leave Game?",
-				"body": "You'll leave this match and return to the lobby.",
+				"body": {
+					"SPYMASTER": "You'll leave this match and return to the lobby. Leaving a running match adds a leave penalty to your profile, heavier for a Spymaster. If nobody takes your seat in time, the room closes for everyone.",
+					"OPERATIVE": "You'll leave this match and return to the lobby. Leaving a running match adds a leave penalty to your profile. If your team has no other Operative and nobody takes your seat in time, the room closes for everyone."
+				},
 				"confirm": "Leave Game"
 			}
 		},
@@ -569,7 +575,8 @@
 			"removed": "You are no longer a member of that room.",
 			"legacy": "You're still in a room from an older version of the game, which can't be opened here. It closes on its own once it ends.",
 			"kicked": "The room owner removed you from the room.",
-			"postGameTimeout": "You didn't choose in time, so you left the room after the match."
+			"postGameTimeout": "You didn't choose in time, so you left the room after the match.",
+			"insufficientPlayers": "The room closed: a team stayed without a player it needed. The match didn't count."
 		},
 		"invites": {
 			"title": "{{username}} invited you to play",
@@ -705,6 +712,31 @@
 			"finished": "The match is already over.",
 			"offline": "You're offline. Try again once the connection is back.",
 			"generic": "Something went wrong. Try again."
+		},
+		"staffing": {
+			"title": "Game Paused",
+			"body": "If nobody takes the seat in time, the room closes and everyone returns to the lobby.",
+			"needs": {
+				"SPYMASTER": "{{team}} needs a Spymaster",
+				"OPERATIVE": "{{team}} needs an Operative",
+				"BOTH": "{{team}} needs a Spymaster and an Operative"
+			},
+			"closesIn": "Room closes in",
+			"role": {
+				"SPYMASTER": "Spymaster",
+				"OPERATIVE": "Operative"
+			},
+			"departure": {
+				"EXITED": "{{username}}, the {{team}} {{role}}, left the match.",
+				"SESSION_ENDED": "{{username}}, the {{team}} {{role}}, logged out.",
+				"DISCONNECTED": "{{username}}, the {{team}} {{role}}, lost their connection.",
+				"KICKED_BY_HOST": "The room owner removed {{username}}, the {{team}} {{role}}.",
+				"ACCOUNT_DELETED": "{{username}}, the {{team}} {{role}}, deleted their account.",
+				"unknown": "A team lost a player it needs."
+			},
+			"claimTitle": "Take a free seat",
+			"claim": "{{team}} {{role}}",
+			"claimClosed": "That seat can't be taken right now."
 		}
 	},
 	"profile": {
@@ -1009,7 +1041,7 @@
 			"button": "Delete account",
 			"title": "Delete Account?",
 			"body": "This permanently deletes your account, profile, friends, statistics and messages. It can't be undone.",
-			"inMatch": "You're in a match. Deleting your account also removes you from it.",
+			"inMatch": "You're playing in a match. Deleting your account removes you from it. If your team is left short and nobody takes your seat in time, the room closes.",
 			"confirmLabel": "Type <name>{{username}}</name> to confirm",
 			"confirmHint": "Your username, exactly as it appears in your profile.",
 			"cancel": "Cancel",

@@ -13,6 +13,10 @@ import * as styles from './RoomOverlays.styles';
  * Leave Room (or Leave Game, once the match runs) confirmation. Stay, the safe choice, sits
  * on the left and the committing Leave on the right. While the leave request runs the
  * dialog cannot be dismissed, so its result is always shown.
+ *
+ * Leave Game says what leaving costs before the request is sent: a leave penalty on the
+ * player's profile, heavier for a Spymaster, and a room that may close if nobody takes the
+ * seat. The penalty's size is the server's to set, so no number is shown.
  */
 export function LeaveRoomDialog({
   action,
@@ -32,9 +36,13 @@ export function LeaveRoomDialog({
   const bodyId = useId();
   const kind = action.kind.startsWith('LEAVE_GAME') ? 'game' : 'room';
   const body =
-    action.kind === 'LEAVE_SPECTATING'
-      ? 'room.leave.room.bodySpectator'
-      : `room.leave.${kind}.body`;
+    action.kind === 'LEAVE_GAME_SPYMASTER'
+      ? 'room.leave.game.body.SPYMASTER'
+      : action.kind === 'LEAVE_GAME_OPERATIVE'
+        ? 'room.leave.game.body.OPERATIVE'
+        : action.kind === 'LEAVE_SPECTATING'
+          ? 'room.leave.room.bodySpectator'
+          : 'room.leave.room.body';
   const leaving = status === 'LEAVING';
 
   return (

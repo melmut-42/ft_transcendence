@@ -5,6 +5,7 @@ import { useLogOut } from '@app/session/useLogOut';
 import { LogOutDialog } from '@features/auth/components/LogOutDialog';
 import { DeleteAccountDialog } from '@features/profile/components/DeleteAccountDialog';
 import { SettingsModal } from '@features/profile/components/SettingsModal';
+import { inRunningMatch } from '@features/room/model/leave';
 import { useRoomStore } from '@features/room/store/roomStore';
 import { useSessionStore } from '@shared/stores';
 
@@ -13,8 +14,9 @@ type Confirmation = 'LOG_OUT' | 'DELETE_ACCOUNT' | null;
 /**
  * Settings with what it needs from other features, joined here at app level so no feature
  * imports another: Log Out and Delete Account from the session flow, and from the room
- * store whether the user is in a running match, where logging out forfeits and is
- * confirmed first. Delete Account is always confirmed.
+ * store whether the user plays in a running match, where logging out counts as leaving it
+ * (a leave penalty, and a team that may be left short) and is confirmed first. Delete
+ * Account is always confirmed.
  */
 export function SettingsPopup({ onClose }: { onClose: () => void }) {
   const { status, logOut } = useLogOut();
@@ -22,12 +24,13 @@ export function SettingsPopup({ onClose }: { onClose: () => void }) {
   const [confirming, setConfirming] = useState<Confirmation>(null);
   const username = useSessionStore((state) => state.user?.username ?? '');
   const activeRoomId = useSessionStore((state) => state.activeRoomId);
-  const inMatch = useRoomStore(
-    (state) =>
-      activeRoomId !== null &&
-      state.room?.room_id === activeRoomId &&
-      state.room.status === 'IN_GAME',
+  const userId = useSessionStore((state) => state.user?.user_id);
+  const seat = useRoomStore((state) =>
+    activeRoomId !== null && state.room?.room_id === activeRoomId
+      ? inRunningMatch(state.room, userId)
+      : null,
   );
+  const inMatch = seat !== null;
 
   const cancelDelete = () => {
     removal.reset();
@@ -47,6 +50,7 @@ export function SettingsPopup({ onClose }: { onClose: () => void }) {
       />
       {confirming === 'LOG_OUT' && (
         <LogOutDialog
+          role={seat?.role === 'SPYMASTER' ? 'SPYMASTER' : 'OPERATIVE'}
           pending={status === 'PENDING'}
           failed={status === 'FAILED'}
           onConfirm={() => void logOut()}
