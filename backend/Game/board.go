@@ -1,6 +1,6 @@
 package game
 
-import "math/rand"
+import "math/rand/v2"
 
 const (
 	BoardSize          int = 25
@@ -34,6 +34,9 @@ func (b *Board) Cards() []Card {
 }
 
 func NewBoard(wordPool []Word, language string, r *rand.Rand) (*Board, error) {
+	if r == nil {
+		return nil, ErrNilRandomSource
+	}
 	cards, startingTeam, err := generateCards(wordPool, language, r)
 	if err != nil {
 		return nil, err

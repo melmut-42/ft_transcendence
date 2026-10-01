@@ -2,7 +2,7 @@ package game
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 )
 
 type Word struct {
@@ -20,7 +20,6 @@ func validateWordPool(pool []Word, language string) error {
 	}
 
 	keys := make(map[string]struct{}, len(pool))
-	texts := make(map[string]string, len(pool))
 
 	for _, word := range pool {
 		if word.Key == "" {
@@ -35,7 +34,6 @@ func validateWordPool(pool []Word, language string) error {
 		if text == "" {
 			return fmt.Errorf("%w: key %q has no %q translation", ErrInvalidWordPack, word.Key, language)
 		}
-		texts[text] = word.Key
 	}
 
 	return nil
@@ -64,7 +62,7 @@ func pickWords(pool []Word, language string, r *rand.Rand) ([]Word, error) {
 }
 
 func randomTeam(r *rand.Rand) Team {
-	if r.Intn(2) == 0 {
+	if r.IntN(2) == 0 {
 		return TeamRed
 	}
 	return TeamBlue

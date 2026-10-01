@@ -14,8 +14,12 @@ var (
 	ErrGameAlreadyFinished = errors.New("GAME_ALREADY_FINISHED")
 )
 
+// Game-specific errors
 var (
 	ErrNotEnoughWords  = errors.New("not enough words in word pack")
 	ErrInvalidWordPack = errors.New("invalid word pack")
 	ErrInvalidBoard    = errors.New("invalid board")
+	ErrNilRandomSource = errors.New("random source cannot be nil")
+	ErrInvalidSeed     = errors.New("invalid seed")
+	ErrGenerateSeed    = errors.New("failed to generate secure seed")
 )
