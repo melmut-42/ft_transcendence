@@ -1,130 +1,130 @@
 {
-  "common": {
-	"loading": "Yükleniyor...",
-	"save": "Kaydet",
-	"cancel": "İptal",
-	"close": "Kapat",
-	"retry": "Tekrar dene",
-	"back": "Geri"
-  },
-  "i18n": {
-	"ready": "Çok dilli altyapı çalışıyor."
-  },
-  "auth": {
-	"close": "Kapat",
-	"modes": "Giriş yap veya kayıt ol",
-	"login": {
-		"tab": "Giriş Yap",
-		"title": "Oynamaya Hazır mısın?",
-		"subtitle": "Oyuna katılmak için giriş yap veya bir hesap oluştur.",
-		"submit": "Giriş Yap",
-		"switchPrompt": "Hesabın yok mu?",
-		"switchAction": "Hesap Oluştur"
+	"common": {
+		"loading": "Yükleniyor...",
+		"save": "Kaydet",
+		"cancel": "İptal",
+		"close": "Kapat",
+		"retry": "Tekrar dene",
+		"back": "Geri"
 	},
-	"register": {
-		"tab": "Kayıt Ol",
-		"title": "Oyuna Katıl!",
-		"subtitle": "Bir hesap oluştur ve arkadaşlarınla oynamaya başla.",
-		"submit": "Hesap Oluştur",
-		"switchPrompt": "Zaten bir hesabın var mı?",
-		"switchAction": "Giriş Yap"
+	"i18n": {
+		"ready": "Çok dilli altyapı çalışıyor."
 	},
-	"fields": {
-		"username": "Kullanıcı adı",
-		"usernamePlaceholder": "Bir kullanıcı adı seç",
-		"email": "E-posta",
-		"emailPlaceholder": "E-posta adresini gir",
-		"password": "Şifre",
-		"passwordPlaceholder": "Şifreni gir",
-		"newPasswordPlaceholder": "Bir şifre oluştur",
-		"confirmPassword": "Şifreyi Onayla",
-		"confirmPasswordPlaceholder": "Şifreni tekrar gir",
-		"showPassword": "Şifreyi göster",
-		"hidePassword": "Şifreyi gizle"
-	},
-	"validation": {
-		"usernameRequired": "Kullanıcı adı gerekli.",
-		"usernameInvalid": "3 ile 20 arasında harf, rakam veya alt çizgi kullan.",
-		"emailRequired": "E-posta gerekli.",
-		"emailInvalid": "Hata! Geçersiz e-posta adresi.",
-		"passwordRequired": "Şifre gerekli.",
-		"passwordTooShort": "Şifre en az 8 karakter olmalı.",
-		"passwordTooLong": "Şifre çok uzun.",
-		"passwordInvalid": "Şifre 8 ile 72 karakter arasında olmalı.",
-		"confirmPasswordRequired": "Lütfen şifreni onayla.",
-		"passwordMismatch": "Şifreler eşleşmiyor."
-	},
-	"feedback": {
-		"emailTaken": "Bu e-posta zaten kayıtlı.",
-		"usernameTaken": "Bu kullanıcı adı zaten alınmış.",
-		"credentialsTitle": "E-posta veya şifre hatalı",
-		"credentialsBody": "Bilgilerini kontrol edip tekrar dene.",
-		"welcomeTitle": "Tekrar hoş geldin, {{username}}!",
-		"welcomeBody": "Lobiye yönlendiriliyorsun…",
-		"rateLimitedTitle": "Çok fazla deneme",
-		"rateLimitedBody": "Biraz bekleyip tekrar dene.",
-		"unavailableTitle": "Bir şeyler ters gitti",
-		"unavailableBody": "Sunucuya ulaşılamadı. Birazdan tekrar dene."
-	},
-	"logOut": {
-		"title": "Çıkış yapılsın mı?",
-		"body": "Bir maçtasın. Çıkış yaparsan maç takımın için hükmen mağlubiyetle biter.",
-		"stay": "Kal",
-		"confirm": "Çıkış Yap",
-		"pending": "Çıkış yapılıyor…",
-		"failed": "Çıkış yapılamadı. Tekrar dene."
-	},
-	"oauth": {
-		"or": "veya",
-		"continue": "Google ile devam et",
-		"redirecting": "Google'a yönlendiriliyor…",
-		"error": {
-			"OAUTH_CANCELLED": {
-				"title": "Google ile giriş iptal edildi",
-				"body": "Tekrar deneyebilir ya da e-postanla giriş yapabilirsin."
-			},
-			"OAUTH_STATE_INVALID": {
-				"title": "Google ile girişin süresi doldu",
-				"body": "Giriş çok uzun sürdü ya da yarıda kesildi. Tekrar dene."
-			},
-			"OAUTH_EMAIL_UNVERIFIED": {
-				"title": "E-posta doğrulanmamış",
-				"body": "Google hesabının e-postası doğrulanmamış. Google'da doğrula ya da e-postanla giriş yap."
-			},
-			"OAUTH_PROVIDER_ERROR": {
-				"title": "Google ile giriş başarısız",
-				"body": "Google ile giriş yapamadık. Biraz sonra tekrar dene."
+	"auth": {
+		"close": "Kapat",
+		"modes": "Giriş yap veya kayıt ol",
+		"login": {
+			"tab": "Giriş Yap",
+			"title": "Oynamaya Hazır mısın?",
+			"subtitle": "Oyuna katılmak için giriş yap veya bir hesap oluştur.",
+			"submit": "Giriş Yap",
+			"switchPrompt": "Hesabın yok mu?",
+			"switchAction": "Hesap Oluştur"
+		},
+		"register": {
+			"tab": "Kayıt Ol",
+			"title": "Oyuna Katıl!",
+			"subtitle": "Bir hesap oluştur ve arkadaşlarınla oynamaya başla.",
+			"submit": "Hesap Oluştur",
+			"switchPrompt": "Zaten bir hesabın var mı?",
+			"switchAction": "Giriş Yap"
+		},
+		"fields": {
+			"username": "Kullanıcı adı",
+			"usernamePlaceholder": "Bir kullanıcı adı seç",
+			"email": "E-posta",
+			"emailPlaceholder": "E-posta adresini gir",
+			"password": "Şifre",
+			"passwordPlaceholder": "Şifreni gir",
+			"newPasswordPlaceholder": "Bir şifre oluştur",
+			"confirmPassword": "Şifreyi Onayla",
+			"confirmPasswordPlaceholder": "Şifreni tekrar gir",
+			"showPassword": "Şifreyi göster",
+			"hidePassword": "Şifreyi gizle"
+		},
+		"validation": {
+			"usernameRequired": "Kullanıcı adı gerekli.",
+			"usernameInvalid": "3 ile 20 arasında harf, rakam veya alt çizgi kullan.",
+			"emailRequired": "E-posta gerekli.",
+			"emailInvalid": "Hata! Geçersiz e-posta adresi.",
+			"passwordRequired": "Şifre gerekli.",
+			"passwordTooShort": "Şifre en az 8 karakter olmalı.",
+			"passwordTooLong": "Şifre çok uzun.",
+			"passwordInvalid": "Şifre 8 ile 72 karakter arasında olmalı.",
+			"confirmPasswordRequired": "Lütfen şifreni onayla.",
+			"passwordMismatch": "Şifreler eşleşmiyor."
+		},
+		"feedback": {
+			"emailTaken": "Bu e-posta zaten kayıtlı.",
+			"usernameTaken": "Bu kullanıcı adı zaten alınmış.",
+			"credentialsTitle": "E-posta veya şifre hatalı",
+			"credentialsBody": "Bilgilerini kontrol edip tekrar dene.",
+			"welcomeTitle": "Tekrar hoş geldin, {{username}}!",
+			"welcomeBody": "Lobiye yönlendiriliyorsun…",
+			"rateLimitedTitle": "Çok fazla deneme",
+			"rateLimitedBody": "Biraz bekleyip tekrar dene.",
+			"unavailableTitle": "Bir şeyler ters gitti",
+			"unavailableBody": "Sunucuya ulaşılamadı. Birazdan tekrar dene."
+		},
+		"logOut": {
+			"title": "Çıkış yapılsın mı?",
+			"body": "Bir maçtasın. Çıkış yaparsan maç takımın için hükmen mağlubiyetle biter.",
+			"stay": "Kal",
+			"confirm": "Çıkış Yap",
+			"pending": "Çıkış yapılıyor…",
+			"failed": "Çıkış yapılamadı. Tekrar dene."
+		},
+		"oauth": {
+			"or": "veya",
+			"continue": "Google ile devam et",
+			"redirecting": "Google'a yönlendiriliyor…",
+			"error": {
+				"OAUTH_CANCELLED": {
+					"title": "Google ile giriş iptal edildi",
+					"body": "Tekrar deneyebilir ya da e-postanla giriş yapabilirsin."
+				},
+				"OAUTH_STATE_INVALID": {
+					"title": "Google ile girişin süresi doldu",
+					"body": "Giriş çok uzun sürdü ya da yarıda kesildi. Tekrar dene."
+				},
+				"OAUTH_EMAIL_UNVERIFIED": {
+					"title": "E-posta doğrulanmamış",
+					"body": "Google hesabının e-postası doğrulanmamış. Google'da doğrula ya da e-postanla giriş yap."
+				},
+				"OAUTH_PROVIDER_ERROR": {
+					"title": "Google ile giriş başarısız",
+					"body": "Google ile giriş yapamadık. Biraz sonra tekrar dene."
+				}
 			}
 		}
-	}
-  },
-  "landing": {
-	"badge": "ÇOK OYUNCULU KELİME EĞLENCESİ",
-	"headlineLead": "Aynı düşün.",
-	"headlineTail": "Birlikte kazan.",
-	"tagline": "ft_transcendence:\nEn İyi Sosyal\nKelime Oyunu",
-	"description": "Takımlara katıl, zekice ipuçları ver ve bu eğlenceli, rekabetçi\nçok oyunculu macerada kelimeleri birlikte tahmin et!\nBağlanmaya hazır mısın?",
-	"descriptionShort": "Takımlara katıl, zekice ipuçları ver ve bu eğlenceli, rekabetçi çok oyunculu oyunda kelimeleri birlikte tahmin et.",
-	"playNow": "Hemen Oyna",
-	"logIn": "Giriş Yap",
-	"learnMore": "Daha Fazla",
-	"primaryNavigation": "Hesap",
-	"howToPlay": "Nasıl Oynanır",
-	"giveClueTitle": "İpucu ver",
-	"giveClueDescription": "Takımını yönlendirmek için\ntek bir zekice kelime kullan.",
-	"guessTogetherTitle": "Birlikte tahmin et",
-	"guessTogetherDescription": "İpucunu tartışın ve\ndoğru kartları seçin.",
-	"beatOtherTeamTitle": "Rakip takımı yen",
-	"beatOtherTeamDescription": "Takımının kartlarını\nrakiplerinden önce aç.",
-	"community": "Binlerce çevrim içi oyuncuya katıl!\nArkadaşlarınla oyna ya da yenileriyle tanış.",
-	"inviteFriends": "Arkadaş Davet Et",
-	"legalNavigation": "Yasal",
-	"privacy": "Gizlilik Politikası",
-	"terms": "Kullanım Koşulları",
-	"help": "Yardım",
-	"copyright": "© 2026 ft_transcendence ekibi. 42 İstanbul öğrencileri için oluşturuldu (ft_transcendence). Tüm hakları saklıdır.",
-	"accountDeleted": "Hesabın silindi."
-  },
+	},
+	"landing": {
+		"badge": "ÇOK OYUNCULU KELİME EĞLENCESİ",
+		"headlineLead": "Aynı düşün.",
+		"headlineTail": "Birlikte kazan.",
+		"tagline": "ft_transcendence:\nEn İyi Sosyal\nKelime Oyunu",
+		"description": "Takımlara katıl, zekice ipuçları ver ve bu eğlenceli, rekabetçi\nçok oyunculu macerada kelimeleri birlikte tahmin et!\nBağlanmaya hazır mısın?",
+		"descriptionShort": "Takımlara katıl, zekice ipuçları ver ve bu eğlenceli, rekabetçi çok oyunculu oyunda kelimeleri birlikte tahmin et.",
+		"playNow": "Hemen Oyna",
+		"logIn": "Giriş Yap",
+		"learnMore": "Daha Fazla",
+		"primaryNavigation": "Hesap",
+		"howToPlay": "Nasıl Oynanır",
+		"giveClueTitle": "İpucu ver",
+		"giveClueDescription": "Takımını yönlendirmek için\ntek bir zekice kelime kullan.",
+		"guessTogetherTitle": "Birlikte tahmin et",
+		"guessTogetherDescription": "İpucunu tartışın ve\ndoğru kartları seçin.",
+		"beatOtherTeamTitle": "Rakip takımı yen",
+		"beatOtherTeamDescription": "Takımının kartlarını\nrakiplerinden önce aç.",
+		"community": "Binlerce çevrim içi oyuncuya katıl!\nArkadaşlarınla oyna ya da yenileriyle tanış.",
+		"inviteFriends": "Arkadaş Davet Et",
+		"legalNavigation": "Yasal",
+		"privacy": "Gizlilik Politikası",
+		"terms": "Kullanım Koşulları",
+		"help": "Yardım",
+		"copyright": "© 2026 ft_transcendence ekibi. 42 İstanbul öğrencileri için oluşturuldu (ft_transcendence). Tüm hakları saklıdır.",
+		"accountDeleted": "Hesabın silindi."
+	},
 	"legal": {
 		"wordmark": "Codenames Online",
 		"home": "Codenames Online ana sayfa",
@@ -551,103 +551,103 @@
 			}
 		}
 	},
-  "game": {
-  	"loading": "Maç yükleniyor…",
-  	"board": "Kelime tahtası",
-  	"team": {
-  		"RED": "Kırmızı",
-  		"BLUE": "Mavi"
-  	},
-  	"teamName": {
-  		"RED": "Kırmızı Takım",
-  		"BLUE": "Mavi Takım"
-  	},
-  	"score": {
-  		"label": "Skor: Kırmızı {{red}}, Mavi {{blue}}"
-  	},
-  	"turn": {
-  		"title": "Sıra <team>{{team}}</team> Takımda",
-  		"over": "Maç Bitti"
-  	},
-  	"instruction": {
-  		"CLUE": "Casus Şefisin. Takımına bir ipucu ver.",
-  		"CLUE_SENT": "İpucu gönderildi. Ajanların kartlarını seçiyor."
-  	},
-  	"clue": {
-  		"label": "İpucu",
-  		"heading": "İpucu Ver",
-  		"number": "Sayı",
-  		"placeholder": "Tek kelimelik ipucu yaz",
-  		"submit": "İpucu Ver",
-  		"sending": "Gönderiliyor…",
-  		"rule": "Boşluksuz, en fazla 30 harflik tek bir kelime kullan.",
-  		"decrease": "Daha az kart",
-  		"increase": "Daha fazla kart",
-  		"sent": "İpucu Gönderildi",
-  		"sentLabel": "İpucu:",
-  		"sentNumber": "Sayı:",
-  		"value": "İpucu: {{word}} · {{number}}",
-  		"guesses": "Kalan Tahmin: {{count}}"
-  	},
-  	"status": {
-  		"waitingLabel": "Bekleniyor",
-  		"waitingTitle": "İpucu bekleniyor…",
-  		"waitingBody": "Casus Şefin bir ipucu seçiyor.",
-  		"opponentGuessing": "{{team}} Takım Tahmin Ediyor",
-  		"opponentClue": "{{team}} Casus Şef Düşünüyor",
-  		"opponentBody": "Sıranı bekle. Şu anda kart seçilemez.",
-  		"spymasterOpponentBody": "İpucu vermek için sıranı bekle."
-  	},
-  	"pass": {
-  		"action": "Pas",
-  		"passing": "Pas geçiliyor…"
-  	},
-  	"roster": {
-  		"operatives": "Ajanlar",
-  		"spymaster": "Casus Şef",
-  		"spymasterLine": "Casus Şef: {{names}}",
-  		"operativesLine": "Ajanlar: {{names}}",
-  		"nobody": "—",
-  		"openProfile": "{{username}} profilini aç"
-  	},
-  	"card": {
-  		"pick": "{{word}} kartını seç",
-  		"key": "{{word}}, {{affiliation}}",
-  		"revealed": "{{word}}, açıldı: {{affiliation}}",
-  		"affiliation": {
-  			"RED": "Kırmızı ajan",
-  			"BLUE": "Mavi ajan",
-  			"NEUTRAL": "Masum",
-  			"ASSASSIN": "Suikastçı"
-  		}
-  	},
-  	"leave": "Oyundan Çık",
-  	"results": {
-  		"badge": "Maç Bitti",
-  		"wins": "{{team}} Takım Kazandı!",
-  		"reason": {
-  			"ALL_TEAM_CARDS_REVEALED": "{{team}} son ajanını açtı.",
-  			"ASSASSIN_REVEALED": "{{team}} suikastçıyı açtı.",
-  			"PLAYER_FORFEIT": "{{team}} maçı hükmen kaybetti.",
-  			"PLAYER_FORFEIT_NAMED": "{{username}} maçtan ayrıldı. {{team}} hükmen kaybetti."
-  		},
-  		"backToLobby": "Lobiye Dön",
-  		"viewBoard": "Son Tahtayı Gör",
-  		"showResults": "Sonuçları Gör"
-  	},
-  	"errors": {
-  		"invalidClue": "İpucu en fazla 30 harflik tek bir kelime olmalı.",
-  		"invalidNumber": "1 ile 9 arasında bir sayı seç.",
-  		"invalidCard": "Bu kart bu tahtada yok.",
-  		"alreadyRevealed": "O kart zaten açıldı.",
-  		"noGuesses": "Takımının tahmin hakkı kalmadı.",
-  		"notYourTurn": "Artık senin sıran değil.",
-  		"roleForbidden": "Rolün bunu yapamaz.",
-  		"finished": "Maç zaten bitti.",
-  		"offline": "Çevrimdışısın. Bağlantı gelince tekrar dene.",
-  		"generic": "Bir şeyler ters gitti. Tekrar dene."
-  	}
-  },
+	"game": {
+		"loading": "Maç yükleniyor…",
+		"board": "Kelime tahtası",
+		"team": {
+			"RED": "Kırmızı",
+			"BLUE": "Mavi"
+		},
+		"teamName": {
+			"RED": "Kırmızı Takım",
+			"BLUE": "Mavi Takım"
+		},
+		"score": {
+			"label": "Skor: Kırmızı {{red}}, Mavi {{blue}}"
+		},
+		"turn": {
+			"title": "Sıra <team>{{team}}</team> Takımda",
+			"over": "Maç Bitti"
+		},
+		"instruction": {
+			"CLUE": "Casus Şefisin. Takımına bir ipucu ver.",
+			"CLUE_SENT": "İpucu gönderildi. Ajanların kartlarını seçiyor."
+		},
+		"clue": {
+			"label": "İpucu",
+			"heading": "İpucu Ver",
+			"number": "Sayı",
+			"placeholder": "Tek kelimelik ipucu yaz",
+			"submit": "İpucu Ver",
+			"sending": "Gönderiliyor…",
+			"rule": "Boşluksuz, en fazla 30 harflik tek bir kelime kullan.",
+			"decrease": "Daha az kart",
+			"increase": "Daha fazla kart",
+			"sent": "İpucu Gönderildi",
+			"sentLabel": "İpucu:",
+			"sentNumber": "Sayı:",
+			"value": "İpucu: {{word}} · {{number}}",
+			"guesses": "Kalan Tahmin: {{count}}"
+		},
+		"status": {
+			"waitingLabel": "Bekleniyor",
+			"waitingTitle": "İpucu bekleniyor…",
+			"waitingBody": "Casus Şefin bir ipucu seçiyor.",
+			"opponentGuessing": "{{team}} Takım Tahmin Ediyor",
+			"opponentClue": "{{team}} Casus Şef Düşünüyor",
+			"opponentBody": "Sıranı bekle. Şu anda kart seçilemez.",
+			"spymasterOpponentBody": "İpucu vermek için sıranı bekle."
+		},
+		"pass": {
+			"action": "Pas",
+			"passing": "Pas geçiliyor…"
+		},
+		"roster": {
+			"operatives": "Ajanlar",
+			"spymaster": "Casus Şef",
+			"spymasterLine": "Casus Şef: {{names}}",
+			"operativesLine": "Ajanlar: {{names}}",
+			"nobody": "—",
+			"openProfile": "{{username}} profilini aç"
+		},
+		"card": {
+			"pick": "{{word}} kartını seç",
+			"key": "{{word}}, {{affiliation}}",
+			"revealed": "{{word}}, açıldı: {{affiliation}}",
+			"affiliation": {
+				"RED": "Kırmızı ajan",
+				"BLUE": "Mavi ajan",
+				"NEUTRAL": "Masum",
+				"ASSASSIN": "Suikastçı"
+			}
+		},
+		"leave": "Oyundan Çık",
+		"results": {
+			"badge": "Maç Bitti",
+			"wins": "{{team}} Takım Kazandı!",
+			"reason": {
+				"ALL_TEAM_CARDS_REVEALED": "{{team}} son ajanını açtı.",
+				"ASSASSIN_REVEALED": "{{team}} suikastçıyı açtı.",
+				"PLAYER_FORFEIT": "{{team}} maçı hükmen kaybetti.",
+				"PLAYER_FORFEIT_NAMED": "{{username}} maçtan ayrıldı. {{team}} hükmen kaybetti."
+			},
+			"backToLobby": "Lobiye Dön",
+			"viewBoard": "Son Tahtayı Gör",
+			"showResults": "Sonuçları Gör"
+		},
+		"errors": {
+			"invalidClue": "İpucu en fazla 30 harflik tek bir kelime olmalı.",
+			"invalidNumber": "1 ile 9 arasında bir sayı seç.",
+			"invalidCard": "Bu kart bu tahtada yok.",
+			"alreadyRevealed": "O kart zaten açıldı.",
+			"noGuesses": "Takımının tahmin hakkı kalmadı.",
+			"notYourTurn": "Artık senin sıran değil.",
+			"roleForbidden": "Rolün bunu yapamaz.",
+			"finished": "Maç zaten bitti.",
+			"offline": "Çevrimdışısın. Bağlantı gelince tekrar dene.",
+			"generic": "Bir şeyler ters gitti. Tekrar dene."
+		}
+	},
 	"profile": {
 		"close": "Profili kapat",
 		"loading": "Profil yükleniyor",
