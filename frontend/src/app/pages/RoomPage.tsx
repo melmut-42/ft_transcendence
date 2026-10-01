@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useBlocker, useNavigate } from 'react-router-dom';
 
 import { useRoomConnection } from '@app/connection/roomConnectionContext';
+import { endSignedInState } from '@app/session/endSignedInState';
 import { useGameStore } from '@features/game/store/gameStore';
 import { LeaveRoomDialog } from '@features/room/components/RoomOverlays';
 import { useLeaveRoom } from '@features/room/hooks/useLeaveRoom';
@@ -59,7 +60,6 @@ export function RoomPage() {
   const room = useRoomStore((state) => state.room);
   const game = useGameStore((state) => state.game);
   const socket = useConnectionStore((state) => state.room);
-  const setAnonymous = useSessionStore((state) => state.setAnonymous);
   const leave = useLeaveRoom();
   const [roomCode] = useState(() => recallRoomCode(roomId));
 
@@ -93,8 +93,8 @@ export function RoomPage() {
 
   // A revoked session cannot reconnect; the route guard takes the user to Log In.
   useEffect(() => {
-    if (sessionEnded) setAnonymous();
-  }, [sessionEnded, setAnonymous]);
+    if (sessionEnded) endSignedInState('EXPIRED');
+  }, [sessionEnded]);
 
   // Leaving a finished room needs no confirmation: a held navigation leaves at once.
   const { request: requestLeave, action: leaveAction } = leave;

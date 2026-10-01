@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { endSignedInState } from '@app/session/endSignedInState';
 import { fetchSession, refreshSession } from '@features/auth/api';
 import { ApiError, setRefreshHandler } from '@shared/api';
 import { useSessionStore } from '@shared/stores';
@@ -15,6 +16,11 @@ import { LoadingState } from '@shared/ui';
  *      retries once after `POST /api/auth/refresh` instead of logging the user out;
  *   2. read `GET /api/auth/session` once before the router renders, so guards never
  *      redirect on a session that is only still `UNKNOWN`.
+ *
+ * A refresh that fails (`401 SESSION_EXPIRED`) while the user is signed in ends the
+ * signed-in state as expired: private state is cleared and the route guard sends the user
+ * to Log In, which explains why. During bootstrap the same failure is simply the anonymous
+ * state, since there was no session to lose.
  *
  * `active_room_id` from that response is the authoritative route-recovery input — the
  * screen after a refresh is derived from server membership, never from the reloaded URL.
@@ -33,7 +39,8 @@ export function SessionBootstrap({ children }: { children: ReactNode }) {
         return true;
       } catch {
         // SESSION_EXPIRED: the refresh credential itself is dead — log in again.
-        useSessionStore.getState().setAnonymous();
+        if (useSessionStore.getState().status === 'AUTHENTICATED') endSignedInState('EXPIRED');
+        else useSessionStore.getState().setAnonymous();
         return false;
       }
     });

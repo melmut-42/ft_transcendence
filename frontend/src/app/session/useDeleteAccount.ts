@@ -46,7 +46,7 @@ export function useDeleteAccount() {
       );
       return;
     }
-    endSignedInState({ accountDeleted: true });
+    endSignedInState('ACCOUNT_DELETED');
   }, []);
 
   const reset = useCallback(() => {

@@ -66,7 +66,9 @@
 			"rateLimitedTitle": "Trop de tentatives",
 			"rateLimitedBody": "Patiente un instant, puis réessaie.",
 			"unavailableTitle": "Un problème est survenu",
-			"unavailableBody": "Impossible de joindre le serveur. Réessaie dans un instant."
+			"unavailableBody": "Impossible de joindre le serveur. Réessaie dans un instant.",
+			"sessionExpiredTitle": "Ta session a expiré",
+			"sessionExpiredBody": "Reconnecte-toi pour reprendre là où tu en étais."
 		},
 		"logOut": {
 			"title": "Se déconnecter ?",

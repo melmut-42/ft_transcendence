@@ -30,6 +30,16 @@ const alert = (key: string): AuthFailure => ({
   alert: { tone: 'error', title: `auth.feedback.${key}Title`, body: `auth.feedback.${key}Body` },
 });
 
+/**
+ * Shown on Log In when a signed-in session was lost because the server would not renew it
+ * (`401 SESSION_EXPIRED`, or a `401` that survived a failed refresh).
+ */
+export const SESSION_EXPIRED_NOTICE: AuthAlert = {
+  tone: 'error',
+  title: 'auth.feedback.sessionExpiredTitle',
+  body: 'auth.feedback.sessionExpiredBody',
+};
+
 /** The `oauth_error` codes the Google callback redirects back with. */
 const OAUTH_ERRORS = [
   'OAUTH_CANCELLED',

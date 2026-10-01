@@ -33,11 +33,22 @@ interface SessionState {
   loggedOut: boolean;
   /** The session ended because the user deleted their own account; Landing says so once. */
   accountDeleted: boolean;
+  /**
+   * A signed-in session was lost because the server would no longer renew it (a failed
+   * refresh). Log In says so once, so the user knows why they were signed out.
+   */
+  sessionExpired: boolean;
 
   setSession: (session: SessionResponse) => void;
-  setAnonymous: (options?: { loggedOut?: boolean; accountDeleted?: boolean }) => void;
+  setAnonymous: (options?: {
+    loggedOut?: boolean;
+    accountDeleted?: boolean;
+    sessionExpired?: boolean;
+  }) => void;
   /** Landing has shown the account-deleted notice. */
   acknowledgeAccountDeleted: () => void;
+  /** Log In has shown the session-expired notice. */
+  acknowledgeSessionExpired: () => void;
   setActiveRoomId: (roomId: number | null) => void;
   /** The username the server confirmed after the user renamed themselves. */
   setUsername: (username: string) => void;
@@ -50,6 +61,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   sessionExpiresAt: null,
   loggedOut: false,
   accountDeleted: false,
+  sessionExpired: false,
 
   setSession: (session) =>
     set({
@@ -59,9 +71,10 @@ export const useSessionStore = create<SessionState>((set) => ({
       sessionExpiresAt: session.session_expires_at,
       loggedOut: false,
       accountDeleted: false,
+      sessionExpired: false,
     }),
 
-  setAnonymous: ({ loggedOut = false, accountDeleted = false } = {}) =>
+  setAnonymous: ({ loggedOut = false, accountDeleted = false, sessionExpired = false } = {}) =>
     set({
       status: 'ANONYMOUS',
       user: null,
@@ -69,9 +82,11 @@ export const useSessionStore = create<SessionState>((set) => ({
       sessionExpiresAt: null,
       loggedOut: loggedOut || accountDeleted,
       accountDeleted,
+      sessionExpired,
     }),
 
   acknowledgeAccountDeleted: () => set({ accountDeleted: false }),
+  acknowledgeSessionExpired: () => set({ sessionExpired: false }),
 
   setActiveRoomId: (activeRoomId) => set({ activeRoomId }),
 

@@ -18,7 +18,7 @@ import giveClueArtwork from '@assets/landing/landing-step-give-a-clue.svg';
 import guessTogetherArtwork from '@assets/landing/landing-step-guess-together.svg';
 import { AuthDialog } from '@features/auth/components/AuthDialog';
 import type { AuthMode } from '@features/auth/components/AuthDialog.types';
-import { oauthFailure } from '@features/auth/model/feedback';
+import { SESSION_EXPIRED_NOTICE, oauthFailure } from '@features/auth/model/feedback';
 import { ROUTES } from '@shared/constants';
 import { LanguageSelector } from '@shared/i18n/LanguageSelector';
 import { useSessionStore } from '@shared/stores';
@@ -92,7 +92,8 @@ const COMMUNITY_AVATARS = [
  * Every call to action opens the Log In dialog over this page, which stays mounted and
  * visible underneath; an authenticated visitor goes straight on to the Lobby instead.
  * `/login` and `/register` render this page with the dialog already open, and closing
- * the dialog there leaves the address at `/`. Learn More and Help bring the How To Play
+ * the dialog there leaves the address at `/`. A session that expired opens Log In with a
+ * notice saying so. Learn More and Help bring the How To Play
  * section into view.
  */
 export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode }) {
@@ -101,6 +102,7 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
   const navigate = useNavigate();
   const authenticated = useSessionStore((state) => state.status === 'AUTHENTICATED');
   const accountDeleted = useSessionStore((state) => state.accountDeleted);
+  const sessionExpired = useSessionStore((state) => state.sessionExpired);
   const [searchParams, setSearchParams] = useSearchParams();
   // A Google sign-in that failed or was cancelled comes back as `?oauth_error=<code>`.
   const [oauthNotice] = useState(() => oauthFailure(searchParams.get('oauth_error')));
@@ -128,6 +130,7 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
 
   const closeAuth = useCallback(() => {
     setAuthMode(null);
+    useSessionStore.getState().acknowledgeSessionExpired();
     if (linkedAuthMode) navigate(ROUTES.landing, { replace: true });
   }, [linkedAuthMode, navigate]);
 
@@ -263,7 +266,13 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
       <img src={edgeLeftArtwork} alt="" className={styles.edgeLeft} />
       <img src={edgeRightArtwork} alt="" className={styles.edgeRight} />
 
-      {authMode && <AuthDialog initialMode={authMode} onClose={closeAuth} notice={oauthNotice} />}
+      {authMode && (
+        <AuthDialog
+          initialMode={authMode}
+          onClose={closeAuth}
+          notice={oauthNotice ?? (sessionExpired ? SESSION_EXPIRED_NOTICE : null)}
+        />
+      )}
       {accountDeleted && (
         <ToastStack>
           <Toast

@@ -66,7 +66,9 @@
 			"rateLimitedTitle": "Too many attempts",
 			"rateLimitedBody": "Wait a moment, then try again.",
 			"unavailableTitle": "Something went wrong",
-			"unavailableBody": "We could not reach the server. Try again in a moment."
+			"unavailableBody": "We could not reach the server. Try again in a moment.",
+			"sessionExpiredTitle": "Your session has expired",
+			"sessionExpiredBody": "Log in again to pick up where you left off."
 		},
 		"logOut": {
 			"title": "Log Out?",
