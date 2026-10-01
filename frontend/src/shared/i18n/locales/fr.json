@@ -672,7 +672,9 @@
 		"stats": {
 			"wins": "Victoires",
 			"losses": "Défaites",
-			"level": "Niveau"
+			"level": "Niveau",
+			"played_one": "{{count}} partie jouée",
+			"played_other": "{{count}} parties jouées"
 		},
 		"friend": {
 			"add": "Ajouter",

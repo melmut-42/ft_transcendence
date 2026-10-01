@@ -118,7 +118,13 @@ export const report: string =
 
 // ---- Stats ----
 
+export const statsBlock: string = 'flex flex-col gap-[8px] md:gap-[6px]';
+
 export const stats: string = 'grid grid-cols-3 gap-[12px] md:gap-[13px]';
+
+/** Matches played, under the three tiles: every settled match, forfeits included. */
+export const statsCaption: string =
+  'text-center text-md leading-[20px] font-bold text-text-muted md:text-sm md:leading-[18px]';
 
 export const stat: string =
   'flex min-w-0 flex-col items-center gap-[4px] rounded-[20px] bg-surface-muted px-[6px] ' +

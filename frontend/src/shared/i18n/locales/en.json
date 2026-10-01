@@ -672,7 +672,9 @@
 		"stats": {
 			"wins": "Wins",
 			"losses": "Losses",
-			"level": "Level"
+			"level": "Level",
+			"played_one": "{{count}} match played",
+			"played_other": "{{count}} matches played"
 		},
 		"friend": {
 			"add": "Add Friend",

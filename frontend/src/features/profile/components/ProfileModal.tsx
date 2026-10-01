@@ -226,15 +226,21 @@ function ProfileStats({ profile }: { profile: ProfileView }) {
     ['level', profile.level],
   ] as const;
 
+  // Level is the server's own value (`1 + floor(wins / 5)`), shown as it arrives.
   return (
-    <dl className={styles.stats}>
-      {stats.map(([key, value]) => (
-        <div key={key} className={styles.stat}>
-          <dt className={styles.statLabel}>{t(`profile.stats.${key}`)}</dt>
-          <dd className={styles.statValue}>{value}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className={styles.statsBlock}>
+      <dl className={styles.stats}>
+        {stats.map(([key, value]) => (
+          <div key={key} className={styles.stat}>
+            <dt className={styles.statLabel}>{t(`profile.stats.${key}`)}</dt>
+            <dd className={styles.statValue}>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className={styles.statsCaption}>
+        {t('profile.stats.played', { count: profile.matches_played })}
+      </p>
+    </div>
   );
 }
 
