@@ -9,7 +9,8 @@
 		"dismiss": "Fermer"
 	},
 	"i18n": {
-		"ready": "L'infrastructure multilingue fonctionne."
+		"ready": "L'infrastructure multilingue fonctionne.",
+		"label": "Langue"
 	},
 	"auth": {
 		"close": "Fermer",
@@ -960,6 +961,10 @@
 				"RATE_LIMITED": "Trop de tentatives. Patientez un instant, puis réessayez.",
 				"FAILED": "Impossible de supprimer votre compte. Réessayez."
 			}
+		},
+		"language": {
+			"label": "Langue",
+			"hint": "Le jeu change de langue immédiatement. Ton choix est enregistré sur cet appareil."
 		}
 	}
 }

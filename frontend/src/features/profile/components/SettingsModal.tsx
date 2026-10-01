@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ROUTES } from '@shared/constants';
+import { LanguageSelector } from '@shared/i18n/LanguageSelector';
 import { useOnReconnect } from '@shared/hooks';
 import { useSessionStore } from '@shared/stores';
 import type { OwnProfile } from '@shared/types';
@@ -47,7 +48,8 @@ type View = 'SETTINGS' | 'CROP' | 'PICK';
  *
  * It edits what the account contract lets the user edit — the avatar, by upload or by a
  * ready-made pick, and the username — and each change is shown only once the server has
- * confirmed it, then everywhere at once through the shared stores. Crop Photo and Pick
+ * confirmed it, then everywhere at once through the shared stores. The language switch
+ * changes this device's language at once. Crop Photo and Pick
  * Avatar take the place of the Settings card inside the same dialog, so the username draft
  * survives a trip to either. Log Out, Delete Account and the legal pages sit at the foot.
  */
@@ -63,6 +65,7 @@ export function SettingsModal({
   const usernameId = useId();
   const usernameNoteId = useId();
   const emailId = useId();
+  const languageId = useId();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const uploadRef = useRef<HTMLButtonElement>(null);
   const pickRef = useRef<HTMLButtonElement>(null);
@@ -313,6 +316,14 @@ export function SettingsModal({
               </p>
             </div>
           )}
+
+          <section aria-labelledby={languageId} className={styles.section}>
+            <h3 id={languageId} className={styles.label}>
+              {t('settings.language.label')}
+            </h3>
+            <LanguageSelector labelledBy={languageId} className={styles.language} />
+            <p className={styles.hint}>{t('settings.language.hint')}</p>
+          </section>
 
           <span aria-hidden="true" className={styles.divider} />
 

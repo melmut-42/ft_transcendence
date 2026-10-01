@@ -177,4 +177,8 @@ export const footerLinks: string =
 
 export const footerLink: string = 'text-text-ink hover:underline';
 
+/** Beside the legal links on desktop, above them on narrower screens. */
+export const language: string =
+  'desktop:absolute desktop:top-[-4px] desktop:left-[calc(50%_+_190px)]';
+
 export const copyright: string = 'text-md leading-tight font-medium text-text-black';

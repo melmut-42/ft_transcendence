@@ -20,6 +20,7 @@ import { AuthDialog } from '@features/auth/components/AuthDialog';
 import type { AuthMode } from '@features/auth/components/AuthDialog.types';
 import { oauthFailure } from '@features/auth/model/feedback';
 import { ROUTES } from '@shared/constants';
+import { LanguageSelector } from '@shared/i18n/LanguageSelector';
 import { useSessionStore } from '@shared/stores';
 import { Icon, Toast, ToastStack } from '@shared/ui';
 import type { IconName } from '@shared/ui';
@@ -254,6 +255,7 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
               {t('landing.help')}
             </a>
           </nav>
+          <LanguageSelector size="sm" className={styles.language} />
           <p className={styles.copyright}>{t('landing.copyright')}</p>
         </footer>
       </div>

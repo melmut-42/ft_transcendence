@@ -1,82 +1,68 @@
-import { useEffect, useRef, useState } from 'react';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { LANGUAGE_FLAG } from './i18n';
+import { cn } from '@shared/utils';
 
-const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'tr', label: 'Türkçe' },
-  { code: 'fr', label: 'Français' },
-] as const;
+import { LANGUAGES, changeLanguage } from './i18n';
 
-/** Shared by the trigger and every option: a bare button that inherits type and color. */
-const CONTROL_STYLES = 'appearance-none border-0 bg-transparent p-2 font-[inherit] text-inherit';
+export interface LanguageSelectorProps {
+  /** Id of the visible heading that names the control; without one it names itself. */
+  labelledBy?: string;
+  /** `sm` sits in a line of footer text; `md` stands on its own in a form. */
+  size?: 'sm' | 'md';
+  className?: string;
+}
 
-export function LanguageSelector() {
-  const { i18n, t } = useTranslation();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const selectorRef = useRef<HTMLDivElement>(null);
-
-  const currentLanguage = (i18n.resolvedLanguage ?? i18n.language).toUpperCase();
-
-  function handleLanguageChange(language: string) {
-    void i18n.changeLanguage(language);
-    localStorage.setItem(LANGUAGE_FLAG, language);
-    setIsMenuOpen(false);
-  }
-
-  useEffect(() => {
-    if (!isMenuOpen) return;
-
-    function handleClickOutside(event: PointerEvent) {
-      if (!selectorRef.current?.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    }
-
-    document.addEventListener('pointerdown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('pointerdown', handleClickOutside);
-    };
-  }, [isMenuOpen]);
+/**
+ * The language switch: one option per agreed language, each named in its own language so
+ * a reader can find theirs whatever the page is in. Picking one re-renders every
+ * translation in place — no reload — and the choice is remembered on this device.
+ *
+ * It is a native radio group, so arrow keys move between the languages and assistive
+ * technology announces the current one.
+ */
+export function LanguageSelector({ labelledBy, size = 'md', className }: LanguageSelectorProps) {
+  const { t, i18n } = useTranslation();
+  const name = useId();
+  const current = i18n.resolvedLanguage ?? i18n.language;
 
   return (
     <div
-      ref={selectorRef}
-      className="fixed top-[clamp(0.75rem,2vw,1.5rem)] right-[clamp(0.75rem,2vw,1.5rem)] z-(--z-toast) bg-transparent"
-    >
-      <button
-        type="button"
-        className={`${CONTROL_STYLES} inline-flex cursor-pointer items-center gap-[0.4rem]`}
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        aria-expanded={isMenuOpen}
-        aria-controls="language-selector-menu"
-      >
-        <span aria-hidden="true">🌐</span>
-        <span>{currentLanguage}</span>
-      </button>
-
-      {isMenuOpen && (
-        <div
-          id="language-selector-menu"
-          className="absolute top-[calc(100%+0.5rem)] right-0 flex flex-col bg-transparent"
-          role="group"
-          aria-label={t('common.language')}
-        >
-          {LANGUAGES.map(({ code, label }) => (
-            <button
-              key={code}
-              type="button"
-              className={`${CONTROL_STYLES} cursor-pointer text-left`}
-              onClick={() => handleLanguageChange(code)}
-              aria-pressed={i18n.resolvedLanguage === code}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      role="radiogroup"
+      {...(labelledBy ? { 'aria-labelledby': labelledBy } : { 'aria-label': t('i18n.label') })}
+      className={cn(
+        'inline-flex rounded-pill bg-surface-muted',
+        size === 'md' ? 'gap-1 p-1' : 'gap-0.5 p-0.5',
+        className,
       )}
+    >
+      {LANGUAGES.map(({ code, name: languageName }) => (
+        <label
+          key={code}
+          lang={code}
+          className={cn(
+            'cursor-pointer rounded-pill font-bold',
+            size === 'md'
+              ? 'px-3 py-1 text-md leading-[22px]'
+              : 'px-2 py-0.5 text-sm leading-[18px]',
+            'text-text-slate transition-[background-color,color] duration-200 ease-pop',
+            'hover:bg-surface hover:text-text-ink',
+            'has-checked:bg-primary has-checked:text-surface has-checked:shadow-alert',
+            'has-focus-visible:outline-(length:--stroke-heavy) has-focus-visible:outline-offset-2',
+            'has-focus-visible:outline-primary has-focus-visible:outline-solid',
+          )}
+        >
+          <input
+            type="radio"
+            name={name}
+            value={code}
+            checked={current === code}
+            onChange={() => changeLanguage(code)}
+            className="sr-only"
+          />
+          {languageName}
+        </label>
+      ))}
     </div>
   );
 }

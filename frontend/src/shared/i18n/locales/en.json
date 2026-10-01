@@ -9,7 +9,8 @@
 		"dismiss": "Dismiss"
 	},
 	"i18n": {
-		"ready": "Multilingual infrastructure is working."
+		"ready": "Multilingual infrastructure is working.",
+		"label": "Language"
 	},
 	"auth": {
 		"close": "Close",
@@ -960,6 +961,10 @@
 				"RATE_LIMITED": "Too many attempts. Wait a moment, then try again.",
 				"FAILED": "Couldn't delete your account. Try again."
 			}
+		},
+		"language": {
+			"label": "Language",
+			"hint": "The game switches language at once. Your choice is saved on this device."
 		}
 	}
 }

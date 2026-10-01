@@ -9,7 +9,8 @@
 		"dismiss": "Kapat"
 	},
 	"i18n": {
-		"ready": "Çok dilli altyapı çalışıyor."
+		"ready": "Çok dilli altyapı çalışıyor.",
+		"label": "Dil"
 	},
 	"auth": {
 		"close": "Kapat",
@@ -960,6 +961,10 @@
 				"RATE_LIMITED": "Çok fazla deneme. Biraz bekleyip tekrar dene.",
 				"FAILED": "Hesabın silinemedi. Tekrar dene."
 			}
+		},
+		"language": {
+			"label": "Dil",
+			"hint": "Oyun dili hemen değişir. Seçimin bu cihazda kaydedilir."
 		}
 	}
 }

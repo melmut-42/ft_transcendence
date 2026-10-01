@@ -87,3 +87,25 @@ The shared error-code-to-translation-key mapping is defined in the
 shared i18n layer once the REST and WebSocket error contracts are
 finalized. Both REST and WebSocket clients use this mapping before
 showing an error to the user.
+
+### 6. Choosing the language
+
+`LanguageSelector` (`shared/i18n/LanguageSelector.tsx`) is the language switch. It sits in
+Settings and in the Landing page footer. Picking a language calls `changeLanguage()` from
+`shared/i18n/i18n.ts`, which re-renders every `t()` in place, without a reload, and saves
+the choice on this device under `ft_transcendence.language`. On the next visit that saved
+language is restored; an unknown or unreadable value falls back to `en`.
+
+Dates and numbers follow the selected language: format them with `Intl` and
+`i18n.language`, for example
+`new Intl.DateTimeFormat(i18n.language, { month: 'short', day: 'numeric' })`. Plural text
+uses i18next's `_one` / `_other` keys with a `count` value.
+
+### 7. Shared UI components
+
+Components in `shared/ui` never contain user-facing text. They take every label through
+props, so the feature that renders them translates it:
+
+<Toast onDismiss={dismiss} dismissLabel={t('common.dismiss')}>…</Toast>
+<ErrorState title={t('…')} onRetry={retry} retryLabel={t('common.retry')} />
+
