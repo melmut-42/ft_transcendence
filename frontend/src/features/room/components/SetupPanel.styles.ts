@@ -106,7 +106,7 @@ export const readySidebar: string = 'h-[53px] rounded-[13px] text-[22px]';
 export const readyTone = {
   READY:
     'bg-success-deep text-surface ' +
-    'shadow-[0_4px_0_var(--color-shadow-strong),0_5px_7px_var(--color-shadow-soft)] ' +
+    'shadow-button-success-deep ' +
     'not-disabled:hover:brightness-105',
   AVAILABLE:
     'bg-primary text-surface shadow-button-primary not-disabled:hover:bg-primary-bright ' +

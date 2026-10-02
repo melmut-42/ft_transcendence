@@ -94,6 +94,7 @@
   --color-shadow-warm-medium: #3d382f2e;
   --color-shadow-warm-strong: #37342e35;
   --color-shadow-primary: #2c6daa;
+  --color-shadow-success-deep: #2d865f;
   --color-shadow-secondary: #aeaeae;
   --color-shadow-card: #5c4a2e2e;
   --color-shadow-team-a: #2f6fc438;
@@ -184,6 +185,8 @@
   --shadow-button-icon-secondary: 0 4px 8px var(--color-shadow-warm-soft);
   --shadow-button-primary:
     0 4px 0px var(--color-shadow-primary), 0 5px 7px var(--color-shadow-medium);
+  --shadow-button-success-deep:
+    0 4px 0px var(--color-shadow-success-deep), 0 5px 7px var(--color-shadow-medium);
   --shadow-button-secondary:
     0 4px 0px var(--color-shadow-secondary), 0 5px 7px var(--color-shadow-medium);
   --shadow-button-neutral:
