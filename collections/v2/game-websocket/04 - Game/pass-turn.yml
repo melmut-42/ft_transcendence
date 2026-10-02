@@ -70,7 +70,8 @@ docs: |-
           "team": "BLUE",
           "phase": "WAITING_FOR_CLUE",
           "clue": null,
-          "guesses_remaining": null
+          "guesses_remaining": null,
+          "deadline_at": null
         },
         "score": {
           "red": 3,
@@ -94,7 +95,8 @@ docs: |-
           "team": "BLUE",
           "phase": "WAITING_FOR_CLUE",
           "clue": null,
-          "guesses_remaining": null
+          "guesses_remaining": null,
+          "deadline_at": null
         },
         "score": {
           "red": 3,
@@ -104,7 +106,7 @@ docs: |-
     }
   ```
 
-  `reason` is `PASSED | GUESSES_EXHAUSTED | OPPONENT_CARD_REVEALED | NEUTRAL_CARD_REVEALED` across turn-change events.
+  `reason` is `PASSED | GUESSES_EXHAUSTED | OPPONENT_CARD_REVEALED | NEUTRAL_CARD_REVEALED | TURN_TIMER_EXPIRED` across turn-change events. `TURN_TIMER_EXPIRED` is server-initiated and has no ack (`workspace.yml`, Turn Timer).
 
   | Result field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
@@ -116,6 +118,7 @@ docs: |-
   | `payload.current_turn.phase` | enum | yes | no | `WAITING_FOR_CLUE` | New phase |
   | `payload.current_turn.clue` | null | yes | yes | `null` | Cleared previous clue |
   | `payload.current_turn.guesses_remaining` | null | yes | yes | `null` | No guesses before next clue |
+  | `payload.current_turn.deadline_at` | `string<date-time>` or null | yes | yes | ISO 8601 UTC, or `null` | Fresh deadline of the new turn; `null` with no limit |
   | `payload.score.red` | integer | yes | no | `0..9` | Unchanged revealed RED count |
   | `payload.score.blue` | integer | yes | no | `0..8` | Unchanged revealed BLUE count |
 

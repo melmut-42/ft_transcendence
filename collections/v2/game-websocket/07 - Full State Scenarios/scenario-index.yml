@@ -67,7 +67,7 @@ docs: |-
         "game_id":5001,
         "status":"GAME_FINISHED",
         "starting_team":"RED",
-        "current_turn":{"team":"RED","phase":"GAME_OVER","clue":{"word":"empire","number":1},"guesses_remaining":null},
+        "current_turn":{"team":"RED","phase":"GAME_OVER","clue":{"word":"empire","number":1},"guesses_remaining":null,"deadline_at":null},
         "score":{"red":9,"blue":5},
         "board":[
           {"card_id":1,"word":"MOON","revealed":true,"color":"RED"},

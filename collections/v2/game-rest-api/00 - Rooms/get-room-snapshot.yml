@@ -46,8 +46,8 @@ docs: |-
   | `data.host_user_id` | integer or null | yes | yes | member user ID or `null` | Null only during the 300-second empty-room window |
   | `data.player_count` | integer | yes | no | `>= 1` for accessible room | Current members |
   | `data.max_players` | integer | yes | no | `4..20` | Room capacity; participants and spectators count |
-  | `data.turn_timer_seconds` | integer or null | yes | yes | unresolved set; `null` means no limit | Per-turn time limit (`workspace.yml`, Room Settings) |
-  | `data.language` | string | yes | no | unresolved set of lowercase language codes | Word-pack language |
+  | `data.turn_timer_seconds` | integer or null | yes | yes | `null`, `60`, `90`, `120`; `null` means no limit | Per-turn time limit (`workspace.yml`, Room Settings) |
+  | `data.language` | string | yes | no | `en` | Word-pack language |
   | `data.startable` | boolean | yes | no | `true`, `false` | Complete start predicate, not merely all-ready |
   | `data.countdown.seconds_remaining` | integer | conditional | no | `0..3` | Present only in `COUNTDOWN` |
   | `data.players[]` | array<object> | yes | no | one or more | Members in join order |
@@ -75,6 +75,7 @@ docs: |-
   | `data.game.current_turn.clue.word` | string | conditional | no | normalized one word, `1..30` chars | Present in `GUESSING`; final clue may remain in `GAME_OVER` |
   | `data.game.current_turn.clue.number` | integer | conditional | no | `1..9` | Clue number `N` |
   | `data.game.current_turn.guesses_remaining` | integer or null | yes | yes | `0..10`, or `null` | `N+1` at clue acceptance; null while waiting for clue |
+  | `data.game.current_turn.deadline_at` | `string<date-time>` or null | yes | yes | ISO 8601 UTC, or `null` | Turn timer deadline; `null` with no limit, while paused, and in `GAME_OVER` (`workspace.yml`, Turn Timer) |
   | `data.game.score.red` | integer | yes | no | `0..9` | Revealed RED cards (either team may start with 9 — see workspace.yml Game Rules) |
   | `data.game.score.blue` | integer | yes | no | `0..9` | Revealed BLUE cards (either team may start with 9 — see workspace.yml Game Rules) |
   | `data.game.board[]` | array<object> | yes | no | exactly 25 unique cards | Fixed board order |
@@ -365,7 +366,7 @@ examples:
                 "game_id": 5001,
                 "status": "IN_PROGRESS",
                 "starting_team": "RED",
-                "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},
+                "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null,"deadline_at":null},
                 "score": {"red":0,"blue":0},
                 "board": [
                   {"card_id":1,"word":"MOON","revealed":false,"color":null},

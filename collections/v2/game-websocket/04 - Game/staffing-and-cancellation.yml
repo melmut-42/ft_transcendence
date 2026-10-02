@@ -64,7 +64,7 @@ docs: |-
 
   A user may join the active room through REST. The new member always starts as `team:null`, `role:SPECTATOR`, receives an Operative-safe board, and cannot play. The spectator atomically claims a legal pair with `room.role.select`, for example `{"team":"RED","role":"SPYMASTER"}`. Existing participants cannot switch teams or roles during the game. A team may never have more than one Spymaster.
 
-  When both teams are valid before every active deadline, the countdown stops and the exact preserved turn resumes. Restoring one of two deficient teams clears only that team's deadline; the pause continues until both are valid.
+  When both teams are valid before every active deadline, the countdown stops and the exact preserved turn resumes. A turn timer stopped by the pause resumes with the time it had left, so `current_turn.deadline_at` is the resume time plus that remainder (`workspace.yml`, Turn Timer). Restoring one of two deficient teams clears only that team's deadline; the pause continues until both are valid.
 
   ```json
   {
@@ -79,7 +79,8 @@ docs: |-
         "team": "RED",
         "phase": "GUESSING",
         "clue": {"word": "ocean", "number": 2},
-        "guesses_remaining": 2
+        "guesses_remaining": 2,
+        "deadline_at": null
       }
     }
   }

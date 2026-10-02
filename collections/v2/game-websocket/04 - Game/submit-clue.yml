@@ -135,7 +135,8 @@ docs: |-
             "word": "ocean",
             "number": 2
           },
-          "guesses_remaining": 3
+          "guesses_remaining": 3,
+          "deadline_at": null
         }
       }
     }
@@ -184,7 +185,8 @@ docs: |-
             "word": "space",
             "number": 3
           },
-          "guesses_remaining": 4
+          "guesses_remaining": 4,
+          "deadline_at": null
         }
       }
     }
@@ -203,6 +205,7 @@ docs: |-
   | `payload.clue.number` | integer | yes | no | `1..9` | `N` |
   | `payload.guesses_remaining` | integer | yes | no | `2..10` | Exactly `N+1` at acceptance |
   | `payload.current_turn.phase` | enum | yes | no | `GUESSING` | New phase |
+  | `payload.current_turn.deadline_at` | `string<date-time>` or null | yes | yes | ISO 8601 UTC, or `null` | Unchanged turn deadline; a clue does not extend it |
 
   ## Errors and state guarantees
 

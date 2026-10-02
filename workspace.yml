@@ -149,7 +149,23 @@ docs: |-
 
   Every room has `max_players`, an integer in `4..20` with default `8`. Capacity counts participants and spectators together. The host sets it in Create room and may change it while the room is `WAITING` through `room.settings.update`, never below the current `player_count`. Join room and Invite friend return `409 ROOM_FULL` when `player_count` equals `max_players`.
 
-  Game v2 rooms also carry `turn_timer_seconds` (the per-turn time limit; `null` means no limit) and `language` (a lowercase language code selecting the board's word pack). The host changes them through the same `room.settings.update` command under the same `WAITING`/`IN_LOBBY` preconditions. **Unresolved:** the allowed timer values, the supported language set, both defaults, and what happens when a turn timer runs out have no agreed values. Until they are agreed, rooms report `turn_timer_seconds:null`, and the server rejects a change to either field with `INVALID_PAYLOAD`.
+  Game v2 rooms also carry `turn_timer_seconds` and `language`. The host changes them through the same `room.settings.update` command under the same `WAITING`/`IN_LOBBY` preconditions; a value outside its allowed set is rejected with `INVALID_PAYLOAD`.
+
+  | Setting | Allowed values | Default | Meaning |
+  | --- | --- | --- | --- |
+  | `max_players` | integer `4..20`, `>= player_count` | `8` | Room capacity, spectators included |
+  | `turn_timer_seconds` | `null`, `60`, `90`, `120` | `null` | Per-turn time limit; `null` means no limit |
+  | `language` | `en` | `en` | Lowercase language code selecting the board's word pack |
+
+  The settings in force when a game starts apply to that whole game; they can change again only once the room is back in `WAITING`.
+
+  ## Turn Timer
+
+  When `turn_timer_seconds` is not `null`, every turn has a server-owned deadline, `current_turn.deadline_at = turn start + turn_timer_seconds`. A turn starts when a team becomes active (`game.started` for the starting team, `game.turn.changed` afterwards) and one deadline covers both its `WAITING_FOR_CLUE` and `GUESSING` phases; an accepted clue does not extend it. With no limit, `deadline_at` is `null`.
+
+  When the deadline passes before the turn ends, the server ends the turn exactly as an accepted pass would: the clue and remaining guesses are cleared, the opponent team becomes active in `WAITING_FOR_CLUE` with a fresh deadline, and every member receives `game.turn.changed` with `reason:TURN_TIMER_EXPIRED`. A timeout never reveals a card, never changes the score, and never ends the game. A command that arrives after the deadline is rejected with `NOT_YOUR_TURN` once the turn has passed.
+
+  While the game is `PAUSED_FOR_PLAYERS` the turn timer is stopped: `deadline_at` is `null` and the server keeps the time that was left. When staffing is restored, the preserved turn resumes with `deadline_at = resume time + remaining time`. Clients render the countdown from `deadline_at` and the server clock offset; they never end a turn themselves.
 
   ## Start Conditions (Game v2)
 

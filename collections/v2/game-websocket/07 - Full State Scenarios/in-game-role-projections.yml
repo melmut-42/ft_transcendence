@@ -40,8 +40,8 @@ docs: |-
   | `payload.room.host_user_id` | integer | yes | no | member ID | Host |
   | `payload.room.player_count` | integer | yes | no | `>= 4` | Participants |
   | `payload.room.max_players` | integer | yes | no | `4..20` | Room capacity |
-  | `payload.room.turn_timer_seconds` | integer or null | yes | yes | unresolved set; `null` means no limit | Per-turn time limit |
-  | `payload.room.language` | string | yes | no | unresolved set of lowercase language codes | Word-pack language |
+  | `payload.room.turn_timer_seconds` | integer or null | yes | yes | `null`, `60`, `90`, `120`; `null` means no limit | Per-turn time limit |
+  | `payload.room.language` | string | yes | no | `en` | Word-pack language |
   | `payload.room.startable` | boolean | yes | no | `false` | Start predicate is only actionable in `WAITING` |
   | `payload.room.players[]` | array<object> | yes | no | configured members | Join-ordered membership |
   | `payload.room.players[].user_id` | integer | yes | no | positive | Member |
@@ -60,6 +60,7 @@ docs: |-
   | `payload.room.game.current_turn.phase` | enum | yes | no | `WAITING_FOR_CLUE` | Initial phase |
   | `payload.room.game.current_turn.clue` | null | yes | yes | `null` | No clue yet |
   | `payload.room.game.current_turn.guesses_remaining` | null | yes | yes | `null` | No guesses before clue |
+  | `payload.room.game.current_turn.deadline_at` | `string<date-time>` or null | yes | yes | ISO 8601 UTC, or `null` | Turn timer deadline; `null` with no limit |
   | `payload.room.game.score.red` | integer | yes | no | `0..9` | Revealed RED cards |
   | `payload.room.game.score.blue` | integer | yes | no | `0..8` | Revealed BLUE cards |
   | `payload.room.game.board[]` | array<object> | yes | no | exactly 25 | Ordered board |
@@ -101,7 +102,7 @@ docs: |-
           "game_id": 5001,
           "status": "IN_PROGRESS",
           "starting_team": "RED",
-          "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},
+          "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null,"deadline_at":null},
           "score": {"red":0,"blue":0},
           "board": [
             {"card_id":1,"word":"MOON","revealed":false,"color":"RED"},
@@ -169,7 +170,7 @@ docs: |-
           "game_id": 5001,
           "status": "IN_PROGRESS",
           "starting_team": "RED",
-          "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null},
+          "current_turn": {"team":"RED","phase":"WAITING_FOR_CLUE","clue":null,"guesses_remaining":null,"deadline_at":null},
           "score": {"red":0,"blue":0},
           "board": [
             {"card_id":1,"word":"MOON","revealed":false,"color":null},

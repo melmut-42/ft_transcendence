@@ -148,6 +148,7 @@ docs: |-
   | `payload.current_turn.team` | enum | yes | no | `RED`, `BLUE` | Active or terminal guessing team |
   | `payload.current_turn.phase` | enum | yes | no | `WAITING_FOR_CLUE`, `GUESSING`, `GAME_OVER` | Result phase |
   | `payload.current_turn.guesses_remaining` | integer or null | yes | yes | `0..10`, `null` | Remaining in `GUESSING`; null otherwise |
+  | `payload.current_turn.deadline_at` | `string<date-time>` or null | yes | yes | ISO 8601 UTC, or `null` | Deadline of the active turn; a fresh one after a turn change; `null` with no limit or in `GAME_OVER` |
   | `payload.winner` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Terminal winner |
   | `payload.end_reason` | enum or null | yes | yes | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `null` | Terminal cause |
   | `payload.game_status` | enum | terminal only | no | `GAME_FINISHED` | Completed game lifecycle state |
@@ -187,7 +188,8 @@ docs: |-
             "word": "ocean",
             "number": 2
           },
-          "guesses_remaining": 2
+          "guesses_remaining": 2,
+          "deadline_at": null
         },
         "winner": null,
         "end_reason": null
@@ -223,7 +225,8 @@ docs: |-
           "team": "BLUE",
           "phase": "WAITING_FOR_CLUE",
           "clue": null,
-          "guesses_remaining": null
+          "guesses_remaining": null,
+          "deadline_at": null
         },
         "winner": null,
         "end_reason": null
@@ -291,7 +294,8 @@ docs: |-
           "team": "BLUE",
           "phase": "WAITING_FOR_CLUE",
           "clue": null,
-          "guesses_remaining": null
+          "guesses_remaining": null,
+          "deadline_at": null
         },
         "winner": null,
         "end_reason": null
@@ -357,7 +361,8 @@ docs: |-
           "team": "BLUE",
           "phase": "WAITING_FOR_CLUE",
           "clue": null,
-          "guesses_remaining": null
+          "guesses_remaining": null,
+          "deadline_at": null
         },
         "winner": null,
         "end_reason": null

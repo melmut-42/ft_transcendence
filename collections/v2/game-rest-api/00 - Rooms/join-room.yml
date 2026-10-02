@@ -36,8 +36,8 @@ docs: |-
   | `data.host_user_id` | integer or null | yes | yes | member ID or `null` | Current host; an empty-room joiner becomes host |
   | `data.player_count` | integer | yes | no | `>= 1` | Count after join; may be one when reviving an empty room |
   | `data.max_players` | integer | yes | no | `4..20` | Room capacity; participants and spectators both count |
-  | `data.turn_timer_seconds` | integer or null | yes | yes | unresolved set; `null` means no limit | Per-turn time limit |
-  | `data.language` | string | yes | no | unresolved set of lowercase language codes | Word-pack language |
+  | `data.turn_timer_seconds` | integer or null | yes | yes | `null`, `60`, `90`, `120`; `null` means no limit | Per-turn time limit |
+  | `data.language` | string | yes | no | `en` | Word-pack language |
   | `data.startable` | boolean | yes | no | current predicate | A spectator does not alter the predicate |
   | `data.players[]` | array<object> | yes | no | members in join order | Membership snapshot |
   | `data.players[].user_id` | integer | yes | no | positive | Member ID |

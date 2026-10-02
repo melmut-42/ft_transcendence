@@ -51,7 +51,7 @@ docs: |-
   | `game.clue.submitted` | `game_id`, actor, team, clue, guesses, turn | accepted clue | common |
   | `game.card.revealed` | game/card/actor/team/score/turn/result | accepted guess | role-safe board delta |
   | `game.score.updated` | `game_id`, `score`, `changed_color` | RED or BLUE reveal | common |
-  | `game.turn.changed` | game ID, previous team, reason, current turn, score | non-terminal turn end | common |
+  | `game.turn.changed` | game ID, previous team, reason, current turn, score | non-terminal turn end, including a turn timer deadline (`TURN_TIMER_EXPIRED`) | common |
   | `game.ended` | winner, loser, reason, revealed card, score, `room_status=POST_GAME`, `game_status=GAME_FINISHED`, phase, post-game deadline, time | terminal reveal | contains only the revealed terminal card; no hidden-board disclosure |
   | `game.staffing.required` | missing roles and `deadline_at` per deficient team, `departure` | live composition becomes invalid | common |
   | `game.staffing.restored` | restored teams and resumed turn/phase | both teams become valid before deadlines | role-safe state |
@@ -91,7 +91,35 @@ docs: |-
           "team": "BLUE",
           "phase": "WAITING_FOR_CLUE",
           "clue": null,
-          "guesses_remaining": null
+          "guesses_remaining": null,
+          "deadline_at": null
+        },
+        "score": {
+          "red": 3,
+          "blue": 2
+        }
+      }
+    }
+  ```
+
+  A turn timer deadline ends the turn the same way, with no actor and no ack. In a room with `turn_timer_seconds: 90`:
+
+  ```json
+    {
+      "type": "game.turn.changed",
+      "event_id": "evt_0152",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:45:50Z",
+      "payload": {
+        "game_id": 5001,
+        "previous_team": "BLUE",
+        "reason": "TURN_TIMER_EXPIRED",
+        "current_turn": {
+          "team": "RED",
+          "phase": "WAITING_FOR_CLUE",
+          "clue": null,
+          "guesses_remaining": null,
+          "deadline_at": "2026-09-10T08:47:20Z"
         },
         "score": {
           "red": 3,
@@ -128,7 +156,8 @@ docs: |-
             "word": "ocean",
             "number": 2
           },
-          "guesses_remaining": 2
+          "guesses_remaining": 2,
+          "deadline_at": null
         },
         "winner": null,
         "end_reason": null
