@@ -7,7 +7,7 @@ import { LanguageSelector } from '@shared/i18n/LanguageSelector';
 import { useOnReconnect } from '@shared/hooks';
 import { useSessionStore } from '@shared/stores';
 import type { OwnProfile } from '@shared/types';
-import { Alert, AvatarImage, Dialog, FieldMessage, Icon } from '@shared/ui';
+import { Alert, AvatarImage, Button, Dialog, FieldMessage, Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import { useAvatarUpload } from '../hooks/useAvatarUpload';
@@ -211,27 +211,29 @@ export function SettingsModal({
               </span>
               <div className={styles.avatarActions}>
                 <div className={styles.avatarButtons}>
-                  <button
+                  <Button
                     ref={uploadRef}
-                    type="button"
+                    theme="outline"
+                    sizeClassName={styles.outlineButton}
                     onClick={chooseFile}
                     aria-describedby={avatarNoteId}
-                    className={styles.outlineButton}
+                    className={styles.outlineButtonWidth}
                   >
                     {t('settings.avatar.upload')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     ref={pickRef}
-                    type="button"
+                    theme="outline"
+                    sizeClassName={styles.outlineButton}
                     onClick={() => {
                       setSaved(false);
                       upload.cancel();
                       setPicking(true);
                     }}
-                    className={styles.outlineButton}
+                    className={styles.outlineButtonWidth}
                   >
                     {t('settings.avatar.pick')}
-                  </button>
+                  </Button>
                 </div>
                 {avatarError ? (
                   <FieldMessage id={avatarNoteId} status="error" className={styles.fieldError}>
@@ -270,14 +272,15 @@ export function SettingsModal({
                   className={cn(styles.input, styles.inputStatus[edit.error ? 'error' : 'default'])}
                 />
               </div>
-              <button
+              <Button
                 type="submit"
+                sizeClassName={styles.saveButton}
                 aria-disabled={!edit.changed || edit.saving}
                 aria-busy={edit.saving}
-                className={styles.saveButton}
+                className="shrink-0"
               >
                 {t(edit.saving ? 'settings.username.saving' : 'settings.username.save')}
-              </button>
+              </Button>
             </div>
             {edit.error ? (
               <FieldMessage id={usernameNoteId} status="error" className={styles.fieldError}>
@@ -322,32 +325,39 @@ export function SettingsModal({
 
           <span aria-hidden="true" className={styles.divider} />
 
-          <button
-            type="button"
-            onClick={logOut.request}
-            disabled={logOut.status === 'PENDING'}
+          {/* The design system's Leave Room button, used for Log Out. */}
+          <Button
+            theme="outline"
+            variant="secondary"
+            sizeClassName={styles.logOut}
+            block
+            onClick={() => logOut.status !== 'PENDING' && logOut.request()}
+            aria-disabled={logOut.status === 'PENDING' || undefined}
             aria-busy={logOut.status === 'PENDING'}
-            className={styles.logOut}
+            className={styles.raisedSurface}
           >
             {t(logOut.status === 'PENDING' ? 'settings.logOut.pending' : 'settings.logOut.button')}
             <Icon name="logout" />
-          </button>
+          </Button>
           {logOut.status === 'FAILED' && (
             <p role="alert" className={styles.logOutError}>
               {t('settings.logOut.failed')}
             </p>
           )}
 
-          <button
-            type="button"
+          {/* A quiet destructive link under Log Out, so it is never pressed by habit. */}
+          <Button
+            theme="link"
+            variant="secondary"
+            icon="trash"
+            sizeClassName={styles.deleteAccount}
             onClick={deleteAccount.request}
             disabled={busy}
             aria-haspopup="dialog"
-            className={styles.deleteAccount}
+            className="mx-auto"
           >
-            <Icon name="trash" />
             {t('settings.deleteAccount.button')}
-          </button>
+          </Button>
 
           {/* A new tab, so the room or match behind Settings keeps running. */}
           <nav aria-label={t('settings.legal.navigation')} className={styles.legal}>

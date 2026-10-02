@@ -1,5 +1,3 @@
-import { buttonInteraction } from '@shared/ui';
-
 /**
  * Class recipes for the Ready Room.
  *
@@ -99,10 +97,11 @@ export const leaveSidebar: string = 'mt-[17px] h-[42px] rounded-[11px] text-[20p
 
 // ---- Leave Room button ----
 
-export const leave: string =
-  `${buttonInteraction} inline-flex w-full items-center justify-center gap-[10px] ` +
-  'border-[1.5px] border-accent-red bg-surface leading-none font-bold text-accent-red ' +
-  'shadow-[0_4px_7px_var(--color-shadow-warm-soft)] ' +
+/** The shared outline `Button` draws the color; the page adds its geometry and its lift. */
+export const leave: string = 'gap-[10px] leading-none font-bold';
+
+export const leaveSurface: string =
+  'bg-surface shadow-[0_4px_7px_var(--color-shadow-warm-soft)] ' +
   'not-disabled:hover:shadow-[0_6px_10px_var(--color-shadow-warm-soft)]';
 
 export const leaveIcon: string = 'text-[0.9em]';

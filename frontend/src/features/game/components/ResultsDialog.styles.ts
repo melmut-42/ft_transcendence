@@ -1,5 +1,4 @@
 import type { Team } from '@shared/types';
-import { buttonInteraction } from '@shared/ui';
 
 /**
  * Results card recipes: the 760×714 card of the 1920px design at the desktop's 80%, and
@@ -51,23 +50,22 @@ export const actions: string =
   'flex w-full flex-col items-stretch gap-[12px] desktop:flex-row desktop:justify-center ' +
   'desktop:gap-[14px]';
 
+/** Button geometry; the shared `Button` draws the fill, the outline and the link. */
 export const primary: string =
-  `${buttonInteraction} inline-flex h-[56px] items-center justify-center rounded-[19px] ` +
-  'bg-primary px-[20px] text-2xl leading-none font-bold text-surface shadow-button-primary ' +
-  'not-disabled:hover:bg-primary-bright not-disabled:hover:shadow-button-primary-hover ' +
-  'disabled:opacity-70 desktop:h-[50px] desktop:w-[240px] desktop:text-[21px]';
+  'h-[56px] rounded-[19px] px-[20px] text-2xl leading-none font-bold desktop:h-[50px] ' +
+  'desktop:w-[240px] desktop:text-[21px]';
+
+/** While a choice is in flight the others hold their color, dimmed. */
+export const busy: string = 'aria-disabled:opacity-70';
 
 export const secondary: string =
-  `${buttonInteraction} inline-flex h-[50px] items-center justify-center rounded-[19px] ` +
-  'border-(length:--stroke-default) border-primary-deep bg-surface px-[20px] text-xl ' +
-  'leading-none font-bold text-primary-sky not-disabled:hover:bg-primary/10 ' +
-  'disabled:opacity-50 desktop:w-[224px] desktop:text-[19px]';
+  'h-[50px] rounded-[19px] px-[20px] text-xl leading-none font-bold desktop:w-[224px] ' +
+  'desktop:text-[19px]';
 
 /** Exit: a quiet text action under the buttons, so leaving the room is never a reflex. */
-export const exit: string =
-  'mx-auto mt-[14px] inline-flex cursor-pointer items-center rounded-sm text-lg ' +
-  'leading-[22px] font-bold text-accent-red underline-offset-2 not-disabled:hover:underline ' +
-  'disabled:cursor-default disabled:opacity-60 desktop:text-[16px]';
+export const exit: string = 'text-lg leading-[22px] font-bold desktop:text-[16px]';
+
+export const exitPlacement: string = 'mx-auto mt-[14px]';
 
 export const deadline: string =
   'mb-[16px] text-center text-md leading-[18px] font-bold text-text-muted tabular-nums ' +

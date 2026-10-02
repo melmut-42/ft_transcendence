@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import trophyArtwork from '@assets/game/results-trophy.svg';
 import type { GameEndReason, Score, Team } from '@shared/types';
-import { Dialog } from '@shared/ui';
+import { Button, Dialog } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import { opponentOf } from '../model/gameView';
@@ -130,28 +130,36 @@ export function ResultsDialog({
       </p>
       <DecisionNote decision={decision} />
       <div className={styles.actions}>
-        <button
-          type="button"
-          onClick={decision.onBackToLobby}
-          disabled={busy}
+        <Button
+          sizeClassName={styles.primary}
+          onClick={() => !busy && decision.onBackToLobby()}
+          aria-disabled={busy || undefined}
           aria-busy={decision.returning || undefined}
-          className={styles.primary}
+          className={styles.busy}
         >
           {t(decision.returning ? 'game.results.returning' : 'game.results.backToLobby')}
-        </button>
-        <button type="button" onClick={onViewBoard} disabled={busy} className={styles.secondary}>
+        </Button>
+        <Button
+          theme="outline"
+          sizeClassName={styles.secondary}
+          onClick={onViewBoard}
+          disabled={busy}
+          className="bg-surface"
+        >
           {t('game.results.viewBoard')}
-        </button>
+        </Button>
       </div>
-      <button
-        type="button"
+      <Button
+        theme="link"
+        variant="secondary"
+        sizeClassName={styles.exit}
         onClick={decision.onExit}
         disabled={busy}
         aria-busy={decision.leaving || undefined}
-        className={styles.exit}
+        className={styles.exitPlacement}
       >
         {t(decision.leaving ? 'room.leave.leaving' : 'game.results.exit')}
-      </button>
+      </Button>
     </Dialog>
   );
 }

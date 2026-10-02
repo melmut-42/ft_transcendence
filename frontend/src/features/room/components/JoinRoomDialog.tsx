@@ -183,7 +183,8 @@ export function JoinRoomDialog({ onClose }: { onClose: () => void }) {
             loading={busy}
             disabled={blocked && !busy}
             trailingIcon={blocked && !busy ? 'block' : 'login'}
-            className={cn(shared.submit, 'normal-case')}
+            sizeClassName={cn(shared.submit, 'gap-2')}
+            block
           >
             {submitLabel}
           </Button>
@@ -192,7 +193,8 @@ export function JoinRoomDialog({ onClose }: { onClose: () => void }) {
             variant="danger"
             onClick={onClose}
             disabled={busy}
-            className={shared.cancel}
+            sizeClassName={shared.cancel}
+            block
           >
             {t('common.cancel')}
           </Button>

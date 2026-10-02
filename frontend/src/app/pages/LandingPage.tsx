@@ -22,7 +22,7 @@ import { SESSION_EXPIRED_NOTICE, oauthFailure } from '@features/auth/model/feedb
 import { ROUTES } from '@shared/constants';
 import { LanguageSelector } from '@shared/i18n/LanguageSelector';
 import { useSessionStore } from '@shared/stores';
-import { Icon, Toast, ToastStack } from '@shared/ui';
+import { Button, Icon, Toast, ToastStack } from '@shared/ui';
 import type { IconName } from '@shared/ui';
 import { cn } from '@shared/utils';
 
@@ -139,9 +139,14 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
       <div className={styles.stage}>
         <header>
           <nav aria-label={t('landing.primaryNavigation')} className={styles.header}>
-            <button type="button" onClick={() => openAuth('login')} className={styles.logIn}>
+            <Button
+              theme="outline"
+              sizeClassName={styles.logIn}
+              onClick={() => openAuth('login')}
+              className="shrink-0"
+            >
               {t('landing.logIn')}
-            </button>
+            </Button>
             <button type="button" onClick={() => openAuth('login')} className={styles.topPlayNow}>
               {t('landing.playNow')}
             </button>
@@ -166,13 +171,13 @@ export function LandingPage({ authMode: linkedAuthMode }: { authMode?: AuthMode 
               </h1>
               <p className={styles.descriptionShort}>{t('landing.descriptionShort')}</p>
               <p className={styles.description}>{t('landing.description')}</p>
-              <button
-                type="button"
+              <Button
+                sizeClassName={styles.heroPlayNow}
                 onClick={() => openAuth('login')}
-                className={styles.heroPlayNow}
+                className={styles.heroPlayNowPlacement}
               >
                 {t('landing.playNow')}
-              </button>
+              </Button>
               <a href={`#${HOW_TO_PLAY_ID}`} className={styles.learnMore}>
                 {t('landing.learnMore')}
               </a>

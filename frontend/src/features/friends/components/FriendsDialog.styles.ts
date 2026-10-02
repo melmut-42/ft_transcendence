@@ -80,11 +80,9 @@ export const badgeDot: string = 'size-[7px] rounded-pill bg-current';
 
 /** The design system's compact primary button. */
 export const addButton: string =
-  `${buttonInteraction} inline-flex h-[36px] shrink-0 items-center gap-[6px] rounded-[14px] ` +
-  'bg-primary px-[12px] text-md leading-none font-bold text-surface shadow-button-primary ' +
-  'not-disabled:not-aria-disabled:hover:bg-primary-bright ' +
-  'not-disabled:not-aria-disabled:hover:shadow-button-primary-hover aria-disabled:cursor-default ' +
-  'aria-disabled:opacity-70';
+  'h-[36px] gap-[6px] rounded-[14px] px-[12px] text-md leading-none font-bold';
+
+export const addPlacement: string = 'shrink-0 aria-disabled:opacity-70';
 
 export const rowError: string = 'basis-full text-sm leading-[18px] font-bold text-accent-red';
 

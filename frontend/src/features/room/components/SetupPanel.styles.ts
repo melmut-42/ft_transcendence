@@ -2,7 +2,8 @@ import type { Team } from '@shared/types';
 import { buttonInteraction } from '@shared/ui';
 
 /**
- * Class recipes for Your Setup: the team buttons, the role cards and the Ready button.
+ * Class recipes for Your Setup: the team buttons, the role cards and the Ready button's
+ * geometry.
  *
  * The panel keeps one size everywhere, the desktop sidebar's at 80% of the design, so the
  * same controls fit the sidebar and the setup dialog that phones and tablets open. The
@@ -89,30 +90,17 @@ export const hint: string =
   'mt-[12px] text-center text-[15px] leading-[18px] font-regular text-text-muted';
 
 /** Watch instead: a quiet text action under the roles, so a seat is not dropped by habit. */
-export const spectate: string =
-  'mx-auto mt-[10px] inline-flex cursor-pointer items-center gap-[8px] rounded-sm ' +
-  'text-[15px] leading-[18px] font-bold text-primary-sky underline-offset-2 ' +
-  'not-disabled:hover:underline disabled:cursor-not-allowed disabled:opacity-60';
+export const spectate: string = 'gap-[8px] text-[15px] leading-[18px] font-bold';
+
+export const spectatePlacement: string = 'mx-auto mt-[10px]';
 
 // ---- Ready ----
 
-export const ready: string =
-  `${buttonInteraction} inline-flex w-full items-center justify-center gap-[12px] ` +
-  'leading-none font-bold disabled:cursor-not-allowed';
+/** The shared `Button` draws the tone: primary to confirm, success once ready. */
+export const ready: string = 'gap-[12px] leading-none font-bold';
 
 /** Sidebar size; phones and tablets pass their own. */
 export const readySidebar: string = 'h-[53px] rounded-[13px] text-[22px]';
-
-export const readyTone = {
-  READY:
-    'bg-success-deep text-surface ' +
-    'shadow-button-success-deep ' +
-    'not-disabled:hover:brightness-105',
-  AVAILABLE:
-    'bg-primary text-surface shadow-button-primary not-disabled:hover:bg-primary-bright ' +
-    'not-disabled:hover:shadow-button-primary-hover',
-  UNAVAILABLE: 'bg-disabled text-text-muted shadow-button-disabled',
-};
 
 export const readyMark: string =
   'inline-flex size-[24px] shrink-0 items-center justify-center rounded-pill bg-surface ' +
@@ -131,9 +119,7 @@ export const summary: string =
 export const summaryText: string =
   'min-w-0 flex-1 truncate text-md leading-[21px] font-bold text-text-ink md:text-lg';
 
-export const summaryChange: string =
-  'shrink-0 cursor-pointer rounded-sm text-xl leading-[21px] font-bold tracking-tight ' +
-  'text-primary-sky hover:underline disabled:cursor-not-allowed disabled:opacity-60';
+export const summaryChange: string = 'text-xl leading-[21px] font-bold tracking-tight';
 
 // ---- Setup dialog (phones and tablets) ----
 

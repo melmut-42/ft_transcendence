@@ -10,7 +10,7 @@ import { OnlinePlayers } from '@features/friends/components/OnlinePlayers';
 import { ProfileMenu } from '@features/profile/components/ProfileMenu';
 import { CreateRoomDialog } from '@features/room/components/CreateRoomDialog';
 import { JoinRoomDialog } from '@features/room/components/JoinRoomDialog';
-import { Icon } from '@shared/ui';
+import { Button, Icon } from '@shared/ui';
 import type { IconName } from '@shared/ui';
 import { cn } from '@shared/utils';
 
@@ -104,11 +104,12 @@ export function LobbyPage() {
                 </span>
               </p>
 
-              <button
-                type="button"
+              <Button
+                variant={action.dialog === 'create' ? 'primary' : 'secondary'}
+                sizeClassName={styles.cardButton}
                 onClick={() => setDialog(action.dialog)}
                 aria-haspopup="dialog"
-                className={cn(styles.cardButton, styles.cardButtonTone[action.dialog])}
+                className={styles.cardButtonPlacement}
               >
                 {t(`lobby.${action.dialog}.action`)}
                 <span
@@ -117,7 +118,7 @@ export function LobbyPage() {
                 >
                   <Icon name={action.buttonIcon} />
                 </span>
-              </button>
+              </Button>
             </section>
           ))}
         </div>

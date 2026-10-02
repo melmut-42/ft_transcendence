@@ -2,7 +2,7 @@ import { useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { MatchHistoryEntry } from '@shared/types';
-import { Icon, Skeleton } from '@shared/ui';
+import { Button, Icon, Skeleton } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import { useMatchHistory } from '../hooks/useMatchHistory';
@@ -73,9 +73,14 @@ export function GameHistory() {
             <p className={styles.alertTitle}>{t('profile.history.errorTitle')}</p>
             <p className={styles.alertBody}>{t('profile.history.errorBody')}</p>
           </div>
-          <button type="button" onClick={history.retry} className={styles.retry}>
+          <Button
+            theme="link"
+            sizeClassName={styles.retry}
+            onClick={history.retry}
+            className={styles.retryPlacement}
+          >
             {t('profile.history.retry')}
-          </button>
+          </Button>
         </>
       )}
 
@@ -89,9 +94,14 @@ export function GameHistory() {
           <li ref={endRef} aria-hidden={!history.loadingMore}>
             {history.loadingMore && <SkeletonRow />}
             {!history.loadingMore && history.hasMore && history.error && (
-              <button type="button" onClick={loadMore} className={styles.retry}>
+              <Button
+                theme="link"
+                sizeClassName={styles.retry}
+                onClick={loadMore}
+                className={styles.retryPlacement}
+              >
                 {t('profile.history.retry')}
-              </button>
+              </Button>
             )}
           </li>
         </ul>

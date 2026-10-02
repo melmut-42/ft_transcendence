@@ -1,5 +1,3 @@
-import { buttonInteraction } from '@shared/ui';
-
 /**
  * Class recipes for Settings and its two pop-ups, Crop Photo and Pick Avatar.
  *
@@ -67,13 +65,13 @@ export const avatarActions: string = 'flex min-w-0 flex-1 flex-col gap-[8px] md:
 export const avatarButtons: string = 'flex flex-col gap-[8px] md:flex-row md:gap-[10px]';
 
 /** The design system's Outline Blue secondary button. */
+/** Geometry of the outline blue buttons beside the avatar; the shared `Button` draws them. */
 export const outlineButton: string =
-  `${buttonInteraction} inline-flex h-[48px] w-full items-center justify-center ` +
-  'rounded-[20px] border-(length:--stroke-default) border-primary-deep bg-surface ' +
-  'px-[12px] text-xl leading-none font-bold tracking-[-1.5px] whitespace-nowrap ' +
-  'text-primary-sky uppercase not-disabled:hover:bg-primary-sky/10 ' +
-  'disabled:border-border disabled:text-text-disabled md:h-[42px] md:w-[176px] ' +
-  'md:rounded-[16px] md:text-[16px] md:tracking-[-1.2px]';
+  'h-[48px] rounded-[20px] px-[12px] text-xl leading-none font-bold tracking-[-1.5px] ' +
+  'whitespace-nowrap uppercase md:h-[42px] md:rounded-[16px] md:text-[16px] ' +
+  'md:tracking-[-1.2px]';
+
+export const outlineButtonWidth: string = 'w-full bg-surface md:w-[176px]';
 
 // ---- Username ----
 
@@ -99,18 +97,9 @@ export const inputStatus = {
   error: 'border-secondary-dark focus:border-error focus:shadow-soft',
 };
 
-/** The design system's primary button. */
-export const primaryButton: string =
-  `${buttonInteraction} inline-flex shrink-0 items-center justify-center bg-primary ` +
-  'leading-none font-bold text-surface shadow-button-primary ' +
-  'not-disabled:not-aria-disabled:hover:bg-primary-bright ' +
-  'not-disabled:not-aria-disabled:hover:shadow-button-primary-hover ' +
-  'disabled:bg-disabled disabled:text-text-disabled disabled:shadow-button-disabled ' +
-  'aria-disabled:cursor-default';
-
 export const saveButton: string =
-  `${primaryButton} h-[52px] w-[92px] rounded-[20px] text-2xl md:h-[45px] md:w-[120px] ` +
-  'md:rounded-[16px] md:text-[18px]';
+  'h-[52px] w-[92px] rounded-[20px] text-2xl leading-none font-bold md:h-[45px] ' +
+  'md:w-[120px] md:rounded-[16px] md:text-[18px]';
 
 /** The read-only email: muted, and no hover or focus change beyond the focus ring. */
 export const inputReadOnly: string = 'border-border bg-surface-muted text-text-slate';
@@ -123,19 +112,16 @@ export const language: string = 'self-start';
 
 export const divider: string = 'h-[2px] w-full shrink-0 rounded-pill bg-surface-sunken';
 
-/** The design system's Leave Room button, used for Log Out. */
 export const logOut: string =
-  `${buttonInteraction} inline-flex h-[52px] w-full items-center justify-center gap-[8px] ` +
-  'rounded-md border-(length:--stroke-default) border-secondary-dark bg-surface ' +
-  'text-[25px] leading-none font-bold text-accent-red shadow-button-muted ' +
-  'not-disabled:hover:bg-secondary-dark/5 not-disabled:hover:shadow-button-muted-hover ' +
-  'md:h-[42px] md:rounded-[11px] md:text-[20px]';
+  'h-[52px] gap-[8px] rounded-md text-[25px] leading-none font-bold md:h-[42px] ' +
+  'md:rounded-[11px] md:text-[20px]';
 
-/** Delete Account: a quiet destructive link under Log Out, so it is never pressed by habit. */
+/** An outline button that sits raised on the white card, like Leave Room. */
+export const raisedSurface: string =
+  'bg-surface shadow-button-muted not-disabled:not-aria-disabled:hover:shadow-button-muted-hover';
+
 export const deleteAccount: string =
-  'mx-auto inline-flex cursor-pointer items-center gap-[8px] rounded-sm text-md leading-[22px] ' +
-  'font-bold text-accent-red underline-offset-2 not-disabled:hover:underline ' +
-  'disabled:cursor-default disabled:opacity-60 md:text-sm md:leading-[18px]';
+  'gap-[8px] text-md leading-[22px] font-bold md:text-sm md:leading-[18px]';
 
 export const logOutError: string =
   'text-center text-md leading-[1.3] font-bold text-accent-red md:text-sm';
@@ -191,14 +177,13 @@ export const hintAction: string =
 
 export const actions: string = 'grid w-full grid-cols-2 gap-[13px]';
 
+/** Cancel and Save under the picker and the cropper: outline and primary. */
 export const actionOutline: string =
-  `${buttonInteraction} inline-flex h-[48px] items-center justify-center rounded-[16px] ` +
-  'border-(length:--stroke-default) border-primary-deep bg-surface text-[16px] ' +
-  'leading-none font-bold tracking-[-1.2px] text-primary-sky uppercase ' +
-  'not-disabled:hover:bg-primary-sky/10 disabled:opacity-60 md:h-[45px]';
+  'h-[48px] rounded-[16px] text-[16px] leading-none font-bold tracking-[-1.2px] uppercase ' +
+  'md:h-[45px]';
 
 export const actionPrimary: string =
-  `${primaryButton} h-[48px] rounded-[11px] text-[16px] tracking-[-1.2px] uppercase ` +
+  'h-[48px] rounded-[11px] text-[16px] leading-none font-bold tracking-[-1.2px] uppercase ' +
   'md:h-[45px]';
 
 export const actionError: string = 'w-full text-center';

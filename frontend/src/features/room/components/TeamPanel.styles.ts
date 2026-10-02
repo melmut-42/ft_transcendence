@@ -126,11 +126,9 @@ export const emptyLabel: string =
 export const kickable: string = 'relative min-w-0';
 
 /** A small round coral control on the card's corner, apart from the card's own press. */
-export const kick: string =
-  `${buttonInteraction} absolute -top-[6px] -right-[6px] z-10 inline-flex size-[30px] ` +
-  'items-center justify-center rounded-pill border-(length:--stroke-default) ' +
-  'border-secondary-dark bg-surface text-[13px] text-accent-red shadow-button-muted ' +
-  'not-disabled:hover:bg-secondary-dark/5 not-disabled:hover:shadow-button-muted-hover';
+export const kickSize: string = 'size-[30px] text-[13px]';
+
+export const kick: string = 'absolute -top-[6px] -right-[6px] z-10 bg-surface shadow-button-muted';
 
 // ---- Spectators ----
 

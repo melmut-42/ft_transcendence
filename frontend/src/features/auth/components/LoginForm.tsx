@@ -13,6 +13,7 @@ import type { FieldErrors, LoginField } from '../model/validation';
 import { AuthAlert } from './AuthAlert';
 import * as styles from './AuthDialog.styles';
 import { AuthField } from './AuthField';
+import { Button } from '@shared/ui';
 
 /** How long the welcome banner stays up before the Lobby opens. */
 const WELCOME_DURATION_MS = 900;
@@ -99,15 +100,15 @@ export function LoginForm() {
         />
       </div>
 
-      <button
+      <Button
         type="submit"
-        aria-busy={submitting || undefined}
-        aria-disabled={submitting || undefined}
-        className={cn(styles.submit.login, submitting && 'pointer-events-none')}
+        loading={submitting}
+        sizeClassName={styles.submit}
+        block
+        className={styles.submitPlacement.login}
       >
         {t('auth.login.submit')}
-        {submitting && <span className={styles.loadingEllipsis}>…</span>}
-      </button>
+      </Button>
     </form>
   );
 }

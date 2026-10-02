@@ -1,5 +1,3 @@
-import { buttonInteraction } from '@shared/ui';
-
 /**
  * Class recipes for the Reconnecting overlay and the Disconnected notice. Both cards share
  * one frame: phones are the base (a 358px card), `md:` draws the 640px card of the design
@@ -37,18 +35,17 @@ export const chip: string =
 
 export const error: string = 'text-md leading-[18px] font-bold text-accent-red desktop:text-[14px]';
 
-/** Leave Match: the design system's outline blue button. */
+/** Leave Match: the design system's outline blue button, at this card's geometry. */
 export const leave: string =
-  `${buttonInteraction} inline-flex h-[54px] w-full items-center justify-center ` +
-  'rounded-[22px] border-(length:--stroke-default) border-primary-deep bg-surface px-[20px] ' +
-  'text-2xl leading-none font-bold text-primary-sky not-aria-disabled:hover:bg-primary/10 ' +
-  'aria-disabled:cursor-default aria-disabled:opacity-50 md:w-[300px] desktop:h-[43px] desktop:w-[240px] ' +
+  'h-[54px] rounded-[22px] px-[20px] text-2xl leading-none font-bold desktop:h-[43px] ' +
   'desktop:rounded-[18px] desktop:text-[18px]';
 
-/** Back to Lobby: the design system's primary button. */
+export const leavePlacement: string =
+  'w-full bg-surface aria-disabled:opacity-50 md:w-[300px] desktop:w-[240px]';
+
+/** Back to Lobby: the design system's primary button, at this card's geometry. */
 export const backToLobby: string =
-  `${buttonInteraction} inline-flex h-[58px] w-full items-center justify-center ` +
-  'rounded-[23px] bg-primary px-[20px] text-[25px] leading-none font-bold text-surface ' +
-  'shadow-button-primary not-disabled:hover:bg-primary-bright ' +
-  'not-disabled:hover:shadow-button-primary-hover md:w-[340px] desktop:h-[46px] ' +
-  'desktop:w-[272px] desktop:rounded-[18px] desktop:text-[20px]';
+  'h-[58px] rounded-[23px] px-[20px] text-[25px] leading-none font-bold desktop:h-[46px] ' +
+  'desktop:rounded-[18px] desktop:text-[20px]';
+
+export const backToLobbyWidth: string = 'w-full md:w-[340px] desktop:w-[272px]';

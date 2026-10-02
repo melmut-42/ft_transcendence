@@ -7,7 +7,7 @@ import cardsArtwork from '@assets/auth/auth-cards.svg';
 import foxCornerArtwork from '@assets/auth/auth-fox-corner.svg';
 import foxPeekArtwork from '@assets/auth/auth-fox-peek.svg';
 import mascotArtwork from '@assets/auth/auth-mascot.svg';
-import { Dialog } from '@shared/ui';
+import { Button, Dialog } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import type { AuthAlert as AuthAlertContent } from '../model/feedback';
@@ -135,13 +135,13 @@ export function AuthDialog({ initialMode, onClose, notice = null }: AuthDialogPr
           {t(`auth.${mode}.switchAction`)}
         </button>
       </p>
-      <button
-        type="button"
+      <Button
+        sizeClassName={styles.submit}
         onClick={() => switchTo(other)}
         className={cn(styles.switchButtonBase, styles.switchButton[mode])}
       >
         {t(`auth.${mode}.switchAction`)}
-      </button>
+      </Button>
 
       <img src={mascotArtwork} alt="" className={styles.mascot} />
       <img src={cardsArtwork} alt="" className={styles.cards} />

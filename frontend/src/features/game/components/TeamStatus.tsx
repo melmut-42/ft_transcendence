@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { openProfileModal } from '@shared/stores';
 import type { RoomMember } from '@shared/types';
-import { AvatarImage, Icon } from '@shared/ui';
+import { AvatarImage, ButtonIcon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import type { TeamLineup } from '../model/lineup';
@@ -47,16 +47,17 @@ function Player({
         </span>
       </button>
       {onKick && (
-        <button
-          type="button"
+        <ButtonIcon
+          icon="kick"
+          theme="outline"
+          variant="secondary"
+          sizeClassName={styles.kickSize}
           onClick={() => onKick(member)}
           aria-haspopup="dialog"
           aria-label={t('room.kick.action', { username: member.username })}
           title={t('room.kick.action', { username: member.username })}
           className={styles.kick}
-        >
-          <Icon name="kick" />
-        </button>
+        />
       )}
     </li>
   );

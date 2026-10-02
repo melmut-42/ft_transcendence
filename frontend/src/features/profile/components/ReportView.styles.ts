@@ -1,5 +1,3 @@
-import { buttonInteraction } from '@shared/ui';
-
 /**
  * Class recipes for Report Player, which takes the place of the profile inside the same
  * Profile pop-up. It uses the pop-up's card, the Settings field and hint type, and the
@@ -51,20 +49,14 @@ export const error: string =
 
 export const actions: string = 'grid w-full grid-cols-2 gap-[13px]';
 
-const buttonBase: string =
-  `${buttonInteraction} inline-flex h-[52px] items-center justify-center rounded-[18px] ` +
-  'px-[12px] text-xl leading-none font-bold whitespace-nowrap md:h-[45px] md:text-[18px]';
+/** Geometry of the report's buttons; the shared `Button` draws their fill. */
+export const button: string =
+  'h-[52px] rounded-[18px] px-[12px] text-xl leading-none font-bold whitespace-nowrap ' +
+  'md:h-[45px] md:text-[18px]';
 
-export const cancel: string =
-  `${buttonBase} bg-background text-text-black shadow-button-neutral ` +
-  'not-disabled:hover:shadow-button-neutral-hover disabled:opacity-60';
+export const cancel: string = 'aria-disabled:opacity-60';
 
-/** Submit is the coral action: a report is a serious step, not a routine one. */
-export const submit: string =
-  `${buttonBase} bg-secondary-deep text-surface shadow-button-coral ` +
-  'not-disabled:not-aria-disabled:hover:brightness-105 ' +
-  'not-disabled:not-aria-disabled:hover:shadow-button-coral-hover ' +
-  'aria-disabled:cursor-default aria-disabled:opacity-70';
+export const submit: string = 'aria-disabled:opacity-70';
 
 export const outcome: string =
   'flex flex-col items-center gap-[12px] px-[8px] pt-[8px] pb-[4px] text-center';
@@ -79,7 +71,4 @@ export const outcomeTone = {
 export const outcomeBody: string =
   'max-w-[400px] text-lg leading-[1.4] font-regular text-text-muted md:text-md';
 
-export const done: string =
-  `${buttonBase} mt-[4px] w-full bg-primary text-surface shadow-button-primary ` +
-  'not-disabled:hover:bg-primary-bright not-disabled:hover:shadow-button-primary-hover ' +
-  'md:w-[240px]';
+export const done: string = 'mt-[4px] w-full md:w-[240px]';

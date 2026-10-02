@@ -3,7 +3,7 @@ import type { ReactNode, RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Room } from '@shared/types';
-import { AvatarImage, Dialog, Icon, Skeleton } from '@shared/ui';
+import { AvatarImage, Button, Dialog, Icon, Skeleton } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import { useInviteToRoom } from '../hooks/useInviteToRoom';
@@ -137,10 +137,17 @@ export function ProfileModal({
           <ProfileStats profile={profile} />
           {isSelf && history}
           {!isSelf && onKick && (
-            <button type="button" onClick={onKick} aria-haspopup="dialog" className={styles.report}>
-              <Icon name="kick" />
+            <Button
+              theme="link"
+              variant="muted"
+              icon="kick"
+              sizeClassName={styles.report}
+              onClick={onKick}
+              aria-haspopup="dialog"
+              className={styles.reportPlacement}
+            >
               {t('room.kick.fromProfile')}
-            </button>
+            </Button>
           )}
           {!isSelf && (
             <ReportButton
@@ -209,16 +216,18 @@ function ReportButton({
 }) {
   const { t } = useTranslation();
   return (
-    <button
+    <Button
       ref={buttonRef}
-      type="button"
+      theme="link"
+      variant="muted"
+      icon={reported ? 'check' : 'flag'}
+      sizeClassName={styles.report}
       onClick={() => !reported && onReport()}
       aria-disabled={reported || undefined}
-      className={styles.report}
+      className={styles.reportPlacement}
     >
-      <Icon name={reported ? 'check' : 'flag'} />
       {t(reported ? 'profile.report.reported' : 'profile.report.action')}
-    </button>
+    </Button>
   );
 }
 
@@ -301,9 +310,14 @@ function ProfileActions({
         )}
         {/* Direct chat is friend-only, so Message is offered to friends only. */}
         {isFriend && onMessage && (
-          <button type="button" onClick={onMessage} className={styles.message}>
+          <Button
+            theme="outline"
+            sizeClassName={styles.action}
+            onClick={onMessage}
+            className={styles.message}
+          >
             {t('profile.message')}
-          </button>
+          </Button>
         )}
       </div>
       <HintLine id={hintId} hint={hint} />
@@ -327,8 +341,9 @@ function FriendButton({
     : t(isFriend ? 'profile.friend.remove' : 'profile.friend.add');
 
   return (
-    <button
-      type="button"
+    <Button
+      variant={isFriend ? 'neutral' : 'primary'}
+      sizeClassName={styles.action}
       onClick={() => {
         if (busy) return;
         if (isFriend) friendship.remove();
@@ -337,10 +352,10 @@ function FriendButton({
       aria-disabled={busy}
       aria-busy={busy}
       aria-describedby={hintId}
-      className={isFriend ? styles.removeFriend : styles.addFriend}
+      className={styles.friend}
     >
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -433,9 +448,9 @@ function ProfileNotice({
       </h2>
       <p className={styles.noticeBody}>{t(`profile.${kind}.body`)}</p>
       {kind === 'error' && (
-        <button type="button" onClick={onRetry} className={styles.retry}>
+        <Button sizeClassName={styles.retry} onClick={onRetry} className={styles.retryPlacement}>
           {t('profile.retry')}
-        </button>
+        </Button>
       )}
     </div>
   );

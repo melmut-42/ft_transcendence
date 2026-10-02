@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { REPORT_DETAILS_MAX, REPORT_REASONS } from '@shared/types';
 import type { ReportReason } from '@shared/types';
-import { Icon } from '@shared/ui';
+import { Button, Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import type { ReportState } from '../hooks/useReportUser';
@@ -76,9 +76,14 @@ export function ReportView({
           <p className={styles.outcomeBody}>
             {t(`profile.report.outcome.${state.status}`, { username })}
           </p>
-          <button ref={doneRef} type="button" onClick={onBack} className={styles.done}>
+          <Button
+            ref={doneRef}
+            sizeClassName={styles.button}
+            onClick={onBack}
+            className={styles.done}
+          >
             {t('profile.report.done')}
-          </button>
+          </Button>
         </div>
       ) : (
         <form onSubmit={submit} noValidate className={styles.form}>
@@ -136,17 +141,26 @@ export function ReportView({
           )}
 
           <div className={styles.actions}>
-            <button type="button" onClick={onBack} disabled={sending} className={styles.cancel}>
+            <Button
+              variant="neutral"
+              sizeClassName={styles.button}
+              onClick={() => !sending && onBack()}
+              aria-disabled={sending || undefined}
+              className={styles.cancel}
+            >
               {t('profile.report.cancel')}
-            </button>
-            <button
+            </Button>
+            {/* Submit is the coral action: a report is a serious step, not a routine one. */}
+            <Button
               type="submit"
+              variant="secondary"
+              sizeClassName={styles.button}
               aria-disabled={!reason || sending}
               aria-busy={sending}
               className={styles.submit}
             >
               {t(sending ? 'profile.report.sending' : 'profile.report.submit')}
-            </button>
+            </Button>
           </div>
         </form>
       )}

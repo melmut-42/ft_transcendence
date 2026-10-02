@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import type { KeyboardEvent, RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { FieldMessage, Icon, Skeleton } from '@shared/ui';
+import { Button, FieldMessage, Icon, Skeleton } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import { useAvatarPresets } from '../hooks/useAvatarPresets';
@@ -108,9 +108,14 @@ export function AvatarPickView({
       ) : (
         <div role="alert" className={styles.pickNotice}>
           <p className={styles.hint}>{t('settings.pick.loadFailed')}</p>
-          <button type="button" onClick={picker.retry} className={styles.outlineButton}>
+          <Button
+            theme="outline"
+            sizeClassName={styles.outlineButton}
+            onClick={picker.retry}
+            className={styles.outlineButtonWidth}
+          >
             {t('settings.pick.retry')}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -123,23 +128,23 @@ export function AvatarPickView({
       )}
 
       <div className={styles.actions}>
-        <button
-          type="button"
+        <Button
+          theme="outline"
+          sizeClassName={styles.actionOutline}
           onClick={onCancel}
           disabled={picker.saving}
-          className={styles.actionOutline}
+          className="bg-surface"
         >
           {t('settings.pick.cancel')}
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          sizeClassName={styles.actionPrimary}
           onClick={() => void picker.save()}
           disabled={!picker.canSave}
           aria-busy={picker.saving}
-          className={styles.actionPrimary}
         >
           {t(picker.saving ? 'settings.pick.saving' : 'settings.pick.save')}
-        </button>
+        </Button>
       </div>
     </>
   );

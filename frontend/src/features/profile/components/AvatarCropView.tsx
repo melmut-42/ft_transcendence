@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import type { CSSProperties, KeyboardEvent, PointerEvent, RefObject } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
-import { FieldMessage, Icon } from '@shared/ui';
+import { Button, FieldMessage, Icon } from '@shared/ui';
 
 import type { useAvatarUpload } from '../hooks/useAvatarUpload';
 import { AVATAR_RULES, displayRect } from '../model/avatarCrop';
@@ -163,23 +163,23 @@ export function AvatarCropView({
       )}
 
       <div className={styles.actions}>
-        <button
-          type="button"
+        <Button
+          theme="outline"
+          sizeClassName={styles.actionOutline}
           onClick={cancel}
           disabled={uploading}
-          className={styles.actionOutline}
+          className="bg-surface"
         >
           {t('settings.crop.cancel')}
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          sizeClassName={styles.actionPrimary}
           onClick={() => void confirm()}
           disabled={uploading}
           aria-busy={uploading}
-          className={styles.actionPrimary}
         >
           {t(uploading ? 'settings.crop.saving' : 'settings.crop.save')}
-        </button>
+        </Button>
       </div>
     </>
   );

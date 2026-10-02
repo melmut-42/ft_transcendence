@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { openProfileModal, useModalStore } from '@shared/stores';
 import { USER_SEARCH_QUERY } from '@shared/types';
 import type { Friend, UserSearchResult } from '@shared/types';
-import { AvatarImage, Dialog, Icon, LoadingDots } from '@shared/ui';
+import { AvatarImage, Button, Dialog, Icon, LoadingDots } from '@shared/ui';
 import type { IconName } from '@shared/ui';
 
 import { useAddFriend } from '../hooks/useAddFriend';
@@ -199,17 +199,17 @@ function SearchResults({
                   )}
                 </PlayerIdentity>
                 {!friend && (
-                  <button
-                    type="button"
-                    onClick={() => void additions.add(result.user_id)}
+                  <Button
+                    icon="userAdd"
+                    sizeClassName={styles.addButton}
+                    onClick={() => !adding && void additions.add(result.user_id)}
                     aria-disabled={adding || undefined}
                     aria-busy={adding || undefined}
                     aria-label={t('friends.search.addLabel', { username: result.username })}
-                    className={styles.addButton}
+                    className={styles.addPlacement}
                   >
-                    <Icon name="userAdd" />
                     {t(adding ? 'friends.search.adding' : 'friends.search.add')}
-                  </button>
+                  </Button>
                 )}
                 {failure && (
                   <p role="alert" className={styles.rowError}>

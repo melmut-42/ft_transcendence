@@ -10,7 +10,7 @@ import { useFocusTrap, useScrollLock } from '@shared/hooks';
 import { useConnectionStore } from '@shared/stores';
 import type { RoomRecovery } from '@shared/stores';
 import type { RoomStatus } from '@shared/types';
-import { Dialog, LoadingDots } from '@shared/ui';
+import { Button, Dialog, LoadingDots } from '@shared/ui';
 
 import { useLeaveRoom } from '../hooks/useLeaveRoom';
 import * as styles from './ConnectionOverlay.styles';
@@ -125,17 +125,18 @@ function ReconnectingCard({ recovery }: { recovery: RoomRecovery }) {
           </p>
         )}
         {/* Held with `aria-disabled` rather than `disabled`, so focus stays in the card. */}
-        <button
-          type="button"
+        <Button
+          theme="outline"
+          sizeClassName={styles.leave}
           onClick={() => {
             if (!leaving) void leave.confirm();
           }}
           aria-disabled={leaving}
           aria-busy={leaving}
-          className={styles.leave}
+          className={styles.leavePlacement}
         >
           {t(leaving ? 'room.leave.leaving' : `room.connection.leave.${kind}`)}
-        </button>
+        </Button>
       </div>
     </div>,
     document.body,
@@ -204,9 +205,13 @@ export function DisconnectedNotice() {
       <p id={bodyId} className={styles.body}>
         {t('room.connection.lostBody')}
       </p>
-      <button type="button" onClick={dismiss} className={styles.backToLobby}>
+      <Button
+        sizeClassName={styles.backToLobby}
+        onClick={dismiss}
+        className={styles.backToLobbyWidth}
+      >
         {t('room.connection.backToLobby')}
-      </button>
+      </Button>
     </Dialog>
   );
 }

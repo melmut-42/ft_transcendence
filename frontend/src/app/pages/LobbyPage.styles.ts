@@ -1,5 +1,3 @@
-import { buttonInteraction } from '@shared/ui';
-
 /**
  * Class recipes for Room Discovery.
  *
@@ -101,20 +99,13 @@ export const cardDescriptionShort: string = 'desktop:hidden';
 
 export const cardDescriptionLong: string = 'hidden whitespace-pre-line desktop:inline';
 
+/** Create is the shared primary `Button` and Join the coral secondary one. */
 export const cardButton: string =
-  `${buttonInteraction} inline-flex h-12 w-full items-center justify-center gap-[10px] ` +
-  'rounded-lg text-xl leading-none font-bold whitespace-nowrap text-surface uppercase ' +
-  'desktop:absolute desktop:top-[182px] desktop:left-[23px] desktop:h-[64px] ' +
-  'desktop:w-[418px] desktop:rounded-md desktop:text-[22px]';
+  'h-12 gap-[10px] rounded-lg text-xl leading-none font-bold whitespace-nowrap uppercase ' +
+  'desktop:h-[64px] desktop:rounded-md desktop:text-[22px]';
 
-export const cardButtonTone = {
-  create:
-    'bg-primary shadow-button-primary not-disabled:hover:bg-primary-bright ' +
-    'not-disabled:hover:shadow-button-primary-hover',
-  join:
-    'bg-secondary-deep shadow-button-coral not-disabled:hover:brightness-105 ' +
-    'not-disabled:hover:shadow-button-coral-hover',
-};
+export const cardButtonPlacement: string =
+  'w-full desktop:absolute desktop:top-[182px] desktop:left-[23px] desktop:w-[418px]';
 
 /** The label is centred on the whole button; the icon sits after it, as the design places it. */
 export const cardButtonIcon: string =

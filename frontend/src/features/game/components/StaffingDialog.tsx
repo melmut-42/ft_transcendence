@@ -3,12 +3,16 @@ import { useTranslation } from 'react-i18next';
 
 import { useSecondsUntil } from '@shared/hooks';
 import type { PlayingRole, Staffing, StaffingDeparture, Team } from '@shared/types';
-import { Dialog, Icon } from '@shared/ui';
+import { Button, Dialog, Icon } from '@shared/ui';
+import type { ButtonVariant } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import * as styles from './StaffingDialog.styles';
 
 const TEAMS: Team[] = ['RED', 'BLUE'];
+
+/** A claim is drawn in its team's color: coral for Red, blue for Blue. */
+const TEAM_BUTTON: Record<Team, ButtonVariant> = { RED: 'secondary', BLUE: 'primary' };
 
 /** `2:05` from whole seconds. */
 const clock = (seconds: number): string =>
@@ -133,19 +137,20 @@ export function StaffingDialog({
           <div className={styles.claimActions}>
             {short.flatMap((team) =>
               staffing[team === 'RED' ? 'red' : 'blue'].missing_roles.map((role) => (
-                <button
+                <Button
                   key={`${team}-${role}`}
-                  type="button"
+                  variant={TEAM_BUTTON[team]}
+                  sizeClassName={styles.claimButton}
                   onClick={() => !claim.pending && claim.onClaim(team, role)}
                   aria-busy={claim.pending || undefined}
-                  disabled={claim.pending}
-                  className={cn(styles.claimButton, styles.claimTone[team])}
+                  aria-disabled={claim.pending || undefined}
+                  className={styles.claimPlacement}
                 >
                   {t('game.staffing.claim', {
                     team: t(`game.team.${team}`),
                     role: t(`game.staffing.role.${role}`),
                   })}
-                </button>
+                </Button>
               )),
             )}
           </div>
@@ -157,10 +162,17 @@ export function StaffingDialog({
         </div>
       )}
 
-      <button type="button" onClick={onLeave} aria-haspopup="dialog" className={styles.leave}>
-        <Icon name="logout" />
+      <Button
+        theme="link"
+        variant="secondary"
+        icon="logout"
+        sizeClassName={styles.leave}
+        onClick={onLeave}
+        aria-haspopup="dialog"
+        className="mt-[18px]"
+      >
         {t('game.leave')}
-      </button>
+      </Button>
     </Dialog>
   );
 }

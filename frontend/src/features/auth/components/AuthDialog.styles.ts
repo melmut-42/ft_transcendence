@@ -133,15 +133,12 @@ export const alertBody: string = 'text-md leading-[18px] font-regular tracking-[
 
 // ---- Actions ----
 
-const primaryButton: string =
-  `${buttonInteraction} inline-flex h-12 w-full shrink-0 items-center justify-center ` +
-  'rounded-lg bg-primary text-2xl leading-tight font-bold whitespace-nowrap text-surface ' +
-  'shadow-button-primary not-disabled:hover:bg-primary-bright ' +
-  'not-disabled:hover:shadow-button-primary-hover';
+/** The form's submit: the shared primary `Button` at the dialog's geometry. */
+export const submit: string = 'h-12 rounded-lg text-2xl leading-tight font-bold whitespace-nowrap';
 
-export const submit: Record<AuthMode, string> = {
-  login: `${primaryButton} mt-[20px]`,
-  register: `${primaryButton} mt-[16px]`,
+export const submitPlacement: Record<AuthMode, string> = {
+  login: 'mt-[20px] shrink-0',
+  register: 'mt-[16px] shrink-0',
 };
 
 /** "or" between the form and Continue with Google. */
@@ -165,9 +162,6 @@ export const googleMark: string = 'size-[20px] shrink-0';
 /** A notice about how the dialog was reached, such as a failed Google sign-in. */
 export const notice: string = 'mb-[12px]';
 
-/** The loading ellipsis trails the label, as the design system's loading button does. */
-export const loadingEllipsis: string = 'motion-safe:animate-pulse';
-
 export const prompt: string =
   'mt-[14px] text-center text-md leading-[20px] font-bold text-text-ink md:text-lg ' +
   'md:leading-[22px] md:font-regular';
@@ -181,4 +175,4 @@ export const switchButton: Record<AuthMode, string> = {
   register: 'max-md:hidden',
 };
 
-export const switchButtonBase: string = `${primaryButton} mt-[10px] md:w-[376px]`;
+export const switchButtonBase: string = 'mt-[10px] w-full shrink-0 md:w-[376px]';

@@ -78,6 +78,7 @@ export const alertTitle: string = 'text-lg leading-[20px] font-bold md:text-md m
 
 export const alertBody: string = 'text-md leading-[18px] font-regular md:text-sm';
 
-export const retry: string =
-  'self-start rounded-sm text-lg leading-[21px] font-bold text-primary-sky underline-offset-2 ' +
-  'transition-colors duration-100 hover:text-primary hover:underline md:text-md';
+/** Try Again: the shared link `Button`, deepening its blue on hover. */
+export const retry: string = 'text-lg leading-[21px] font-bold md:text-md';
+
+export const retryPlacement: string = 'self-start hover:text-primary';

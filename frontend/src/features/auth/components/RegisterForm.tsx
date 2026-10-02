@@ -13,6 +13,7 @@ import type { FieldErrors, RegisterField, RegisterValues } from '../model/valida
 import { AuthAlert } from './AuthAlert';
 import * as styles from './AuthDialog.styles';
 import { AuthField } from './AuthField';
+import { Button } from '@shared/ui';
 
 const EMPTY: RegisterValues = { username: '', email: '', password: '', confirmPassword: '' };
 
@@ -109,15 +110,15 @@ export function RegisterForm() {
         {alert && <AuthAlert alert={alert} />}
       </div>
 
-      <button
+      <Button
         type="submit"
-        aria-busy={submitting || undefined}
-        aria-disabled={submitting || undefined}
-        className={cn(styles.submit.register, submitting && 'pointer-events-none')}
+        loading={submitting}
+        sizeClassName={styles.submit}
+        block
+        className={styles.submitPlacement.register}
       >
         {t('auth.register.submit')}
-        {submitting && <span className={styles.loadingEllipsis}>…</span>}
-      </button>
+      </Button>
     </form>
   );
 }

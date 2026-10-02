@@ -29,7 +29,7 @@ import {
 import { useRoomStore } from '@features/room/store/roomStore';
 import { useConnectionStore, useSessionStore } from '@shared/stores';
 import type { Room, RoomMember } from '@shared/types';
-import { Icon, Toast, ToastStack } from '@shared/ui';
+import { Button, Icon, Toast, ToastStack } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import * as styles from './ReadyRoom.styles';
@@ -39,15 +39,18 @@ const CANCEL_NOTICE_MS = 5_000;
 function LeaveButton({ onLeave, className }: { onLeave: () => void; className: string }) {
   const { t } = useTranslation();
   return (
-    <button
-      type="button"
+    <Button
+      theme="outline"
+      variant="secondary"
+      sizeClassName={cn(styles.leave, className)}
+      block
       onClick={onLeave}
       aria-haspopup="dialog"
-      className={cn(styles.leave, className)}
+      className={styles.leaveSurface}
     >
       {t('room.leave.action')}
       <Icon name="logout" className={styles.leaveIcon} />
-    </button>
+    </Button>
   );
 }
 

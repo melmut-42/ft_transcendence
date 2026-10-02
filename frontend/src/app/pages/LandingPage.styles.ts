@@ -46,9 +46,10 @@ const outlineButton: string =
   'border-(length:--stroke-default) border-primary-deep text-center font-bold leading-tight ' +
   'whitespace-nowrap text-primary-sky not-disabled:hover:bg-primary/10';
 
+/** Log In: the shared outline `Button` at the header's geometry. */
 export const logIn: string =
-  `${outlineButton} inline-flex h-10 w-24 text-xl md:h-12 md:w-30 md:text-2xl ` +
-  'desktop:h-[47px] desktop:w-[111px] desktop:text-[22px]';
+  'h-10 w-24 rounded-lg text-xl leading-tight font-bold whitespace-nowrap md:h-12 md:w-30 ' +
+  'md:text-2xl desktop:h-[47px] desktop:w-[111px] desktop:text-[22px]';
 
 export const topPlayNow: string =
   `${buttonInteraction} hidden h-[49px] w-[142px] items-center justify-center rounded-[22px] ` +
@@ -95,12 +96,12 @@ export const description: string =
   'hidden w-[540px] text-xl leading-[24px] font-medium whitespace-pre-line text-text-ink ' +
   'desktop:block';
 
+/** Play Now: the shared primary `Button` at the hero's geometry. */
 export const heroPlayNow: string =
-  `${buttonInteraction} inline-flex h-14 w-full items-center justify-center rounded-lg ` +
-  'bg-primary text-3xl leading-tight font-bold whitespace-nowrap text-surface uppercase ' +
-  'shadow-button-primary not-disabled:hover:bg-primary-bright ' +
-  'not-disabled:hover:shadow-button-primary-hover md:h-17 md:pt-[2px] md:text-4xl ' +
-  'desktop:mt-[4px] desktop:h-[61px] desktop:w-[211px] desktop:rounded-md desktop:text-[29px]';
+  'h-14 rounded-lg text-3xl leading-tight font-bold whitespace-nowrap uppercase md:h-17 ' +
+  'md:pt-[2px] md:text-4xl desktop:h-[61px] desktop:rounded-md desktop:text-[29px]';
+
+export const heroPlayNowPlacement: string = 'w-full desktop:mt-[4px] desktop:w-[211px]';
 
 export const learnMore: string =
   `${outlineButton} hidden h-[43px] w-[148px] text-xl uppercase ` +

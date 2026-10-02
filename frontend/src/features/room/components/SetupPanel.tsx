@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import operativeArtwork from '@assets/ready-room/role-operative.svg';
 import spymasterArtwork from '@assets/ready-room/role-spymaster.svg';
 import type { PlayingRole, Room, RoomMember, Team } from '@shared/types';
-import { Dialog, Icon } from '@shared/ui';
+import { Button, Dialog, Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import type { RoomSetup } from '../hooks/useRoomSetup';
@@ -130,16 +130,17 @@ export function SetupPanel({ room, me, setup, className }: SetupProps & { classN
       </div>
       <RoleHint room={room} me={me} draftTeam={setup.draftTeam} id={`${roleLabelId}-hint`} />
       {!spectating && (
-        <button
-          type="button"
+        <Button
+          theme="link"
+          icon="spectate"
+          sizeClassName={styles.spectate}
           aria-busy={setup.pending === 'role'}
           disabled={locked}
           onClick={() => !busy && void setup.spectate()}
-          className={styles.spectate}
+          className={styles.spectatePlacement}
         >
-          <Icon name="spectate" />
           {t('room.ready.spectate')}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -197,20 +198,19 @@ export function ReadyButton({
 
   return (
     <>
-      <button
-        type="button"
+      <Button
+        variant={me.ready ? 'success' : 'primary'}
+        sizeClassName={cn(styles.ready, size)}
+        block
         aria-pressed={me.ready}
         aria-busy={setup.pending === 'ready'}
         aria-describedby={unavailable ? hintId : undefined}
-        disabled={unavailable}
-        onClick={() => setup.pending === null && void setup.setReady(!me.ready)}
-        className={cn(
-          styles.ready,
-          // A ready player stays green while the countdown locks the button.
-          styles.readyTone[me.ready ? 'READY' : state.kind],
-          size,
-          className,
-        )}
+        // A ready player stays green while the countdown locks the button, so it is held
+        // rather than drawn disabled.
+        disabled={unavailable && !me.ready}
+        aria-disabled={(unavailable && me.ready) || undefined}
+        onClick={() => !unavailable && setup.pending === null && void setup.setReady(!me.ready)}
+        className={className}
       >
         {me.ready && (
           <span aria-hidden="true" className={styles.readyMark}>
@@ -218,7 +218,7 @@ export function ReadyButton({
           </span>
         )}
         {t(me.ready ? 'room.ready.readyDone' : 'room.ready.readyAction')}
-      </button>
+      </Button>
       {unavailable && (
         <span id={hintId} className="sr-only">
           {t(`room.ready.hints.ready.${state.reason}`)}
@@ -258,15 +258,16 @@ export function SetupSummary({
   return (
     <div className={styles.summary}>
       <p className={styles.summaryText}>{t('room.ready.summary', { setup: parts.join(' · ') })}</p>
-      <button
-        type="button"
+      <Button
+        theme="link"
+        sizeClassName={styles.summaryChange}
         onClick={onChange}
         disabled={disabled}
         aria-haspopup="dialog"
-        className={styles.summaryChange}
+        className="shrink-0"
       >
         {t(me.role === 'SPECTATOR' ? 'room.ready.choose' : 'room.ready.change')}
-      </button>
+      </Button>
     </div>
   );
 }

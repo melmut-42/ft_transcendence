@@ -140,7 +140,7 @@ export function CreateRoomDialog({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className={shared.actions}>
-          <Button type="submit" loading={status === 'CREATING'} className={shared.submit}>
+          <Button type="submit" loading={status === 'CREATING'} sizeClassName={shared.submit} block>
             {status !== 'CREATED' && (
               <span aria-hidden="true" className={cn(shared.submitIcon, 'text-primary-sky')}>
                 <Icon name="add" />
@@ -153,7 +153,8 @@ export function CreateRoomDialog({ onClose }: { onClose: () => void }) {
             variant="danger"
             onClick={onClose}
             disabled={busy}
-            className={shared.cancel}
+            sizeClassName={shared.cancel}
+            block
           >
             {t('common.cancel')}
           </Button>

@@ -3,7 +3,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Clue } from '@shared/types';
-import { Icon, LoadingDots } from '@shared/ui';
+import { Button, Icon, LoadingDots } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import type { GameActions } from '../hooks/useGameActions';
@@ -132,17 +132,18 @@ export function ClueForm({ actions, className }: { actions: GameActions; classNa
           disabled={sending}
           labelledBy={ids.number}
         />
-        <button
+        <Button
           type="submit"
+          sizeClassName={styles.submit}
           disabled={!valid}
           aria-busy={sending || undefined}
-          className={styles.submit}
+          className={styles.submitPlacement}
         >
           {t(sending ? 'game.clue.sending' : 'game.clue.submit')}
           <span aria-hidden="true" className={styles.submitIcon}>
             <Icon name="send" />
           </span>
-        </button>
+        </Button>
       </div>
       {showRule && (
         <p id={ids.error} className={styles.rule}>

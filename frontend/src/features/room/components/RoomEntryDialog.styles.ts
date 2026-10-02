@@ -54,10 +54,15 @@ export const messageBadge: string =
 
 export const actions: string = 'flex w-full flex-col gap-[10px]';
 
-export const submit: string = 'h-12 w-full rounded-lg text-2xl';
+/** Primary submit and outline Cancel, both drawn by the shared `Button` at full width. */
+export const submit: string =
+  'h-12 rounded-md px-4 text-xl leading-tight font-bold tracking-tight whitespace-nowrap ' +
+  'uppercase';
 
 export const submitIcon: string =
   'mr-[10px] inline-flex h-[22px] w-[22px] items-center justify-center rounded-pill ' +
   'bg-surface align-[-4px] text-md';
 
-export const cancel: string = 'h-11 w-full text-xl';
+export const cancel: string =
+  'h-11 gap-2 rounded-lg px-4 text-xl leading-tight font-bold tracking-tight ' +
+  'whitespace-nowrap uppercase';

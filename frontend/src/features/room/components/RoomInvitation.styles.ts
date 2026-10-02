@@ -31,11 +31,10 @@ export const code: string = 'font-bold tracking-[1px] text-text-ink';
 
 export const actions: string = 'flex gap-[8px]';
 
-export const join: string =
-  `${buttonInteraction} inline-flex h-[38px] flex-1 items-center justify-center gap-[6px] ` +
-  'rounded-[14px] bg-primary text-md leading-none font-bold text-surface shadow-button-primary ' +
-  'not-aria-disabled:hover:bg-primary-bright not-aria-disabled:hover:shadow-button-primary-hover ' +
-  'aria-disabled:cursor-default aria-disabled:opacity-70';
+/** Join: the shared primary `Button` at the notice's geometry. */
+export const join: string = 'h-[38px] gap-[6px] rounded-[14px] text-md leading-none font-bold';
+
+export const joinPlacement: string = 'flex-1 aria-disabled:opacity-70';
 
 export const dismiss: string =
   `${buttonInteraction} inline-flex h-[38px] items-center justify-center rounded-[14px] ` +

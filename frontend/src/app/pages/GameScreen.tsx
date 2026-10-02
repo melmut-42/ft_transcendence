@@ -38,7 +38,7 @@ import { useRoomStore } from '@features/room/store/roomStore';
 import { useSecondsUntil } from '@shared/hooks';
 import { useSessionStore } from '@shared/stores';
 import type { Game, PlayingRole, Room, RoomMember, RoomRole, Team } from '@shared/types';
-import { Icon } from '@shared/ui';
+import { Button, Icon } from '@shared/ui';
 import { RoomCommandError } from '@shared/websocket';
 import { cn } from '@shared/utils';
 
@@ -140,15 +140,16 @@ function StagePanel({
                 <button type="button" onClick={onShowResults} className={styles.overSecondary}>
                   {t('game.results.showResults')}
                 </button>
-                <button
-                  type="button"
-                  onClick={decision.onBackToLobby}
-                  disabled={decision.returning || decision.leaving}
+                <Button
+                  sizeClassName={styles.overButton}
+                  onClick={() =>
+                    !decision.returning && !decision.leaving && decision.onBackToLobby()
+                  }
+                  aria-disabled={decision.returning || decision.leaving || undefined}
                   aria-busy={decision.returning || undefined}
-                  className={styles.overPrimary}
                 >
                   {t(decision.returning ? 'game.results.returning' : 'game.results.backToLobby')}
-                </button>
+                </Button>
               </div>
             )
           }

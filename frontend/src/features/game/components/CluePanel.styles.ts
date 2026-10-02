@@ -61,13 +61,13 @@ export const stepperValue: string =
   'flex items-center justify-center border-x-(length:--stroke-thin) border-border ' +
   'bg-surface text-xl font-bold text-text-ink desktop:text-[19px]';
 
+/** Give Clue: the shared primary `Button` at the panel's geometry. */
 export const submit: string =
-  `${buttonInteraction} inline-flex h-[46px] items-center justify-center gap-[10px] rounded-lg ` +
-  'bg-primary text-xl leading-none font-bold text-surface shadow-button-primary ' +
-  'not-disabled:hover:bg-primary-bright not-disabled:hover:shadow-button-primary-hover ' +
-  'disabled:bg-disabled disabled:text-text-muted disabled:shadow-button-disabled ' +
-  'aria-busy:cursor-progress [grid-area:submit] ' +
-  'desktop:h-[56px] desktop:self-start desktop:rounded-[14px] desktop:text-[24px]';
+  'h-[46px] gap-[10px] rounded-lg text-xl leading-none font-bold desktop:h-[56px] ' +
+  'desktop:rounded-[14px] desktop:text-[24px]';
+
+export const submitPlacement: string =
+  'aria-busy:cursor-progress [grid-area:submit] desktop:self-start';
 
 export const submitIcon: string = 'hidden text-[0.8em] desktop:inline';
 

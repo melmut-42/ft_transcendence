@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { openProfileModal } from '@shared/stores';
 import type { RoomMember } from '@shared/types';
-import { AvatarImage, Icon } from '@shared/ui';
+import { AvatarImage, ButtonIcon, Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import type { TeamRoster } from '../model/readyRoom';
@@ -28,16 +28,17 @@ function KickButton({ member, selfId, onKick }: Pick<MemberProps, 'member' | 'se
   const { t } = useTranslation();
   if (!onKick || member.user_id === selfId) return null;
   return (
-    <button
-      type="button"
+    <ButtonIcon
+      icon="kick"
+      theme="outline"
+      variant="secondary"
+      sizeClassName={styles.kickSize}
       onClick={() => onKick(member)}
       aria-haspopup="dialog"
       aria-label={t('room.kick.action', { username: member.username })}
       title={t('room.kick.action', { username: member.username })}
       className={styles.kick}
-    >
-      <Icon name="kick" />
-    </button>
+    />
   );
 }
 

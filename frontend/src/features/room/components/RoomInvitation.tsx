@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Icon } from '@shared/ui';
+import { Button, Icon } from '@shared/ui';
 
 import { useJoinInvite } from '../hooks/useJoinInvite';
 import * as styles from './RoomInvitation.styles';
@@ -52,18 +52,18 @@ export function RoomInvitation({ roomId, roomCode, fromUsername, onDismiss }: Ro
         </p>
       )}
       <div className={styles.actions}>
-        <button
-          type="button"
+        <Button
+          icon="login"
+          sizeClassName={styles.join}
           onClick={() => {
             if (!joining) void join(roomId).then((joined) => joined && onDismiss());
           }}
           aria-disabled={joining || undefined}
           aria-busy={joining || undefined}
-          className={styles.join}
+          className={styles.joinPlacement}
         >
-          <Icon name="login" />
           {t(joining ? 'room.invites.joining' : 'room.invites.join')}
-        </button>
+        </Button>
         <button type="button" onClick={onDismiss} disabled={joining} className={styles.dismiss}>
           {t('room.invites.dismiss')}
         </button>

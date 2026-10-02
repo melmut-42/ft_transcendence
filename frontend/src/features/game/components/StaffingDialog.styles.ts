@@ -1,5 +1,4 @@
 import type { Team } from '@shared/types';
-import { buttonInteraction } from '@shared/ui';
 
 /**
  * Class recipes for the Game Paused dialog. It shares the Leave Game dialog's card, title
@@ -48,23 +47,13 @@ export const claimTitle: string =
 
 export const claimActions: string = 'flex w-full flex-wrap justify-center gap-[10px]';
 
+/** In the team's color, like the Ready Room's team buttons. */
 export const claimButton: string =
-  `${buttonInteraction} inline-flex h-[46px] min-w-0 flex-1 items-center justify-center ` +
-  'rounded-[14px] px-[14px] text-lg leading-none font-bold text-surface disabled:opacity-60 ' +
-  'desktop:h-[42px] desktop:text-[16px]';
+  'h-[46px] rounded-[14px] px-[14px] text-lg leading-none font-bold desktop:h-[42px] ' +
+  'desktop:text-[16px]';
 
-/** The Ready Room's team buttons. */
-export const claimTone: Record<Team, string> = {
-  RED:
-    'bg-secondary-deep shadow-button-coral not-disabled:hover:brightness-105 ' +
-    'not-disabled:hover:shadow-button-coral-hover',
-  BLUE:
-    'bg-primary shadow-button-primary not-disabled:hover:bg-primary-bright ' +
-    'not-disabled:hover:shadow-button-primary-hover',
-};
+export const claimPlacement: string = 'min-w-0 flex-1 aria-disabled:opacity-60';
 
 export const error: string = 'text-md leading-[18px] font-bold text-accent-red';
 
-export const leave: string =
-  'mt-[18px] inline-flex cursor-pointer items-center gap-[8px] rounded-sm text-md ' +
-  'leading-[20px] font-bold text-accent-red underline-offset-2 hover:underline';
+export const leave: string = 'gap-[8px] text-md leading-[20px] font-bold';

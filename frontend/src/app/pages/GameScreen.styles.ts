@@ -83,15 +83,13 @@ export const overAction: string = 'desktop:static';
 export const overActions: string =
   'flex flex-col items-stretch gap-[6px] desktop:flex-row desktop:gap-[12px]';
 
-const overButton: string =
-  `${buttonInteraction} inline-flex h-[40px] items-center justify-center rounded-pill px-[14px] ` +
-  'text-md leading-none font-black whitespace-nowrap uppercase desktop:h-[42px] desktop:px-[20px] ' +
-  'desktop:text-[16px]';
+/** Geometry of the game-over buttons; Back to Lobby is the shared primary `Button`. */
+export const overButton: string =
+  'h-[40px] rounded-pill px-[14px] text-md leading-none font-black whitespace-nowrap ' +
+  'uppercase desktop:h-[42px] desktop:px-[20px] desktop:text-[16px]';
 
-export const overPrimary: string =
-  `${overButton} bg-primary text-surface shadow-button-primary ` +
-  'not-disabled:hover:bg-primary-bright not-disabled:hover:shadow-button-primary-hover';
-
+/** Show Results: raised on a two-pixel border, quieter than the primary beside it. */
 export const overSecondary: string =
+  `${buttonInteraction} inline-flex items-center justify-center ${overButton} ` +
   `${overButton} border-(length:--stroke-medium) border-border bg-surface text-text-slate ` +
   'shadow-button-muted not-disabled:hover:shadow-button-muted-hover';

@@ -58,21 +58,17 @@ export const actions: string = 'flex flex-col gap-[10px] md:gap-[8px]';
 
 export const actionRow: string = 'flex gap-[14px]';
 
+/** Geometry of the action row's buttons; the shared `Button` draws Add, Remove and Message. */
+export const action: string =
+  'h-[58px] gap-[8px] rounded-[22px] px-[12px] text-xl leading-none font-bold tracking-tight ' +
+  'whitespace-nowrap md:h-[46px] md:rounded-[18px] md:text-[16px]';
+
+/** Add Friend is primary and Remove Friend neutral, the safe secondary choice. */
+export const friend: string = 'min-w-0 flex-1 aria-disabled:pointer-events-none';
+
 const actionBase: string =
-  `${buttonInteraction} inline-flex h-[58px] min-w-0 flex-1 items-center justify-center ` +
-  'gap-[8px] rounded-[22px] px-[12px] text-xl leading-none font-bold tracking-tight ' +
-  'whitespace-nowrap aria-disabled:pointer-events-none md:h-[46px] md:rounded-[18px] ' +
-  'md:text-[16px]';
-
-/** Add Friend: the design system's primary button. */
-export const addFriend: string =
-  `${actionBase} bg-primary text-surface shadow-button-primary ` +
-  'not-aria-disabled:hover:bg-primary-bright not-aria-disabled:hover:shadow-button-primary-hover';
-
-/** Remove Friend: the neutral button, the safe secondary choice. */
-export const removeFriend: string =
-  `${actionBase} bg-background text-text-black shadow-button-neutral ` +
-  'not-aria-disabled:hover:bg-surface-raised not-aria-disabled:hover:shadow-button-neutral-hover';
+  `${buttonInteraction} inline-flex min-w-0 flex-1 items-center justify-center ${action} ` +
+  'aria-disabled:pointer-events-none';
 
 export const friendSkeleton: string =
   'h-[58px] flex-1 rounded-[22px] bg-surface-sunken motion-safe:animate-pulse md:h-[46px] ' +
@@ -91,9 +87,7 @@ export const invite = {
 };
 
 /** Message: the outline blue button. */
-export const message: string =
-  `${actionBase} border-(length:--stroke-default) border-primary-deep bg-surface ` +
-  'text-primary-sky hover:bg-primary-sky/10';
+export const message: string = 'min-w-0 flex-1 bg-surface';
 
 /** Takes no room while there is nothing to say, so no blank line sits under the buttons. */
 export const hintBase: string =
@@ -111,10 +105,10 @@ export const hintAction: string =
 
 /** Report Player: a quiet link at the foot of another player's profile. */
 export const report: string =
-  'mx-auto inline-flex cursor-pointer items-center gap-[8px] rounded-sm text-md leading-[22px] ' +
-  'font-bold text-text-muted underline-offset-2 not-aria-disabled:hover:text-accent-red ' +
-  'not-aria-disabled:hover:underline aria-disabled:cursor-default md:text-sm ' +
-  'md:leading-[18px]';
+  'gap-[8px] text-md leading-[22px] font-bold md:text-sm md:leading-[18px]';
+
+/** Muted at rest, it turns red on hover, as the serious step it is. */
+export const reportPlacement: string = 'mx-auto not-aria-disabled:hover:text-accent-red';
 
 // ---- Stats ----
 
@@ -158,8 +152,7 @@ export const noticeBody: string =
   'max-w-[400px] text-lg leading-[1.4] font-regular text-text-muted md:text-md';
 
 export const retry: string =
-  `${buttonInteraction} mt-[8px] inline-flex h-[54px] w-full items-center justify-center ` +
-  'rounded-[22px] bg-primary px-[20px] text-xl leading-none font-bold text-surface ' +
-  'shadow-button-primary not-disabled:hover:bg-primary-bright ' +
-  'not-disabled:hover:shadow-button-primary-hover md:h-[43px] md:w-[240px] ' +
+  'h-[54px] rounded-[22px] px-[20px] text-xl leading-none font-bold md:h-[43px] ' +
   'md:rounded-[18px] md:text-[18px]';
+
+export const retryPlacement: string = 'mt-[8px] w-full md:w-[240px]';
