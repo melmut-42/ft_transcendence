@@ -229,3 +229,35 @@ func TestDiffSeedDiffBoard(t *testing.T) {
 		t.Errorf("Boards generated with different seeds are equal")
 	}
 }
+
+func TestCardIDDoesNotRevealColors(t *testing.T) {
+	wordPack := loadTestWordPack(t, "wordpack.json")
+	var seed [32]byte
+
+	colorsByCardID := make(map[int]map[CardColor]struct{}, BoardSize)
+
+	for testSeed := byte(1); testSeed <= 200; testSeed++ {
+		seed[0] = testSeed
+
+		r := rand.New(rand.NewChaCha8(seed))
+		board, err := NewBoard(wordPack.Words, "en", r)
+		if err != nil {
+			t.Fatalf("seed %d: NewBoard returned an error: %v", testSeed, err)
+		}
+		for _, card := range board.Cards() {
+			if colorsByCardID[card.CardID] == nil {
+				colorsByCardID[card.CardID] = make(map[CardColor]struct{})
+			}
+			colorsByCardID[card.CardID][card.Color] = struct{}{}
+		}
+	}
+
+	for cardID := 1; cardID <= BoardSize; cardID++ {
+		if len(colorsByCardID[cardID]) < 4 {
+			t.Fatalf(
+				"CardID %d did not receive all card colors across 200 seeds",
+				cardID,
+			)
+		}
+	}
+}

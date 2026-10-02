@@ -6,12 +6,6 @@ import (
 	rand "math/rand/v2"
 )
 
-type Player struct {
-	UserID int
-	Team   Team
-	Role   Role
-}
-
 type Game struct {
 	GameID      int
 	Board       *Board
@@ -56,4 +50,26 @@ func NewGame(wordPool []Word, language string) (*Game, error) {
 	}
 
 	return NewGameWithSeed(wordPool, language, seed)
+}
+
+func (g *Game) Score() Score {
+	redScore := 0
+	blueScore := 0
+
+	for _, card := range g.Board.Cards() {
+		if !card.Revealed {
+			continue
+		}
+		switch card.Color {
+		case CardColorRed:
+			redScore++
+		case CardColorBlue:
+			blueScore++
+		}
+	}
+
+	return Score{
+		Red:  redScore,
+		Blue: blueScore,
+	}
 }

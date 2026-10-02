@@ -11,10 +11,10 @@ const (
 )
 
 type Card struct {
-	CardID   int       `json:"card_id"`
-	Word     string    `json:"word"`
-	Color    CardColor `json:"color"`
-	Revealed bool      `json:"revealed"`
+	CardID   int
+	Word     string
+	Color    CardColor
+	Revealed bool
 }
 
 type Board struct {
@@ -50,7 +50,7 @@ func NewBoard(wordPool []Word, language string, r *rand.Rand) (*Board, error) {
 	return board, nil
 }
 
-func (b *Board) Reveal(cardID int) (Card, error) {
+func (b *Board) reveal(cardID int) (Card, error) {
 	if cardID > BoardSize || cardID < 1 {
 		return Card{}, ErrInvalidCard
 	}
