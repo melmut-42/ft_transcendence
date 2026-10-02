@@ -9,7 +9,6 @@ import (
 type Game struct {
 	GameID      int
 	Board       *Board
-	Players     map[int]Player
 	CurrentTurn CurrentTurn
 	Winner      *Team
 	EndReason   *EndReason
@@ -33,11 +32,16 @@ func NewGameWithSeed(wordPool []Word, language string, seed [32]byte) (*Game, er
 		return nil, err
 	}
 	game := &Game{
-		Board:   board,
-		Players: make(map[int]Player),
+		GameID: 0,
+		Board:  board,
 		CurrentTurn: CurrentTurn{
-			Team:  board.StartingTeam(),
-			Phase: PhaseWaitingForClue},
+			Team:             board.StartingTeam(),
+			Phase:            PhaseWaitingForClue,
+			Clue:             nil,
+			GuessesRemaining: nil,
+		},
+		Winner:    nil,
+		EndReason: nil,
 	}
 
 	return game, nil
@@ -72,4 +76,44 @@ func (g *Game) Score() Score {
 		Red:  redScore,
 		Blue: blueScore,
 	}
+}
+
+func (g *Game) ValidateGameState() error {
+	if g.Board == nil {
+		return ErrInvalidBoard
+	}
+
+	switch g.CurrentTurn.Phase {
+	case PhaseWaitingForClue:
+		if g.CurrentTurn.Clue != nil || g.CurrentTurn.GuessesRemaining != nil {
+			return fmt.Errorf("%w: clue and guesses must be nil while waiting for clue", ErrInvalidGameState)
+		}
+		if g.Winner != nil || g.EndReason != nil {
+			return fmt.Errorf("%w: winner and end reason must be nil while waiting for clue", ErrInvalidGameState)
+		}
+	case PhaseGuessing:
+		if g.CurrentTurn.Clue == nil || g.CurrentTurn.GuessesRemaining == nil {
+			return fmt.Errorf("%w: clue and guesses are required while guessing", ErrInvalidGameState)
+		}
+		if g.Winner != nil || g.EndReason != nil {
+			return fmt.Errorf("%w: winner and end reason must be nil while guessing", ErrInvalidGameState)
+		}
+	case PhaseGameOver:
+		if g.Winner == nil {
+			return fmt.Errorf("%w: winner is required when game is over", ErrInvalidWinner)
+		}
+		if g.EndReason == nil {
+			return fmt.Errorf("%w: end reason is required when game is over", ErrInvalidGameState)
+		}
+		if g.CurrentTurn.Clue != nil || g.CurrentTurn.GuessesRemaining != nil {
+			return fmt.Errorf("%w: clue and guesses must be nil when game is over", ErrInvalidGameState)
+		}
+	default:
+		return fmt.Errorf("%w: unknown phase %q", ErrInvalidGameState, g.CurrentTurn.Phase)
+	}
+
+	if g.Winner != nil && *g.Winner != TeamRed && *g.Winner != TeamBlue {
+		return ErrInvalidWinner
+	}
+	return nil
 }

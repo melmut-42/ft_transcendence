@@ -63,14 +63,14 @@ type CurrentTurn struct {
 }
 
 type CardView struct {
-	CardID   int       `json:"card_id"`
-	Word     string    `json:"word"`
+	CardID   int        `json:"card_id"`
+	Word     string     `json:"word"`
 	Color    *CardColor `json:"color"`
-	Revealed bool      `json:"revealed"`
+	Revealed bool       `json:"revealed"`
 }
 
 func newCardView(card Card) CardView {
-    view := CardView{
+	view := CardView{
 		CardID:   card.CardID,
 		Word:     card.Word,
 		Revealed: card.Revealed,
@@ -83,11 +83,11 @@ func newCardView(card Card) CardView {
 }
 
 type GuessResult struct {
-	GameID       int              `json:"game_id"`
-	Card         CardView         `json:"card"`
-	GuessingTeam Team             `json:"guessing_team"`
-	Score        Score            `json:"score"`
-	CurrentTurn  CurrentTurn      `json:"current_turn"`
-	Winner       *Team            `json:"winner"`
-	EndReason    *EndReason       `json:"end_reason"`
+	GameID       int         `json:"game_id"`
+	Card         CardView    `json:"card"`
+	GuessingTeam Team        `json:"guessing_team"`
+	Score        Score       `json:"score"`
+	CurrentTurn  CurrentTurn `json:"current_turn"`
+	Winner       *Team       `json:"winner"`
+	EndReason    *EndReason  `json:"end_reason"`
 }

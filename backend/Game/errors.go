@@ -16,10 +16,11 @@ var (
 
 // Game-specific errors
 var (
-	ErrNotEnoughWords  = errors.New("not enough words in word pack")
-	ErrInvalidWordPack = errors.New("invalid word pack")
-	ErrInvalidBoard    = errors.New("invalid board")
-	ErrNilRandomSource = errors.New("random source cannot be nil")
-	ErrInvalidSeed     = errors.New("invalid seed")
-	ErrGenerateSeed    = errors.New("failed to generate secure seed")
+	ErrNotEnoughWords   = errors.New("not enough words in word pack")
+	ErrInvalidWordPack  = errors.New("invalid word pack")
+	ErrInvalidBoard     = errors.New("invalid board")
+	ErrNilRandomSource  = errors.New("random source cannot be nil")
+	ErrGenerateSeed     = errors.New("failed to generate secure seed")
+	ErrInvalidGameState = errors.New("invalid game state")
+	ErrInvalidWinner    = errors.New("invalid winner")
 )
