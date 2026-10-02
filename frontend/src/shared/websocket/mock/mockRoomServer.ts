@@ -13,7 +13,7 @@
  * with independent Back to Lobby.
  */
 
-import { ROOM_CAPACITY } from '@shared/types';
+import { ROOM_CAPACITY, ROOM_LANGUAGES, TURN_TIMER_OPTIONS } from '@shared/types';
 import type {
   AckMessage,
   Card,
@@ -137,6 +137,10 @@ export class MockRoomServer implements MockServerBinding {
   private graceTimer: ReturnType<typeof setTimeout> | null = null;
   private postGameTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly staffingTimers = new Map<Team, ReturnType<typeof setTimeout>>();
+  /** Ends the active turn at its `deadline_at`; `null` with no turn limit. */
+  private turnTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Turn time left when a pause stopped the clock, restored on resume. */
+  private turnRemainingMs: number | null = null;
   /**
    * The contract's default timings. Lower them from the console to reach the end of a
    * grace period, a result's decision window or a staffing deadline sooner.
@@ -330,6 +334,23 @@ export class MockRoomServer implements MockServerBinding {
 
   updateSettings(maxPlayers: number, byUserId: number | null = this.room.host_user_id): Room {
     this.doUpdateSettings(byUserId ?? -1, { max_players: maxPlayers });
+    this.flush();
+    return this.state();
+  }
+
+  /** The host sets the turn timer: `null`, `60`, `90` or `120` seconds. */
+  setTurnTimer(seconds: number | null, byUserId: number | null = this.room.host_user_id): Room {
+    this.doUpdateSettings(byUserId ?? -1, { turn_timer_seconds: seconds });
+    this.flush();
+    return this.state();
+  }
+
+  /** End the active turn now, as its timer running out would. */
+  expireTurn(): Room {
+    const game = this.requireGame();
+    this.requireUnpaused(game);
+    this.stopTurnClock();
+    this.changeTurn('TURN_TIMER_EXPIRED');
     this.flush();
     return this.state();
   }
@@ -546,19 +567,29 @@ export class MockRoomServer implements MockServerBinding {
         field: 'payload',
       });
     }
-    // The allowed timer values and languages are not agreed yet: no change is accepted.
-    if ('turn_timer_seconds' in settings || 'language' in settings) {
-      const field = 'turn_timer_seconds' in settings ? 'turn_timer_seconds' : 'language';
-      throw new MockActionError('INVALID_PAYLOAD', `payload.${field} cannot be changed yet.`, {
-        field: `payload.${field}`,
-      });
+    const timer = settings.turn_timer_seconds;
+    if (
+      'turn_timer_seconds' in settings &&
+      !(TURN_TIMER_OPTIONS as readonly unknown[]).includes(timer)
+    ) {
+      throw new MockActionError(
+        'INVALID_PAYLOAD',
+        `payload.turn_timer_seconds must be one of ${TURN_TIMER_OPTIONS.join(', ')}.`,
+        { field: 'payload.turn_timer_seconds', allowed: [...TURN_TIMER_OPTIONS] },
+      );
+    }
+    const { language } = settings;
+    if (language !== undefined && !(ROOM_LANGUAGES as readonly string[]).includes(language)) {
+      throw new MockActionError(
+        'INVALID_PAYLOAD',
+        `payload.language must be one of ${ROOM_LANGUAGES.join(', ')}.`,
+        { field: 'payload.language', allowed: [...ROOM_LANGUAGES] },
+      );
     }
     const min = Math.max(ROOM_CAPACITY.min, this.room.player_count);
     if (
-      maxPlayers === undefined ||
-      !Number.isInteger(maxPlayers) ||
-      maxPlayers < min ||
-      maxPlayers > ROOM_CAPACITY.max
+      maxPlayers !== undefined &&
+      (!Number.isInteger(maxPlayers) || maxPlayers < min || maxPlayers > ROOM_CAPACITY.max)
     ) {
       throw new MockActionError(
         'INVALID_PAYLOAD',
@@ -566,9 +597,11 @@ export class MockRoomServer implements MockServerBinding {
         { field: 'payload.max_players', min, max: ROOM_CAPACITY.max },
       );
     }
-    this.room.max_players = maxPlayers;
+    if (maxPlayers !== undefined) this.room.max_players = maxPlayers;
+    if (timer !== undefined) this.room.turn_timer_seconds = timer;
+    if (language !== undefined) this.room.language = language;
     this.queue('room.settings.updated', {
-      max_players: maxPlayers,
+      max_players: this.room.max_players,
       turn_timer_seconds: this.room.turn_timer_seconds,
       language: this.room.language,
       player_count: this.room.player_count,
@@ -853,6 +886,7 @@ export class MockRoomServer implements MockServerBinding {
         phase: 'WAITING_FOR_CLUE',
         clue: null,
         guesses_remaining: null,
+        deadline_at: null,
       },
       score: { red: 0, blue: 0 },
       board: WORDS.map((word, i) => ({ card_id: i + 1, word, revealed: false, color: null })),
@@ -861,6 +895,7 @@ export class MockRoomServer implements MockServerBinding {
       started_at: now(),
       finished_at: null,
     };
+    this.startTurnClock();
     this.queue('game.started', { room: this.projectRoom() });
   }
 
@@ -899,6 +934,7 @@ export class MockRoomServer implements MockServerBinding {
       phase: 'GUESSING',
       clue: { word: clue, number },
       guesses_remaining: number + 1,
+      deadline_at: game.current_turn.deadline_at,
     };
     this.queue('game.clue.submitted', {
       game_id: game.game_id,
@@ -984,7 +1020,9 @@ export class MockRoomServer implements MockServerBinding {
       phase: 'WAITING_FOR_CLUE',
       clue: null,
       guesses_remaining: null,
+      deadline_at: null,
     };
+    this.startTurnClock();
     this.queue('game.turn.changed', {
       game_id: game.game_id,
       previous_team: previous,
@@ -1011,7 +1049,8 @@ export class MockRoomServer implements MockServerBinding {
     game.winner = winner;
     game.end_reason = reason;
     game.finished_at = finishedAt;
-    game.current_turn = { ...game.current_turn, phase: 'GAME_OVER' };
+    this.stopTurnClock();
+    game.current_turn = { ...game.current_turn, phase: 'GAME_OVER', deadline_at: null };
     delete game.staffing;
     this.room.status = 'POST_GAME';
     this.room.players.forEach((p) => {
@@ -1127,7 +1166,14 @@ export class MockRoomServer implements MockServerBinding {
     if (short) {
       if (game.current_turn.phase !== 'PAUSED_FOR_PLAYERS') {
         this.pausedPhase = game.current_turn.phase;
-        game.current_turn = { ...game.current_turn, phase: 'PAUSED_FOR_PLAYERS' };
+        const deadline = game.current_turn.deadline_at;
+        this.turnRemainingMs = deadline === null ? null : Date.parse(deadline) - Date.now();
+        this.stopTurnClock();
+        game.current_turn = {
+          ...game.current_turn,
+          phase: 'PAUSED_FOR_PLAYERS',
+          deadline_at: null,
+        };
       }
       game.staffing = staffing;
       if (newlyShort && departure) {
@@ -1144,6 +1190,9 @@ export class MockRoomServer implements MockServerBinding {
       delete game.staffing;
       game.current_turn = { ...game.current_turn, phase: this.pausedPhase ?? 'WAITING_FOR_CLUE' };
       this.pausedPhase = null;
+      // The turn resumes with the time it had left when the pause stopped its clock.
+      this.startTurnClock(this.turnRemainingMs);
+      this.turnRemainingMs = null;
       this.queue('game.staffing.restored', {
         game_id: game.game_id,
         restored_teams: restored,
@@ -1162,7 +1211,8 @@ export class MockRoomServer implements MockServerBinding {
     game.status = 'GAME_CANCELLED';
     game.end_reason = 'INSUFFICIENT_PLAYERS';
     game.finished_at = finishedAt;
-    game.current_turn = { ...game.current_turn, phase: 'GAME_OVER' };
+    this.stopTurnClock();
+    game.current_turn = { ...game.current_turn, phase: 'GAME_OVER', deadline_at: null };
     this.room.status = 'CLOSED';
     this.queue('game.cancelled', {
       game_id: game.game_id,
@@ -1188,6 +1238,41 @@ export class MockRoomServer implements MockServerBinding {
     this.recount();
     [...this.endpoints].forEach((endpoint) => endpoint.simulateClose('ROOM_NOT_FOUND'));
     mockRoomLifecycle.changed();
+  }
+
+  /**
+   * Start the active turn's clock for `ms` (default: the room's full turn limit) and set
+   * `deadline_at`. With no turn limit the deadline stays `null`.
+   */
+  private startTurnClock(ms?: number | null): void {
+    const game = this.requireGame();
+    this.stopTurnClock();
+    const limit = this.room.turn_timer_seconds;
+    const duration = ms ?? (limit === null ? null : limit * 1_000);
+    if (limit === null || duration === null) {
+      game.current_turn.deadline_at = null;
+      return;
+    }
+    game.current_turn.deadline_at = isoIn(Math.max(0, duration));
+    this.turnTimer = setTimeout(
+      () => {
+        this.turnTimer = null;
+        const current = this.game;
+        if (
+          current?.status !== 'IN_PROGRESS' ||
+          current.current_turn.phase === 'PAUSED_FOR_PLAYERS'
+        )
+          return;
+        this.changeTurn('TURN_TIMER_EXPIRED');
+        this.flush();
+      },
+      Math.max(0, duration),
+    );
+  }
+
+  private stopTurnClock(): void {
+    if (this.turnTimer !== null) clearTimeout(this.turnTimer);
+    this.turnTimer = null;
   }
 
   private stopStaffingTimers(): void {

@@ -1,6 +1,7 @@
 /**
- * The Ready Room's own commands — team, role, spectating, ready and room size — with the
- * feedback the controls show while one is in flight and after the server turns one down.
+ * The Ready Room's own commands — team, role, spectating, ready, room size and turn timer —
+ * with the feedback the controls show while one is in flight and after the server turns one
+ * down.
  *
  * A spectator picks a team first and a role second, but the server takes both in one
  * command, so the picked team is held here as a draft (`draftTeam`) until the role is chosen.
@@ -21,11 +22,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRoomConnection } from '@app/connection/roomConnectionContext';
 import { useConnectionStore } from '@shared/stores';
 import { RoomCommandError } from '@shared/websocket';
-import type { PlayingRole, Team } from '@shared/types';
+import type { PlayingRole, Team, TurnTimerSeconds } from '@shared/types';
 
 import { useRoomCommands } from './useRoomCommands';
 
-export type SetupAction = 'team' | 'role' | 'ready' | 'capacity';
+export type SetupAction = 'team' | 'role' | 'ready' | 'capacity' | 'timer';
 
 export interface SetupFeedback {
   action: SetupAction;
@@ -33,7 +34,7 @@ export interface SetupFeedback {
   message: string;
 }
 
-function messageFor(error: unknown): string {
+function messageFor(action: SetupAction, error: unknown): string {
   const code = error instanceof RoomCommandError ? error.code : null;
   switch (code) {
     case 'ROLE_CONFLICT':
@@ -49,7 +50,7 @@ function messageFor(error: unknown): string {
     case 'NOT_HOST':
       return 'room.ready.errors.notHost';
     case 'INVALID_PAYLOAD':
-      return 'room.ready.errors.capacity';
+      return action === 'timer' ? 'room.ready.errors.timer' : 'room.ready.errors.capacity';
     case 'NOT_SENT':
     case 'CONNECTION_LOST':
       return 'room.ready.errors.offline';
@@ -91,7 +92,7 @@ export function useRoomSetup() {
       } catch (error) {
         // A lost answer is not a refusal; the snapshot shows whether the command counted.
         const lost = error instanceof RoomCommandError && error.code === 'CONNECTION_LOST';
-        if (mounted.current && !lost) setFeedback({ action, message: messageFor(error) });
+        if (mounted.current && !lost) setFeedback({ action, message: messageFor(action, error) });
       } finally {
         busy.current = false;
         if (mounted.current) setPending(null);
@@ -122,6 +123,11 @@ export function useRoomSetup() {
     updateMaxPlayers: useCallback(
       (maxPlayers: number) =>
         run('capacity', () => commands.updateSettings({ max_players: maxPlayers })),
+      [commands, run],
+    ),
+    updateTurnTimer: useCallback(
+      (seconds: TurnTimerSeconds) =>
+        run('timer', () => commands.updateSettings({ turn_timer_seconds: seconds })),
       [commands, run],
     ),
   };

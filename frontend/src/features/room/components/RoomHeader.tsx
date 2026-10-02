@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { TURN_TIMER_OPTIONS } from '@shared/types';
 import type { Room } from '@shared/types';
 import { Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
@@ -54,34 +55,77 @@ export function RoomCode({ code, className }: { code: string; className?: string
 }
 
 /**
- * The turn timer and the word language. Both belong to the Room Owner, but their allowed
- * values are not agreed yet, so the server takes no change to either: they are shown as the
- * room reports them, and nothing offers a value the contract does not define. Everyone is
- * told who may change the room's settings.
+ * The turn timer and the word language. The Room Owner picks the turn timer from
+ * `TURN_TIMER_OPTIONS` while the room waits, under the same rules as the room size; everyone
+ * else sees the value read-only. Only one word-pack language exists, so the language is
+ * shown, never offered. Everyone is told who may change the room's settings.
  */
 export function RoomSettingsInfo({
   room,
   userId,
+  setup,
   className,
 }: {
   room: Room;
   userId: number;
+  setup: RoomSetup;
   className?: string;
 }) {
   const { t, i18n } = useTranslation();
+  const timerId = useId();
+  const hintId = useId();
   const language = languageName(room.language, i18n.language);
   const isHost = room.host_user_id === userId;
+  const access = roomSettingsAccess(room, userId);
+  const timerLabel = (seconds: number | null) =>
+    seconds === null ? t('room.settings.noLimit') : t('room.settings.seconds', { count: seconds });
+
+  const changeTimer = (value: string) => {
+    const seconds = TURN_TIMER_OPTIONS.find((option) => String(option) === value);
+    if (setup.pending === null && seconds !== undefined && seconds !== room.turn_timer_seconds) {
+      void setup.updateTurnTimer(seconds);
+    }
+  };
 
   return (
     <div className={cn(styles.settings, className)}>
       <div className={styles.settingRow}>
-        <span className={styles.settingChip}>
-          <Icon name="timer" />
-          <span className={styles.settingLabel}>{t('room.settings.timer')}</span>
-          {room.turn_timer_seconds === null
-            ? t('room.settings.noLimit')
-            : t('room.settings.seconds', { count: room.turn_timer_seconds })}
-        </span>
+        {access.editable ? (
+          <span className={cn(styles.settingChip, styles.settingChipEditable)}>
+            <Icon name="timer" />
+            <label htmlFor={timerId} className={styles.settingLabel}>
+              {t('room.settings.timer')}
+            </label>
+            <select
+              id={timerId}
+              value={String(room.turn_timer_seconds)}
+              onChange={(event) => changeTimer(event.target.value)}
+              disabled={setup.pending !== null}
+              aria-busy={setup.pending === 'timer'}
+              className={styles.settingSelect}
+            >
+              {TURN_TIMER_OPTIONS.map((option) => (
+                <option key={String(option)} value={String(option)}>
+                  {timerLabel(option)}
+                </option>
+              ))}
+            </select>
+            <Icon name="chevronDown" className={styles.settingSelectIcon} />
+          </span>
+        ) : (
+          <span className={styles.settingChip} aria-describedby={hintId}>
+            <Icon name="timer" />
+            <span className={styles.settingLabel}>{t('room.settings.timer')}</span>
+            {timerLabel(room.turn_timer_seconds)}
+            <span id={hintId} className="sr-only">
+              {t(
+                access.reason === 'NOT_HOST'
+                  ? 'room.ready.hints.timerHostOnly'
+                  : 'room.ready.hints.locked',
+              )}
+            </span>
+          </span>
+        )}
         <span className={styles.settingChip}>
           <Icon name="rules" />
           <span className={styles.settingLabel}>{t('room.settings.language')}</span>

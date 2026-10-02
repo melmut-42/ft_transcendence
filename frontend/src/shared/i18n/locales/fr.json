@@ -552,7 +552,8 @@
 					"LOCKED": "La partie commence.",
 					"POST_GAME_PENDING": "Des joueurs regardent encore le dernier résultat."
 				},
-				"claim": "Choisissez un rôle pour rejoindre l'équipe {{team}}."
+				"claim": "Choisissez un rôle pour rejoindre l'équipe {{team}}.",
+				"timerHostOnly": "Seul le propriétaire du salon peut changer le minuteur."
 			},
 			"errors": {
 				"roleConflict": "Un autre joueur vient de prendre la place de maître-espion de cette équipe.",
@@ -563,7 +564,8 @@
 				"capacity": "Le salon ne peut pas être plus petit que le nombre de joueurs présents.",
 				"offline": "Vous êtes hors ligne. Réessayez une fois reconnecté.",
 				"generic": "Ça n'a pas marché. Réessayez.",
-				"postGamePending": "Attendez que tout le monde soit revenu du dernier résultat."
+				"postGamePending": "Attendez que tout le monde soit revenu du dernier résultat.",
+				"timer": "Ce minuteur n'est pas disponible. Choisissez-en un dans la liste."
 			},
 			"spectators": "Spectateurs",
 			"spectate": "Regarder plutôt"
@@ -592,7 +594,7 @@
 			"noLimit": "Sans limite",
 			"seconds_one": "{{count}} seconde",
 			"seconds_other": "{{count}} secondes",
-			"ownerYou": "Vous êtes le propriétaire du salon. Vous pouvez retirer des joueurs et changer la taille du salon.",
+			"ownerYou": "Vous êtes le propriétaire du salon. Vous pouvez retirer des joueurs, changer la taille du salon et régler le minuteur.",
 			"ownerOnly": "Seul le propriétaire du salon peut changer ses réglages."
 		},
 		"kick": {
@@ -628,7 +630,8 @@
 		"turn": {
 			"title": "Au tour de l'équipe <team>{{team}}</team>",
 			"over": "Partie terminée",
-			"paused": "Partie en pause"
+			"paused": "Partie en pause",
+			"timeLeft": "Temps restant pour ce tour"
 		},
 		"instruction": {
 			"CLUE": "Vous êtes l'Espion en chef. Donnez un indice à votre équipe.",

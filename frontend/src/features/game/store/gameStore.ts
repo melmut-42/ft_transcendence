@@ -110,7 +110,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             end_reason: event.payload.end_reason,
             score: event.payload.score,
             finished_at: event.payload.finished_at,
-            current_turn: { ...game.current_turn, phase: 'GAME_OVER' },
+            current_turn: { ...game.current_turn, phase: 'GAME_OVER', deadline_at: null },
             board: game.board.map((c) => (c.card_id === revealed.card_id ? revealed : c)),
           },
         });
@@ -123,7 +123,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           game: {
             ...game,
             staffing: event.payload.staffing,
-            current_turn: { ...game.current_turn, phase: 'PAUSED_FOR_PLAYERS' },
+            current_turn: { ...game.current_turn, phase: 'PAUSED_FOR_PLAYERS', deadline_at: null },
           },
         });
         return;
@@ -144,7 +144,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             end_reason: event.payload.end_reason,
             score: event.payload.score,
             finished_at: event.payload.finished_at,
-            current_turn: { ...game.current_turn, phase: 'GAME_OVER' },
+            current_turn: { ...game.current_turn, phase: 'GAME_OVER', deadline_at: null },
           },
         });
         return;

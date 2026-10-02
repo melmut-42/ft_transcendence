@@ -552,7 +552,8 @@
 					"LOCKED": "The match is starting.",
 					"POST_GAME_PENDING": "Some players are still viewing the last result."
 				},
-				"claim": "Choose a role to join the {{team}} team."
+				"claim": "Choose a role to join the {{team}} team.",
+				"timerHostOnly": "Only the room owner can change the turn timer."
 			},
 			"errors": {
 				"roleConflict": "Another player just took this team's Spymaster seat.",
@@ -563,7 +564,8 @@
 				"capacity": "The room can't be smaller than the players in it.",
 				"offline": "You're offline. Try again once you're reconnected.",
 				"generic": "That didn't work. Try again.",
-				"postGamePending": "Wait until everyone is back from the last result."
+				"postGamePending": "Wait until everyone is back from the last result.",
+				"timer": "That turn timer isn't available. Pick one from the list."
 			},
 			"spectators": "Spectators",
 			"spectate": "Watch instead"
@@ -592,7 +594,7 @@
 			"noLimit": "No limit",
 			"seconds_one": "{{count}} second",
 			"seconds_other": "{{count}} seconds",
-			"ownerYou": "You're the room owner. You can remove players and change the room size.",
+			"ownerYou": "You're the room owner. You can remove players, change the room size and set the turn timer.",
 			"ownerOnly": "Only the room owner can change the room settings."
 		},
 		"kick": {
@@ -628,7 +630,8 @@
 		"turn": {
 			"title": "<team>{{team}}</team> Team's Turn",
 			"over": "Match Over",
-			"paused": "Game Paused"
+			"paused": "Game Paused",
+			"timeLeft": "Time left in this turn"
 		},
 		"instruction": {
 			"CLUE": "You are the Spymaster. Give your team a clue.",

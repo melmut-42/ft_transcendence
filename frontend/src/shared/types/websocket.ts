@@ -292,7 +292,11 @@ export type GameScoreUpdatedEvent = ServerEventEnvelope<
 >;
 
 export type GameTurnChangeReason =
-  'PASSED' | 'NEUTRAL_CARD_REVEALED' | 'OPPONENT_CARD_REVEALED' | 'GUESSES_EXHAUSTED';
+  | 'PASSED'
+  | 'NEUTRAL_CARD_REVEALED'
+  | 'OPPONENT_CARD_REVEALED'
+  | 'GUESSES_EXHAUSTED'
+  | 'TURN_TIMER_EXPIRED';
 
 export type GameTurnChangedEvent = ServerEventEnvelope<
   'game.turn.changed',

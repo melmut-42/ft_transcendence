@@ -23,7 +23,7 @@ import { ScoreBoard } from '@features/game/components/ScoreBoard';
 import { StaffingDialog } from '@features/game/components/StaffingDialog';
 import type { SeatClaim } from '@features/game/components/StaffingDialog';
 import { TeamStatusCard, TeamSummary } from '@features/game/components/TeamStatus';
-import { TurnHeading } from '@features/game/components/TurnHeading';
+import { TurnHeading, TurnTimer } from '@features/game/components/TurnHeading';
 import { useGameActions } from '@features/game/hooks/useGameActions';
 import { gameStage, isGameOver } from '@features/game/model/gameView';
 import { lineupOf } from '@features/game/model/lineup';
@@ -318,6 +318,7 @@ export function GameScreen({
 
         <div className={styles.center}>
           <TurnHeading game={game} className={styles.heading} />
+          <TurnTimer game={game} clockOffsetMs={clockOffsetMs} />
           {spymasterLayout && (
             <p className={styles.instruction}>{t(`game.instruction.${stage}`)}</p>
           )}

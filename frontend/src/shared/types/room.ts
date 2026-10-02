@@ -33,6 +33,16 @@ export type MemberState = 'IN_LOBBY' | 'IN_GAME' | 'POST_GAME';
  */
 export const ROOM_CAPACITY = { min: 4, max: 20, default: 8 } as const;
 
+/**
+ * Turn-timer choices, in seconds; `null` means no limit and is the default. Only the host
+ * changes it, under the same rules as the capacity.
+ */
+export const TURN_TIMER_OPTIONS = [null, 60, 90, 120] as const;
+export type TurnTimerSeconds = (typeof TURN_TIMER_OPTIONS)[number];
+
+/** Word-pack languages a room can use; the first is the default. */
+export const ROOM_LANGUAGES = ['en'] as const;
+
 /** `^[A-Z0-9]{6}$` — the one canonical shareable room-code format. */
 export const ROOM_CODE_PATTERN = /^[A-Z0-9]{6}$/;
 
@@ -86,9 +96,9 @@ export interface Room {
   player_count: number;
   /** `ROOM_CAPACITY.min..ROOM_CAPACITY.max`. Join fails with `ROOM_FULL` at this count. */
   max_players: number;
-  /** Per-turn time limit; `null` means no limit. The allowed values are not agreed yet. */
+  /** Per-turn time limit, one of `TURN_TIMER_OPTIONS`; `null` means no limit. */
   turn_timer_seconds: number | null;
-  /** Lowercase code of the board's word-pack language. */
+  /** Lowercase code of the board's word-pack language, one of `ROOM_LANGUAGES`. */
   language: string;
   /** Full server-side start predicate, not merely "everyone is ready". */
   startable: boolean;

@@ -60,7 +60,7 @@ export const countTone = {
 
 // ---- Other settings ----
 
-/** The turn timer and word language, read-only until their values are agreed. */
+/** The turn timer (a select for the Room Owner) and the read-only word language. */
 export const settings: string = 'flex flex-col items-center gap-[8px] desktop:gap-[6px]';
 
 export const settingRow: string =
@@ -72,6 +72,19 @@ export const settingChip: string =
   'desktop:text-[13px]';
 
 export const settingLabel: string = 'font-black tracking-[0.4px] text-text-muted uppercase';
+
+/** The owner's timer chip: the whole pill is the control, with a focus ring around it. */
+export const settingChipEditable: string =
+  'relative pr-[10px] focus-within:outline-2 focus-within:outline-offset-2 ' +
+  'focus-within:outline-primary desktop:pr-[8px]';
+
+export const settingSelect: string =
+  'cursor-pointer appearance-none bg-transparent pr-[18px] font-bold text-text-slate ' +
+  'outline-none disabled:cursor-default disabled:text-text-disabled';
+
+export const settingSelectIcon: string =
+  'pointer-events-none absolute right-[12px] text-[12px] text-text-muted desktop:right-[9px] ' +
+  'desktop:text-[10px]';
 
 export const ownerNote: string =
   'inline-flex items-center gap-[6px] text-md leading-[18px] font-bold text-text-muted ' +

@@ -552,7 +552,8 @@
 					"LOCKED": "Maç başlıyor.",
 					"POST_GAME_PENDING": "Bazı oyuncular hâlâ son sonuca bakıyor."
 				},
-				"claim": "{{team}} takımına katılmak için bir rol seç."
+				"claim": "{{team}} takımına katılmak için bir rol seç.",
+				"timerHostOnly": "Tur süresini yalnızca oda sahibi değiştirebilir."
 			},
 			"errors": {
 				"roleConflict": "Başka bir oyuncu az önce bu takımın Ajan Şefi yerini aldı.",
@@ -563,7 +564,8 @@
 				"capacity": "Oda, içindeki oyuncu sayısından küçük olamaz.",
 				"offline": "Çevrimdışısın. Yeniden bağlanınca tekrar dene.",
 				"generic": "Olmadı. Tekrar dene.",
-				"postGamePending": "Herkes son sonuçtan dönene kadar bekle."
+				"postGamePending": "Herkes son sonuçtan dönene kadar bekle.",
+				"timer": "Bu tur süresi kullanılamıyor. Listeden birini seç."
 			},
 			"spectators": "İzleyiciler",
 			"spectate": "Bunun yerine izle"
@@ -592,7 +594,7 @@
 			"noLimit": "Sınırsız",
 			"seconds_one": "{{count}} saniye",
 			"seconds_other": "{{count}} saniye",
-			"ownerYou": "Oda sahibi sensin. Oyuncuları çıkarabilir ve oda boyutunu değiştirebilirsin.",
+			"ownerYou": "Oda sahibi sensin. Oyuncuları çıkarabilir, oda boyutunu ve tur süresini değiştirebilirsin.",
 			"ownerOnly": "Oda ayarlarını yalnızca oda sahibi değiştirebilir."
 		},
 		"kick": {
@@ -628,7 +630,8 @@
 		"turn": {
 			"title": "Sıra <team>{{team}}</team> Takımda",
 			"over": "Maç Bitti",
-			"paused": "Oyun Duraklatıldı"
+			"paused": "Oyun Duraklatıldı",
+			"timeLeft": "Bu turda kalan süre"
 		},
 		"instruction": {
 			"CLUE": "Casus Şefisin. Takımına bir ipucu ver.",

@@ -148,7 +148,8 @@ disappears.
 3. Expected: `night_owl` leaves the room.
 4. As non-host: join `QWER12`, then run `mockSockets.room().kick(42)`. Expected: you
    return to the Lobby with a kick notice.
-5. Room settings are read-only in the room header.
+5. As host, change the turn timer in the room header (No limit, 60, 90 or 120 seconds).
+   Non-hosts see it read-only. The word language is always English.
 
 ### Countdown and start
 
@@ -255,6 +256,16 @@ mockSockets.room().passTurn();
    Expected: the game resumes.
 
 4. Let the deadline pass instead. Expected: the game is cancelled and the room closes.
+
+### Turn timer
+
+1. Create a room. In the room header, set **Turn timer** to 60 seconds.
+2. Start a game: `mockSockets.room().configureStartable('OPERATIVE')`.
+3. Verify: a countdown pill under the turn heading. It turns red in the last 10 seconds.
+4. Let it run out, or run `mockSockets.room().expireTurn()`. Expected: the turn passes
+   to BLUE with a fresh countdown; no card is revealed.
+5. Pause the game with `mockSockets.room().playerLeave(44)`. Expected: the countdown
+   disappears. Restore staffing (see above): the turn resumes with the time it had left.
 
 ### Spectator
 

@@ -137,7 +137,12 @@ export function ReadyRoom({ room, onLeave }: { room: Room; onLeave: () => void }
           {userId !== undefined && (
             <>
               <RoomCapacity room={room} userId={userId} setup={setup} className={styles.capacity} />
-              <RoomSettingsInfo room={room} userId={userId} className={styles.settings} />
+              <RoomSettingsInfo
+                room={room}
+                userId={userId}
+                setup={setup}
+                className={styles.settings}
+              />
             </>
           )}
 

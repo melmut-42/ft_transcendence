@@ -46,6 +46,12 @@ export interface CurrentTurn {
   clue: Clue | null;
   /** `N + 1` at clue acceptance; `null` while waiting for a clue. */
   guesses_remaining: number | null;
+  /**
+   * Absolute turn-timer deadline, covering the clue and the guesses. `null` when the room
+   * has no turn limit, while the game is paused and once it is over. The server ends the
+   * turn when it passes (`TURN_TIMER_EXPIRED`); the client only draws it.
+   */
+  deadline_at: string | null;
 }
 
 /** One team's staffing while the game is paused for players. */
