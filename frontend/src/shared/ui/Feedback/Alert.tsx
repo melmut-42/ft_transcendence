@@ -42,7 +42,7 @@ export function Alert({ tone, title, children, className }: AlertProps) {
         className,
       )}
     >
-      <Icon name={toneIcons[tone]} className="mt-0.5 shrink-0 text-lg" />
+      <Icon name={toneIcons[tone]} className="mt-2 shrink-0 text-lg" />
       <div className="min-w-0">
         <p className="text-md font-bold tracking-tight">{title}</p>
         {children && <p className="text-md">{children}</p>}
