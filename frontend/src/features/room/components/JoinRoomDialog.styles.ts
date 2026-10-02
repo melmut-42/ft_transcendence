@@ -45,7 +45,7 @@ export const preview: string =
 /** The arrow that points the preview at the code field above it. */
 export const previewPointer: string =
   'absolute -top-[7px] left-1/2 size-[12px] -translate-x-1/2 rotate-45 border-t border-l ' +
-  'border-(length:--stroke-thin) border-border bg-surface';
+  'border-border bg-surface';
 
 export const previewHead: string = 'flex items-center gap-[10px] p-[11px]';
 
