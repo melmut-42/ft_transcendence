@@ -43,5 +43,5 @@ export const stepperButton: string =
   'disabled:cursor-not-allowed disabled:text-text-disabled';
 
 export const stepperValue: string =
-  'inline-flex w-[56px] items-center justify-center border-x border-(length:--stroke-thin) ' +
+  'inline-flex w-[56px] items-center justify-center border-x ' +
   'border-border bg-surface text-md leading-tight font-bold text-text';
