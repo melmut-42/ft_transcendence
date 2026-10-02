@@ -54,7 +54,7 @@ export function Button({
         {children}
         {loading && <span className="motion-safe:animate-pulse">…</span>}
       </span>
-      {trailingIcon && <Icon name={trailingIcon} className={trailingIconStyles} />}
+      {trailingIcon && <Icon name={trailingIcon} className={disabled ? '' : trailingIconStyles} />}
     </button>
   );
 }
