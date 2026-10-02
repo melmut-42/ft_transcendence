@@ -50,6 +50,8 @@ export function UIElements() {
         <Button>Join room</Button>
         <Button variant="neutral">Stay</Button>
         <Button variant="muted">Pass</Button>
+        <Button variant="secondary">Leave room</Button>
+        <Button variant="success">Ready!</Button>
         <Button variant="danger">Delete room</Button>
         <Button variant="cta" size="xl">
           Start party!
@@ -78,6 +80,15 @@ export function UIElements() {
         </Button>
         <Button theme="outline" variant="danger" icon="leave">
           Leave
+        </Button>
+        <Button theme="outline" variant="secondary" trailingIcon="logout">
+          Leave room
+        </Button>
+        <Button
+          variant="primary"
+          sizeClassName="h-[53px] gap-[12px] rounded-[13px] px-5 text-[22px] leading-none font-bold"
+        >
+          Own geometry
         </Button>
         <Button theme="text">Show more players</Button>
         <ButtonIcon icon="send" aria-label="Send" />
