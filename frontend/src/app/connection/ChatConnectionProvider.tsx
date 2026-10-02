@@ -6,8 +6,6 @@ import { useInviteStore } from '@features/lobby/store/inviteStore';
 import { useConnectionStore } from '@shared/stores';
 import { ChatConnection } from '@shared/websocket';
 
-import { ChatConnectionContext } from './chatConnectionContext';
-
 /**
  * Owner of the per-user Chat Gateway socket (`/ws/v2/channels`).
  *
@@ -46,9 +44,8 @@ export function ChatConnectionProvider({
     };
   }, [setChatStatus, userId]);
 
+  // The chat feature reaches the socket through `attachChatConnection`; its UI waits for it.
   if (!connection) return null;
 
-  return (
-    <ChatConnectionContext.Provider value={connection}>{children}</ChatConnectionContext.Provider>
-  );
+  return children;
 }

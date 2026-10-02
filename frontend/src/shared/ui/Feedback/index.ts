@@ -3,4 +3,3 @@ export * from './ErrorState';
 export * from './LoadingDots';
 export * from './LoadingState';
 export * from './Skeleton';
-export * from './Spinner';

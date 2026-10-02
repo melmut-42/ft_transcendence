@@ -21,30 +21,54 @@ Rules:
 
 ## Primitives
 
-`index.ts` is the entry point: `import { Button, Input, Modal } from '@shared/ui'`.
+`index.ts` is the entry point: `import { Button, ConfirmDialog, Dialog } from '@shared/ui'`.
 
-| Component                           | Use it for                                                       |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `Button`                            | Any labelled action, in the `fill`, `outline` and `text` themes. |
-| `ButtonIcon`                        | Circular icon-only action. It requires an `aria-label`.          |
-| `Input`, `Textarea`, `FieldMessage` | Labelled fields with hint, error and success lines.              |
-| `Avatar`                            | Player picture with its team ring and online dot.                |
-| `Badge`                             | Short status pill: host, ready, player role.                     |
-| `Card`                              | Elevated surface grouping related content.                       |
-| `Overlay`                           | Dimmed full-screen backdrop, rendered in a portal.               |
-| `Modal`                             | Dialog shell over `Overlay`: title, close control, action row.   |
-| `Dialog`                            | Popup over the visible page for a designed surface of its own.   |
-| `Toast`, `ToastStack`               | Transient notice and the stack it renders into.                  |
-| `PlayerRow`                         | One seat in a lobby or team list, including the empty seat.      |
-| `WordCard`                          | One board tile, hidden or revealed.                              |
-| `Alert`                             | Page-level result of an action.                                  |
-| `LoadingDots`, `Spinner`            | The ring of dots, and the inline ring for a small area.          |
-| `Skeleton`, `SkeletonPlayerCard`    | Content placeholders while data loads.                           |
-| `LoadingState`, `ErrorState`        | The shared presentation of a loading and a failed area.          |
+| Component                           | Use it for                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------ |
+| `Button`                            | Any labelled action, in the `fill`, `outline`, `text` and `link` themes. |
+| `ButtonIcon`                        | Circular icon-only action. It requires an `aria-label`.                  |
+| `Input`, `Textarea`, `FieldMessage` | Labelled fields with hint, error and success lines.                      |
+| `Avatar`                            | Player picture with its team ring and online dot.                        |
+| `AvatarImage`                       | The picture inside a feature's own avatar frame, with its fallback.      |
+| `Badge`                             | Short status pill: host, ready, player role.                             |
+| `Card`                              | Elevated surface grouping related content.                               |
+| `Dialog`                            | Popup over the visible page for a designed surface of its own.           |
+| `ConfirmDialog`                     | The confirmation modal: title, cost, the safe and the committing choice. |
+| `Toast`, `ToastStack`               | Transient notice and the stack it renders into.                          |
+| `WordCard`                          | One board tile, hidden or revealed.                                      |
+| `Alert`                             | Page-level result of an action.                                          |
+| `LoadingDots`                       | The ring of dots.                                                        |
+| `Skeleton`                          | Content placeholder while data loads.                                    |
+| `LoadingState`, `ErrorState`        | The shared presentation of a loading and a failed area.                  |
 
 `Button` variants are emphasis, not color: `primary` for the committing action, `neutral`
 for the safe choice beside a committing one, `muted` for a low-emphasis action such as
-Pass, `danger` for a destructive action and `cta` for the single large call to action.
+Pass, `secondary` (coral) for a committing action that costs the player something, such as
+leaving or kicking, `success` for a confirmed state such as Ready, `danger` for a
+destructive action and `cta` for the single large call to action. A team-colored action
+uses `secondary` for Red and `primary` for Blue.
+
+### Sizing a button to its design
+
+A screen whose design draws a button at its own height, radius and type passes those
+values as `sizeClassName`, which replaces the preset `size` entirely:
+
+```tsx
+<Button variant="success" sizeClassName="h-[53px] gap-[12px] rounded-[13px] text-[22px]">
+  Ready!
+</Button>
+```
+
+`className` only adds layout — width, margin, placement. `cn()` joins classes without
+resolving conflicts, so when two utilities set the same property the stylesheet's order
+decides, not the class list. A height or a type size in `className` would therefore
+silently lose to the preset; `sizeClassName` never competes with it.
+
+A soft-disabled control — one that keeps its focus while it cannot act, marked with
+`aria-disabled` — answers neither hover nor press. The caller still guards its click.
+
+`buttonInteraction` is exported for a control that must stay a link but look like a
+button, such as Log In on the legal pages.
 
 ## Interaction states
 
@@ -81,13 +105,13 @@ motion.
 A feature that waits on data renders `LoadingState`, and a feature whose load failed
 renders `ErrorState` with a retry handler. Both are live regions, so the outcome is
 announced as well as drawn, and every screen reports the same situation the same way.
-`Skeleton` and `SkeletonPlayerCard` replace a `LoadingState` only where the shape of the
+`Skeleton` replaces a `LoadingState` only where the shape of the
 incoming content is already known.
 
 ## Accessibility and motion
 
 Keyboard focus is drawn once, by the `:focus-visible` rule in `shared/styles/base.css`,
-so every control shows the same ring. `Modal` traps focus, closes on Escape, holds the
+so every control shows the same ring. `Dialog` traps focus, closes on Escape, holds the
 page still behind itself and returns focus to the element that opened it. An icon-only
 button requires an `aria-label`.
 

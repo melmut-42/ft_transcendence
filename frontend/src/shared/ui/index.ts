@@ -7,8 +7,5 @@ export * from './Dialog';
 export * from './Feedback';
 export * from './Icon';
 export * from './Input';
-export * from './Modal';
-export * from './Overlay';
-export * from './PlayerRow';
 export * from './Toast';
 export * from './WordCard';

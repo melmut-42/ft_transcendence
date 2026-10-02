@@ -186,8 +186,6 @@ export const actionPrimary: string =
   'h-[48px] rounded-[11px] text-[16px] leading-none font-bold tracking-[-1.2px] uppercase ' +
   'md:h-[45px]';
 
-export const actionError: string = 'w-full text-center';
-
 // ---- Pick Avatar ----
 
 export const grid: string =

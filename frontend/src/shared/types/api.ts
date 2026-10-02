@@ -55,19 +55,6 @@ export type RestErrorCode =
   | 'CHANNEL_ACCESS_REVOKED'
   | 'CHANNEL_NOT_FOUND';
 
-/**
- * UI-handling bucket each error falls into. Bruno's codes stay the authoritative
- * list (`workspace.yml` · Error Philosophy); this is the UI classification applied
- * to them in `shared/api/errors`, not a second code list.
- */
-export type ErrorHandlingClass =
-  | 'INLINE_VALIDATION'
-  | 'TOAST'
-  | 'AUTH_REDIRECT'
-  | 'ROOM_RECOVERY'
-  | 'RECONNECT'
-  | 'FATAL_GAME_STATE';
-
 /** `GET /api/health` */
 export interface HealthResponse {
   status: 'OK';

@@ -7,15 +7,12 @@ import {
   Button,
   ButtonIcon,
   Card,
+  ConfirmDialog,
   ErrorState,
   Input,
   LoadingDots,
   LoadingState,
-  Modal,
-  PlayerRow,
   Skeleton,
-  SkeletonPlayerCard,
-  Spinner,
   Textarea,
   Toast,
   WordCard,
@@ -38,7 +35,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function UIElements() {
-  const [modalOpen, setModalOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selected, setSelected] = useState<number | null>(1);
 
@@ -148,25 +144,6 @@ export function UIElements() {
         <Card tone="raised" interactive className="w-full max-w-sm">
           Interactive card
         </Card>
-        <PlayerRow
-          name="Player One"
-          online
-          host="Host"
-          ready="Ready"
-          emptyLabel="Waiting for player…"
-          role={{ label: 'Operative', icon: 'search' }}
-          className="max-w-xl"
-        />
-        <PlayerRow
-          name="Player Two"
-          online={false}
-          compact
-          ring="teamB"
-          emptyLabel="Waiting for player…"
-          role={{ label: 'Spymaster', icon: 'key' }}
-          className="max-w-md"
-        />
-        <PlayerRow emptyLabel="Waiting for player…" className="max-w-xl" />
       </Section>
 
       <Section title="Board">
@@ -212,8 +189,6 @@ export function UIElements() {
           <Skeleton shape="block" />
           <Skeleton />
         </div>
-        <SkeletonPlayerCard className="w-full max-w-sm" />
-        <Spinner />
         <LoadingDots size="sm" />
         <LoadingState label="Loading rooms…" />
         <ErrorState
@@ -225,42 +200,20 @@ export function UIElements() {
       </Section>
 
       <Section title="Dialogs">
-        <Button onClick={() => setModalOpen(true)}>Open modal</Button>
-        <Button variant="danger" onClick={() => setConfirmOpen(true)}>
+        <Button variant="secondary" onClick={() => setConfirmOpen(true)}>
           Open confirmation
         </Button>
       </Section>
 
-      {modalOpen && (
-        <Modal
-          title="Player profile"
-          closeLabel="Close"
-          onClose={() => setModalOpen(false)}
-          footer={<Button onClick={() => setModalOpen(false)}>Close</Button>}
-        >
-          <p>Stats, avatar and friendship state live here.</p>
-        </Modal>
-      )}
-
       {confirmOpen && (
-        <Modal
-          title="Leave game?"
-          align="center"
-          closeLabel="Close"
-          onClose={() => setConfirmOpen(false)}
-          footer={
-            <>
-              <Button variant="neutral" onClick={() => setConfirmOpen(false)}>
-                Stay
-              </Button>
-              <Button variant="danger" onClick={() => setConfirmOpen(false)}>
-                Leave
-              </Button>
-            </>
-          }
-        >
-          <p>Leaving during a game forfeits it for your team.</p>
-        </Modal>
+        <ConfirmDialog
+          title="Leave Room?"
+          body="You will leave this room and lose your seat."
+          cancelLabel="Stay"
+          confirmLabel="Leave Room"
+          onCancel={() => setConfirmOpen(false)}
+          onConfirm={() => setConfirmOpen(false)}
+        />
       )}
     </div>
   );

@@ -9,13 +9,6 @@ import type { Room, RoomLookupResponse } from '@shared/types';
 export const isRoomFull = (room: Pick<Room, 'player_count' | 'max_players'>): boolean =>
   room.player_count >= room.max_players;
 
-/** `"4 / 8 Players"` — the lobby and join-dialog capacity label. */
-export const capacityLabel = (room: Pick<Room, 'player_count' | 'max_players'>): string =>
-  `${room.player_count} / ${room.max_players} Players`;
-
-/** Capacities a Create Room form may offer. */
-export const createCapacityOptions = (): number[] => range(ROOM_CAPACITY.min, ROOM_CAPACITY.max);
-
 /** Capacities the host may switch to right now: never below the current membership. */
 export const settingsCapacityOptions = (room: Pick<Room, 'player_count'>): number[] =>
   range(Math.max(ROOM_CAPACITY.min, room.player_count), ROOM_CAPACITY.max);

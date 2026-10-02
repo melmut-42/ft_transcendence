@@ -24,22 +24,3 @@ export function Skeleton({ shape = 'line', className }: SkeletonProps) {
     />
   );
 }
-
-/** The player card placeholder from the design system: avatar, name, status, room. */
-export function SkeletonPlayerCard({ className }: { className?: string }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={cn('flex flex-col gap-3 rounded-lg bg-surface p-4 shadow-panel', className)}
-    >
-      <div className="flex items-center gap-3">
-        <Skeleton shape="circle" />
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <Skeleton className="w-3/5" />
-          <Skeleton className="w-2/5" />
-        </div>
-      </div>
-      <Skeleton />
-    </div>
-  );
-}
