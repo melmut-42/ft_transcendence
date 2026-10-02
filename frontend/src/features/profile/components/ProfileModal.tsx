@@ -3,7 +3,7 @@ import type { ReactNode, RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Room } from '@shared/types';
-import { Dialog, Icon, Skeleton } from '@shared/ui';
+import { AvatarImage, Dialog, Icon, Skeleton } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import { useInviteToRoom } from '../hooks/useInviteToRoom';
@@ -167,23 +167,17 @@ export function ProfileModal({
 
 function ProfileHeader({ profile, titleId }: { profile: ProfileView; titleId: string }) {
   const { t } = useTranslation();
-  const [imageFailed, setImageFailed] = useState(false);
   const presence = profile.is_online ? 'online' : 'offline';
 
   return (
     <div className={styles.header}>
       <span className={styles.avatarFrame}>
         <span className={styles.avatar}>
-          {profile.avatar_url && !imageFailed ? (
-            <img
-              src={profile.avatar_url}
-              alt=""
-              onError={() => setImageFailed(true)}
-              className={styles.avatarImage}
-            />
-          ) : (
-            <Icon name="smile" className={styles.avatarPlaceholder} />
-          )}
+          <AvatarImage
+            src={profile.avatar_url}
+            className={styles.avatarImage}
+            placeholderClassName={styles.avatarPlaceholder}
+          />
         </span>
         {profile.is_online && <span aria-hidden="true" className={styles.onlineDot} />}
       </span>

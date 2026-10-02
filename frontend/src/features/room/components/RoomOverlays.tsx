@@ -1,8 +1,7 @@
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Dialog } from '@shared/ui';
-import { cn } from '@shared/utils';
+import { ConfirmDialog, Dialog } from '@shared/ui';
 
 import type { KickMember } from '../hooks/useKickMember';
 import type { LeaveStatus } from '../hooks/useLeaveRoom';
@@ -32,8 +31,6 @@ export function LeaveRoomDialog({
   onCancel: () => void;
 }) {
   const { t } = useTranslation();
-  const titleId = useId();
-  const bodyId = useId();
   const kind = action.kind.startsWith('LEAVE_GAME') ? 'game' : 'room';
   const body =
     action.kind === 'LEAVE_GAME_SPYMASTER'
@@ -46,47 +43,16 @@ export function LeaveRoomDialog({
   const leaving = status === 'LEAVING';
 
   return (
-    <Dialog
-      role="alertdialog"
-      labelledBy={titleId}
-      describedBy={bodyId}
-      closeLabel={t('room.leave.stay')}
-      onClose={onCancel}
-      closable={!leaving}
-      showCloseButton={false}
-      className={styles.leave}
-    >
-      <h2 id={titleId} className={styles.leaveTitle}>
-        {t(`room.leave.${kind}.title`)}
-      </h2>
-      <p id={bodyId} className={styles.leaveBody}>
-        {t(body)}
-      </p>
-      {failed && (
-        <p role="alert" className={styles.leaveError}>
-          {t('room.leave.failed')}
-        </p>
-      )}
-      <div className={styles.leaveActions}>
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={leaving}
-          className={cn(styles.leaveButton, styles.stayTone)}
-        >
-          {t('room.leave.stay')}
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={leaving}
-          aria-busy={leaving}
-          className={cn(styles.leaveButton, styles.leaveTone)}
-        >
-          {t(leaving ? 'room.leave.leaving' : `room.leave.${kind}.confirm`)}
-        </button>
-      </div>
-    </Dialog>
+    <ConfirmDialog
+      title={t(`room.leave.${kind}.title`)}
+      body={t(body)}
+      error={failed ? t('room.leave.failed') : null}
+      cancelLabel={t('room.leave.stay')}
+      confirmLabel={t(leaving ? 'room.leave.leaving' : `room.leave.${kind}.confirm`)}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      pending={leaving}
+    />
   );
 }
 
@@ -98,55 +64,22 @@ export function LeaveRoomDialog({
  */
 export function KickDialog({ kick, inMatch }: { kick: KickMember; inMatch: boolean }) {
   const { t } = useTranslation();
-  const titleId = useId();
-  const bodyId = useId();
   const { target } = kick;
   if (!target) return null;
   const kicking = kick.status === 'KICKING';
   const playing = inMatch && target.role !== 'SPECTATOR';
 
   return (
-    <Dialog
-      role="alertdialog"
-      labelledBy={titleId}
-      describedBy={bodyId}
-      closeLabel={t('common.cancel')}
-      onClose={kick.close}
-      closable={!kicking}
-      showCloseButton={false}
-      className={styles.leave}
-    >
-      <h2 id={titleId} className={styles.leaveTitle}>
-        {t('room.kick.title', { username: target.username })}
-      </h2>
-      <p id={bodyId} className={styles.leaveBody}>
-        {t(playing ? 'room.kick.bodyInGame' : 'room.kick.body', { username: target.username })}
-      </p>
-      {kick.failure && (
-        <p role="alert" className={styles.leaveError}>
-          {t(kick.failure)}
-        </p>
-      )}
-      <div className={styles.leaveActions}>
-        <button
-          type="button"
-          onClick={kick.close}
-          disabled={kicking}
-          className={cn(styles.leaveButton, styles.stayTone)}
-        >
-          {t('common.cancel')}
-        </button>
-        <button
-          type="button"
-          onClick={() => void kick.confirm()}
-          disabled={kicking}
-          aria-busy={kicking}
-          className={cn(styles.leaveButton, styles.leaveTone)}
-        >
-          {t(kicking ? 'room.kick.kicking' : 'room.kick.confirm')}
-        </button>
-      </div>
-    </Dialog>
+    <ConfirmDialog
+      title={t('room.kick.title', { username: target.username })}
+      body={t(playing ? 'room.kick.bodyInGame' : 'room.kick.body', { username: target.username })}
+      error={kick.failure && t(kick.failure)}
+      cancelLabel={t('common.cancel')}
+      confirmLabel={t(kicking ? 'room.kick.kicking' : 'room.kick.confirm')}
+      onCancel={kick.close}
+      onConfirm={() => void kick.confirm()}
+      pending={kicking}
+    />
   );
 }
 

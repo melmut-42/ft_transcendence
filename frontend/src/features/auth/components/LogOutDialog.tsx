@@ -1,11 +1,7 @@
-import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { PlayingRole } from '@shared/types';
-import { Dialog } from '@shared/ui';
-import { cn } from '@shared/utils';
-
-import * as styles from './LogOutDialog.styles';
+import { ConfirmDialog } from '@shared/ui';
 
 /**
  * Log Out? — asked only while the player plays in a running match, because logging out
@@ -29,50 +25,17 @@ export function LogOutDialog({
   onCancel: () => void;
 }) {
   const { t } = useTranslation();
-  const titleId = useId();
-  const bodyId = useId();
 
   return (
-    <Dialog
-      role="alertdialog"
-      labelledBy={titleId}
-      describedBy={bodyId}
-      closeLabel={t('auth.logOut.stay')}
-      onClose={onCancel}
-      closable={!pending}
-      showCloseButton={false}
-      className={styles.card}
-    >
-      <h2 id={titleId} className={styles.title}>
-        {t('auth.logOut.title')}
-      </h2>
-      <p id={bodyId} className={styles.body}>
-        {t(`auth.logOut.body.${role}`)}
-      </p>
-      {failed && (
-        <p role="alert" className={styles.error}>
-          {t('auth.logOut.failed')}
-        </p>
-      )}
-      <div className={styles.actions}>
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={pending}
-          className={cn(styles.button, styles.stay)}
-        >
-          {t('auth.logOut.stay')}
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={pending}
-          aria-busy={pending}
-          className={cn(styles.button, styles.confirm)}
-        >
-          {t(pending ? 'auth.logOut.pending' : 'auth.logOut.confirm')}
-        </button>
-      </div>
-    </Dialog>
+    <ConfirmDialog
+      title={t('auth.logOut.title')}
+      body={t(`auth.logOut.body.${role}`)}
+      error={failed ? t('auth.logOut.failed') : null}
+      cancelLabel={t('auth.logOut.stay')}
+      confirmLabel={t(pending ? 'auth.logOut.pending' : 'auth.logOut.confirm')}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      pending={pending}
+    />
   );
 }

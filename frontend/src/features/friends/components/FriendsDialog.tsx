@@ -1,11 +1,11 @@
-import { useId, useState } from 'react';
+import { useId } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { openProfileModal, useModalStore } from '@shared/stores';
 import { USER_SEARCH_QUERY } from '@shared/types';
 import type { Friend, UserSearchResult } from '@shared/types';
-import { Dialog, Icon, LoadingDots } from '@shared/ui';
+import { AvatarImage, Dialog, Icon, LoadingDots } from '@shared/ui';
 import type { IconName } from '@shared/ui';
 
 import { useAddFriend } from '../hooks/useAddFriend';
@@ -250,8 +250,6 @@ function PlayerIdentity({
   children?: ReactNode;
 }) {
   const { t } = useTranslation();
-  const [imageFailed, setImageFailed] = useState(false);
-
   return (
     <button
       type="button"
@@ -261,16 +259,11 @@ function PlayerIdentity({
       className={styles.profileButton}
     >
       <span className={styles.avatar}>
-        {player.avatar_url && !imageFailed ? (
-          <img
-            src={player.avatar_url}
-            alt=""
-            onError={() => setImageFailed(true)}
-            className={styles.avatarImage}
-          />
-        ) : (
-          <Icon name="smile" className={styles.avatarPlaceholder} />
-        )}
+        <AvatarImage
+          src={player.avatar_url}
+          className={styles.avatarImage}
+          placeholderClassName={styles.avatarPlaceholder}
+        />
       </span>
       <span className={styles.identity}>
         <span className={styles.name}>{player.username}</span>

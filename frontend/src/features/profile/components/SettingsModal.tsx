@@ -7,7 +7,7 @@ import { LanguageSelector } from '@shared/i18n/LanguageSelector';
 import { useOnReconnect } from '@shared/hooks';
 import { useSessionStore } from '@shared/stores';
 import type { OwnProfile } from '@shared/types';
-import { Alert, Dialog, FieldMessage, Icon } from '@shared/ui';
+import { Alert, AvatarImage, Dialog, FieldMessage, Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import { useAvatarUpload } from '../hooks/useAvatarUpload';
@@ -75,7 +75,6 @@ export function SettingsModal({
   const { profile, refresh } = useOwnProfile();
   const [picking, setPicking] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [imageFailedUrl, setImageFailedUrl] = useState<string | null>(null);
 
   const userId = profile?.user_id ?? session?.user_id;
   const username = profile?.username ?? session?.username ?? '';
@@ -203,16 +202,12 @@ export function SettingsModal({
             </h3>
             <div className={styles.avatarRow}>
               <span className={styles.currentAvatar}>
-                {avatarUrl && avatarUrl !== imageFailedUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={t('settings.avatar.current')}
-                    onError={() => setImageFailedUrl(avatarUrl)}
-                    className={styles.avatarImage}
-                  />
-                ) : (
-                  <Icon name="smile" className={styles.avatarPlaceholder} />
-                )}
+                <AvatarImage
+                  src={avatarUrl}
+                  alt={t('settings.avatar.current')}
+                  className={styles.avatarImage}
+                  placeholderClassName={styles.avatarPlaceholder}
+                />
               </span>
               <div className={styles.avatarActions}>
                 <div className={styles.avatarButtons}>

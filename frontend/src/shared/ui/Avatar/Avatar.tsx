@@ -1,5 +1,6 @@
 import { cn } from '@shared/utils';
-import { Icon } from '@shared/ui/Icon';
+
+import { AvatarImage } from './AvatarImage';
 
 export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -71,11 +72,12 @@ export function Avatar({
           ringStyles[ring],
         )}
       >
-        {src ? (
-          <img src={src} alt={name} className="h-full w-full object-cover" />
-        ) : (
-          <Icon name="smile" className="text-text-black" />
-        )}
+        <AvatarImage
+          src={src}
+          alt={name}
+          className="h-full w-full object-cover"
+          placeholderClassName="text-text-black"
+        />
       </span>
 
       {online !== undefined && (

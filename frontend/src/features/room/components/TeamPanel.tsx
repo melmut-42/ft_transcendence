@@ -1,9 +1,9 @@
-import { useId, useState } from 'react';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { openProfileModal } from '@shared/stores';
 import type { RoomMember } from '@shared/types';
-import { Icon } from '@shared/ui';
+import { AvatarImage, Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import type { TeamRoster } from '../model/readyRoom';
@@ -50,14 +50,13 @@ function MemberAvatar({
   className: string;
   placeholderClassName?: string;
 }) {
-  const [failed, setFailed] = useState<string | null>(null);
   return (
     <span className={className}>
-      {url && failed !== url ? (
-        <img src={url} alt="" onError={() => setFailed(url)} className={styles.avatarImage} />
-      ) : (
-        <Icon name="smile" className={placeholderClassName} />
-      )}
+      <AvatarImage
+        src={url}
+        className={styles.avatarImage}
+        placeholderClassName={placeholderClassName}
+      />
     </span>
   );
 }

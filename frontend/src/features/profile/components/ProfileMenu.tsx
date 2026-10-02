@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 import { openProfileModal, openSettingsModal, useSessionStore } from '@shared/stores';
-import { Icon } from '@shared/ui';
+import { AvatarImage, Icon } from '@shared/ui';
 import type { IconName } from '@shared/ui';
 import { cn } from '@shared/utils';
 
@@ -34,7 +34,6 @@ export function ProfileMenu({
   const { t } = useTranslation();
   const session = useSessionStore((state) => state.user);
   const { profile, status } = useOwnProfile();
-  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -45,13 +44,9 @@ export function ProfileMenu({
   const avatarUrl = profile?.avatar_url;
   const label = t('lobby.profile.menu.label', { username });
 
-  // A new avatar gets its own chance to load, even after the previous one failed.
-  const avatar = (imageClass: string, placeholderClass: string) =>
-    avatarUrl && avatarUrl !== failedUrl ? (
-      <img src={avatarUrl} alt="" onError={() => setFailedUrl(avatarUrl)} className={imageClass} />
-    ) : (
-      <Icon name="smile" className={placeholderClass} />
-    );
+  const avatar = (imageClass: string, placeholderClass: string) => (
+    <AvatarImage src={avatarUrl} className={imageClass} placeholderClassName={placeholderClass} />
+  );
 
   const trigger = (triggerClass: string, content: ReactNode) => (
     <>

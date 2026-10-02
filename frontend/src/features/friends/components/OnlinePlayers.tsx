@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { openProfileModal } from '@shared/stores';
 import type { Friend } from '@shared/types';
-import { Icon, LoadingDots } from '@shared/ui';
+import { AvatarImage, Icon, LoadingDots } from '@shared/ui';
 import type { IconName } from '@shared/ui';
 import { cn } from '@shared/utils';
 
@@ -139,8 +139,6 @@ export function OnlinePlayers({ onInvite, className }: OnlinePlayersProps) {
 
 function PlayerCard({ friend }: { friend: Friend }) {
   const { t } = useTranslation();
-  const [imageFailed, setImageFailed] = useState(false);
-
   return (
     <button
       type="button"
@@ -150,16 +148,11 @@ function PlayerCard({ friend }: { friend: Friend }) {
       className={cn(styles.card, styles.playerCard)}
     >
       <span className={styles.avatar}>
-        {friend.avatar_url && !imageFailed ? (
-          <img
-            src={friend.avatar_url}
-            alt=""
-            onError={() => setImageFailed(true)}
-            className={styles.avatarImage}
-          />
-        ) : (
-          <Icon name="smile" className={styles.avatarPlaceholder} />
-        )}
+        <AvatarImage
+          src={friend.avatar_url}
+          className={styles.avatarImage}
+          placeholderClassName={styles.avatarPlaceholder}
+        />
       </span>
       <span className={styles.name}>{friend.username}</span>
       <span className={styles.badge}>

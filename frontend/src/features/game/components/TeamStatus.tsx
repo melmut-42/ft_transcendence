@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { openProfileModal } from '@shared/stores';
 import type { RoomMember } from '@shared/types';
-import { Icon } from '@shared/ui';
+import { AvatarImage, Icon } from '@shared/ui';
 import { cn } from '@shared/utils';
 
 import type { TeamLineup } from '../model/lineup';
@@ -26,7 +25,6 @@ function Player({
 }) {
   const { t } = useTranslation();
   const url = avatarFor(member.user_id);
-  const [failed, setFailed] = useState<string | null>(null);
 
   return (
     <li className={styles.kickable}>
@@ -38,11 +36,11 @@ function Player({
         className={styles.player}
       >
         <span className={styles.avatar}>
-          {url && failed !== url ? (
-            <img src={url} alt="" onError={() => setFailed(url)} className={styles.avatarImage} />
-          ) : (
-            <Icon name="smile" className={styles.avatarPlaceholder} />
-          )}
+          <AvatarImage
+            src={url}
+            className={styles.avatarImage}
+            placeholderClassName={styles.avatarPlaceholder}
+          />
         </span>
         <span aria-hidden="true" title={member.username} className={styles.playerName}>
           {member.username}
