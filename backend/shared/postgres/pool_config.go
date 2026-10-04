@@ -6,7 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// poolConfig prepares validated pgx settings without opening a connection.
+// PoolConfig prepares validated pgx settings without opening a connection.
 //
 // Parameters:
 //
@@ -18,7 +18,7 @@ import (
 // Errors:
 //
 //   - ErrInvalidConfig: The DSN is missing or malformed, an option is negative, or effective pool bounds are inconsistent.
-func poolConfig(config Config) (*pgxpool.Config, error) {
+func PoolConfig(config Config) (*pgxpool.Config, error) {
 	if err := validateConfig(config); err != nil {
 		return nil, err
 	}

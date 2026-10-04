@@ -1,4 +1,4 @@
-package httpresponse_test
+package unit_test
 
 import (
 	"encoding/json"

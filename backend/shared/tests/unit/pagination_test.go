@@ -1,4 +1,4 @@
-package pagination_test
+package unit_test
 
 import (
 	"encoding/base64"

@@ -1,9 +1,10 @@
-package logging
+package unit_test
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/melmut-42/ft_transcendence/backend/shared/logging"
 	"strings"
 	"testing"
 	"time"
@@ -73,7 +74,7 @@ func TestAccessLogFormats(t *testing.T) {
 //   - Both unsupported configurations return errors.
 func TestLoggerLevels(t *testing.T) {
 	var output bytes.Buffer
-	logger, err := New(Config{Format: "json", Level: "warn", Service: "test-service"}, &output)
+	logger, err := logging.New(logging.Config{Format: "json", Level: "warn", Service: "test-service"}, &output)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,8 +85,8 @@ func TestLoggerLevels(t *testing.T) {
 	if strings.Count(output.String(), "\n") != 2 {
 		t.Fatalf("unexpected application logs: %s", output.String())
 	}
-	for _, cfg := range []Config{{Format: "xml"}, {Level: "trace"}} {
-		if _, err := New(cfg, &output); err == nil {
+	for _, cfg := range []logging.Config{{Format: "xml"}, {Level: "trace"}} {
+		if _, err := logging.New(cfg, &output); err == nil {
 			t.Fatalf("invalid config accepted: %+v", cfg)
 		}
 	}
@@ -94,13 +95,13 @@ func TestLoggerLevels(t *testing.T) {
 func checkAccessLogFormat(t *testing.T, format, threshold string, statuses []int) {
 	t.Helper()
 	var output bytes.Buffer
-	logger, err := New(Config{Format: format, Level: threshold, Service: "test-service"}, &output)
+	logger, err := logging.New(logging.Config{Format: format, Level: threshold, Service: "test-service"}, &output)
 	if err != nil {
 		t.Fatal(err)
 	}
 	stamp := time.Date(2026, 10, 2, 14, 30, 0, 123, time.FixedZone("local", 3*60*60))
 	for _, status := range []int{200, 302, 400, 500} {
-		LogAccess(context.Background(), logger, AccessLog{
+		logging.LogAccess(context.Background(), logger, logging.AccessLog{
 			Time: stamp, RequestID: "request-123", Status: status,
 			Latency: 85 * time.Millisecond, Method: "GET", Path: "/path\nforged\"value",
 		})

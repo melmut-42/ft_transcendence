@@ -24,7 +24,7 @@ import (
 //   - context.Canceled: Startup was canceled; the error also wraps ErrConnect.
 //   - context.DeadlineExceeded: Startup timed out; the error also wraps ErrConnect.
 func Open(ctx context.Context, config Config) (*pgxpool.Pool, error) {
-	cfg, err := poolConfig(config)
+	cfg, err := PoolConfig(config)
 	if err != nil {
 		return nil, err
 	}
