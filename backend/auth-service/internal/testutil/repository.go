@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/melmut-42/ft_transcendence/backend/auth-service/internal/model"
@@ -11,14 +12,17 @@ import (
 )
 
 type state struct {
-	Users    []model.User
-	Sessions []model.Session
-	Refresh  []model.RefreshToken
+	Users                []model.User
+	Sessions             []model.Session
+	Refresh              []model.RefreshToken
+	Revocations          []service.SessionRevocation
+	DeliveredRevocations map[string]bool
 }
 
-// MemoryRepository implements registration transactions in memory for tests.
+// MemoryRepository implements account and session transactions in memory for tests.
 type MemoryRepository struct {
 	state
+	mu        sync.Mutex
 	FailAt    string
 	CommitErr error
 	Calls     int
@@ -43,11 +47,10 @@ type MemoryRepository struct {
 //   - Success returns nil and publishes the draft records.
 //   - Failure returns the callback or commit error and preserves the original state.
 func (r *MemoryRepository) WithTransaction(ctx context.Context, fn func(service.AuthTx) error) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	r.Calls++
-	draft := &memoryTx{state: state{
-		Users: append([]model.User(nil), r.Users...), Sessions: append([]model.Session(nil), r.Sessions...),
-		Refresh: append([]model.RefreshToken(nil), r.Refresh...),
-	}, FailAt: r.FailAt}
+	draft := r.draft()
 	if err := fn(draft); err != nil {
 		return err
 	}

@@ -17,17 +17,32 @@ type RegistrationService interface {
 }
 
 type AuthController struct {
-	service RegistrationService
+	service  RegistrationService
+	sessions SessionService
 }
 
 // NewAuth returns a controller backed by an auth service.
-func NewAuth(service RegistrationService) *AuthController {
-	return &AuthController{service: service}
+func NewAuth(service RegistrationService, options ...Option) *AuthController {
+	controller := &AuthController{service: service}
+	controller.sessions, _ = service.(SessionService)
+	for _, option := range options {
+		option(controller)
+	}
+	return controller
 }
 
 // RegisterRoutes installs auth routes on a group mounted at /api/v1/auth.
-func (a *AuthController) RegisterRoutes(routes gin.IRoutes) {
-	routes.POST("/register", router.Wrap(validation.ValidateRegister, mapAuthError), router.Wrap(a.Register, mapAuthError))
+func (authController *AuthController) RegisterRoutes(routes gin.IRoutes) {
+	routes.Use(disableAuthCaching)
+	routes.POST("/register", router.Wrap(validation.ValidateRegister, mapAuthError),
+		router.Wrap(authController.Register, mapAuthError))
+	if authController.sessions != nil {
+		authController.registerSessionRoutes(routes)
+	}
+}
+
+func disableAuthCaching(c *gin.Context) {
+	c.Header("Cache-Control", "no-store")
 }
 
 // Register handles account registration and writes the HTTP response.
@@ -47,19 +62,18 @@ func (a *AuthController) RegisterRoutes(routes gin.IRoutes) {
 //   - 409 EMAIL_TAKEN: Another account already uses the email.
 //   - 409 USERNAME_TAKEN: Another account already uses the username.
 //   - 500 INTERNAL_ERROR: An unexpected failure occurred; internal details are omitted.
-func (a *AuthController) Register(c *gin.Context) error {
+func (authController *AuthController) Register(c *gin.Context) error {
 	input, ok := validation.RegisterInput(c)
 	if !ok {
 		return errors.New("validated registration input is missing")
 	}
 
-	result, err := a.service.Register(c.Request.Context(), input)
+	result, err := authController.service.Register(c.Request.Context(), input)
 	if err != nil {
 		return err
 	}
 
-	setCredentialCookie(c.Writer, "ft_session", result.Credentials.AccessToken, "/", result.Credentials.AccessExpiresAt)
-	setCredentialCookie(c.Writer, "ft_refresh", result.Credentials.RefreshToken, "/api/v1/auth/refresh", result.Credentials.Refresh.ExpiresAt)
+	setCredentials(c.Writer, result.Credentials)
 
 	c.JSON(http.StatusCreated, gin.H{"data": gin.H{
 		"user": result.User, "access_token_expires_at": result.Credentials.AccessExpiresAt,

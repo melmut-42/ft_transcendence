@@ -45,6 +45,7 @@ func setup(ctx context.Context, cfg config.Config, logger *slog.Logger) (*http.S
 	authRepository := authpostgres.NewAuth(pool)
 	authService := service.NewAuth(authRepository, issuer)
 	authController := controller.NewAuth(authService)
+	cleanup := startSessionRevocations(ctx, authService, pool.Close, logger)
 
-	return server.New(cfg.Port, authController, logger), pool.Close, nil
+	return server.New(cfg.Port, authController, logger), cleanup, nil
 }

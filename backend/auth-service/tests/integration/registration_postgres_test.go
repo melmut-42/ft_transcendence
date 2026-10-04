@@ -106,12 +106,14 @@ func createRegistrationTestSchema(t *testing.T, admin *pgxpool.Pool) string {
 
 func applyRegistrationMigration(t *testing.T, pool *pgxpool.Pool) {
 	t.Helper()
-	migration, err := os.ReadFile(filepath.Join("..", "..", "migrations", "000001_create_auth_tables.up.sql"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := pool.Exec(context.Background(), string(migration)); err != nil {
-		t.Fatal(err)
+	for _, name := range []string{"000001_create_auth_tables.up.sql", "000002_session_revocations.up.sql"} {
+		migration, err := os.ReadFile(filepath.Join("..", "..", "migrations", name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := pool.Exec(context.Background(), string(migration)); err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 

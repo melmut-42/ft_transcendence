@@ -39,13 +39,26 @@ type AuthResult struct {
 }
 
 type AuthService struct {
-	repository AuthRepository
-	issuer     CredentialIssuer
+	repository  AuthRepository
+	issuer      CredentialIssuer
+	sessions    SessionRepository
+	tokens      SessionCredentialIssuer
+	verifier    AccessVerifier
+	lifecycle   SessionLifecycle
+	revocations RevocationRepository
 }
 
 // NewAuth returns an auth service using the supplied transaction and token providers.
-func NewAuth(repository AuthRepository, issuer CredentialIssuer) *AuthService {
-	return &AuthService{repository: repository, issuer: issuer}
+func NewAuth(repository AuthRepository, issuer CredentialIssuer, options ...Option) *AuthService {
+	s := &AuthService{repository: repository, issuer: issuer}
+	s.sessions, _ = repository.(SessionRepository)
+	s.tokens, _ = issuer.(SessionCredentialIssuer)
+	s.verifier, _ = issuer.(AccessVerifier)
+	s.revocations, _ = repository.(RevocationRepository)
+	for _, option := range options {
+		option(s)
+	}
+	return s
 }
 
 // Register validates credentials and creates an account with its session.

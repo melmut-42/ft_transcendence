@@ -86,7 +86,20 @@ func (i *TokenIssuer) Issue(userID int64) (Credentials, error) {
 		return Credentials{}, errors.New("credentials require a positive user ID")
 	}
 
-	credentials, err := newRefreshCredentials(userID)
+	sessionID, err := newUUID()
+	if err != nil {
+		return Credentials{}, err
+	}
+	return i.Rotate(userID, sessionID)
+}
+
+// Rotate creates new credentials tied to an existing, caller-validated session.
+// The caller must persist the refresh record and revoke its predecessor atomically.
+func (i *TokenIssuer) Rotate(userID int64, sessionID string) (Credentials, error) {
+	if userID <= 0 || !validSessionID(sessionID) {
+		return Credentials{}, errors.New("credentials require a positive user ID and valid session ID")
+	}
+	credentials, err := newRefreshCredentials(userID, sessionID)
 	if err != nil {
 		return Credentials{}, err
 	}
@@ -117,12 +130,8 @@ func (i *TokenIssuer) signAccessToken(userID int64, sessionID string, now, expir
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(i.key)
 }
 
-// newRefreshCredentials generates session identifiers and a hashed refresh secret.
-func newRefreshCredentials(userID int64) (Credentials, error) {
-	sessionID, err := newUUID()
-	if err != nil {
-		return Credentials{}, err
-	}
+// newRefreshCredentials creates a refresh identifier and hashed secret for the session.
+func newRefreshCredentials(userID int64, sessionID string) (Credentials, error) {
 	refreshID, err := newUUID()
 	if err != nil {
 		return Credentials{}, err

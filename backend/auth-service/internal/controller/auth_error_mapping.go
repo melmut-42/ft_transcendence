@@ -12,10 +12,27 @@ import (
 func mapAuthError(err error) *httpresponse.Error {
 	status, code, message := http.StatusInternalServerError, "INTERNAL_ERROR", "An internal error occurred."
 	details := map[string]any{}
-
 	switch {
+	case errors.Is(err, validation.ErrInvalidLoginRequest):
+		status, code, message = http.StatusBadRequest, "VALIDATION_ERROR", validation.ErrInvalidLoginRequest.Error()
 	case errors.Is(err, validation.ErrInvalidRequest):
 		status, code, message = http.StatusBadRequest, "VALIDATION_ERROR", validation.ErrInvalidRequest.Error()
+	case errors.Is(err, service.ErrInvalidCredentials):
+		status, code, message = http.StatusUnauthorized, "INVALID_CREDENTIALS", "Email or password is incorrect."
+	case errors.Is(err, service.ErrUnauthorized):
+		status, code, message = http.StatusUnauthorized, "UNAUTHORIZED", "A valid active session is required."
+	case errors.Is(err, service.ErrSessionExpired):
+		status, code, message = http.StatusUnauthorized, "SESSION_EXPIRED", "The refresh token is invalid or expired. Log in again."
+	default:
+		return mapRegistrationError(err)
+	}
+	return &httpresponse.Error{Status: status, Code: code, Message: message, Details: details}
+}
+
+func mapRegistrationError(err error) *httpresponse.Error {
+	status, code, message := http.StatusInternalServerError, "INTERNAL_ERROR", "An internal error occurred."
+	details := map[string]any{}
+	switch {
 	case errors.Is(err, service.ErrInvalidEmail):
 		status, code, message = http.StatusUnprocessableEntity, "INVALID_EMAIL", service.ErrInvalidEmail.Error()
 		details["field"] = "email"
