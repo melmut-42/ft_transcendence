@@ -25,7 +25,7 @@ func EncodeCursor(value any) (string, error) {
 	if len(encoded) > MaxRefLength {
 		return "", ErrInvalidCursor
 	}
-	
+
 	return encoded, nil
 }
 

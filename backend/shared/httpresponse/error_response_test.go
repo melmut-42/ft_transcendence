@@ -9,6 +9,31 @@ import (
 	"github.com/melmut-42/ft_transcendence/backend/shared/httpresponse"
 )
 
+// TestWriteError checks the public JSON error envelope and fallback response.
+//
+// Parameters:
+//
+//   - t: Go test runner used for subtests, assertions and failure reporting.
+//
+// Inputs:
+//
+//   - nil, invalid status, missing fields, unencodable details and a valid 422 INVALID_EMAIL
+//     error.
+//   - Each case specifies the expected HTTP status and public code.
+//
+// Flow:
+//
+//  1. Write the error into an HTTP response recorder.
+//  2. Decode the envelope and inspect status, code, message, details and Content-Type.
+//  3. Check internal values and the status field are not serialized.
+//
+// Expected output:
+//
+//   - Invalid definitions return HTTP 500 INTERNAL_ERROR; the public error returns HTTP 422
+//     INVALID_EMAIL.
+//   - Every response is application/json; charset=utf-8 with a nonempty message and non-null
+//     details.
+//   - The body contains neither private values nor a serialized Status field.
 func TestWriteError(t *testing.T) {
 	for _, tt := range []struct {
 		name   string
