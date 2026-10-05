@@ -4,6 +4,8 @@ import (
 	cryptorand "crypto/rand"
 	"fmt"
 	rand "math/rand/v2"
+	"strings"
+	"unicode/utf8"
 )
 
 type Game struct {
@@ -116,4 +118,63 @@ func (g *Game) ValidateGameState() error {
 		return ErrInvalidWinner
 	}
 	return nil
+}
+
+func validateTurnAction(g *Game, player *Player, phase Phase, role Role) error {
+	if player == nil {
+		return fmt.Errorf("%w: player is required", ErrInvalidArgument)
+	}
+	switch {
+	case g.CurrentTurn.Phase == PhaseGameOver:
+		return ErrGameAlreadyFinished
+	case g.CurrentTurn.Phase != phase:
+		return fmt.Errorf("%w: expected %q, got %q", ErrInvalidRoomState, phase, g.CurrentTurn.Phase)
+	case player.Team != g.CurrentTurn.Team:
+		return ErrNotYourTurn
+	case player.Role != role:
+		return ErrRoleForbidden
+	}
+	return nil
+}
+
+func validateClue(board *Board, clue *Clue) (Clue, error) {
+	if clue == nil {
+		return Clue{}, fmt.Errorf("%w: clue is required", ErrInvalidArgument)
+	}
+	word := strings.TrimSpace(clue.Word)
+	if word == "" {
+		return Clue{}, fmt.Errorf("%w: clue word cannot be empty", ErrInvalidClue)
+	}
+	if len(strings.Fields(word)) != 1 {
+		return Clue{}, fmt.Errorf("%w: clue word cannot contain spaces", ErrInvalidClue)
+	}
+	if utf8.RuneCountInString(word) > 30 {
+		return Clue{}, fmt.Errorf("%w: clue word cannot exceed 30 characters", ErrInvalidClue)
+	}
+	if clue.Number < 1 || clue.Number > 9 {
+		return Clue{}, fmt.Errorf("%w: clue number must be between 1 and 9", ErrInvalidClueNumber)
+	}
+	for _, card := range board.Cards() {
+		if strings.EqualFold(card.Word, strings.ToLower(word)) {
+			return Clue{}, fmt.Errorf("%w: %q is already on the board", ErrInvalidClue, word)
+		}
+	}
+	return Clue{Word: word, Number: clue.Number}, nil
+}
+
+func (g *Game) GiveClue(player *Player, clue *Clue) (CurrentTurn, error) {
+	if err := validateTurnAction(g, player, PhaseWaitingForClue, RoleSpymaster); err != nil {
+		return CurrentTurn{}, err
+	}
+	cleaned, err := validateClue(g.Board, clue)
+	if err != nil {
+		return CurrentTurn{}, err
+	}
+
+	guesses := clue.Number + 1
+	g.CurrentTurn.Clue = &cleaned
+	g.CurrentTurn.Phase = PhaseGuessing
+	g.CurrentTurn.GuessesRemaining = &guesses
+
+	return g.CurrentTurn, nil
 }

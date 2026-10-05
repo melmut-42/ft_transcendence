@@ -23,4 +23,5 @@ var (
 	ErrGenerateSeed     = errors.New("failed to generate secure seed")
 	ErrInvalidGameState = errors.New("invalid game state")
 	ErrInvalidWinner    = errors.New("invalid winner")
+	ErrInvalidArgument  = errors.New("invalid argument")
 )
