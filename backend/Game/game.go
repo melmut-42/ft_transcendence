@@ -178,3 +178,92 @@ func (g *Game) GiveClue(player *Player, clue *Clue) (CurrentTurn, error) {
 
 	return g.CurrentTurn, nil
 }
+
+func (g *Game) finish(winner Team, reason EndReason) {
+	g.CurrentTurn.Phase = PhaseGameOver
+	g.CurrentTurn.Clue = nil
+	g.CurrentTurn.GuessesRemaining = nil
+	g.Winner = &winner
+	g.EndReason = &reason
+}
+
+func opposite(t Team) Team {
+	if t == TeamRed {
+		return TeamBlue
+	}
+	return TeamRed
+}
+
+func (g *Game) switchTurn() {
+	if g.CurrentTurn.Team == TeamRed {
+		g.CurrentTurn.Team = TeamBlue
+	} else {
+		g.CurrentTurn.Team = TeamRed
+	}
+	g.CurrentTurn.Phase = PhaseWaitingForClue
+	g.CurrentTurn.Clue = nil
+	g.CurrentTurn.GuessesRemaining = nil
+}
+
+func handleTeamCard(g *Game, cardTeam Team) {
+	target := 8
+	if g.Board.startingTeam == cardTeam {
+		target = 9
+	}
+	score := g.Score()
+	revealed := score.Red
+	if cardTeam == TeamBlue {
+		revealed = score.Blue
+	}
+	if revealed >= target {
+		g.finish(cardTeam, EndReasonAllTeamCardsRevealed)
+		return
+	}
+	if g.CurrentTurn.Team != cardTeam {
+		g.switchTurn()
+		return
+	}
+	*g.CurrentTurn.GuessesRemaining--
+	if *g.CurrentTurn.GuessesRemaining <= 0 {
+		g.switchTurn()
+	}
+}
+
+func handleCardColor(g *Game, card *Card) {
+	activeTeam := g.CurrentTurn.Team
+	switch card.Color {
+	case CardColorAssassin:
+		g.finish(opposite(activeTeam), EndReasonAssassinRevealed)
+	case CardColorNeutral:
+		g.switchTurn()
+	case CardColorRed:
+		handleTeamCard(g, TeamRed)
+	case CardColorBlue:
+		handleTeamCard(g, TeamBlue)
+	}
+}
+
+func (g *Game) GuessCard(player *Player, cardID int) (GuessResult, error) {
+	if err := validateTurnAction(g, player, PhaseGuessing, RoleOperative); err != nil {
+		return GuessResult{}, err
+	}
+	if *g.CurrentTurn.GuessesRemaining <= 0 {
+		return GuessResult{}, fmt.Errorf("%w: no guesses remaining", ErrNoGuessesRemaining)
+	}
+	card, err := g.Board.reveal(cardID)
+	if err != nil {
+		return GuessResult{}, err
+	}
+	handleCardColor(g, &card)
+
+	return GuessResult{
+		GameID:         g.GameID,
+		Card:           newCardView(card),
+		GuessingTeam:   player.Team,
+		IsCorrectGuess: (player.Team == TeamRed && card.Color == CardColorRed) || (player.Team == TeamBlue && card.Color == CardColorBlue),
+		Score:          g.Score(),
+		CurrentTurn:    g.CurrentTurn,
+		Winner:         g.Winner,
+		EndReason:      g.EndReason,
+	}, nil
+}

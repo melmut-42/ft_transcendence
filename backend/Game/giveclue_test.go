@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestClueValidation(t *testing.T) {
+func TestGiveClue(t *testing.T) {
 	game := &Game{
 		Board: &Board{},
 		CurrentTurn: CurrentTurn{
@@ -30,7 +30,7 @@ func TestClueValidation(t *testing.T) {
 	}
 }
 
-func TestClueValidationErrors(t *testing.T) {
+func TestGiveClueErrors(t *testing.T) {
 	game := &Game{
 		Board: &Board{},
 		CurrentTurn: CurrentTurn{

@@ -83,11 +83,12 @@ func newCardView(card Card) CardView {
 }
 
 type GuessResult struct {
-	GameID       int         `json:"game_id"`
-	Card         CardView    `json:"card"`
-	GuessingTeam Team        `json:"guessing_team"`
-	Score        Score       `json:"score"`
-	CurrentTurn  CurrentTurn `json:"current_turn"`
-	Winner       *Team       `json:"winner"`
-	EndReason    *EndReason  `json:"end_reason"`
+	GameID         int         `json:"game_id"`
+	Card           CardView    `json:"card"`
+	GuessingTeam   Team        `json:"guessing_team"`
+	IsCorrectGuess bool        `json:"-"`
+	Score          Score       `json:"score"`
+	CurrentTurn    CurrentTurn `json:"current_turn"`
+	Winner         *Team       `json:"winner"`
+	EndReason      *EndReason  `json:"end_reason"`
 }
