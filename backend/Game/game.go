@@ -10,10 +10,10 @@ import (
 
 type Game struct {
 	GameID      int
-	Board       *Board
-	CurrentTurn CurrentTurn
-	Winner      *Team
-	EndReason   *EndReason
+	board       *Board
+	currentTurn CurrentTurn
+	winner      *Team
+	endReason   *EndReason
 }
 
 func NewSecureSeed() ([32]byte, error) {
@@ -35,15 +35,15 @@ func NewGameWithSeed(wordPool []Word, language string, seed [32]byte) (*Game, er
 	}
 	game := &Game{
 		GameID: 0,
-		Board:  board,
-		CurrentTurn: CurrentTurn{
+		board:  board,
+		currentTurn: CurrentTurn{
 			Team:             board.StartingTeam(),
 			Phase:            PhaseWaitingForClue,
 			Clue:             nil,
 			GuessesRemaining: nil,
 		},
-		Winner:    nil,
-		EndReason: nil,
+		winner:    nil,
+		endReason: nil,
 	}
 
 	return game, nil
@@ -62,7 +62,7 @@ func (g *Game) Score() Score {
 	redScore := 0
 	blueScore := 0
 
-	for _, card := range g.Board.Cards() {
+	for _, card := range g.board.Cards() {
 		if !card.Revealed {
 			continue
 		}
@@ -81,55 +81,58 @@ func (g *Game) Score() Score {
 }
 
 func (g *Game) ValidateGameState() error {
-	if g.Board == nil {
+	if g.board == nil {
 		return ErrInvalidBoard
 	}
 
-	switch g.CurrentTurn.Phase {
+	switch g.currentTurn.Phase {
 	case PhaseWaitingForClue:
-		if g.CurrentTurn.Clue != nil || g.CurrentTurn.GuessesRemaining != nil {
+		if g.currentTurn.Clue != nil || g.currentTurn.GuessesRemaining != nil {
 			return fmt.Errorf("%w: clue and guesses must be nil while waiting for clue", ErrInvalidGameState)
 		}
-		if g.Winner != nil || g.EndReason != nil {
+		if g.winner != nil || g.endReason != nil {
 			return fmt.Errorf("%w: winner and end reason must be nil while waiting for clue", ErrInvalidGameState)
 		}
 	case PhaseGuessing:
-		if g.CurrentTurn.Clue == nil || g.CurrentTurn.GuessesRemaining == nil {
+		if g.currentTurn.Clue == nil || g.currentTurn.GuessesRemaining == nil {
 			return fmt.Errorf("%w: clue and guesses are required while guessing", ErrInvalidGameState)
 		}
-		if g.Winner != nil || g.EndReason != nil {
+		if g.winner != nil || g.endReason != nil {
 			return fmt.Errorf("%w: winner and end reason must be nil while guessing", ErrInvalidGameState)
 		}
 	case PhaseGameOver:
-		if g.Winner == nil {
+		if g.winner == nil {
 			return fmt.Errorf("%w: winner is required when game is over", ErrInvalidWinner)
 		}
-		if g.EndReason == nil {
+		if g.endReason == nil {
 			return fmt.Errorf("%w: end reason is required when game is over", ErrInvalidGameState)
 		}
-		if g.CurrentTurn.Clue != nil || g.CurrentTurn.GuessesRemaining != nil {
+		if g.currentTurn.Clue != nil || g.currentTurn.GuessesRemaining != nil {
 			return fmt.Errorf("%w: clue and guesses must be nil when game is over", ErrInvalidGameState)
 		}
 	default:
-		return fmt.Errorf("%w: unknown phase %q", ErrInvalidGameState, g.CurrentTurn.Phase)
+		return fmt.Errorf("%w: unknown phase %q", ErrInvalidGameState, g.currentTurn.Phase)
 	}
 
-	if g.Winner != nil && *g.Winner != TeamRed && *g.Winner != TeamBlue {
+	if g.winner != nil && *g.winner != TeamRed && *g.winner != TeamBlue {
 		return ErrInvalidWinner
 	}
 	return nil
 }
 
 func validateTurnAction(g *Game, player *Player, phase Phase, role Role) error {
+	if err := g.ValidateGameState(); err != nil {
+		return err
+	}
 	if player == nil {
 		return fmt.Errorf("%w: player is required", ErrInvalidArgument)
 	}
 	switch {
-	case g.CurrentTurn.Phase == PhaseGameOver:
+	case g.currentTurn.Phase == PhaseGameOver:
 		return ErrGameAlreadyFinished
-	case g.CurrentTurn.Phase != phase:
-		return fmt.Errorf("%w: expected %q, got %q", ErrInvalidRoomState, phase, g.CurrentTurn.Phase)
-	case player.Team != g.CurrentTurn.Team:
+	case g.currentTurn.Phase != phase:
+		return fmt.Errorf("%w: expected %q, got %q", ErrInvalidRoomState, phase, g.currentTurn.Phase)
+	case player.Team != g.currentTurn.Team:
 		return ErrNotYourTurn
 	case player.Role != role:
 		return ErrRoleForbidden
@@ -141,7 +144,7 @@ func validateClue(board *Board, clue *Clue) (Clue, error) {
 	if clue == nil {
 		return Clue{}, fmt.Errorf("%w: clue is required", ErrInvalidArgument)
 	}
-	word := strings.TrimSpace(clue.Word)
+	word := strings.ToLower(strings.TrimSpace(clue.Word))
 	if word == "" {
 		return Clue{}, fmt.Errorf("%w: clue word cannot be empty", ErrInvalidClue)
 	}
@@ -155,8 +158,8 @@ func validateClue(board *Board, clue *Clue) (Clue, error) {
 		return Clue{}, fmt.Errorf("%w: clue number must be between 1 and 9", ErrInvalidClueNumber)
 	}
 	for _, card := range board.Cards() {
-		if strings.EqualFold(card.Word, strings.ToLower(word)) {
-			return Clue{}, fmt.Errorf("%w: %q is already on the board", ErrInvalidClue, word)
+		if !card.Revealed && strings.EqualFold(card.Word, word) {
+			return Clue{}, fmt.Errorf("%w: %q is already on the board as unrevealed", ErrInvalidClue, word)
 		}
 	}
 	return Clue{Word: word, Number: clue.Number}, nil
@@ -166,25 +169,25 @@ func (g *Game) GiveClue(player *Player, clue *Clue) (CurrentTurn, error) {
 	if err := validateTurnAction(g, player, PhaseWaitingForClue, RoleSpymaster); err != nil {
 		return CurrentTurn{}, err
 	}
-	cleaned, err := validateClue(g.Board, clue)
+	cleaned, err := validateClue(g.board, clue)
 	if err != nil {
 		return CurrentTurn{}, err
 	}
 
 	guesses := clue.Number + 1
-	g.CurrentTurn.Clue = &cleaned
-	g.CurrentTurn.Phase = PhaseGuessing
-	g.CurrentTurn.GuessesRemaining = &guesses
+	g.currentTurn.Clue = &cleaned
+	g.currentTurn.Phase = PhaseGuessing
+	g.currentTurn.GuessesRemaining = &guesses
 
-	return g.CurrentTurn, nil
+	return g.currentTurn.Clone(), nil
 }
 
 func (g *Game) finish(winner Team, reason EndReason) {
-	g.CurrentTurn.Phase = PhaseGameOver
-	g.CurrentTurn.Clue = nil
-	g.CurrentTurn.GuessesRemaining = nil
-	g.Winner = &winner
-	g.EndReason = &reason
+	g.currentTurn.Phase = PhaseGameOver
+	g.currentTurn.Clue = nil
+	g.currentTurn.GuessesRemaining = nil
+	g.winner = &winner
+	g.endReason = &reason
 }
 
 func opposite(t Team) Team {
@@ -195,19 +198,19 @@ func opposite(t Team) Team {
 }
 
 func (g *Game) switchTurn() {
-	if g.CurrentTurn.Team == TeamRed {
-		g.CurrentTurn.Team = TeamBlue
+	if g.currentTurn.Team == TeamRed {
+		g.currentTurn.Team = TeamBlue
 	} else {
-		g.CurrentTurn.Team = TeamRed
+		g.currentTurn.Team = TeamRed
 	}
-	g.CurrentTurn.Phase = PhaseWaitingForClue
-	g.CurrentTurn.Clue = nil
-	g.CurrentTurn.GuessesRemaining = nil
+	g.currentTurn.Phase = PhaseWaitingForClue
+	g.currentTurn.Clue = nil
+	g.currentTurn.GuessesRemaining = nil
 }
 
-func handleTeamCard(g *Game, cardTeam Team) {
+func handleTeamCard(g *Game, cardTeam Team) *ChangeReason {
 	target := 8
-	if g.Board.startingTeam == cardTeam {
+	if g.board.startingTeam == cardTeam {
 		target = 9
 	}
 	score := g.Score()
@@ -217,44 +220,62 @@ func handleTeamCard(g *Game, cardTeam Team) {
 	}
 	if revealed >= target {
 		g.finish(cardTeam, EndReasonAllTeamCardsRevealed)
-		return
+		return nil
 	}
-	if g.CurrentTurn.Team != cardTeam {
+	if g.currentTurn.Team != cardTeam {
 		g.switchTurn()
-		return
+		reason := ChangeReasonOpponentCardRevealed
+		return &reason
 	}
-	*g.CurrentTurn.GuessesRemaining--
-	if *g.CurrentTurn.GuessesRemaining <= 0 {
+	*g.currentTurn.GuessesRemaining--
+	if *g.currentTurn.GuessesRemaining <= 0 {
 		g.switchTurn()
+		reason := ChangeReasonGuessesExhausted
+		return &reason
 	}
+	return nil
 }
 
-func handleCardColor(g *Game, card *Card) {
-	activeTeam := g.CurrentTurn.Team
+func handleCardColor(g *Game, card *Card) *ChangeReason {
+	activeTeam := g.currentTurn.Team
 	switch card.Color {
 	case CardColorAssassin:
 		g.finish(opposite(activeTeam), EndReasonAssassinRevealed)
 	case CardColorNeutral:
 		g.switchTurn()
+		reason := ChangeReasonNeutralCardRevealed
+		return &reason
 	case CardColorRed:
-		handleTeamCard(g, TeamRed)
+		return handleTeamCard(g, TeamRed)
 	case CardColorBlue:
-		handleTeamCard(g, TeamBlue)
+		return handleTeamCard(g, TeamBlue)
 	}
+	return nil
 }
 
 func (g *Game) GuessCard(player *Player, cardID int) (GuessResult, error) {
 	if err := validateTurnAction(g, player, PhaseGuessing, RoleOperative); err != nil {
 		return GuessResult{}, err
 	}
-	if *g.CurrentTurn.GuessesRemaining <= 0 {
+	if *g.currentTurn.GuessesRemaining <= 0 {
 		return GuessResult{}, fmt.Errorf("%w: no guesses remaining", ErrNoGuessesRemaining)
 	}
-	card, err := g.Board.reveal(cardID)
+	card, err := g.board.reveal(cardID)
 	if err != nil {
 		return GuessResult{}, err
 	}
-	handleCardColor(g, &card)
+	changeReason := handleCardColor(g, &card)
+
+	var winner *Team
+	if g.winner != nil {
+		winnerCopy := *g.winner
+		winner = &winnerCopy
+	}
+	var endReason *EndReason
+	if g.endReason != nil {
+		endReasonCopy := *g.endReason
+		endReason = &endReasonCopy
+	}
 
 	return GuessResult{
 		GameID:         g.GameID,
@@ -262,8 +283,20 @@ func (g *Game) GuessCard(player *Player, cardID int) (GuessResult, error) {
 		GuessingTeam:   player.Team,
 		IsCorrectGuess: (player.Team == TeamRed && card.Color == CardColorRed) || (player.Team == TeamBlue && card.Color == CardColorBlue),
 		Score:          g.Score(),
-		CurrentTurn:    g.CurrentTurn,
-		Winner:         g.Winner,
-		EndReason:      g.EndReason,
+		CurrentTurn:    g.currentTurn.Clone(),
+		ChangeReason:   changeReason,
+		Winner:         winner,
+		EndReason:      endReason,
 	}, nil
+}
+
+func (g *Game) PassTurn(player *Player) error {
+	if err := validateTurnAction(g, player, PhaseGuessing, RoleOperative); err != nil {
+		return err
+	}
+	if *g.currentTurn.GuessesRemaining <= 0 {
+		return ErrNoGuessesRemaining
+	}
+	g.switchTurn()
+	return nil
 }

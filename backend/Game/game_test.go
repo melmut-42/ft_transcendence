@@ -17,17 +17,17 @@ func TestCheckInitialGameState(t *testing.T) {
 		if err != nil {
 			t.Fatalf("NewGameWithSeed returned an error: %v", err)
 		}
-		if game.CurrentTurn.Team != game.Board.StartingTeam() {
-			t.Errorf("CurrentTurn.Team (%v) does not match Board.StartingTeam() (%v)", game.CurrentTurn.Team, game.Board.StartingTeam())
+		if game.currentTurn.Team != game.board.StartingTeam() {
+			t.Errorf("CurrentTurn.Team (%v) does not match Board.StartingTeam() (%v)", game.currentTurn.Team, game.board.StartingTeam())
 		}
-		if game.CurrentTurn.Phase != PhaseWaitingForClue {
-			t.Errorf("CurrentTurn.Phase is not PhaseWaitingForClue, got: %v", game.CurrentTurn.Phase)
+		if game.currentTurn.Phase != PhaseWaitingForClue {
+			t.Errorf("CurrentTurn.Phase is not PhaseWaitingForClue, got: %v", game.currentTurn.Phase)
 		}
-		if game.CurrentTurn.Clue != nil || game.CurrentTurn.GuessesRemaining != nil {
-			t.Errorf("CurrentTurn Clue or GuessesRemaining are not nil, got: %v", game.CurrentTurn.Clue)
+		if game.currentTurn.Clue != nil || game.currentTurn.GuessesRemaining != nil {
+			t.Errorf("CurrentTurn Clue or GuessesRemaining are not nil, got: %v", game.currentTurn.Clue)
 		}
-		if game.Winner != nil || game.EndReason != nil {
-			t.Errorf("Winner or EndReason are not nil, got: %v", game.Winner)
+		if game.winner != nil || game.endReason != nil {
+			t.Errorf("Winner or EndReason are not nil, got: %v", game.winner)
 		}
 		if game.Score().Blue != 0 || game.Score().Red != 0 {
 			t.Error("Team scores are not 0")
@@ -45,9 +45,9 @@ func TestScoreCalculation(t *testing.T) {
 	}
 
 	expectedRed, expectedBlue := 0, 0
-	for i, card := range game.Board.Cards() {
+	for i, card := range game.board.Cards() {
 		if i < 9 {
-			revealed, err := game.Board.reveal(card.CardID)
+			revealed, err := game.board.reveal(card.CardID)
 			if err != nil {
 				t.Fatalf("reveal returned an error: %v", err)
 			}
@@ -77,8 +77,8 @@ func TestValidateGameState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ValidateGameState returned an error: %v", err)
 	}
-	team := game.Board.StartingTeam()
-	game.Winner = &team
+	team := game.board.StartingTeam()
+	game.winner = &team
 	err = game.ValidateGameState()
 	if !errors.Is(err, ErrInvalidGameState) {
 		t.Fatalf("ValidateGameState should have returned an error for winner set while in waiting for clue phase, but got: %v", err)

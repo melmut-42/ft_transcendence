@@ -7,8 +7,8 @@ import (
 
 func TestGiveClue(t *testing.T) {
 	game := &Game{
-		Board: &Board{},
-		CurrentTurn: CurrentTurn{
+		board: &Board{},
+		currentTurn: CurrentTurn{
 			Team:  TeamRed,
 			Phase: PhaseWaitingForClue,
 		},
@@ -32,8 +32,8 @@ func TestGiveClue(t *testing.T) {
 
 func TestGiveClueErrors(t *testing.T) {
 	game := &Game{
-		Board: &Board{},
-		CurrentTurn: CurrentTurn{
+		board: &Board{},
+		currentTurn: CurrentTurn{
 			Team:  TeamRed,
 			Phase: PhaseWaitingForClue,
 		},
@@ -65,7 +65,7 @@ func TestGiveClueErrors(t *testing.T) {
 		t.Fatalf("expected ErrInvalidClueNumber but got: %v", err)
 	}
 
-	game.Board.cards[0].Word = "existingword"
+	game.board.cards[0].Word = "existingword"
 	clue = &Clue{Word: "ExistinGwOrd", Number: 3}
 	_, err = game.GiveClue(player, clue)
 	if err == nil || !errors.Is(err, ErrInvalidClue) {

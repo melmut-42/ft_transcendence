@@ -62,6 +62,19 @@ type CurrentTurn struct {
 	GuessesRemaining *int  `json:"guesses_remaining"`
 }
 
+func (t CurrentTurn) Clone() CurrentTurn {
+	copied := t
+	if t.Clue != nil {
+		clue := *t.Clue
+		copied.Clue = &clue
+	}
+	if t.GuessesRemaining != nil {
+		guesses := *t.GuessesRemaining
+		copied.GuessesRemaining = &guesses
+	}
+	return copied
+}
+
 type CardView struct {
 	CardID   int        `json:"card_id"`
 	Word     string     `json:"word"`
@@ -82,13 +95,23 @@ func newCardView(card Card) CardView {
 	return view
 }
 
+type ChangeReason string
+
+const (
+	ChangeReasonPassed               ChangeReason = "PASSED"
+	ChangeReasonGuessesExhausted     ChangeReason = "GUESSES_EXHAUSTED"
+	ChangeReasonOpponentCardRevealed ChangeReason = "OPPONENT_CARD_REVEALED"
+	ChangeReasonNeutralCardRevealed  ChangeReason = "NEUTRAL_CARD_REVEALED"
+)
+
 type GuessResult struct {
-	GameID         int         `json:"game_id"`
-	Card           CardView    `json:"card"`
-	GuessingTeam   Team        `json:"guessing_team"`
-	IsCorrectGuess bool        `json:"-"`
-	Score          Score       `json:"score"`
-	CurrentTurn    CurrentTurn `json:"current_turn"`
-	Winner         *Team       `json:"winner"`
-	EndReason      *EndReason  `json:"end_reason"`
+	GameID         int           `json:"game_id"`
+	Card           CardView      `json:"card"`
+	GuessingTeam   Team          `json:"guessing_team"`
+	IsCorrectGuess bool          `json:"-"`
+	Score          Score         `json:"score"`
+	CurrentTurn    CurrentTurn   `json:"current_turn"`
+	ChangeReason   *ChangeReason `json:"-"`
+	Winner         *Team         `json:"winner"`
+	EndReason      *EndReason    `json:"end_reason"`
 }
