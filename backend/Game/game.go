@@ -290,13 +290,18 @@ func (g *Game) GuessCard(player *Player, cardID int) (GuessResult, error) {
 	}, nil
 }
 
-func (g *Game) PassTurn(player *Player) error {
+func (g *Game) PassTurn(player *Player) (PassResult, error) {
 	if err := validateTurnAction(g, player, PhaseGuessing, RoleOperative); err != nil {
-		return err
+		return PassResult{}, err
 	}
 	if *g.currentTurn.GuessesRemaining <= 0 {
-		return ErrNoGuessesRemaining
+		return PassResult{}, ErrNoGuessesRemaining
 	}
 	g.switchTurn()
-	return nil
+	return PassResult{
+		GameID:       g.GameID,
+		Score:        g.Score(),
+		CurrentTurn:  g.currentTurn.Clone(),
+		ChangeReason: ChangeReasonPassed,
+	}, nil
 }

@@ -115,3 +115,10 @@ type GuessResult struct {
 	Winner         *Team         `json:"winner"`
 	EndReason      *EndReason    `json:"end_reason"`
 }
+
+type PassResult struct {
+	GameID       int          `json:"game_id"`
+	Score        Score        `json:"score"`
+	CurrentTurn  CurrentTurn  `json:"current_turn"`
+	ChangeReason ChangeReason `json:"-"`
+}
