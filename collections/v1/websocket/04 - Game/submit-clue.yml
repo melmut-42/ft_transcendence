@@ -97,6 +97,32 @@ websocket:
               "number": 2
             }
           }
+    - title: Error - Clue matches unrevealed card (MOON unrevealed)
+      selected: false
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0027",
+            "payload": {
+              "word": "moon",
+              "number": 2
+            }
+          }
+    - title: Success - Clue matches revealed card (MOON revealed)
+      selected: false
+      message:
+        type: json
+        data: |-
+          {
+            "type": "game.clue.submit",
+            "request_id": "req_0028",
+            "payload": {
+              "word": "moon",
+              "number": 2
+            }
+          }
 docs: |-
   # Submit clue
 
@@ -115,7 +141,7 @@ docs: |-
   | `payload.word` | payload | yes | string | trim; one non-whitespace word; `1..30` Unicode characters | no | Clue stored in Unicode lowercase | `ocean` |
   | `payload.number` | payload | yes | integer | `1..9` | no | Base guess count `N` | `2` |
 
-  Deterministic validation adds no word-list, board-word, inflection, or proper-noun restrictions. `" SPACE "` normalizes to `"space"`; `"deep ocean"` is invalid.
+  The clue word is trimmed and stored in Unicode lowercase. A clue must not match the word of any unrevealed board card, using case-insensitive comparison. Words of revealed cards are allowed. No additional word-list, inflection, or proper-noun restrictions apply. " SPACE " normalizes to "space"; "deep ocean" is invalid.
 
   ## Success behavior and response
 
@@ -204,12 +230,58 @@ docs: |-
   | `payload.guesses_remaining` | integer | yes | no | `2..10` | Exactly `N+1` at acceptance |
   | `payload.current_turn.phase` | enum | yes | no | `GUESSING` | New phase |
 
+  ## Board-card clue rule
+
+  The request contains only `word` and `number`. Whether a word is accepted depends on the server-side board state: a clue is rejected only if it matches an **unrevealed** card. Words of revealed cards are allowed.
+
+  Both examples below assume the room is `IN_GAME`, RED is the active team in `WAITING_FOR_CLUE`, and the sender is RED's `SPYMASTER`. Only the state of the `MOON` card differs.
+
+  **Board A: `MOON` is unrevealed.** `req_0027` (`"moon"`, `2`) returns `INVALID_CLUE`. The phase stays `WAITING_FOR_CLUE`, no clue is created, and the socket stays open.
+
+  ```json
+    {
+      "type": "error",
+      "request_id": "req_0027",
+      "error": {
+        "code": "INVALID_CLUE",
+        "message": "payload.word is already on the board as unrevealed",
+        "details": {
+          "field": "payload.word"
+        }
+      }
+    }
+  ```
+
+  **Board B: `MOON` is revealed.** `req_0028` (`"moon"`, `2`) is accepted:
+
+  ```json
+    {
+      "type": "ack",
+      "request_id": "req_0028",
+      "ok": true,
+      "payload": {
+        "game_id": 5001,
+        "current_turn": {
+          "team": "RED",
+          "phase": "GUESSING",
+          "clue": {
+            "word": "moon",
+            "number": 2
+          },
+          "guesses_remaining": 3
+        }
+      }
+    }
+  ```
+
+  It emits one `game.clue.submitted` event, as in the success example above.
+
   ## Errors and state guarantees
 
   - `ROLE_FORBIDDEN`: an Operative submits; message `Only the active team's Spymaster may submit a clue.`
   - `NOT_YOUR_TURN`: inactive-team Spymaster submits.
   - `INVALID_ROOM_STATE`: room is not `IN_GAME`.
-  - `INVALID_CLUE`: word missing, empty, over 30 characters, or contains whitespace.
+  - `INVALID_CLUE`: word missing, empty, over 30 characters, contains whitespace, or matches an unrevealed board card using case-insensitive comparison.
   - `INVALID_CLUE_NUMBER`: number is non-integer or outside `1..9`.
   - `GAME_ALREADY_FINISHED`: phase is `GAME_OVER`.
 
