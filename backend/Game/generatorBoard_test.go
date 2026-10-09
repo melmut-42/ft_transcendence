@@ -43,10 +43,10 @@ func TestNewBoardWithRealWordPackSameSeed(t *testing.T) {
 	for _, card := range cards {
 		t.Logf(
 			"CardID: %2d | Word: %-15s | Color: %-7v | Revealed: %t",
-			card.CardID,
-			card.Word,
-			card.Color,
-			card.Revealed,
+			card.cardID,
+			card.word,
+			card.color,
+			card.revealed,
 		)
 	}
 
@@ -65,10 +65,10 @@ func TestNewBoardWithRealWordPackSameSeed(t *testing.T) {
 	for _, card := range cards {
 		t.Logf(
 			"CardID: %2d | Word: %-15s | Color: %-7v | Revealed: %t",
-			card.CardID,
-			card.Word,
-			card.Color,
-			card.Revealed,
+			card.cardID,
+			card.word,
+			card.color,
+			card.revealed,
 		)
 	}
 
@@ -100,25 +100,25 @@ func TestNewBoardWithDiffVariants(t *testing.T) {
 		seen := make(map[string]struct{}, BoardSize)
 		for i, card := range cards {
 			expectedID := i + 1
-			if card.CardID != expectedID {
+			if card.cardID != expectedID {
 				t.Fatalf(
 					"seed %d: card at index %d: expected CardID %d, got %d",
-					testseed, i, expectedID, card.CardID,
+					testseed, i, expectedID, card.cardID,
 				)
 			}
-			if card.Word == "" {
-				t.Fatalf("seed %d: card %d has an empty word", testseed, card.CardID)
+			if card.word == "" {
+				t.Fatalf("seed %d: card %d has an empty word", testseed, card.cardID)
 			}
 
-			if card.Revealed {
-				t.Fatalf("seed %d: card %d should be unrevealed", testseed, card.CardID)
+			if card.revealed {
+				t.Fatalf("seed %d: card %d should be unrevealed", testseed, card.cardID)
 			}
-			counts[card.Color]++
+			counts[card.color]++
 
-			if _, exists := seen[card.Word]; exists {
-				t.Fatalf("seed %d: duplicate word on board: %s", testseed, card.Word)
+			if _, exists := seen[card.word]; exists {
+				t.Fatalf("seed %d: duplicate word on board: %s", testseed, card.word)
 			}
-			seen[card.Word] = struct{}{}
+			seen[card.word] = struct{}{}
 		}
 
 		if (board.StartingTeam() == TeamRed && (counts[CardColorRed] != StartTeamCardsSize || counts[CardColorBlue] != OtherTeamCardsSize)) ||
@@ -200,10 +200,10 @@ func TestNewBoardSkipsDuplicateTexts(t *testing.T) {
 
 		seen := make(map[string]struct{}, BoardSize)
 		for _, card := range cards {
-			if _, exists := seen[card.Word]; exists {
-				t.Fatalf("seed %d: duplicate word on board: %s", testseed, card.Word)
+			if _, exists := seen[card.word]; exists {
+				t.Fatalf("seed %d: duplicate word on board: %s", testseed, card.word)
 			}
-			seen[card.Word] = struct{}{}
+			seen[card.word] = struct{}{}
 		}
 	}
 }
@@ -245,10 +245,10 @@ func TestCardIDDoesNotRevealColors(t *testing.T) {
 			t.Fatalf("seed %d: NewBoard returned an error: %v", testSeed, err)
 		}
 		for _, card := range board.Cards() {
-			if colorsByCardID[card.CardID] == nil {
-				colorsByCardID[card.CardID] = make(map[CardColor]struct{})
+			if colorsByCardID[card.cardID] == nil {
+				colorsByCardID[card.cardID] = make(map[CardColor]struct{})
 			}
-			colorsByCardID[card.CardID][card.Color] = struct{}{}
+			colorsByCardID[card.cardID][card.color] = struct{}{}
 		}
 	}
 

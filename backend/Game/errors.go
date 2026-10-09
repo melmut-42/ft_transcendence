@@ -24,4 +24,5 @@ var (
 	ErrInvalidGameState = errors.New("invalid game state")
 	ErrInvalidWinner    = errors.New("invalid winner")
 	ErrInvalidArgument  = errors.New("invalid argument")
+	ErrInvalidRole = errors.New("Invalid Role")
 )

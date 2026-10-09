@@ -63,10 +63,10 @@ func (g *Game) Score() Score {
 	blueScore := 0
 
 	for _, card := range g.board.Cards() {
-		if !card.Revealed {
+		if !card.revealed {
 			continue
 		}
-		switch card.Color {
+		switch card.color {
 		case CardColorRed:
 			redScore++
 		case CardColorBlue:
@@ -158,7 +158,7 @@ func validateClue(board *Board, clue *Clue) (Clue, error) {
 		return Clue{}, fmt.Errorf("%w: clue number must be between 1 and 9", ErrInvalidClueNumber)
 	}
 	for _, card := range board.Cards() {
-		if !card.Revealed && strings.EqualFold(card.Word, word) {
+		if !card.revealed && strings.EqualFold(card.word, word) {
 			return Clue{}, fmt.Errorf("%w: %q is already on the board as unrevealed", ErrInvalidClue, word)
 		}
 	}
@@ -236,9 +236,9 @@ func handleTeamCard(g *Game, cardTeam Team) *ChangeReason {
 	return nil
 }
 
-func handleCardColor(g *Game, card *Card) *ChangeReason {
+func handleCardColor(g *Game, card *card) *ChangeReason {
 	activeTeam := g.currentTurn.Team
-	switch card.Color {
+	switch card.color {
 	case CardColorAssassin:
 		g.finish(opposite(activeTeam), EndReasonAssassinRevealed)
 	case CardColorNeutral:
@@ -253,6 +253,23 @@ func handleCardColor(g *Game, card *Card) *ChangeReason {
 	return nil
 }
 
+
+func (g *Game) cloneGameResult() (*Team, *EndReason) {
+	var winner *Team
+	if g.winner != nil {
+		winnerCopy := *g.winner
+		winner = &winnerCopy
+	}
+	
+	var endReason *EndReason
+	if g.endReason != nil {
+		endReasonCopy := *g.endReason
+		endReason = &endReasonCopy
+	}
+	return winner, endReason
+}
+
+
 func (g *Game) GuessCard(player *Player, cardID int) (GuessResult, error) {
 	if err := validateTurnAction(g, player, PhaseGuessing, RoleOperative); err != nil {
 		return GuessResult{}, err
@@ -265,23 +282,13 @@ func (g *Game) GuessCard(player *Player, cardID int) (GuessResult, error) {
 		return GuessResult{}, err
 	}
 	changeReason := handleCardColor(g, &card)
-
-	var winner *Team
-	if g.winner != nil {
-		winnerCopy := *g.winner
-		winner = &winnerCopy
-	}
-	var endReason *EndReason
-	if g.endReason != nil {
-		endReasonCopy := *g.endReason
-		endReason = &endReasonCopy
-	}
+	winner, endReason := g.cloneGameResult()
 
 	return GuessResult{
 		GameID:         g.GameID,
 		Card:           newCardView(card),
 		GuessingTeam:   player.Team,
-		IsCorrectGuess: (player.Team == TeamRed && card.Color == CardColorRed) || (player.Team == TeamBlue && card.Color == CardColorBlue),
+		IsCorrectGuess: (player.Team == TeamRed && card.color == CardColorRed) || (player.Team == TeamBlue && card.color == CardColorBlue),
 		Score:          g.Score(),
 		CurrentTurn:    g.currentTurn.Clone(),
 		ChangeReason:   changeReason,

@@ -98,7 +98,7 @@ func buildColors(startingTeam Team, r *rand.Rand) []CardColor {
 	return colors
 }
 
-func generateCards(wordPool []Word, language string, r *rand.Rand) ([]Card, Team, error) {
+func generateCards(wordPool []Word, language string, r *rand.Rand) ([]card, Team, error) {
 	if err := validateWordPool(wordPool, language); err != nil {
 		return nil, "", err
 	}
@@ -110,14 +110,14 @@ func generateCards(wordPool []Word, language string, r *rand.Rand) ([]Card, Team
 
 	startingTeam := randomTeam(r)
 	colors := buildColors(startingTeam, r)
-	cards := make([]Card, BoardSize)
+	cards := make([]card, BoardSize)
 
 	for i, word := range words {
-		cards[i] = Card{
-			CardID:   i + 1,
-			Word:     word.Translations[language],
-			Color:    colors[i],
-			Revealed: false,
+		cards[i] = card{
+			cardID:   i + 1,
+			word:     word.Translations[language],
+			color:    colors[i],
+			revealed: false,
 		}
 	}
 

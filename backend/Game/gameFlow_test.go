@@ -29,10 +29,10 @@ func newTestGame() *Game {
 		} else {
 			color = CardColorAssassin
 		}
-		game.board.cards[i] = Card{
-			CardID: i + 1,
-			Word:   fmt.Sprintf("word%d", i+1),
-			Color:  color,
+		game.board.cards[i] = card{
+			cardID: i + 1,
+			word:   fmt.Sprintf("word%d", i+1),
+			color:  color,
 		}
 	}
 	return game

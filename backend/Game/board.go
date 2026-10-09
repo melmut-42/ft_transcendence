@@ -10,15 +10,15 @@ const (
 	AssassinCardsSize  int = 1
 )
 
-type Card struct {
-	CardID   int
-	Word     string
-	Color    CardColor
-	Revealed bool
+type card struct {
+	cardID   int
+	word     string
+	color    CardColor
+	revealed bool
 }
 
 type Board struct {
-	cards        [BoardSize]Card
+	cards        [BoardSize]card
 	startingTeam Team
 }
 
@@ -26,8 +26,8 @@ func (b *Board) StartingTeam() Team {
 	return b.startingTeam
 }
 
-func (b *Board) Cards() []Card {
-	cards := make([]Card, BoardSize)
+func (b *Board) Cards() []card {
+	cards := make([]card, BoardSize)
 	copy(cards, b.cards[:])
 
 	return cards
@@ -50,14 +50,14 @@ func NewBoard(wordPool []Word, language string, r *rand.Rand) (*Board, error) {
 	return board, nil
 }
 
-func (b *Board) reveal(cardID int) (Card, error) {
+func (b *Board) reveal(cardID int) (card, error) {
 	if cardID > BoardSize || cardID < 1 {
-		return Card{}, ErrInvalidCard
+		return card{}, ErrInvalidCard
 	}
 	target := &b.cards[cardID-1]
-	if target.Revealed {
-		return Card{}, ErrCardAlreadyRevealed
+	if target.revealed {
+		return card{}, ErrCardAlreadyRevealed
 	}
-	target.Revealed = true
+	target.revealed = true
 	return *target, nil
 }

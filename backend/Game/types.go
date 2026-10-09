@@ -27,6 +27,7 @@ type Role string
 const (
 	RoleSpymaster Role = "SPYMASTER"
 	RoleOperative Role = "OPERATIVE"
+	RoleSpectator Role = "SPECTATOR"
 )
 
 type Phase string
@@ -82,14 +83,14 @@ type CardView struct {
 	Revealed bool       `json:"revealed"`
 }
 
-func newCardView(card Card) CardView {
+func newCardView(card card) CardView {
 	view := CardView{
-		CardID:   card.CardID,
-		Word:     card.Word,
-		Revealed: card.Revealed,
+		CardID:   card.cardID,
+		Word:     card.word,
+		Revealed: card.revealed,
 	}
-	if card.Revealed {
-		c := card.Color
+	if card.revealed {
+		c := card.color
 		view.Color = &c
 	}
 	return view

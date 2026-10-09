@@ -47,11 +47,11 @@ func TestScoreCalculation(t *testing.T) {
 	expectedRed, expectedBlue := 0, 0
 	for i, card := range game.board.Cards() {
 		if i < 9 {
-			revealed, err := game.board.reveal(card.CardID)
+			revealed, err := game.board.reveal(card.cardID)
 			if err != nil {
 				t.Fatalf("reveal returned an error: %v", err)
 			}
-			switch revealed.Color {
+			switch revealed.color {
 			case CardColorRed:
 				expectedRed++
 			case CardColorBlue:

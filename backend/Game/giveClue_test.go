@@ -72,7 +72,7 @@ func TestGiveClueErrors(t *testing.T) {
 	}
 	checkGameUnchanged(t, before, game)
 
-	game.board.cards[0].Word = "existingword"
+	game.board.cards[0].word = "existingword"
 	clue = &Clue{Word: "ExistinGwOrd", Number: 3}
 	before = cloneTestGame(game)
 	_, err = game.GiveClue(player, clue)
@@ -88,7 +88,7 @@ func TestGiveClueErrors(t *testing.T) {
 		t.Fatalf("expected ErrNotYourTurn but got: %v", err)
 	}
 	checkGameUnchanged(t, before, game)
-	
+
 	player = &Player{UserID: 1, Team: TeamRed, Role: RoleOperative}
 	before = cloneTestGame(game)
 	_, err = game.GiveClue(player, clue)
