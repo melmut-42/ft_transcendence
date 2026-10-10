@@ -36,6 +36,8 @@ docs: |-
   | `data.losses` | integer | yes | no | `>= 0` | Losses |
   | `data.matches_played` | integer | yes | no | `wins + losses` | Settled matches |
   | `data.is_online` | boolean | yes | no | `true`, `false` | At least one open authenticated connection right now (`workspace.yml`, Presence) |
+  | `data.relationship` | string enum | yes | no | `NONE`, `REQUEST_SENT`, `REQUEST_RECEIVED`, `FRIENDS`, `BLOCKED` | The caller's relationship to this user (`workspace.yml`, Relationship model). A block placed by the other user reads as `NONE`; `BLOCKED` means the caller blocks this user |
+  | `data.friend_request_id` | integer or null | yes | yes | positive or `null` | The pending request between the two users while `relationship` is `REQUEST_SENT` or `REQUEST_RECEIVED` (the caller accepts or declines a received one with it); otherwise `null` |
 
   ## State changes, events, and errors
 
@@ -58,7 +60,9 @@ examples:
               "wins": 9,
               "losses": 11,
               "matches_played": 20,
-              "is_online": true
+              "is_online": true,
+              "relationship": "FRIENDS",
+              "friend_request_id": null
             }
           }
   - name: Error - User not found

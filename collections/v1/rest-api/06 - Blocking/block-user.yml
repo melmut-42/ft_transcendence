@@ -1,0 +1,61 @@
+info:
+  name: Block user
+  type: http
+  seq: 1
+  tags: [blocking]
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/45/block"
+  headers:
+    - name: Accept
+      value: application/json
+docs: |-
+  # Block user
+
+  ## Purpose and preconditions
+
+  The caller blocks another user. The operation is idempotent: blocking an already blocked user changes nothing and returns the same block. No body is accepted.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `user_id` | path | yes | integer | positive, existing user, not the caller | no | User to block | `45` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity (the blocker) | set by Register/Login |
+
+  ## Success behavior
+
+  `200 OK` returns the block. In the same transaction the server cancels every pending friend request between the two users and suspends their friendship if one exists.
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.user_id` | integer | yes | no | positive | Blocked user |
+  | `data.blocked_at` | `string<date-time>` | yes | no | ISO 8601 UTC | When the block started |
+
+  Emitted on Chat v2 sockets: `friend.request.resolved` with `status: CANCELLED` to both users for each cancelled request; `friend.removed` to both users when a friendship was suspended; `chat.channel.access_changed` with `access: INACTIVE` for their DIRECT channel, reason `USER_BLOCKED` to the blocker and `FRIENDSHIP_REMOVED` to the blocked user, so the block itself is never revealed.
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `404` | `USER_NOT_FOUND` | `user_id` does not exist |
+  | `422` | `VALIDATION_ERROR` | `user_id` is not a positive integer, or is the caller |
+examples:
+  - name: Success - Block blue_agent
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/45/block", method: PUT, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "user_id": 45,
+              "blocked_at": "2026-09-10T08:50:00Z"
+            }
+          }
+  - name: Error - Block self
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/42/block", method: PUT, headers: [], params: [], body: {mode: none}}
+    response: {status: 422, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"VALIDATION_ERROR","message":"You cannot block yourself.","details":{"field":"user_id"}}}'}}

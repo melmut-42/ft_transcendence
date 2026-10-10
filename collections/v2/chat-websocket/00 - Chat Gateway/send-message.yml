@@ -48,7 +48,7 @@ websocket:
 docs: |-
   # Send channel message
 
-  Chat Gateway validates the envelope and publishes the command to RabbitMQ. Before persistence, Channel Service verifies participation and obtains a current authorization verdict from User/Auth for DIRECT or Game Session for ROOM; its asynchronous lifecycle projection is only a cache/notification source. The ROOM verdict includes `room_version`, and the command waits until Channel Service has applied/reconciled lifecycle and visibility-window state through that version. A DIRECT sender must still be friends with the peer. A ROOM sender must be `IN_LOBBY` while the room is `WAITING`/`COUNTDOWN`, or `IN_GAME` while it is `IN_GAME`; `POST_GAME`, Exit, kick, and timeout are forbidden. Channel Service then persists the message, assigns `message_id`, `sent_at`, and `expires_at`, and publishes the canonical event. A success ack is sent only after authorization and persistence succeed. Deduplication by `(sender_user_id, request_id)` prevents duplicates.
+  Chat Gateway validates the envelope and publishes the command to RabbitMQ. Before persistence, Channel Service verifies participation and obtains a current authorization verdict from User/Auth for DIRECT or Game Session for ROOM; its asynchronous lifecycle projection is only a cache/notification source. The ROOM verdict includes `room_version`, and the command waits until Channel Service has applied/reconciled lifecycle and visibility-window state through that version. A DIRECT sender must still be an active friend of the peer (no block in either direction). A ROOM sender must be `IN_LOBBY` while the room is `WAITING`/`COUNTDOWN`, or `IN_GAME` while it is `IN_GAME`; `POST_GAME`, Exit, kick, and timeout are forbidden. A sender who is an `IN_GAME` member of a running match (phase `WAITING_FOR_CLUE` or `GUESSING`) cannot send on any channel until the match pauses (`PAUSED_FOR_PLAYERS`) or ends; Game Session's verdict carries the phase for every send, ROOM or DIRECT. Channel Service then persists the message, assigns `message_id`, `sent_at`, and `expires_at`, and publishes the canonical event. A success ack is sent only after authorization and persistence succeed. Deduplication by `(sender_user_id, request_id)` prevents duplicates.
 
   Required fields are `type=chat.message.send`, a unique `request_id` of `1..64` visible ASCII characters, `payload.channel_id` as a positive integer, and trimmed `payload.text` of `1..500` characters.
 
@@ -90,7 +90,7 @@ docs: |-
 
   Channel Service keeps a 30-day request ledger (at least as long as default message retention) keyed by `(sender_user_id, request_id)`, including a hash of the command and its terminal result. Reuse with identical content returns the original ack/error without a second message. Reuse with a different `channel_id` or text returns `INVALID_EVENT` and persists no message. A failure before Channel Service can record a terminal result, such as broker/service unavailability, is safely retried with the same ID.
 
-  Errors: `INVALID_EVENT`, `NOT_CHANNEL_MEMBER`, `CHANNEL_ACCESS_REVOKED`, `CHANNEL_NOT_FOUND`, `INVALID_PAYLOAD`, and `SERVICE_UNAVAILABLE`. `CHANNEL_ACCESS_REVOKED` means a DIRECT friendship ended or the ROOM sender no longer has an eligible member state. Errors correlate to `request_id`; failed commands persist no chat message, although a terminal validation/authorization result may be memoized in the request ledger. A timeout or `SERVICE_UNAVAILABLE` has no delivery implication, so the client retries with the same `request_id`.
+  Errors: `INVALID_EVENT`, `NOT_CHANNEL_MEMBER`, `CHANNEL_ACCESS_REVOKED`, `CHANNEL_READ_ONLY`, `CHANNEL_NOT_FOUND`, `INVALID_PAYLOAD`, and `SERVICE_UNAVAILABLE`. `CHANNEL_ACCESS_REVOKED` means a DIRECT friendship ended or was suspended by a block, or the ROOM sender no longer has an eligible member state. `CHANNEL_READ_ONLY` means the sender plays a running match (`details.reason: GAME_RUNNING`); the channel stays readable and sending works again once the match pauses or ends. Errors correlate to `request_id`; failed commands persist no chat message, although a terminal validation/authorization result may be memoized in the request ledger. A timeout or `SERVICE_UNAVAILABLE` has no delivery implication, so the client retries with the same `request_id`.
 
   ```json
   {
@@ -101,6 +101,23 @@ docs: |-
       "message": "User 42 is not a participant of channel 7999.",
       "details": {
         "channel_id": 7999
+      }
+    }
+  }
+  ```
+
+  Chat during a running match:
+
+  ```json
+  {
+    "type": "error",
+    "request_id": "req_c003",
+    "error": {
+      "code": "CHANNEL_READ_ONLY",
+      "message": "Chat is unavailable while the game is active.",
+      "details": {
+        "channel_id": 8001,
+        "reason": "GAME_RUNNING"
       }
     }
   }

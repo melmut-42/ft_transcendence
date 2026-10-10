@@ -31,7 +31,7 @@ docs: |-
   | `room_id` | integer | yes | no | positive | Room |
   | `sent_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Event time |
   | `payload.seconds_remaining` | integer | start/tick only | no | `0..3` | Whole seconds remaining |
-  | `payload.reason` | string enum | cancel only | no | `PLAYER_UNREADY`, `PLAYER_LEFT`, `PLAYER_KICKED`, `TEAM_CHANGED`, `ROLE_CHANGED` | Invariant invalidation cause |
+  | `payload.reason` | string enum | cancel only | no | `PLAYER_UNREADY`, `PLAYER_JOINED`, `PLAYER_LEFT`, `PLAYER_KICKED`, `TEAM_CHANGED`, `ROLE_CHANGED` | Invariant invalidation cause; `PLAYER_JOINED` means an unseated member joined |
   | `payload.changed_by_user_id` | integer | cancel only | no | positive | Member whose action invalidated start |
 
   ## Complete successful sequence

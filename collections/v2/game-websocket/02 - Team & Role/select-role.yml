@@ -32,19 +32,7 @@ websocket:
               "role": "OPERATIVE"
             }
           }
-    - title: Success - Become spectator
-      selected: false
-      message:
-        type: json
-        data: |-
-          {
-            "type": "room.role.select",
-            "request_id": "req_0006_spec",
-            "payload": {
-              "role": "SPECTATOR"
-            }
-          }
-    - title: Success - Spectator fills live RED Spymaster
+    - title: Success - Unseated joiner fills paused RED Spymaster
       selected: false
       message:
         type: json
@@ -112,7 +100,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Selects `SPYMASTER`, `OPERATIVE`, or `SPECTATOR`. Every member begins as a spectator. Claiming a participating role always requires `payload.team` in the same message and atomically changes both fields. Selecting `SPECTATOR` clears team and readiness. During `IN_GAME`, only a spectator may claim a participating role; existing participants cannot switch role or team. A valid claim can restore staffing and resume a paused game.
+  Selects `SPYMASTER` or `OPERATIVE` together with a team. Every member begins unseated (`team:null`, `role:null`). Every claim requires `payload.team` in the same message and atomically changes both fields; there is no spectator role and no way back to unseated. During `IN_GAME`, only an unseated member who joined the paused match may claim a seat, and only a vacant one; existing participants cannot switch role or team. A valid claim can restore staffing and resume a paused game.
 
   ## Message and payload parameters
 
@@ -122,8 +110,8 @@ docs: |-
   | `ft_session` cookie | handshake | yes | string | HttpOnly, Secure, active session | no | Sole handshake credential; automatic on same-origin upgrade | set by Register/Login |
   | `type` | envelope | yes | string enum | `room.role.select` | no | Operation | `room.role.select` |
   | `request_id` | envelope | yes | string | `1..64` visible ASCII, unique | no | Idempotency key | `req_0005` |
-  | `payload.role` | payload | yes | string enum | `SPYMASTER`, `OPERATIVE`, `SPECTATOR` | no | New temporary role | `SPYMASTER` |
-  | `payload.team` | payload | for participating role | string enum | `RED`, `BLUE` | no | Team claimed atomically by a spectator | `RED` |
+  | `payload.role` | payload | yes | string enum | `SPYMASTER`, `OPERATIVE` | no | New temporary role | `SPYMASTER` |
+  | `payload.team` | payload | yes | string enum | `RED`, `BLUE` | no | Team claimed atomically with the role | `RED` |
 
   ## Success, state, and emitted events
 
@@ -184,7 +172,7 @@ docs: |-
   | --- | --- | ---: | ---: | --- | --- |
   | `ack.payload.user_id` | integer | yes | no | positive | Updated member |
   | `ack.payload.team` | enum | yes | no | `RED`, `BLUE` | Existing selected team |
-  | `ack.payload.role` | enum | yes | no | `SPYMASTER`, `OPERATIVE`, `SPECTATOR` | Accepted role |
+  | `ack.payload.role` | enum | yes | no | `SPYMASTER`, `OPERATIVE` | Accepted role |
   | `ack.payload.ready` | boolean | yes | no | `false` | Reset confirmation |
   | `ack.payload.room_status` | enum | yes | no | `WAITING` | Post-command state |
   | `room.player.updated.payload.changed_fields[]` | array<string enum> | yes | no | `role`, plus `ready` when it changed | Atomic changes |
@@ -214,7 +202,7 @@ docs: |-
 
   - `TEAM_REQUIRED`: `Select a team before selecting a role.`
   - `INVALID_PAYLOAD`: role is absent or outside the two-value enum.
-  - `INVALID_ROOM_STATE`: room status disallows the requested transition; in `IN_GAME`, only spectator-to-vacant-participant claims are accepted.
+  - `INVALID_ROOM_STATE`: room status disallows the requested transition; in `IN_GAME`, only an unseated member's claim of a vacant seat is accepted, and only while the game is `PAUSED_FOR_PLAYERS`.
   - `NOT_ROOM_MEMBER`: session user is outside the room.
 
   ```json

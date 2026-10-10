@@ -53,12 +53,18 @@ docs:
     | `DELETE` | `/api/v1/rooms/{room_id}/members/me` | Leave room (forfeits if `IN_GAME`) | yes | room member |
     | `GET` | `/api/v1/rooms/lookup/{room_code}` | Resolve room code to room ID | yes | active room with that code |
     | `GET` | `/api/v1/friends?limit=&offset=` | Offset-paginated friends with snapshot presence | yes | active session |
-    | `POST` | `/api/v1/friends` | Add a friend (immediate, mutual) | yes | target user exists, not self |
-    | `DELETE` | `/api/v1/friends/{user_id}` | Remove a friend | yes | friendship exists |
+    | `POST` | `/api/v1/friends/requests` | Send a friend request | yes | target exists, not self, no block, no friendship or pending request |
+    | `GET` | `/api/v1/friends/requests` | Pending incoming and outgoing friend requests | yes | active session |
+    | `POST` | `/api/v1/friends/requests/{request_id}/accept` | Accept a request; become friends | yes | request pending for the caller |
+    | `POST` | `/api/v1/friends/requests/{request_id}/decline` | Decline a request | yes | request pending for the caller |
+    | `DELETE` | `/api/v1/friends/requests/{request_id}` | Cancel the caller's own pending request | yes | request pending, sent by the caller |
+    | `DELETE` | `/api/v1/friends/{user_id}` | Remove a friend | yes | active friendship exists |
+    | `PUT` | `/api/v1/users/{user_id}/block` | Block a user (idempotent) | yes | target exists, not self |
+    | `DELETE` | `/api/v1/users/{user_id}/block` | Lift own block (idempotent) | yes | target exists, not self |
 
     ## Status conventions
 
-    `200` reads/updates; `201` creation/join/add; `204` session or account deletion, leave/remove; `302` OAuth redirects; `400` malformed syntax; `401` authentication (`UNAUTHORIZED` for a bad access credential, `SESSION_EXPIRED` for a bad refresh credential); `403` access; `404` missing entity; `409` uniqueness/lifecycle conflict; `422` field validation; `429` throttling.
+    `200` reads/updates/accept/block; `201` creation/join/friend request; `204` session or account deletion, leave/remove; `302` OAuth redirects; `400` malformed syntax; `401` authentication (`UNAUTHORIZED` for a bad access credential, `SESSION_EXPIRED` for a bad refresh credential); `403` access; `404` missing entity; `409` uniqueness/lifecycle conflict; `422` field validation; `429` throttling.
 
     ## Domain and lifetime
 

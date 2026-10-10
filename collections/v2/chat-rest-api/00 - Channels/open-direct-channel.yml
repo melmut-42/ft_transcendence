@@ -29,7 +29,7 @@ docs: |-
 
   Resolves the canonical private `DIRECT` channel for the authenticated user and `peer_user_id`. Returns `201 Created` when Channel Service creates it and `200 OK` when the friends already have a channel.
 
-  The users must currently be friends. Sharing a lobby or game never authorizes this endpoint; room-wide conversation uses the automatically created `ROOM` channel. If a canonical channel exists after friendship removal, this endpoint does not disclose it and returns `403 NOT_PERMITTED`; restoring friendship makes the same channel resolvable again.
+  The users must currently be active friends: a block in either direction suspends the friendship and makes this endpoint return `403 NOT_PERMITTED`. Sharing a lobby or game never authorizes this endpoint; room-wide conversation uses the automatically created `ROOM` channel. If a canonical channel exists after friendship removal, this endpoint does not disclose it and returns `403 NOT_PERMITTED`; restoring friendship (or lifting the block) makes the same channel resolvable again.
 
   The response contains `data.channel_id`, `data.type=DIRECT`, `data.peer` (`user_id`, `username`, `avatar_url`, `is_online`), and `data.created_at`.
 

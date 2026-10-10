@@ -1,7 +1,7 @@
 info:
   name: Search users
   type: http
-  seq: 4
+  seq: 8
   tags: [friends]
 http:
   method: GET
@@ -43,7 +43,8 @@ docs: |-
   | `data.results[].user_id` | integer | yes | no | positive | Matched user |
   | `data.results[].username` | string | yes | no | username rule | Matched username |
   | `data.results[].avatar_url` | string | yes | no | URL | Avatar |
-  | `data.results[].is_friend` | boolean | yes | no | `true`, `false` | Whether already a friend of the requester |
+  | `data.results[].relationship` | string enum | yes | no | `NONE`, `REQUEST_SENT`, `REQUEST_RECEIVED`, `FRIENDS`, `BLOCKED` | The requester's relationship to this user (`workspace.yml`, Relationship model); a block by the other user reads as `NONE` |
+  | `data.results[].friend_request_id` | integer or null | yes | yes | positive or `null` | The pending request between the two users while `relationship` is `REQUEST_SENT` or `REQUEST_RECEIVED`; otherwise `null` |
 
   No email, credentials, or session data is ever exposed by this endpoint — same privacy boundary as `Get public profile`.
 
@@ -70,8 +71,8 @@ examples:
               "offset": 0,
               "has_more": false,
               "results": [
-                {"user_id": 43, "username": "red_agent", "avatar_url": "https://{{baseUrl}}/static/avatars/default/43.svg", "is_friend": false},
-                {"user_id": 46, "username": "extra_red", "avatar_url": "https://{{baseUrl}}/static/avatars/default/46.svg", "is_friend": false}
+                {"user_id": 43, "username": "red_agent", "avatar_url": "https://{{baseUrl}}/static/avatars/default/43.svg", "relationship": "NONE", "friend_request_id": null},
+                {"user_id": 46, "username": "extra_red", "avatar_url": "https://{{baseUrl}}/static/avatars/default/46.svg", "relationship": "NONE", "friend_request_id": null}
               ]
             }
           }

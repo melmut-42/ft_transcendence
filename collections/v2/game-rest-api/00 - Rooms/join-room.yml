@@ -14,7 +14,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Adds the authenticated user to a room in `WAITING`, `COUNTDOWN`, or `IN_GAME`. The user must have no active room and capacity must remain. No body is accepted. Every join starts as `team:null`, `role:SPECTATOR`, `ready:false`; state is `IN_LOBBY` before play and `IN_GAME` during play.
+  Adds the authenticated user to a room in `WAITING` or `COUNTDOWN`, or in `IN_GAME` while the game is `PAUSED_FOR_PLAYERS`. The user must have no active room and capacity must remain. No body is accepted. Every join starts unseated: `team:null`, `role:null`, `ready:false`; state is `IN_LOBBY` before play and `IN_GAME` during play.
 
   ## Request parameters
 
@@ -26,7 +26,7 @@ docs: |-
 
   ## Response fields
 
-  `201 Created` returns `{data: room_snapshot}`. `player_count` increments atomically. Because every join is a spectator, joining never invalidates countdown, changes staffing, or mutates the board/turn.
+  `201 Created` returns `{data: room_snapshot}`. `player_count` increments atomically. A join never changes staffing or the board/turn. During `COUNTDOWN` it cancels the countdown with reason `PLAYER_JOINED`, because the start predicate needs every member seated and ready.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
@@ -35,16 +35,16 @@ docs: |-
   | `data.status` | string enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME` | Joinable lifecycle state |
   | `data.host_user_id` | integer or null | yes | yes | member ID or `null` | Current host; an empty-room joiner becomes host |
   | `data.player_count` | integer | yes | no | `>= 1` | Count after join; may be one when reviving an empty room |
-  | `data.max_players` | integer | yes | no | `4..20` | Room capacity; participants and spectators both count |
+  | `data.max_players` | integer | yes | no | `4..20` | Room capacity; every member counts |
   | `data.turn_timer_seconds` | integer or null | yes | yes | `null`, `60`, `90`, `120`; `null` means no limit | Per-turn time limit |
-  | `data.language` | string | yes | no | `en` | Word-pack language |
-  | `data.startable` | boolean | yes | no | current predicate | A spectator does not alter the predicate |
+  | `data.language` | string | yes | no | `en`, `tr`, `fr` | Word-pack language: English, Turkish, French |
+  | `data.startable` | boolean | yes | no | current predicate | `false` after a join: the joiner is unseated |
   | `data.players[]` | array<object> | yes | no | members in join order | Membership snapshot |
   | `data.players[].user_id` | integer | yes | no | positive | Member ID |
   | `data.players[].username` | string | yes | no | username rule | Display name |
   | `data.players[].avatar_url` | string | yes | no | same-origin URL | Current avatar for lobby rendering |
   | `data.players[].team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
-  | `data.players[].role` | enum | yes | no | `SPECTATOR` on join | Later changed atomically through `room.role.select` |
+  | `data.players[].role` | enum | yes | yes | `null` on join | Later changed atomically through `room.role.select` |
   | `data.players[].ready` | boolean | yes | no | `true`, `false` | Current readiness |
   | `data.players[].state` | string enum | yes | no | `IN_LOBBY`, `IN_GAME` | Mirrors whether the room is pre-game or active |
   | `data.players[].is_host` | boolean | yes | no | `true`, `false` | Host marker |
@@ -54,7 +54,7 @@ docs: |-
 
   ## State changes and emitted events
 
-  Sets `active_room_id`, cancels an active empty-room closure timer, assigns host if the room was empty, and emits `room.player.joined` followed by a recipient-safe `room.state`. An in-game spectator receives the Operative-safe board projection and may later claim a legal team role over WebSocket. A join never starts a game by itself.
+  Sets `active_room_id`, cancels an active empty-room closure timer, assigns host if the room was empty, and emits `room.player.joined` followed by a recipient-safe `room.state`. A member who joins a paused match receives the Operative-safe board projection and claims a vacant seat over WebSocket; if play resumes before they claim one, they are removed with reason `SEAT_UNAVAILABLE`. A join never starts a game by itself.
 
   ## Errors
 
@@ -62,14 +62,14 @@ docs: |-
   | --- | --- | --- | --- |
   | `401` | `UNAUTHORIZED` | invalid session | none |
   | `404` | `ROOM_NOT_FOUND` | room ID absent | none |
-  | `409` | `ROOM_NOT_JOINABLE` | state is `POST_GAME` or `CLOSED`; or shared state is `WAITING` but post-game members remain | none |
+  | `409` | `ROOM_NOT_JOINABLE` | state is `POST_GAME` or `CLOSED`; `IN_GAME` with a running (not `PAUSED_FOR_PLAYERS`) game; or shared state is `WAITING` but post-game members remain | none |
   | `409` | `ROOM_FULL` | `player_count` already equals `max_players` | none |
   | `409` | `ALREADY_IN_ROOM` | user already has active room, including this one | none |
   | `422` | `VALIDATION_ERROR` | room ID is not positive integer | none |
 
   ## Invariants
 
-  `player_count` never exceeds `max_players`; the capacity check and insert are atomic. Mid-game joins are always spectators first and therefore cannot obtain hidden Spymaster information before a legal role claim.
+  `player_count` never exceeds `max_players`; the capacity check and insert are atomic. Mid-game joins start unseated and therefore cannot obtain hidden Spymaster information before a legal role claim; joins into an unpaused match are rejected with `ROOM_NOT_JOINABLE`.
 examples:
   - name: Success - Join empty-team room
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
@@ -94,7 +94,7 @@ examples:
                   "user_id": 42,
                   "username": "player_one",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": true,
@@ -104,7 +104,7 @@ examples:
                   "user_id": 43,
                   "username": "red_agent",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,
@@ -178,7 +178,7 @@ examples:
                   "user_id": 46,
                   "username": "extra_red",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,
@@ -192,9 +192,9 @@ examples:
   - name: Error - Room not found
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/9999/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_FOUND","message":"Room 9999 was not found.","details":{"room_id":9999}}}'}}
-  - name: Error - Countdown already started
+  - name: Error - Game running
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
-    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_JOINABLE","message":"Room 1001 is not joinable while status is COUNTDOWN.","details":{"room_id":1001,"status":"COUNTDOWN"}}}'}}
+    response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ROOM_NOT_JOINABLE","message":"Room 1001 is not joinable while its game is running.","details":{"room_id":1001,"status":"IN_GAME"}}}'}}
   - name: Error - Already in another room
     request: {url: "{{baseUrl}}/api/{{gameApiVersion}}/rooms/1001/members", method: POST, headers: [], params: [], body: {mode: none}}
     response: {status: 409, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"ALREADY_IN_ROOM","message":"User 46 already belongs to active room 1002.","details":{"room_id":1002}}}'}}

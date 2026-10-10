@@ -35,10 +35,10 @@ docs: |-
   | `payload.player.username` | string | yes | no | username rule | Affected username |
   | `payload.player.avatar_url` | string | yes | no | same-origin URL | Affected member's current avatar |
   | `payload.player.team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team |
-  | `payload.player.role` | enum | yes | no | `SPYMASTER`, `OPERATIVE`, `SPECTATOR` | New joins are always `SPECTATOR` |
+  | `payload.player.role` | enum | yes | yes | `SPYMASTER`, `OPERATIVE` | `null` for every new join (unseated) |
   | `payload.player.ready` | boolean | yes | no | `true`, `false` | Readiness at change time |
   | `payload.player.state` | enum | yes | no | `IN_LOBBY`, `IN_GAME`, `POST_GAME` | Member lifecycle state at removal/join |
-  | `payload.reason` | enum | leave only | no | `EXITED`, `SESSION_ENDED`, `DISCONNECTED`, `POST_GAME_TIMEOUT`, `KICKED_BY_HOST`, `ACCOUNT_DELETED` | Why membership ended; logout is distinct from transport grace expiry |
+  | `payload.reason` | enum | leave only | no | `EXITED`, `SESSION_ENDED`, `DISCONNECTED`, `POST_GAME_TIMEOUT`, `KICKED_BY_HOST`, `ACCOUNT_DELETED`, `SEAT_UNAVAILABLE` | Why membership ended; logout is distinct from transport grace expiry; `SEAT_UNAVAILABLE` removes a member still unseated when a paused match resumes |
   | `payload.kicked_by_user_id` | integer | kick only | no | current host ID | Actor for `KICKED_BY_HOST` |
   | `payload.host_user_id` | integer or null | yes | yes | remaining member ID or `null` | Host after change; null only when room closes empty |
   | `payload.player_count` | integer | yes | no | `>= 0` | Membership after change |
@@ -61,7 +61,7 @@ docs: |-
           "user_id": 43,
           "username": "red_agent",
           "team": null,
-          "role": "SPECTATOR",
+          "role": null,
           "ready": false,
           "state": "IN_LOBBY",
           "is_host": false,

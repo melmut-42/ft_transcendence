@@ -79,7 +79,7 @@ docs: |-
               "user_id": 42,
               "username": "player_one",
               "team": null,
-              "role": "SPECTATOR",
+              "role": null,
               "ready": false,
               "state": "IN_LOBBY",
               "is_host": true,

@@ -19,7 +19,7 @@ docs: |-
 
   ## Purpose
 
-  Returns the authenticated user's friend list with live online/offline presence, for the Profile popup, which shows friend count, friend list and online/offline state.
+  Returns the authenticated user's active friendships with live online/offline presence (a friendship suspended by a block in either direction is not listed), for the Profile popup, which shows friend count, friend list and online/offline state.
 
   ## Request parameters
 

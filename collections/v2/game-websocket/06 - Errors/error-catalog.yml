@@ -72,7 +72,7 @@ docs: |-
   | `ROLE_CONFLICT` | second Spymaster on one team | unchanged; open |
   | `NOT_YOUR_TURN` | inactive team attempts clue/guess/pass | unchanged; open |
   | `ROLE_FORBIDDEN` | wrong room role attempts game action | unchanged; open |
-  | `INVALID_CLUE` | clue word fails deterministic rule | unchanged; open |
+  | `INVALID_CLUE` | clue word fails the format rule (`details.reason: INVALID_FORMAT`) or matches a board word (`WORD_ON_BOARD`) | unchanged; open |
   | `INVALID_CLUE_NUMBER` | clue number not integer `1..9` | unchanged; open |
   | `INVALID_CARD` | card ID absent/invalid | unchanged; open |
   | `CARD_ALREADY_REVEALED` | card was already revealed | unchanged; open |
@@ -273,7 +273,8 @@ docs: |-
         "code": "INVALID_CLUE",
         "message": "payload.word must contain exactly one non-whitespace word.",
         "details": {
-          "field": "payload.word"
+          "field": "payload.word",
+          "reason": "INVALID_FORMAT"
         }
       }
     }

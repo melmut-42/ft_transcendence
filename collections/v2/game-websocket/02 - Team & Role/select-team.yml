@@ -59,7 +59,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Changes an existing participant's team during `WAITING`; during `COUNTDOWN`, the change clears readiness and cancels countdown. A spectator cannot use this command for initial setup: becoming a participant always sends both `payload.team` and `payload.role` atomically with `room.role.select`. This command is not accepted during `IN_GAME`.
+  Changes an existing participant's team during `WAITING`; during `COUNTDOWN`, the change clears readiness and cancels countdown. An unseated member cannot use this command for initial setup: becoming a participant always sends both `payload.team` and `payload.role` atomically with `room.role.select`. This command is not accepted during `IN_GAME`.
 
   ## Message and payload parameters
 

@@ -69,5 +69,24 @@ docs: |-
 
   Back to Lobby restores access only for that returned `IN_LOBBY` member and opens a new visibility window after the then-current message sequence. Other `POST_GAME` members remain inactive and never gain later history for messages sent before their own return. Exit, kick, post-game timeout, and room closure produce `INACTIVE` with reason `ROOM_LEFT`, `KICKED_BY_HOST`, `POST_GAME_TIMEOUT`, or `ROOM_CLOSED`.
 
-  DIRECT channels use the same access event with `channel_type:DIRECT`, `room_id:null`, and reasons `FRIENDSHIP_ADDED` or `FRIENDSHIP_REMOVED`. Shared-room membership never activates a DIRECT channel.
+  DIRECT channels use the same access event with `channel_type:DIRECT`, `room_id:null`, and reasons `FRIENDSHIP_ADDED`, `FRIENDSHIP_REMOVED`, or `USER_BLOCKED` (sent only to the blocker; the blocked user receives `FRIENDSHIP_REMOVED`). Shared-room membership never activates a DIRECT channel.
+
+  ## Chat during a running match
+
+  `access` has three values: `ACTIVE` (read and send), `READ_ONLY` (read, no send), and `INACTIVE` (neither). When a match starts or resumes from `PAUSED_FOR_PLAYERS`, every `IN_GAME` member receives `access: READ_ONLY` with reason `GAME_RUNNING` for each of their channels, ROOM and DIRECT. When the match pauses, they receive `access: ACTIVE` with reason `GAME_PAUSED`. When it ends, the ROOM channel becomes `INACTIVE` (`GAME_FINISHED`) as above and each DIRECT channel returns to `ACTIVE` with reason `GAME_FINISHED`. Messages stay readable throughout `READ_ONLY`. A reconnecting client restores the state from `GET /api/v2/channels`, which reports `access` per channel.
+
+  ```json
+  {
+    "type": "chat.channel.access_changed",
+    "event_id": "evt_c030",
+    "sent_at": "2026-09-17T10:20:00Z",
+    "payload": {
+      "channel_id": 8001,
+      "channel_type": "ROOM",
+      "room_id": 1001,
+      "access": "READ_ONLY",
+      "reason": "GAME_RUNNING"
+    }
+  }
+  ```
 examples: []

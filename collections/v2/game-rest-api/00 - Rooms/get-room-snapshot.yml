@@ -45,9 +45,9 @@ docs: |-
   | `data.status` | string enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME`, `POST_GAME` | Lifecycle state; `CLOSED` has no remaining member who could read this endpoint |
   | `data.host_user_id` | integer or null | yes | yes | member user ID or `null` | Null only during the 300-second empty-room window |
   | `data.player_count` | integer | yes | no | `>= 1` for accessible room | Current members |
-  | `data.max_players` | integer | yes | no | `4..20` | Room capacity; participants and spectators count |
+  | `data.max_players` | integer | yes | no | `4..20` | Room capacity; every member counts |
   | `data.turn_timer_seconds` | integer or null | yes | yes | `null`, `60`, `90`, `120`; `null` means no limit | Per-turn time limit (`workspace.yml`, Room Settings) |
-  | `data.language` | string | yes | no | `en` | Word-pack language |
+  | `data.language` | string | yes | no | `en`, `tr`, `fr` | Word-pack language: English, Turkish, French |
   | `data.startable` | boolean | yes | no | `true`, `false` | Complete start predicate, not merely all-ready |
   | `data.countdown.seconds_remaining` | integer | conditional | no | `0..3` | Present only in `COUNTDOWN` |
   | `data.players[]` | array<object> | yes | no | one or more | Members in join order |
@@ -55,7 +55,7 @@ docs: |-
   | `data.players[].username` | string | yes | no | username rule | Username |
   | `data.players[].avatar_url` | string | yes | no | same-origin URL | Current avatar for lobby/game rendering |
   | `data.players[].team` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Temporary team; null until selected |
-  | `data.players[].role` | enum | yes | no | `SPYMASTER`, `OPERATIVE`, `SPECTATOR` | Always `SPECTATOR` on initial membership |
+  | `data.players[].role` | enum | yes | yes | `SPYMASTER`, `OPERATIVE` | `null` while the member is unseated, as on initial membership |
   | `data.players[].ready` | boolean | yes | no | `true`, `false` | Confirms current selections; selection change resets false |
   | `data.players[].state` | string enum | yes | no | `IN_LOBBY`, `IN_GAME`, `POST_GAME` | Per-member lifecycle; may differ between members after a completed game |
   | `data.players[].is_host` | boolean | yes | no | `true`, `false` | Exactly one true in non-empty room |
@@ -86,6 +86,7 @@ docs: |-
   | `data.game.winner` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Non-null only after terminal result |
   | `data.game.end_reason` | enum or null | yes | yes | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `INSUFFICIENT_PLAYERS`, `null` | Terminal cause; cancellation has no winner |
   | `data.game.staffing` | object | conditional | no | per-team missing roles/deadlines | Present in `PAUSED_FOR_PLAYERS`; the same shape as `game.staffing.required.payload.staffing`, so a reconnect restores the shutdown countdown |
+  | `data.game.history[]` | array<object> | yes | no | Game History entries, oldest first | Public action log of this match (`workspace.yml`, Game History); identical for every recipient |
   | `data.game.started_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Board creation/start time |
   | `data.game.finished_at` | `string<date-time>` or null | yes | yes | ISO 8601 UTC or `null` | Terminal time |
   | `data.post_game` | object | conditional | no | deadline and pending members | Present while any current member remains `POST_GAME`; omitted otherwise |
@@ -135,7 +136,7 @@ examples:
                   "user_id": 42,
                   "username": "player_one",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": true,
@@ -169,7 +170,7 @@ examples:
                   "user_id": 42,
                   "username": "player_one",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": true,
@@ -179,7 +180,7 @@ examples:
                   "user_id": 43,
                   "username": "red_agent",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,
@@ -189,7 +190,7 @@ examples:
                   "user_id": 44,
                   "username": "blue_master",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,
@@ -199,7 +200,7 @@ examples:
                   "user_id": 45,
                   "username": "blue_agent",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,
@@ -243,7 +244,7 @@ examples:
                   "user_id": 43,
                   "username": "red_agent",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,
@@ -263,7 +264,7 @@ examples:
                   "user_id": 45,
                   "username": "blue_agent",
                   "team": null,
-                  "role": "SPECTATOR",
+                  "role": null,
                   "ready": false,
                   "state": "IN_LOBBY",
                   "is_host": false,
@@ -397,6 +398,9 @@ examples:
                 ],
                 "winner": null,
                 "end_reason": null,
+                "history": [
+                  {"seq":1,"type":"GAME_STARTED","at":"2026-09-10T08:43:15Z","team":"RED"}
+                ],
                 "started_at": "2026-09-10T08:43:15Z",
                 "finished_at": null
               },

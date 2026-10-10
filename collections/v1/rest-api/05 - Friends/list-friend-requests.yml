@@ -1,0 +1,67 @@
+info:
+  name: List friend requests
+  type: http
+  seq: 3
+  tags: [friends]
+http:
+  method: GET
+  url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests"
+  headers:
+    - name: Accept
+      value: application/json
+docs: |-
+  # List friend requests
+
+  ## Purpose
+
+  Returns the caller's pending friend requests: `incoming` ones wait for the caller's Accept or Decline, `outgoing` ones wait for the other user. Resolved requests are never listed. Requests between users where either blocks the other are cancelled by the block and are never listed.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
+
+  ## Response fields
+
+  | Field | Type | Required | Nullable | Allowed values | Description |
+  | --- | --- | ---: | ---: | --- | --- |
+  | `data.incoming[]` | array<object> | yes | no | friend request objects | Pending requests sent to the caller, newest first |
+  | `data.outgoing[]` | array<object> | yes | no | friend request objects | Pending requests the caller sent, newest first |
+
+  Each object has the fields of `Send friend request`'s response (`request_id`, `from_user`, `to_user`, `status: PENDING`, `created_at`). Both lists are bounded by the number of distinct users and are returned whole. Read-only; no event.
+
+  ## Errors
+
+  `401 UNAUTHORIZED` for an invalid session.
+examples:
+  - name: Success - One incoming, one outgoing
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests", method: GET, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "incoming": [
+                {
+                  "request_id": 702,
+                  "from_user": {"user_id": 46, "username": "extra_red", "avatar_url": "https://{{baseUrl}}/static/avatars/default/46.svg"},
+                  "to_user": {"user_id": 42, "username": "player_one", "avatar_url": "https://{{baseUrl}}/static/avatars/default/42.svg"},
+                  "status": "PENDING",
+                  "created_at": "2026-09-10T08:41:00Z"
+                }
+              ],
+              "outgoing": [
+                {
+                  "request_id": 701,
+                  "from_user": {"user_id": 42, "username": "player_one", "avatar_url": "https://{{baseUrl}}/static/avatars/default/42.svg"},
+                  "to_user": {"user_id": 43, "username": "red_agent", "avatar_url": "https://{{baseUrl}}/static/avatars/default/43.svg"},
+                  "status": "PENDING",
+                  "created_at": "2026-09-10T08:40:00Z"
+                }
+              ]
+            }
+          }

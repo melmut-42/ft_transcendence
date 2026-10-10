@@ -1,7 +1,7 @@
 info:
   name: Remove friend
   type: http
-  seq: 3
+  seq: 7
   tags: [friends]
 http:
   method: DELETE
@@ -12,7 +12,7 @@ docs: |-
 
   ## Purpose
 
-  Removes an existing friendship both ways.
+  Removes an active friendship both ways. The other user's Chat v2 sockets receive `friend.removed` with the remover's `user_id`, and the caller's other sockets receive it with the removed friend's `user_id`, so both friend lists update without a reload. A friendship suspended by a block cannot be removed until the block is lifted.
 
   ## Request parameters
 
@@ -23,7 +23,7 @@ docs: |-
 
   ## Success and errors
 
-  `204 No Content` on success. `401 UNAUTHORIZED` for invalid session; `404 NOT_FRIENDS` when no friendship exists.
+  `204 No Content` on success. `401 UNAUTHORIZED` for invalid session; `404 NOT_FRIENDS` when no active friendship exists.
 examples:
   - name: Success - Remove red_agent
     request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends/43", method: DELETE, headers: [], params: [], body: {mode: none}}

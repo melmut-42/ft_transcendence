@@ -38,12 +38,12 @@ docs: |-
   | --- | --- | --- | --- |
   | `room.state` | `room` | connect, recovery, room mutation | per recipient when game exists |
   | `room.player.joined` | `player`, `host_user_id`, `player_count`, `room_status` | REST join | common |
-  | `room.player.left` | membership fields plus `reason`; optional `kicked_by_user_id` | Exit, logout, disconnect expiry, host kick, post-game timeout | common |
+  | `room.player.left` | membership fields plus `reason`; optional `kicked_by_user_id` | Exit, logout, disconnect expiry, host kick, post-game timeout, unseated member when a paused match resumes (`SEAT_UNAVAILABLE`) | common |
   | `room.player.returned_to_lobby` | user, previous game, room/member state | accepted `room.lobby.return` | common |
   | `room.post_game.started` | game ID, deadline, pending users | immediately after `game.ended` | common |
   | `room.post_game.completed` | room status, remaining members | pending set becomes empty | common |
   | `room.settings.updated` | `max_players`, `turn_timer_seconds`, `language`, `player_count`, `changed_by_user_id` | host `room.settings.update` | common |
-  | `room.player.updated` | `player`, `changed_fields`, `room_status`, `startable` | team, role, ready | common |
+  | `room.player.updated` | `player`, `changed_fields`, `room_status`, `startable` | team, role, ready; the member's `username` or `avatar_url` changed through the profile endpoints | common |
   | `room.countdown.started` | `seconds_remaining=3` | full start predicate becomes true | common |
   | `room.countdown.tick` | `seconds_remaining` | server timer | common |
   | `room.countdown.cancelled` | `reason`, `changed_by_user_id` | predicate becomes false | common |
@@ -57,8 +57,36 @@ docs: |-
   | `game.staffing.restored` | restored teams and resumed turn/phase | both teams become valid before deadlines | role-safe state |
   | `game.cancelled` | null winner/loser, `INSUFFICIENT_PLAYERS`, deficient team, score, `room_status=CLOSED`, time | a staffing deadline expires | no match/stat update |
   | `room.closed` | `reason=INSUFFICIENT_PLAYERS`, game ID, deficient team, time | immediately after `game.cancelled`; sockets then close with `4404` | common |
+  | `game.history.appended` | `game_id`, `entry` (one Game History entry with `seq`) | right after the events of every recorded action (`workspace.yml`, Game History) | common; entries hold public information only |
 
   ## Concrete game events
+
+  One confirmed guess produces its `game.card.revealed` (and `game.score.updated` when a team scores), then one history entry:
+
+  ```json
+    {
+      "type": "game.history.appended",
+      "event_id": "evt_0143",
+      "room_id": 1001,
+      "sent_at": "2026-09-10T08:44:01Z",
+      "payload": {
+        "game_id": 5001,
+        "entry": {
+          "seq": 6,
+          "type": "CARD_REVEALED",
+          "at": "2026-09-10T08:44:01Z",
+          "team": "RED",
+          "user_id": 43,
+          "username": "red_agent",
+          "card_id": 7,
+          "word": "WHALE",
+          "color": "RED"
+        }
+      }
+    }
+  ```
+
+  A clue that is accepted appends `CLUE_GIVEN` (`team`, `user_id`, `username`, `clue`); a turn end appends `TURN_PASSED` when an Operative passed, then `TURN_CHANGED` (`team`, `previous_team`, `reason`); a result appends `GAME_ENDED` (`team` = winner, `reason`).
 
   ```json
     {

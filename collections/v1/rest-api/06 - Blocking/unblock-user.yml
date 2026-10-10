@@ -1,0 +1,38 @@
+info:
+  name: Unblock user
+  type: http
+  seq: 2
+  tags: [blocking]
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/{{apiVersion}}/users/45/block"
+  headers: []
+docs: |-
+  # Unblock user
+
+  ## Purpose and preconditions
+
+  The caller lifts their own block on another user. The operation is idempotent: unblocking a user who is not blocked changes nothing. A block placed by the other user stays in force.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `user_id` | path | yes | integer | positive, existing user, not the caller | no | User to unblock | `45` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity | set by Register/Login |
+
+  ## Success behavior
+
+  `204 No Content`. When the two users had a friendship suspended by blocks and neither user blocks the other any more, the friendship becomes active again: both users' Chat v2 sockets receive `friend.restored` with the other user as a `List friends` entry, and their DIRECT channel returns to `ACTIVE` with reason `FRIENDSHIP_ADDED`. Requests cancelled by the block stay cancelled, and no friendship is ever created by unblocking.
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `404` | `USER_NOT_FOUND` | `user_id` does not exist |
+  | `422` | `VALIDATION_ERROR` | `user_id` is not a positive integer, or is the caller |
+examples:
+  - name: Success - Unblock blue_agent
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/45/block", method: DELETE, headers: [], params: [], body: {mode: none}}
+    response: {status: 204, headers: [], body: {type: text, data: ""}}

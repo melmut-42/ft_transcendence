@@ -20,7 +20,7 @@ docs: |-
   | Scenario | Fixture transition | Contract location |
   | --- | --- | --- |
   | Newly created room | user `42` creates `1001` | REST `Create room` |
-  | Four joined as spectators | users `42..45`, `team:null`, `role:SPECTATOR` | REST `Get room snapshot` |
+  | Four joined unseated | users `42..45`, `team:null`, `role:null` | REST `Get room snapshot` |
   | Teams selected, roles incomplete | users `43` and `45` lack roles | REST `Get room snapshot` |
   | Duplicate Spymaster | user `43` requests RED Spymaster occupied by `42` | WebSocket `Select role` |
   | Roles valid, some unready | user `45` remains false | REST `Get room snapshot` |
@@ -111,4 +111,4 @@ docs: |-
 
   ## Scope boundary
 
-  Back to Lobby reuses the room for a new match after every remaining member returns or leaves. Host kick exists for room administration but there is no persistent ban list. Spectators, bots, matchmaking, room passwords, custom boards, and custom timers remain out of scope.
+  Back to Lobby reuses the room for a new match after every remaining member returns or leaves. Host kick exists for room administration but there is no persistent ban list. Spectating, bots, matchmaking, room passwords, custom boards, and custom timers remain out of scope.

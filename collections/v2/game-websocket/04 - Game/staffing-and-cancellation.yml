@@ -13,7 +13,7 @@ docs: |-
 
   This is a passive event reference. It sends no client command.
 
-  During `IN_GAME`, play may continue only while RED and BLUE each have exactly one `SPYMASTER` and at least one `OPERATIVE`. Spectators are ignored. A team becomes deficient when it loses its only Spymaster or its last Operative, whether by Leave room, logout, host kick, account deletion, or an expired reconnect grace period. The room then remains `IN_GAME`, the game changes to `PAUSED_FOR_PLAYERS`, and the server preserves the board, score, active team, clue, and remaining guesses.
+  During `IN_GAME`, play may continue only while RED and BLUE each have exactly one `SPYMASTER` and at least one `OPERATIVE`. Unseated members are ignored. A team becomes deficient when it loses its only Spymaster or its last Operative, whether by Leave room, logout, host kick, account deletion, or an expired reconnect grace period. The room then remains `IN_GAME`, the game changes to `PAUSED_FOR_PLAYERS`, and the server preserves the board, score, active team, clue, and remaining guesses.
 
   Each deficient team owns an independent absolute deadline, 120 seconds by default and server-configurable. A second team becoming deficient later receives its own deadline; it does not reset the first team's timer. Clue, guess, and pass commands return `INVALID_GAME_PHASE` while paused.
 
@@ -62,7 +62,7 @@ docs: |-
   }
   ```
 
-  A user may join the active room through REST. The new member always starts as `team:null`, `role:SPECTATOR`, receives an Operative-safe board, and cannot play. The spectator atomically claims a legal pair with `room.role.select`, for example `{"team":"RED","role":"SPYMASTER"}`. Existing participants cannot switch teams or roles during the game. A team may never have more than one Spymaster.
+  While the game is `PAUSED_FOR_PLAYERS`, a user may join the room through REST to fill the vacant seat. The new member starts unseated (`team:null`, `role:null`), receives an Operative-safe board, and cannot play until seated. They atomically claim a legal pair with `room.role.select`, for example `{"team":"RED","role":"SPYMASTER"}`. Existing participants cannot switch teams or roles during the game. A team may never have more than one Spymaster. If play resumes while a member is still unseated, the server removes that member with `room.player.left` reason `SEAT_UNAVAILABLE` and closes their room sockets with `4403`; nobody watches a running match without playing.
 
   When both teams are valid before every active deadline, the countdown stops and the exact preserved turn resumes. A turn timer stopped by the pause resumes with the time it had left, so `current_turn.deadline_at` is the resume time plus that remainder (`workspace.yml`, Turn Timer). Restoring one of two deficient teams clears only that team's deadline; the pause continues until both are valid.
 

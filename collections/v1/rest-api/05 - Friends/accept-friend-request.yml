@@ -1,0 +1,57 @@
+info:
+  name: Accept friend request
+  type: http
+  seq: 4
+  tags: [friends]
+http:
+  method: POST
+  url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/702/accept"
+  headers:
+    - name: Accept
+      value: application/json
+docs: |-
+  # Accept friend request
+
+  ## Purpose and preconditions
+
+  The recipient of a pending request accepts it. Resolving the request and creating the friendship both ways happen in one transaction, so a repeated or concurrent acceptance creates no second friendship: only the first one finds the request pending. No body is accepted.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `request_id` | path | yes | integer | positive | no | Pending request sent to the caller | `702` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity (the recipient) | set by Register/Login |
+
+  ## Success behavior
+
+  `200 OK` returns the new friend, in the `List friends` entry shape (`user_id`, `username`, `avatar_url`, `is_online`). Both users' Chat v2 sockets receive `friend.request.resolved` with `status: ACCEPTED` and the new friend for each side, so both friend lists update without a reload.
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `403` | `RELATIONSHIP_BLOCKED` | either user blocks the other |
+  | `404` | `REQUEST_NOT_FOUND` | no pending request with this ID is addressed to the caller: it does not exist, was already accepted, declined or cancelled, or was sent by the caller |
+  | `422` | `VALIDATION_ERROR` | `request_id` is not a positive integer |
+examples:
+  - name: Success - Accept extra_red
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/702/accept", method: POST, headers: [], params: [], body: {mode: none}}
+    response:
+      status: 200
+      headers: [{name: Content-Type, value: application/json}]
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "user_id": 46,
+              "username": "extra_red",
+              "avatar_url": "https://{{baseUrl}}/static/avatars/default/46.svg",
+              "is_online": true
+            }
+          }
+  - name: Error - Already resolved
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/702/accept", method: POST, headers: [], params: [], body: {mode: none}}
+    response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"REQUEST_NOT_FOUND","message":"Friend request 702 is not pending for you.","details":{"request_id":702}}}'}}

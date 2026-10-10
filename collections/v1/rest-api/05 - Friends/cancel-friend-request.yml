@@ -1,0 +1,41 @@
+info:
+  name: Cancel friend request
+  type: http
+  seq: 6
+  tags: [friends]
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/701"
+  headers: []
+docs: |-
+  # Cancel friend request
+
+  ## Purpose and preconditions
+
+  The sender withdraws their own pending request before the recipient answers it. No friendship is created, and the two users return to relationship `NONE`; either may send a new request later. Cancelling and the recipient's Accept or Decline are decided atomically on the same request: whichever reaches the server first resolves it, and the other then finds it no longer pending. No body is accepted.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `request_id` | path | yes | integer | positive | no | Pending request sent by the caller | `701` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity (the sender) | set by Register/Login |
+
+  ## Success behavior
+
+  `204 No Content`. Both users' Chat v2 sockets receive `friend.request.resolved` with `status: CANCELLED`, so the recipient's Accept and Decline disappear without a reload.
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `404` | `REQUEST_NOT_FOUND` | no pending request with this ID was sent by the caller: it does not exist, was already accepted, declined or cancelled, or was sent to the caller (the recipient declines instead) |
+  | `422` | `VALIDATION_ERROR` | `request_id` is not a positive integer |
+examples:
+  - name: Success - Cancel
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/701", method: DELETE, headers: [], params: [], body: {mode: none}}
+    response: {status: 204, headers: [], body: {type: text, data: ""}}
+  - name: Error - Already answered
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/701", method: DELETE, headers: [], params: [], body: {mode: none}}
+    response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"REQUEST_NOT_FOUND","message":"Friend request 701 is not pending from you.","details":{"request_id":701}}}'}}

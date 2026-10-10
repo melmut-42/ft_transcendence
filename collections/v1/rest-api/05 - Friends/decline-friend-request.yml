@@ -1,0 +1,41 @@
+info:
+  name: Decline friend request
+  type: http
+  seq: 5
+  tags: [friends]
+http:
+  method: POST
+  url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/702/decline"
+  headers: []
+docs: |-
+  # Decline friend request
+
+  ## Purpose and preconditions
+
+  The recipient of a pending request declines it. No friendship is created, and the two users return to relationship `NONE`; either may send a new request later. No body is accepted.
+
+  ## Request parameters
+
+  | Parameter | Location | Required | Type | Allowed values | Nullable | Description | Example |
+  | --- | --- | ---: | --- | --- | ---: | --- | --- |
+  | `request_id` | path | yes | integer | positive | no | Pending request sent to the caller | `702` |
+  | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Requesting identity (the recipient) | set by Register/Login |
+
+  ## Success behavior
+
+  `204 No Content`. Both users' Chat v2 sockets receive `friend.request.resolved` with `status: DECLINED`.
+
+  ## Errors
+
+  | Status | Code | When |
+  | --- | --- | --- |
+  | `401` | `UNAUTHORIZED` | invalid session |
+  | `404` | `REQUEST_NOT_FOUND` | no pending request with this ID is addressed to the caller |
+  | `422` | `VALIDATION_ERROR` | `request_id` is not a positive integer |
+examples:
+  - name: Success - Decline
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/702/decline", method: POST, headers: [], params: [], body: {mode: none}}
+    response: {status: 204, headers: [], body: {type: text, data: ""}}
+  - name: Error - Not pending
+    request: {url: "{{baseUrl}}/api/{{apiVersion}}/friends/requests/702/decline", method: POST, headers: [], params: [], body: {mode: none}}
+    response: {status: 404, headers: [{name: Content-Type, value: application/json}], body: {type: json, data: '{"error":{"code":"REQUEST_NOT_FOUND","message":"Friend request 702 is not pending for you.","details":{"request_id":702}}}'}}

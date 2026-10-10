@@ -22,7 +22,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Sends a live room invitation to a friend. The sender must be a member of the room, the room must be `WAITING` with no pending `POST_GAME` member and below `max_players`, and the recipient must be a friend with no active room and at least one active Chat Gateway v2 socket. Generic presence through only a room socket is not enough because v2 invites are delivered only on `/ws/v2/channels`.
+  Sends a live room invitation to a friend. The sender must be a member of the room, the room must be `WAITING` with no pending `POST_GAME` member and below `max_players`, and the recipient must be an active friend (no block in either direction) with no active room and at least one active Chat Gateway v2 socket. Generic presence through only a room socket is not enough because v2 invites are delivered only on `/ws/v2/channels`.
 
   ## Request parameters
 
@@ -53,7 +53,7 @@ docs: |-
   | `403` | `NOT_ROOM_MEMBER` | sender is not in the room |
   | `404` | `ROOM_NOT_FOUND` | room absent |
   | `404` | `USER_NOT_FOUND` | recipient absent |
-  | `404` | `NOT_FRIENDS` | recipient is not a friend |
+  | `404` | `NOT_FRIENDS` | recipient is not an active friend: no friendship, or one suspended by a block in either direction (the block itself is not revealed) |
   | `409` | `ROOM_NOT_JOINABLE` | room is not `WAITING`, or any member is still `POST_GAME` |
   | `409` | `ROOM_FULL` | `player_count` equals `max_players` |
   | `409` | `USER_OFFLINE` | recipient has no active Chat Gateway v2 socket |

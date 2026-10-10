@@ -21,7 +21,7 @@ docs:
 
     Connect through the same public origin at `{{chatWsUrl}}/ws/{{chatApiVersion}}/channels`. The reverse proxy routes this path directly to Chat Gateway; live chat does not pass through the Web BFF.
 
-    Chat Gateway validates the session and transports commands/events. Channel Service owns channel records, dynamic authorization, idempotency, persistence, 30-day default retention, and canonical events. `DIRECT` is friend-only; `ROOM` follows the caller's room/member lifecycle and is inactive in `POST_GAME`.
+    Chat Gateway validates the session and transports commands/events. Channel Service owns channel records, dynamic authorization, idempotency, persistence, 30-day default retention, and canonical events. `DIRECT` is limited to active friends (a block suspends it); `ROOM` follows the caller's room/member lifecycle and is inactive in `POST_GAME`. A member of a running match reads but cannot send on any channel (`READ_ONLY`) until the match pauses or ends. The same socket also carries social notifications: room invitations and friend request/friendship changes (`social-events.yml`).
 
     Client commands use `{type, request_id, payload}`; acks and errors echo `request_id`. Application errors keep the socket open. Explicit session invalidation closes it with `4401`; handshake rejection happens before upgrade; repeated protocol abuse may close it after an error. A transport timeout has no delivery meaning, so clients retry `chat.message.send` with the same `request_id` and let Channel Service return the original persisted result.
   type: text/markdown

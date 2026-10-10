@@ -19,7 +19,7 @@ docs: |-
 
   Optional query parameters are `limit` (`1..100`, default `50`) and opaque `after`. The response contains `data.channels[]` and nullable `data.next_cursor`. Ordering uses caller-visible activity time descending, then `channel_id` descending. The cursor is scoped to the authenticated user.
 
-  Common fields are `channel_id`, `type` (`DIRECT`, `ROOM`), and nullable `last_message`. A DIRECT item contains `peer` and `room:null`; a ROOM item contains `room` (`room_id`, `room_code`) and `peer:null`. A non-null last message contains `message_id`, `sender_user_id`, `text`, `sent_at`, and `expires_at`. For ROOM, `last_message` and sort position use only the caller's current membership epoch and visibility windows; pre-join and temporarily inaccessible `POST_GAME` messages affect neither preview nor ordering.
+  Common fields are `channel_id`, `type` (`DIRECT`, `ROOM`), `access`, `access_reason`, and nullable `last_message`. `access` is `ACTIVE` (read and send) or `READ_ONLY` (read only, while the caller plays a running match); `access_reason` is `GAME_RUNNING` with `READ_ONLY` and `null` otherwise, so a reconnecting client restores the restriction from this list. A DIRECT item contains `peer` and `room:null`; a ROOM item contains `room` (`room_id`, `room_code`) and `peer:null`. A non-null last message contains `message_id`, `sender_user_id`, `text`, `sent_at`, and `expires_at`. For ROOM, `last_message` and sort position use only the caller's current membership epoch and visibility windows; pre-join and temporarily inaccessible `POST_GAME` messages affect neither preview nor ordering.
 
   Errors: `401 UNAUTHORIZED` for an invalid session; `422 VALIDATION_ERROR` for invalid `limit` or cursor.
 examples:
@@ -30,4 +30,4 @@ examples:
       headers: [{name: Content-Type, value: application/json}]
       body:
         type: json
-        data: '{"data":{"channels":[{"channel_id":8001,"type":"ROOM","peer":null,"room":{"room_id":1001,"room_code":"ABCD12"},"last_message":null},{"channel_id":7001,"type":"DIRECT","peer":{"user_id":43,"username":"red_agent","avatar_url":"/static/avatars/default/43.svg","is_online":true},"room":null,"last_message":{"message_id":"msg_001","sender_user_id":42,"text":"gg, ready?","sent_at":"2026-09-17T10:00:00Z","expires_at":"2026-10-17T10:00:00Z"}}],"next_cursor":null}}'
+        data: '{"data":{"channels":[{"channel_id":8001,"type":"ROOM","peer":null,"room":{"room_id":1001,"room_code":"ABCD12"},"access":"ACTIVE","access_reason":null,"last_message":null},{"channel_id":7001,"type":"DIRECT","peer":{"user_id":43,"username":"red_agent","avatar_url":"/static/avatars/default/43.svg","is_online":true},"room":null,"access":"ACTIVE","access_reason":null,"last_message":{"message_id":"msg_001","sender_user_id":42,"text":"gg, ready?","sent_at":"2026-09-17T10:00:00Z","expires_at":"2026-10-17T10:00:00Z"}}],"next_cursor":null}}'

@@ -41,7 +41,7 @@ docs: |-
   | `payload.room.player_count` | integer | yes | no | `>= 4` | Participants |
   | `payload.room.max_players` | integer | yes | no | `4..20` | Room capacity |
   | `payload.room.turn_timer_seconds` | integer or null | yes | yes | `null`, `60`, `90`, `120`; `null` means no limit | Per-turn time limit |
-  | `payload.room.language` | string | yes | no | `en` | Word-pack language |
+  | `payload.room.language` | string | yes | no | `en`, `tr`, `fr` | Word-pack language: English, Turkish, French |
   | `payload.room.startable` | boolean | yes | no | `false` | Start predicate is only actionable in `WAITING` |
   | `payload.room.players[]` | array<object> | yes | no | configured members | Join-ordered membership |
   | `payload.room.players[].user_id` | integer | yes | no | positive | Member |
@@ -70,6 +70,7 @@ docs: |-
   | `payload.room.game.board[].color` | enum or null | yes | yes | `RED`, `BLUE`, `NEUTRAL`, `ASSASSIN`, `null` | Null only for an Operative's unrevealed card |
   | `payload.room.game.winner` | enum or null | yes | yes | `RED`, `BLUE`, `null` | Null at start |
   | `payload.room.game.end_reason` | enum or null | yes | yes | `ALL_TEAM_CARDS_REVEALED`, `ASSASSIN_REVEALED`, `null` | Null at start |
+  | `payload.room.game.history[]` | array<object> | yes | no | Game History entries, oldest first | Public action log of this match (`workspace.yml`, Game History); identical for every recipient |
   | `payload.room.game.started_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Game start |
   | `payload.room.game.finished_at` | `string<date-time>` or null | yes | yes | UTC or `null` | Null at start |
   | `payload.room.created_at` | `string<date-time>` | yes | no | ISO 8601 UTC | Room creation |
@@ -133,6 +134,9 @@ docs: |-
           ],
           "winner": null,
           "end_reason": null,
+          "history": [
+            {"seq":1,"type":"GAME_STARTED","at":"2026-09-10T08:43:15Z","team":"RED"}
+          ],
           "started_at": "2026-09-10T08:43:15Z",
           "finished_at": null
         },
@@ -201,6 +205,9 @@ docs: |-
           ],
           "winner": null,
           "end_reason": null,
+          "history": [
+            {"seq":1,"type":"GAME_STARTED","at":"2026-09-10T08:43:15Z","team":"RED"}
+          ],
           "started_at": "2026-09-10T08:43:15Z",
           "finished_at": null
         },

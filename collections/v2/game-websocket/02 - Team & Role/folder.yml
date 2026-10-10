@@ -5,4 +5,4 @@ info:
 docs: |-
   # Team and role
 
-  Every member starts as `team:null`, `role:SPECTATOR`, `ready:false`. To participate, a spectator atomically claims `{team: RED|BLUE, role: SPYMASTER|OPERATIVE}` through `room.role.select`. A team may have exactly one Spymaster and one or more Operatives. Returning to `SPECTATOR` atomically clears team and readiness. During `IN_GAME`, only spectator-to-participant claims are allowed; existing participants cannot switch teams or roles.
+  Every member starts unseated: `team:null`, `role:null`, `ready:false`. To play, the member atomically claims `{team: RED|BLUE, role: SPYMASTER|OPERATIVE}` through `room.role.select`. There is no spectator role and no way back to unseated; a seated member changes team or role instead. A team may have exactly one Spymaster and one or more Operatives. During `IN_GAME`, only an unseated member who joined the paused match may claim a seat; existing participants cannot switch teams or roles.

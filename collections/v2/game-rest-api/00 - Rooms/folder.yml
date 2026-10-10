@@ -5,9 +5,9 @@
 docs: |-
   # Rooms
 
-  Creating joins the creator and assigns host. A room accepts joins in `WAITING`, `COUNTDOWN`, and `IN_GAME` while capacity remains; in-game joiners start as spectators. A user may have one active room. After a game, members independently choose Back to Lobby or Exit during a 60-second post-game window. An empty room remains recoverable for 300 seconds before closure.
+  Creating joins the creator and assigns host. A room accepts joins in `WAITING` and `COUNTDOWN`, and in `IN_GAME` only while the game is `PAUSED_FOR_PLAYERS`, while capacity remains. Every joiner starts unseated and claims a seat; nobody watches a running match without playing. A user may have one active room. After a game, members independently choose Back to Lobby or Exit during a 60-second post-game window. An empty room remains recoverable for 300 seconds before closure.
 
-  Every room has a capacity, `max_players`, in `4..20` (default `8`). Participants and spectators both count. The host sets it on create and can change it while the room is `WAITING`; it can never drop below `player_count`.
+  Every room has a capacity, `max_players`, in `4..20` (default `8`). Every member counts, seated or unseated. The host sets it on create and can change it while the room is `WAITING`; it can never drop below `player_count`.
 
   A room member can invite a friend with `Invite friend`; the transient invite is accepted for delivery through Chat Gateway v2, and accepting it is an ordinary v2 Join.
 

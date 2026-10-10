@@ -50,7 +50,7 @@ docs:
     | Type | Direction | Allowed room/phase | Permission | Purpose |
     | --- | --- | --- | --- | --- |
     | `room.team.select` | C to S | `WAITING`, `COUNTDOWN` | existing participant | change team; countdown change cancels |
-    | `room.role.select` | C to S | `WAITING`, `COUNTDOWN`, conditional `IN_GAME` | spectator/member | atomically claim `{team, role}` or return to spectator |
+    | `room.role.select` | C to S | `WAITING`, `COUNTDOWN`, paused `IN_GAME` | member; in `IN_GAME` unseated only | atomically claim `{team, role}` |
     | `room.ready.set` | C to S | `WAITING`, `COUNTDOWN` for false | configured member | toggle readiness |
     | `room.lobby.return` | C to S | member state `POST_GAME` | any member | return independently; first return moves room to `WAITING` |
     | `room.settings.update` | C to S | `WAITING` | host, `IN_LOBBY` | change capacity, turn timer, language |
@@ -59,13 +59,13 @@ docs:
     | `game.card.guess` | C to S | `IN_GAME / GUESSING` | active Operative | reveal one card |
     | `game.turn.pass` | C to S | `IN_GAME / GUESSING` | active Operative | end team turn |
     | `room.state` | S to C | any non-closed state | recipient projection | full room snapshot |
-    | `room.player.joined` | S to C | `WAITING`, `COUNTDOWN`, `IN_GAME` | server | spectator membership added |
+    | `room.player.joined` | S to C | `WAITING`, `COUNTDOWN`, paused `IN_GAME` | server | unseated membership added |
     | `room.player.left` | S to C | any non-closed state | server | exit, logout, disconnect, kick, account deletion, or timeout; may include host transfer |
     | `room.settings.updated` | S to C | `WAITING` | server | full current settings after a host change |
     | `room.player.returned_to_lobby` | S to C | `POST_GAME` or `WAITING` | server | one member moved from `POST_GAME` to `IN_LOBBY` |
     | `room.post_game.started` | S to C | `POST_GAME` | server | result decision deadline begins |
     | `room.post_game.completed` | S to C | `WAITING` or `CLOSED` | server | no pending post-game members remain |
-    | `room.player.updated` | S to C | `WAITING`, `COUNTDOWN` | server | team, role, ready change |
+    | `room.player.updated` | S to C | `WAITING`, `COUNTDOWN`; any status except `CLOSED` for a profile change | server | team, role, ready change; a member's new `username` or `avatar_url` |
     | `room.countdown.started` | S to C | `COUNTDOWN` | server | start at 3 seconds |
     | `room.countdown.tick` | S to C | `COUNTDOWN` | server | remaining `2`, `1`, `0` |
     | `room.countdown.cancelled` | S to C | `WAITING` | server | invariant broke |
@@ -79,6 +79,7 @@ docs:
     | `game.staffing.restored` | S to C | `IN_GAME` | server | both teams valid; preserved turn resumes |
     | `game.cancelled` | S to C | `IN_GAME` to `CLOSED` | server | no-winner `INSUFFICIENT_PLAYERS` cancellation |
     | `room.closed` | S to C | `CLOSED` | server | room shut down after a staffing deadline; sockets close with `4404` |
+    | `game.history.appended` | S to C | `IN_GAME`, `POST_GAME` | server | one new public action-log entry; `room.state` carries the full `game.history` |
     | `ack` | S to C | command-dependent | requester | command accepted |
     | `error` | S to C | any open connection | requester | command rejected |
 
