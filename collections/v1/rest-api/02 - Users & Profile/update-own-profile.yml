@@ -20,6 +20,8 @@ http:
 docs: |-
   # Update own profile
 
+  User Service owns username validation, case-insensitive uniqueness and the canonical update. Auth's registration/login/session responses subsequently obtain this value from User; neither Auth's credentials nor an old JWT can overwrite the renamed profile. User records the profile change and outgoing notification in its own PostgreSQL transaction/outbox.
+
   ## Purpose and preconditions
 
   Completes the Standard User Management contract (subject Ch. III–IV, Major module): lets a user edit their own profile. Requires an active session.

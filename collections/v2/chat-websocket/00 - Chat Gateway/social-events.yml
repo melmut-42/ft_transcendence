@@ -8,7 +8,7 @@ websocket:
 docs: |-
   # Social events
 
-  User/Auth publishes friend request, friendship and profile changes through RabbitMQ, and Chat Gateway delivers them to every active Chat v2 socket of each affected user, including the acting user's other tabs. They are live notifications only: nothing is replayed after a reconnect, so a client reads `GET /api/v1/friends` and `GET /api/v1/friends/requests` again after every `chat.ready` that follows a drop. Each event has a stable `event_id`; Chat Gateway deduplicates broker redelivery.
+  User Service commits friend request, friendship and profile changes with its own PostgreSQL transactional outbox, and its publisher sends the resulting events through RabbitMQ, and Chat Gateway delivers them to every active Chat v2 socket of each affected user, including the acting user's other tabs. They are live notifications only: nothing is replayed after a reconnect, so a client reads `GET /api/v1/friends` and `GET /api/v1/friends/requests` again after every `chat.ready` that follows a drop. Each event has a stable `event_id`; Chat Gateway deduplicates broker redelivery.
 
   | Type | Sent to | When | Payload |
   | --- | --- | --- | --- |

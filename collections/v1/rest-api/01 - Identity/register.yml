@@ -40,7 +40,7 @@ docs: |-
 
   ## Purpose
 
-  Mandatory registered-account creation (subject Ch. III–IV: email + password auth, hashed + salted at rest). Creates one persistent user and one authenticated session pair. This is the only account-creation path — there is no separate guest/anonymous identity in this contract.
+  Auth Service owns this password-registration entry point (subject Ch. III–IV: email + password auth, hashed + salted at rest). It creates one Auth account, coordinates one User Service profile under the same Auth-assigned `user_id`, and issues one authenticated session pair. Google sign-in uses the same account/profile provisioning boundary; there is no guest/anonymous identity.
 
   ## Preconditions
 
@@ -70,7 +70,7 @@ docs: |-
 
   ## State changes and events
 
-  A user and session pair are persisted. No room membership is created and no WebSocket event is emitted.
+  Auth persists the account/email/password and session pair in its PostgreSQL records; User persists the canonical username/default-avatar profile in its own PostgreSQL records. Auth uses a durable internal `operation_id` to coordinate idempotent provisioning and enforces email uniqueness; User enforces username uniqueness. `201` and both cookies require completed provisioning. Failed provisional work is durably retried or compensated without leaving a usable partial account or permanently orphaned reservations. No room membership is created and no WebSocket event is emitted. See `workspace.yml`, Auth and User Service Boundary.
 
   ## Errors
 

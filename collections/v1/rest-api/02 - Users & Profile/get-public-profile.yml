@@ -12,6 +12,8 @@ http:
 docs: |-
   # Get public profile
 
+  User Service owns the profile and caller-specific relationship fields. Auth validates the requester session; Stats supplies statistics and User queries Gateway registries for current presence. Auth credentials/login email remain private and never appear in this response.
+
   ## Purpose and preconditions
 
   Returns another player's public persistent profile. Authentication is required; room co-membership is not.

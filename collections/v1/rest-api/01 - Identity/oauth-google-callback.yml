@@ -15,6 +15,8 @@ http:
 docs: |-
   # Complete Google sign-in
 
+  Auth Service owns Google verification, email/account linking and session issuance. User Service owns the generated or existing canonical username/default-avatar profile. First Google sign-in uses the same durable, idempotent provisioning coordination as password registration; the redirect and first session require a ready account and profile. An existing account reuses its profile rather than creating a second one.
+
   ## Purpose and preconditions
 
   Google redirects the browser here after the user approves or cancels. The request must carry the `ft_oauth` cookie set by `Start Google sign-in`. Bruno cannot complete a real Google consent screen; the examples document the redirects the browser receives.
@@ -34,7 +36,7 @@ docs: |-
 
   1. A user already linked to this Google account signs in.
   2. Otherwise a user whose email matches the verified Google email (case-insensitive) is linked and signs in.
-  3. Otherwise a new account is created with that email, no password, the deterministic default avatar, and a generated unique username that matches `^[A-Za-z0-9_]{3,20}$` (derived from the Google name or email local part, with a numeric suffix on collision). The user can rename it in Settings.
+  3. Otherwise Auth creates an account with that email and no password, then coordinates the User profile with a deterministic default avatar and generated unique username that matches `^[A-Za-z0-9_]{3,20}$` (derived from the Google name or email local part, with a numeric suffix on collision). User enforces username uniqueness and owns later Settings renames; Auth owns the Google link and session.
 
   `302 Found` to the stored `return_to` (default `/lobby`). The response sets `ft_session` and `ft_refresh` exactly as Login does (`workspace.yml`, Session and Credential Model), clears `ft_oauth`, and puts no token in the URL or body. The SPA then bootstraps with `GET /api/v1/auth/session`.
 

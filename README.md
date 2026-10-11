@@ -10,7 +10,9 @@ This repository is the development, Git-native API contract for the `ft_transcen
 - `environments/local.yml` — safe localhost defaults and blank secret session values.
 - `workspace.yml` — product rules, state machines, fixtures, privacy, and protocol boundaries.
 
-Chat-service is Channel Service; Chat Gateway is a separate socket service. PostgreSQL owns domain state, request ledgers/inboxes, read positions, and transactional outboxes. Gateways keep live socket registries in memory, and internal REST queries supply current presence. Commands and committed events travel through RabbitMQ; Channel Service publishes its own outbox events.
+Auth Service (`auth-service`) and User Service (`user-service`) are independently deployable services. Auth owns account identity, credentials, Google OAuth and sessions; User owns canonical usernames, profiles, avatars, social relationships, reports and current presence aggregation. They share an Auth-assigned `user_id` and coordinate profile provisioning and account deletion through internal REST and durable operations. See `workspace.yml`, Auth and User Service Boundary, for ownership, routing and private integration contracts.
+
+Chat-service is Channel Service; Chat Gateway is a separate socket service. Chat Gateway validates sessions with Auth, and Channel Service obtains current friendship/block verdicts from User. PostgreSQL owns each service's domain state, request ledgers/inboxes, read positions, and transactional outboxes. Gateways keep live socket registries in memory, and User's internal REST queries supply current presence. Commands and committed events travel through RabbitMQ; User and Channel Service each publish their own outbox events.
 
 API v1 room/game/chat behavior remains available; its session and own-profile responses only gain the additive `active_room_api_version` recovery field. Game v2 and Chat v2 are separate Bruno collections and use `gameApiVersion: v2` and `chatApiVersion: v2`; frontend code must not mix room protocol versions within one session.
 

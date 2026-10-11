@@ -25,6 +25,8 @@ docs:
 
     ## Response envelopes
 
+    **Service ownership:** `/api/v1/auth/*` routes to Auth Service (`auth-service`). Profile/search, avatar, friends/requests, blocking, reports and account deletion route to User Service (`user-service`). Stats owns match-history records and profile statistics; Game Session owns room membership. Every protected route validates the session through Auth, while domain authorization belongs to the owning service. Public URLs, cookie rules and response schemas are shared browser contracts, not a shared backend deployment or database. See `workspace.yml`, Auth and User Service Boundary.
+
     Every non-empty success is `{ "data": value }`. `204 No Content` has no body. Every error is `{ "error": { "code": string, "message": string, "details": object } }`; `details` is always an object and may be empty.
 
     ## Endpoint matrix

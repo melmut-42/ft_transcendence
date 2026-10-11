@@ -38,7 +38,7 @@ docs: |-
 
   ## Purpose
 
-  Mandatory authentication entry point for an existing registered account (subject Ch. III–IV). Verifies email + password and issues a new session.
+  Auth Service owns this mandatory authentication entry point for an existing registered account (subject Ch. III–IV). It verifies its email/password credentials and issues a new session for an active account. The response's canonical username/profile fields are read from User Service; Auth does not maintain a second editable profile. A missing dependency is an availability failure, not invalid credentials.
 
   ## Preconditions
 

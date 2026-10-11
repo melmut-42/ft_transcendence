@@ -5,6 +5,8 @@ info:
 docs: |-
   # Chat Gateway
 
+  Auth Service validates the socket session; User Service owns canonical profiles, social notifications, current friendship/block verdicts and presence queries. Channel Service obtains DIRECT authorization from User and ROOM authorization from Game Session. Authenticating a socket is separate from authorizing a channel operation.
+
   Live chat is an independently deployable gateway, separate from the Game Gateway. The browser connects to the same public origin at `{{chatWsUrl}}/ws/{{chatApiVersion}}/channels`; the reverse proxy routes that path directly to Chat Gateway, so chat traffic does not pass through the Web BFF or Game Gateway.
 
   Version 2 supports friend-only private `DIRECT` channels and common `ROOM` channels. Exactly one ROOM channel is created automatically when a room is created; joining does not create pairwise direct channels. Channel records, retained history, read positions, inbox/request ledgers, and the transactional outbox belong to chat-service (Channel Service). Chat Gateway authenticates the connection, associates sockets with `user_id` and `session_id`, accepts channel commands, publishes them through RabbitMQ, and fans Channel Service events out to active sockets. Channel Service's own outbox publisher publishes committed events; the Gateway does not access its PostgreSQL tables.

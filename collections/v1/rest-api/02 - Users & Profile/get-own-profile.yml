@@ -12,6 +12,8 @@ http:
 docs: |-
   # Get own profile
 
+  User Service owns this response and its username/avatar fields. It validates the session with Auth, obtains the owner's read-only email/account creation time from Auth, profile statistics/penalty points from Stats and the live room/version pair from Game Session. These fields do not transfer ownership of credentials, statistics or room state into User's database.
+
   ## Purpose and preconditions
 
   Returns the owner's account details (including the read-only login email), persistent statistics, and the current room link. Requires an active session.

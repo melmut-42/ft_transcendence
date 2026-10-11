@@ -33,12 +33,14 @@ docs: |-
 
   ## Success, state changes, and events
 
-  `204 No Content`. In one operation the server:
+  User Service validates `confirm_username` and persists a durable deletion `operation_id`. This is a coordinated workflow across service-owned databases, not one cross-service transaction. Auth first blocks new authentication and revokes all user sessions with cause `ACCOUNT_DELETED`. Required cleanup is then coordinated idempotently; `204 No Content` is returned only after it completes:
 
   1. Removes the user from any active room as a departure with reason `ACCOUNT_DELETED`. In a Game v2 room this emits `room.player.left` and rechecks staffing during `IN_GAME` (possibly `game.staffing.required`); no leave penalty is recorded. In a v1 `IN_GAME` room it applies the v1 `PLAYER_FORFEIT`.
-  2. Deletes the credentials, the Google link, the profile and avatar, every friendship, the user's DIRECT channels and their messages, and the user's penalty points.
-  3. Keeps other players' finalized match records; the deleted participant appears there as `user_id: null`, `username: "deleted_user"`.
-  4. Revokes every session and refresh-token family of the user, clears `ft_session` and `ft_refresh`, and closes every open socket of the user with `4401`.
+  2. User deletes its profile/avatar and social relationships; Channel Service deletes the user's DIRECT channels/messages and user read state; Stats clears the user's penalty points. Each service deletes only its own records.
+  3. Stats keeps other players' finalized match records; the deleted participant appears there as `user_id: null`, `username: "deleted_user"`.
+  4. Auth completes removal of its account/credentials/Google links after required cleanup. Its all-session revocation notifications close every user socket with `4401`; User's public response clears `ft_session` and `ft_refresh` on their original paths.
+
+  Game Session processes the `ACCOUNT_DELETED` departure exactly once and must not record a second logout/transport-abandonment penalty because Auth closed the sockets. The coordinator resumes from its durable progress after timeouts/restarts, even after the initiating session is revoked. See `workspace.yml`, Account Deletion.
 
   The email and username become available for new registrations. The client clears all private state and returns to Landing.
 
@@ -50,7 +52,7 @@ docs: |-
   | `422` | `CONFIRMATION_MISMATCH` | `confirm_username` is missing or differs from the current username |
   | `429` | `RATE_LIMITED` | throttled |
 
-  Every error leaves the account unchanged.
+  The authentication, confirmation and throttling errors listed above occur before deletion begins and leave the account unchanged. A timeout or dependency failure after a deletion operation begins does not imply rollback of already-completed cleanup; durable coordination continues until completion.
 examples:
   - name: Success - Account deleted
     request: {url: "{{baseUrl}}/api/{{apiVersion}}/users/me", method: DELETE, headers: [{name: Content-Type, value: application/json, enabled: true}], params: [], body: {mode: json, json: '{"confirm_username":"player_one"}'}}

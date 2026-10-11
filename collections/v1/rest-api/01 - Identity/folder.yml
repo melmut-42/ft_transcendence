@@ -5,6 +5,8 @@ info:
 docs: |-
   # Identity
 
+  This folder is owned by Auth Service (`auth-service`), independently deployed from User Service (`user-service`). Auth owns account IDs, login email/password, Google OAuth links, session cookies, refresh rotation and revocation. User owns the canonical username/profile/default avatar. Registration and first Google sign-in coordinate idempotent profile provisioning with User; the first successful session is issued only when both account and profile are ready. Later Auth responses obtain current profile fields from User rather than maintaining another editable profile. See `workspace.yml`, Auth and User Service Boundary.
+
   Registered-account identity: email + username + password (subject Ch. III–IV, mandatory). Accounts authenticate with email + password or with Google sign-in (`oauth-google-authorize.yml`, `oauth-google-callback.yml`); every identity is a registered account — there is no anonymous identity. Email is the login identifier; username is the public display name. Both are trimmed and case-insensitively unique; password is hashed + salted server-side and never returned or logged.
 
   Registration and login each issue a two-cookie session pair — a JWT access credential plus a refresh credential, both carried as cookies: `ft_session` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/`, short-lived JWT access credential) and `ft_refresh` (HttpOnly, `Secure`, `SameSite=Lax`, `Path=/api/v1/auth/refresh`, long-lived opaque refresh credential, single-use/rotated). No token value is ever returned in a JSON response body, and no authentication header or other credential path exists — every client, browser or non-browser, authenticates through these two cookies. Bruno uses its cookie jar the same way a browser does.
