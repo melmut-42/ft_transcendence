@@ -22,9 +22,11 @@ docs: |-
 
   ROOM history is additionally bounded by the requester's current room-membership epoch and its sequence-based visibility windows. Join opens the first window after the channel's current monotonic sequence; `game.ended` closes it; Back to Lobby opens another window after the then-current sequence without starting a new membership epoch; Exit, kick, or timeout closes the epoch, and a later rejoin starts a new one. Only messages whose internal sequence falls inside one of the current epoch's visibility windows are returned. This avoids timestamp/clock races, prevents pre-join disclosure, and prevents a late returner from reading lobby messages sent while they were still `POST_GAME`. `limit` defaults to 50 and accepts `1..100`; optional `before` is the opaque `next_cursor` from the previous response.
 
-  Each item contains `message_id`, `channel_id`, `sender_user_id`, `text`, `sent_at`, and `expires_at`. Expired messages are physically deleted by Channel Service and never returned. `data.next_cursor` is nullable.
+  Each item contains `message_id`, `channel_id`, `sender_user_id`, `text`, `sent_at`, `expires_at`, and `read_by`. Expired messages are physically deleted by Channel Service and never returned. `data.next_cursor` is nullable. `data.read_state` contains the requester's nullable `last_read_message_id`, nullable `read_at`, and non-negative `version`, matching the channel-list snapshot. A history GET never advances read state.
 
-  Errors: `401 UNAUTHORIZED`, `403 NOT_CHANNEL_MEMBER`, `403 CHANNEL_ACCESS_REVOKED`, `404 CHANNEL_NOT_FOUND`, and `422 VALIDATION_ERROR`. `CHANNEL_ACCESS_REVOKED` means a DIRECT friendship ended or a ROOM participant no longer has an eligible member state.
+  `read_by` is a sorted array of unique user IDs, excluding the message's sender. A user appears only if they currently have channel access, the message is visible in their current membership epoch/windows when ROOM, and their persisted read position covers the message's internal sequence. Thus an empty array means no currently eligible recipient has acknowledged reading that message. ROOM receipts never imply that a user read messages outside that user's visibility windows. The sender's own presence, socket delivery, and message storage do not add read receipts. The frontend obtains these authoritative snapshots after reconnect or a peer read event.
+
+  History and receipts remain readable with `READ_ONLY` access during a running match. Errors: `401 UNAUTHORIZED`, `403 NOT_CHANNEL_MEMBER`, `403 CHANNEL_ACCESS_REVOKED`, `404 CHANNEL_NOT_FOUND`, and `422 VALIDATION_ERROR`. `CHANNEL_ACCESS_REVOKED` means a DIRECT friendship ended or was suspended by a block, or a ROOM participant no longer has an eligible member state.
 examples:
   - name: Success - Retained history
     request: {url: "{{baseUrl}}/api/{{chatApiVersion}}/channels/7001/messages?limit=50", method: GET, headers: [], params: [{name: limit, value: "50", enabled: true}], body: {mode: none}}
@@ -33,4 +35,4 @@ examples:
       headers: [{name: Content-Type, value: application/json}]
       body:
         type: json
-        data: '{"data":{"messages":[{"message_id":"msg_001","channel_id":7001,"sender_user_id":42,"text":"gg, ready?","sent_at":"2026-09-17T10:00:00Z","expires_at":"2026-10-17T10:00:00Z"}],"next_cursor":null}}'
+        data: '{"data":{"messages":[{"message_id":"msg_001","channel_id":7001,"sender_user_id":42,"text":"gg, ready?","sent_at":"2026-09-17T10:00:00Z","expires_at":"2026-10-17T10:00:00Z","read_by":[43]}],"read_state":{"last_read_message_id":null,"read_at":null,"version":0},"next_cursor":null}}'

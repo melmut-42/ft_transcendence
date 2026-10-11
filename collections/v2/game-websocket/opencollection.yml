@@ -39,7 +39,7 @@ docs:
 
     ## Envelopes and ordering
 
-    Client messages are `{ "type", "request_id", "payload" }`. `request_id` is a client-generated unique string of `1..64` visible ASCII characters (a UUID is a good default generator, but any unique string in that length/charset is valid). The server caches the result of a request ID per session for the room lifetime; an identical retry returns the original ack/error and does not repeat mutation. Reuse with different content returns `INVALID_EVENT`. This dedup cache lives in Redis alongside other ephemeral room state (`workspace.yml`, State Ownership).
+    Client messages are `{ "type", "request_id", "payload" }`. `request_id` is a client-generated unique string of `1..64` visible ASCII characters (a UUID is a good default generator, but any unique string in that length/charset is valid). The server stores the result of a request ID per session for the room lifetime; an identical retry returns the original ack/error and does not repeat mutation. Reuse with different content returns `INVALID_EVENT`. These room-scoped results live in Game Session's PostgreSQL storage and commit atomically with their room mutation (`workspace.yml`, State Ownership).
 
     Successful commands receive `{ "type": "ack", "request_id", "ok": true, "payload": object }`. Events are `{ "type", "event_id", "room_id", "sent_at", "payload" }`. `event_id` is unique and monotonically increasing within one room stream. Timestamps are ISO 8601 UTC.
 

@@ -10,6 +10,8 @@ This repository is the development, Git-native API contract for the `ft_transcen
 - `environments/local.yml` — safe localhost defaults and blank secret session values.
 - `workspace.yml` — product rules, state machines, fixtures, privacy, and protocol boundaries.
 
+Chat-service is Channel Service; Chat Gateway is a separate socket service. PostgreSQL owns domain state, request ledgers/inboxes, read positions, and transactional outboxes. Gateways keep live socket registries in memory, and internal REST queries supply current presence. Commands and committed events travel through RabbitMQ; Channel Service publishes its own outbox events.
+
 API v1 room/game/chat behavior remains available; its session and own-profile responses only gain the additive `active_room_api_version` recovery field. Game v2 and Chat v2 are separate Bruno collections and use `gameApiVersion: v2` and `chatApiVersion: v2`; frontend code must not mix room protocol versions within one session.
 
 On application bootstrap, `GET /api/v1/auth/session` returns both `active_room_id` and `active_room_api_version`; use them together to restore the matching REST/WebSocket pair after refresh or reconnect.
@@ -22,5 +24,6 @@ On application bootstrap, `GET /api/v1/auth/session` returns both `active_room_i
 4. For the stable flow, create or join through REST v1 and connect to `{{wsUrl}}/ws/{{apiVersion}}/rooms/{{roomId}}`.
 5. For the new flow, create or join through Game REST v2, connect gameplay to `{{wsUrl}}/ws/{{gameApiVersion}}/rooms/{{roomId}}`, and connect chat to `{{chatWsUrl}}/ws/{{chatApiVersion}}/channels`.
 6. Authentication is cookie-only: `ft_session` attaches automatically on same-origin upgrades from Bruno's cookie jar. Use message examples only when their documented preconditions hold.
+7. For Chat v2 read receipts, send `chat.channel.read` only after displaying messages in an active visible conversation. Channel lists include `read_state` and `unread_count`; history includes `read_state` and `read_by`; `chat.channel.read.updated` synchronizes live clients. The read-command and read-event requests document monotonic updates, retries, and ROOM visibility boundaries.
 
 The contract can lead implementation; a failing request can mean the backend has not yet implemented the specified behavior. Bruno authenticates through its cookie jar exactly like a browser — `ft_session`/`ft_refresh` are set automatically by Register/Login/Refresh, never held in a variable or committed.
