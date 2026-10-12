@@ -149,13 +149,13 @@ docs: |-
 
   ## Room Settings
 
-  Every room has `max_players`, an integer in `4..20` with default `8`. Capacity counts every member, seated or unseated. The host sets it in Create room and may change it while the room is `WAITING` through `room.settings.update`, never below the current `player_count`. Join room and Invite friend return `409 ROOM_FULL` when `player_count` equals `max_players`.
+  Every room has `max_players`, an integer in `4..20` with default `20`. Capacity counts every member, seated or unseated. The host sets it in Create room and may change it while the room is `WAITING` through `room.settings.update`, never below the current `player_count`. Join room and Invite friend return `409 ROOM_FULL` when `player_count` equals `max_players`.
 
   Game v2 rooms also carry `turn_timer_seconds` and `language`. The host changes them through the same `room.settings.update` command under the same `WAITING`/`IN_LOBBY` preconditions; a value outside its allowed set is rejected with `INVALID_PAYLOAD`.
 
   | Setting | Allowed values | Default | Meaning |
   | --- | --- | --- | --- |
-  | `max_players` | integer `4..20`, `>= player_count` | `8` | Room capacity, unseated members included |
+  | `max_players` | integer `4..20`, `>= player_count` | `20` | Room capacity, unseated members included |
   | `turn_timer_seconds` | `null`, `60`, `90`, `120` | `null` | Per-turn time limit; `null` means no limit |
   | `language` | `en`, `tr`, `fr` | `en` | Lowercase language code selecting the board's word pack: English, Turkish, French |
 

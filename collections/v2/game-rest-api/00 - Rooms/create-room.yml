@@ -14,9 +14,7 @@ http:
   body:
     type: json
     data: |-
-      {
-        "max_players": 8
-      }
+      {}
 runtime:
   scripts:
     - type: after-response
@@ -29,6 +27,9 @@ runtime:
         test("creator is joined unseated as host", function () {
           expect(res.status).to.equal(201);
           expect(res.body.data.status).to.equal("WAITING");
+          expect(res.body.data.max_players).to.equal(20);
+          expect(res.body.data.turn_timer_seconds).to.equal(null);
+          expect(res.body.data.language).to.equal("en");
           expect(res.body.data.players[0].is_host).to.equal(true);
           expect(res.body.data.players[0].team).to.equal(null);
           expect(res.body.data.players[0].role).to.equal(null);
@@ -49,9 +50,9 @@ docs: |-
   | --- | --- | ---: | --- | --- | ---: | --- | --- |
   | `ft_session` cookie | request cookie | yes | string | active JWT access credential | no | Creating user | set by Register/Login |
   | `Accept` | header | yes | string | `application/json` | no | Requested response media type | `application/json` |
-  | `max_players` | body | no | integer | `4..20`, default `8` | no | Room capacity | `8` |
+  | `max_players` | body | no | integer | `4..20`, default `20` | no | Room capacity | `8` |
 
-  The body is optional; an empty or absent body creates a room with `max_players: 8`. The room starts with the default turn timer and language (`workspace.yml`, Room Settings); the host changes them afterwards through `room.settings.update`. Passwords and custom boards are not contract features.
+  The body is optional; an empty or absent body creates a room with `max_players: 20`. The room starts with the default turn timer and language (`workspace.yml`, Room Settings); the host changes them afterwards through `room.settings.update`. Passwords and custom boards are not contract features.
 
   ## Response fields
 
@@ -104,7 +105,7 @@ examples:
               "status": "WAITING",
               "host_user_id": 42,
               "player_count": 1,
-              "max_players": 8,
+              "max_players": 20,
               "turn_timer_seconds": null,
               "language": "en",
               "startable": false,

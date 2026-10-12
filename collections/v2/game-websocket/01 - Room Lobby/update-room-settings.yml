@@ -42,6 +42,18 @@ websocket:
               "language": "tr"
             }
           }
+    - title: Success - Host switches the word pack to French
+      selected: false
+      message:
+        type: json
+        data: |-
+          {
+            "type": "room.settings.update",
+            "request_id": "req_0009",
+            "payload": {
+              "language": "fr"
+            }
+          }
     - title: Error - Language outside the allowed set
       selected: false
       message:
@@ -97,7 +109,7 @@ docs: |-
 
   Changes the room settings: player capacity, per-turn timer, and word-pack language. Only the current host (the Room Owner) may send it, only while the room is `WAITING`, and only after that host's member state is `IN_LOBBY`. The payload carries at least one of the three fields; an omitted field keeps its current value.
 
-  A new room starts with `max_players: 8`, `turn_timer_seconds: null` and `language: "en"`. What a running turn timer does is defined in `workspace.yml`, Turn Timer.
+  A new room starts with `max_players: 20`, `turn_timer_seconds: null` and `language: "en"`. What a running turn timer does is defined in `workspace.yml`, Turn Timer.
 
   ## Message and payload parameters
 
@@ -174,7 +186,7 @@ docs: |-
         "details": {
           "field": "payload.max_players",
           "min": 5,
-          "max": 8
+          "max": 20
         }
       }
     }

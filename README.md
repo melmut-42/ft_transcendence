@@ -16,6 +16,8 @@ Chat-service is Channel Service; Chat Gateway is a separate socket service. Chat
 
 API v1 room/game/chat behavior remains available; its session and own-profile responses only gain the additive `active_room_api_version` recovery field. Game v2 and Chat v2 are separate Bruno collections and use `gameApiVersion: v2` and `chatApiVersion: v2`; frontend code must not mix room protocol versions within one session.
 
+Game v2 rooms default to a capacity of **20** (configurable from **4 to 20**) and the English word pack. Supported word-pack languages are **`en`**, **`tr`**, and **`fr`**; this room setting is separate from the application interface language.
+
 On application bootstrap, `GET /api/v1/auth/session` returns both `active_room_id` and `active_room_api_version`; use them together to restore the matching REST/WebSocket pair after refresh or reconnect.
 
 ## Local use
