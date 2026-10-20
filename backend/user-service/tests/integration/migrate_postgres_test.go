@@ -3,6 +3,7 @@ package integration_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -36,12 +37,12 @@ func queryString(t *testing.T, pool *pgxpool.Pool, sql string) string {
 // Flow:
 //
 //  1. Create an empty database and run Migrate.
-//  2. Check the users schema exists and the version table records version 1 as clean.
+//  2. Check the users schema exists and the version table records the latest version as clean.
 //  3. Run Migrate again to confirm nothing pending is not an error.
 //
 // Expected output:
 //
-//   - Both runs succeed, and the version stays 1 and not dirty.
+//   - Both runs succeed, and the version stays at the latest and not dirty.
 func TestMigrateEmptyDatabase(t *testing.T) {
 	dsn := freshDatabase(t)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -57,8 +58,8 @@ func TestMigrateEmptyDatabase(t *testing.T) {
 	if got := queryString(t, pool, "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'users'"); got != "users" {
 		t.Fatalf("schema = %q, want users", got)
 	}
-	if got := queryString(t, pool, "SELECT version::text || ' ' || dirty::text FROM users.schema_migrations"); got != "1 false" {
-		t.Fatalf("schema_migrations = %q, want \"1 false\"", got)
+	if got := queryString(t, pool, "SELECT version::text || ' ' || dirty::text FROM users.schema_migrations"); got != fmt.Sprintf("%d false", latestMigration) {
+		t.Fatalf("schema_migrations = %q, want latest version %d, clean", got, latestMigration)
 	}
 }
 
