@@ -9,6 +9,10 @@ import (
 	"testing"
 )
 
+// Board tests
+
+// Generator board tests
+
 func loadTestWordPack(t *testing.T, filename string) WordPack {
 	t.Helper()
 

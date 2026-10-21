@@ -1,5 +1,7 @@
 package game
 
+import "time"
+
 type Team string
 
 const (
@@ -8,9 +10,10 @@ const (
 )
 
 type Player struct {
-	UserID int
-	Team   Team
-	Role   Role
+	UserID   int
+	Username string
+	Team     Team
+	Role     Role
 }
 
 type CardColor string
@@ -27,15 +30,23 @@ type Role string
 const (
 	RoleSpymaster Role = "SPYMASTER"
 	RoleOperative Role = "OPERATIVE"
-	RoleSpectator Role = "SPECTATOR"
+)
+
+type GameStatus string
+
+const (
+	GameStatusInProgress GameStatus = "IN_PROGRESS"
+	GameStatusFinished   GameStatus = "GAME_FINISHED"
+	GameStatusCancelled  GameStatus = "GAME_CANCELLED"
 )
 
 type Phase string
 
 const (
-	PhaseWaitingForClue Phase = "WAITING_FOR_CLUE"
-	PhaseGuessing       Phase = "GUESSING"
-	PhaseGameOver       Phase = "GAME_OVER"
+	PhaseWaitingForClue   Phase = "WAITING_FOR_CLUE"
+	PhaseGuessing         Phase = "GUESSING"
+	PhaseGameOver         Phase = "GAME_OVER"
+	PhasePausedForPlayers Phase = "PAUSED_FOR_PLAYERS"
 )
 
 type EndReason string
@@ -43,7 +54,7 @@ type EndReason string
 const (
 	EndReasonAllTeamCardsRevealed EndReason = "ALL_TEAM_CARDS_REVEALED"
 	EndReasonAssassinRevealed     EndReason = "ASSASSIN_REVEALED"
-	EndReasonPlayerForfeit        EndReason = "PLAYER_FORFEIT"
+	EndReasonInsufficientPlayers  EndReason = "INSUFFICIENT_PLAYERS"
 )
 
 type Clue struct {
@@ -57,10 +68,11 @@ type Score struct {
 }
 
 type CurrentTurn struct {
-	Team             Team  `json:"team"`
-	Phase            Phase `json:"phase"`
-	Clue             *Clue `json:"clue"`
-	GuessesRemaining *int  `json:"guesses_remaining"`
+	Team             Team       `json:"team"`
+	Phase            Phase      `json:"phase"`
+	Clue             *Clue      `json:"clue"`
+	GuessesRemaining *int       `json:"guesses_remaining"`
+	DeadlineAt       *time.Time `json:"deadline_at"`
 }
 
 func (t CurrentTurn) Clone() CurrentTurn {
@@ -72,6 +84,10 @@ func (t CurrentTurn) Clone() CurrentTurn {
 	if t.GuessesRemaining != nil {
 		guesses := *t.GuessesRemaining
 		copied.GuessesRemaining = &guesses
+	}
+	if t.DeadlineAt != nil {
+		deadline := *t.DeadlineAt
+		copied.DeadlineAt = &deadline
 	}
 	return copied
 }
@@ -103,6 +119,7 @@ const (
 	ChangeReasonGuessesExhausted     ChangeReason = "GUESSES_EXHAUSTED"
 	ChangeReasonOpponentCardRevealed ChangeReason = "OPPONENT_CARD_REVEALED"
 	ChangeReasonNeutralCardRevealed  ChangeReason = "NEUTRAL_CARD_REVEALED"
+	ChangeReasonTurnTimerExpired     ChangeReason = "TURN_TIMER_EXPIRED"
 )
 
 type GuessResult struct {
@@ -115,6 +132,7 @@ type GuessResult struct {
 	ChangeReason   *ChangeReason `json:"-"`
 	Winner         *Team         `json:"winner"`
 	EndReason      *EndReason    `json:"end_reason"`
+	FinishedAt     *time.Time    `json:"-"`
 }
 
 type PassResult struct {

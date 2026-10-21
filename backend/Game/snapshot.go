@@ -1,30 +1,34 @@
 package game
 
-//game paketi kartlar, başlangıç takımı, sıra, skor ve oyun sonucu gibi oyun bilgilerini üretir. room tarafı üyeler, host, oda ayarları, countdown ve kullanıcıya hangi oyunun gösterileceğiyle ilgilenir.
+import "time"
 
 type GameSnapshot struct {
-	GameID       int         `json:"game_id"`
-	StartingTeam Team        `json:"starting_team"`
-	CurrentTurn  CurrentTurn `json:"current_turn"`
-	Score        Score       `json:"score"`
-	Board        []CardView  `json:"board"`
-	Winner       *Team       `json:"winner"`
-	EndReason    *EndReason  `json:"end_reason"`
+	GameID       int            `json:"game_id"`
+	StartingTeam Team           `json:"starting_team"`
+	CurrentTurn  CurrentTurn    `json:"current_turn"`
+	Score        Score          `json:"score"`
+	Board        []CardView     `json:"board"`
+	Winner       *Team          `json:"winner"`
+	EndReason    *EndReason     `json:"end_reason"`
+	Status       GameStatus     `json:"status"`
+	StartedAt    time.Time      `json:"started_at"`
+	FinishedAt   *time.Time     `json:"finished_at"`
+	History      []HistoryEntry `json:"history"`
 }
 
-func cardViewForRole(card card, role Role) (CardView, error) {
-	if role != RoleOperative && role != RoleSpymaster && role != RoleSpectator {
+func cardViewForRole(card card, role *Role) (CardView, error) {
+	if role != nil && *role != RoleOperative && *role != RoleSpymaster {
 		return CardView{}, ErrInvalidRole
 	}
 	view := newCardView(card)
-	if role == RoleSpymaster {
+	if role != nil && *role == RoleSpymaster {
 		view.Color = &card.color
 	}
 	return view, nil
 }
 
-func (b *Board) boardViewForRole(role Role) ([]CardView, error) {
-	if role != RoleOperative && role != RoleSpymaster && role != RoleSpectator {
+func (b *Board) boardViewForRole(role *Role) ([]CardView, error) {
+	if role != nil && *role != RoleOperative && *role != RoleSpymaster {
 		return nil, ErrInvalidRole
 	}
 	views := make([]CardView, len(b.cards))
@@ -38,23 +42,26 @@ func (b *Board) boardViewForRole(role Role) ([]CardView, error) {
 	return views, nil
 }
 
-func (g *Game)SnapshotForRole(role Role) (GameSnapshot, error) {
-	if role != RoleOperative && role != RoleSpymaster && role != RoleSpectator {
+func (g *Game) SnapshotForRole(role *Role) (GameSnapshot, error) {
+	if role != nil && *role != RoleOperative && *role != RoleSpymaster {
 		return GameSnapshot{}, ErrInvalidRole
 	}
 	view, err := g.board.boardViewForRole(role)
 	if err != nil {
 		return GameSnapshot{}, err
 	}
-	winner, endReason := g.cloneGameResult()
+	winner, endReason, finishedAt := g.cloneGameResult()
 	return GameSnapshot{
-		GameID: g.GameID,
+		GameID:       g.GameID,
 		StartingTeam: g.board.startingTeam,
-		CurrentTurn: g.currentTurn.Clone(),
-		Score: g.Score(),
-		Board: view,
-		Winner: winner,
-		EndReason: endReason,
+		CurrentTurn:  g.currentTurn.Clone(),
+		Score:        g.Score(),
+		Board:        view,
+		Winner:       winner,
+		EndReason:    endReason,
+		Status:       g.Status(),
+		StartedAt:    g.startedAt,
+		FinishedAt:   finishedAt,
+		History:      g.cloneHistory(),
 	}, nil
 }
-
