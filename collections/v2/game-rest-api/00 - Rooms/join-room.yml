@@ -14,7 +14,7 @@ docs: |-
 
   ## Purpose and preconditions
 
-  Adds the authenticated user to a room in `WAITING` or `COUNTDOWN`, or in `IN_GAME` while the game is `PAUSED_FOR_PLAYERS`. The user must have no active room and capacity must remain. No body is accepted. Every join starts unseated: `team:null`, `role:null`, `ready:false`; state is `IN_LOBBY` before play and `IN_GAME` during play.
+  Adds the authenticated user to a room in `WAITING`, or in `IN_GAME` while the game is `PAUSED_FOR_PLAYERS`. The user must have no active room and capacity must remain. No body is accepted. Every join starts unseated: `team:null`, `role:null`, `ready:false`; state is `IN_LOBBY` before play and `IN_GAME` during play.
 
   ## Request parameters
 
@@ -26,13 +26,13 @@ docs: |-
 
   ## Response fields
 
-  `201 Created` returns `{data: room_snapshot}`. `player_count` increments atomically. A join never changes staffing or the board/turn. During `COUNTDOWN` it cancels the countdown with reason `PLAYER_JOINED`, because the start predicate needs every member seated and ready.
+  `201 Created` returns `{data: room_snapshot}`. `player_count` increments atomically. A join never changes staffing or the board/turn. A room in `COUNTDOWN` rejects joins with `ROOM_NOT_JOINABLE`; the countdown is never cancelled by a newcomer.
 
   | Field | Type | Required | Nullable | Allowed values | Description |
   | --- | --- | ---: | ---: | --- | --- |
   | `data.room_id` | integer | yes | no | positive | Joined room |
   | `data.room_code` | string | yes | no | `^[A-Z0-9]{6}$` | Human-shareable code for the joined room |
-  | `data.status` | string enum | yes | no | `WAITING`, `COUNTDOWN`, `IN_GAME` | Joinable lifecycle state |
+  | `data.status` | string enum | yes | no | `WAITING`, `IN_GAME` | Joinable lifecycle state |
   | `data.host_user_id` | integer or null | yes | yes | member ID or `null` | Current host; an empty-room joiner becomes host |
   | `data.player_count` | integer | yes | no | `>= 1` | Count after join; may be one when reviving an empty room |
   | `data.max_players` | integer | yes | no | `4..20` | Room capacity; every member counts |
@@ -62,7 +62,7 @@ docs: |-
   | --- | --- | --- | --- |
   | `401` | `UNAUTHORIZED` | invalid session | none |
   | `404` | `ROOM_NOT_FOUND` | room ID absent | none |
-  | `409` | `ROOM_NOT_JOINABLE` | state is `POST_GAME` or `CLOSED`; `IN_GAME` with a running (not `PAUSED_FOR_PLAYERS`) game; or shared state is `WAITING` but post-game members remain | none |
+  | `409` | `ROOM_NOT_JOINABLE` | state is `COUNTDOWN`, `POST_GAME` or `CLOSED`; `IN_GAME` with a running (not `PAUSED_FOR_PLAYERS`) game; or shared state is `WAITING` but post-game members remain | none |
   | `409` | `ROOM_FULL` | `player_count` already equals `max_players` | none |
   | `409` | `ALREADY_IN_ROOM` | user already has active room, including this one | none |
   | `422` | `VALIDATION_ERROR` | room ID is not positive integer | none |

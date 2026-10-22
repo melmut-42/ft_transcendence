@@ -59,7 +59,7 @@ docs:
     | `game.card.guess` | C to S | `IN_GAME / GUESSING` | active Operative | reveal one card |
     | `game.turn.pass` | C to S | `IN_GAME / GUESSING` | active Operative | end team turn |
     | `room.state` | S to C | any non-closed state | recipient projection | full room snapshot |
-    | `room.player.joined` | S to C | `WAITING`, `COUNTDOWN`, paused `IN_GAME` | server | unseated membership added |
+    | `room.player.joined` | S to C | `WAITING`, paused `IN_GAME` | server | unseated membership added |
     | `room.player.left` | S to C | any non-closed state | server | exit, logout, disconnect, kick, account deletion, or timeout; may include host transfer |
     | `room.settings.updated` | S to C | `WAITING` | server | full current settings after a host change |
     | `room.player.returned_to_lobby` | S to C | `POST_GAME` or `WAITING` | server | one member moved from `POST_GAME` to `IN_LOBBY` |
