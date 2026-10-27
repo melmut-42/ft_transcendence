@@ -41,9 +41,9 @@ func TestNewBoardWithRealWordPackSameSeed(t *testing.T) {
 		t.Fatalf("NewBoard returned an error: %v", err)
 	}
 
-	cards := board.Cards()
+	cards := board.cards
 
-	t.Logf("BOARD1\nStarting team: %v", board.StartingTeam())
+	t.Logf("BOARD1\nStarting team: %v", board.startingTeam)
 	for _, card := range cards {
 		t.Logf(
 			"CardID: %2d | Word: %-15s | Color: %-7v | Revealed: %t",
@@ -63,9 +63,9 @@ func TestNewBoardWithRealWordPackSameSeed(t *testing.T) {
 		t.Fatalf("NewBoard returned an error: %v", err)
 	}
 
-	cards = board2.Cards()
+	cards = board2.cards
 
-	t.Logf("BOARD2\nStarting team: %v", board2.StartingTeam())
+	t.Logf("BOARD2\nStarting team: %v", board2.startingTeam)
 	for _, card := range cards {
 		t.Logf(
 			"CardID: %2d | Word: %-15s | Color: %-7v | Revealed: %t",
@@ -94,7 +94,7 @@ func TestNewBoardWithDiffVariants(t *testing.T) {
 			t.Fatalf("seed %d: NewBoard returned an error: %v", testseed, err)
 		}
 
-		cards := board.Cards()
+		cards := board.cards
 
 		if len(cards) != BoardSize {
 			t.Fatalf("seed %d: expected %d cards, got %d", testseed, BoardSize, len(cards))
@@ -125,8 +125,8 @@ func TestNewBoardWithDiffVariants(t *testing.T) {
 			seen[card.word] = struct{}{}
 		}
 
-		if (board.StartingTeam() == TeamRed && (counts[CardColorRed] != StartTeamCardsSize || counts[CardColorBlue] != OtherTeamCardsSize)) ||
-			(board.StartingTeam() == TeamBlue && (counts[CardColorBlue] != StartTeamCardsSize || counts[CardColorRed] != OtherTeamCardsSize)) ||
+		if (board.startingTeam == TeamRed && (counts[CardColorRed] != StartTeamCardsSize || counts[CardColorBlue] != OtherTeamCardsSize)) ||
+			(board.startingTeam == TeamBlue && (counts[CardColorBlue] != StartTeamCardsSize || counts[CardColorRed] != OtherTeamCardsSize)) ||
 			counts[CardColorNeutral] != NeutralCardsSize || counts[CardColorAssassin] != AssassinCardsSize {
 			t.Fatalf("seed %d: unexpected card distribution", testseed)
 		}
@@ -197,7 +197,7 @@ func TestNewBoardSkipsDuplicateTexts(t *testing.T) {
 			t.Fatalf("seed %d: unexpected error: %v", testseed, err)
 		}
 
-		cards := board.Cards()
+		cards := board.cards
 		if len(cards) != BoardSize {
 			t.Fatalf("seed %d: expected %d cards, got %d", testseed, BoardSize, len(cards))
 		}
@@ -248,7 +248,7 @@ func TestCardIDDoesNotRevealColors(t *testing.T) {
 		if err != nil {
 			t.Fatalf("seed %d: NewBoard returned an error: %v", testSeed, err)
 		}
-		for _, card := range board.Cards() {
+		for _, card := range board.cards {
 			if colorsByCardID[card.cardID] == nil {
 				colorsByCardID[card.cardID] = make(map[CardColor]struct{})
 			}

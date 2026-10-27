@@ -8,20 +8,32 @@ import (
 )
 
 type Game struct {
-	GameID           int
-	board            *Board
-	currentTurn      CurrentTurn
-	winner           *Team
-	endReason        *EndReason
-	phaseBeforePause *Phase
-	turnTimer        *time.Duration
-	remainingOnPause *time.Duration
-	startedAt        time.Time
-	finishedAt       *time.Time
-	history          []HistoryEntry
+	gameID               int64
+	board                *Board
+	currentTurn          CurrentTurn
+	winner               *Team
+	endReason            *EndReason
+	phaseBeforePause     *Phase
+	turnTimer            *time.Duration
+	remainingOnPause     *time.Duration
+	startedAt            time.Time
+	finishedAt           *time.Time
+	history              []HistoryEntry
+	staffingTimeout      time.Duration
+	redMissing           []Role
+	blueMissing          []Role
+	redStaffingDeadline  *time.Time
+	blueStaffingDeadline *time.Time
 }
 
-func NewSecureSeed() ([32]byte, error) {
+type GameSettings struct {
+	Language        string
+	TurnTimer       *time.Duration
+	StaffingTimeout time.Duration
+	GameID          int64
+}
+
+func newSecureSeed() ([32]byte, error) {
 	var seed [32]byte
 	_, err := cryptorand.Read(seed[:])
 	if err != nil {
@@ -30,79 +42,73 @@ func NewSecureSeed() ([32]byte, error) {
 	return seed, nil
 }
 
-func NewGameWithSeed(wordPool []Word, language string, seed [32]byte, turnTimer *time.Duration, now time.Time) (*Game, error) {
-	if turnTimer != nil && *turnTimer <= 0 {
-		return nil, fmt.Errorf("%w: turn timer must be positive", ErrInvalidArgument)
+func validateSettings(settings GameSettings) error {
+	if settings.TurnTimer != nil && *settings.TurnTimer <= 0 {
+		return fmt.Errorf("%w: turn timer must be positive", ErrInvalidArgument)
 	}
-
-	r := rand.New(rand.NewChaCha8(seed))
-
-	board, err := NewBoard(wordPool, language, r)
-	if err != nil {
-		return nil, err
+	if settings.StaffingTimeout <= 0 {
+		return fmt.Errorf("%w: staffing timeout must be positive", ErrInvalidArgument)
 	}
+	if settings.GameID <= 0 {
+		return fmt.Errorf("%w: game ID must be positive", ErrInvalidArgument)
+	}
+	return nil
+}
+
+func newGameFromBoard(board *Board, settings GameSettings, now time.Time) *Game {
 	game := &Game{
-		GameID: 0,
+		gameID: settings.GameID,
 		board:  board,
 		currentTurn: CurrentTurn{
-			Team:             board.StartingTeam(),
-			Phase:            PhaseWaitingForClue,
-			Clue:             nil,
-			GuessesRemaining: nil,
+			Team:  board.startingTeam,
+			Phase: PhaseWaitingForClue,
 		},
-		winner:    nil,
-		endReason: nil,
-	}
-	if turnTimer != nil {
-		timer := *turnTimer
-		game.turnTimer = &timer
+		turnTimer:       copyPtr(settings.TurnTimer),
+		staffingTimeout: settings.StaffingTimeout,
+		redMissing:      []Role{},
+		blueMissing:     []Role{},
+		startedAt:       now,
 	}
 	game.startTurnTimer(now)
-	game.startedAt = now
 
-	startingTeam := board.StartingTeam()
+	startingTeam := board.startingTeam
 	game.addHistory(HistoryEntry{
 		Type: HistoryGameStarted,
 		Team: &startingTeam,
 	}, now)
-
-	return game, nil
+	return game
 }
 
-func NewGame(wordPool []Word, language string, turnTimer *time.Duration, now time.Time) (*Game, error) {
-	seed, err := NewSecureSeed()
+func NewGameWithSeed(wordPool []Word, settings GameSettings, seed [32]byte, now time.Time) (*Game, error) {
+	if err := validateSettings(settings); err != nil {
+		return nil, err
+	}
+	r := rand.New(rand.NewChaCha8(seed))
+	board, err := NewBoard(wordPool, settings.Language, r)
+	if err != nil {
+		return nil, err
+	}
+	return newGameFromBoard(board, settings, now), nil
+}
+
+func NewGame(wordPool []Word, settings GameSettings, now time.Time) (*Game, error) {
+	seed, err := newSecureSeed()
 	if err != nil {
 		return nil, err
 	}
 
-	return NewGameWithSeed(wordPool, language, seed, turnTimer, now)
+	return NewGameWithSeed(wordPool, settings, seed, now)
 }
 
 func (g *Game) cloneGameResult() (*Team, *EndReason, *time.Time) {
-	var winner *Team
-	if g.winner != nil {
-		winnerCopy := *g.winner
-		winner = &winnerCopy
-	}
-
-	var endReason *EndReason
-	if g.endReason != nil {
-		endReasonCopy := *g.endReason
-		endReason = &endReasonCopy
-	}
-	var finishedAt *time.Time
-	if g.finishedAt != nil {
-		finishedAtCopy := *g.finishedAt
-		finishedAt = &finishedAtCopy
-	}
-	return winner, endReason, finishedAt
+	return copyPtr(g.winner), copyPtr(g.endReason), copyPtr(g.finishedAt)
 }
 
 func (g *Game) Score() Score {
 	redScore := 0
 	blueScore := 0
 
-	for _, card := range g.board.Cards() {
+	for _, card := range g.board.cards {
 		if !card.revealed {
 			continue
 		}
@@ -134,37 +140,36 @@ func (g *Game) GiveClue(player *Player, clue *Clue, now time.Time) (CurrentTurn,
 	g.currentTurn.Phase = PhaseGuessing
 	g.currentTurn.GuessesRemaining = &guesses
 
-	team := player.Team
-	userID := player.UserID
-	username := player.Username
-	clueCopy := cleaned
 	g.addHistory(HistoryEntry{
 		Type:     HistoryClueGiven,
-		Team:     &team,
-		UserID:   &userID,
-		Username: &username,
-		Clue:     &clueCopy,
+		Team:     copyPtr(&player.Team),
+		UserID:   copyPtr(&player.UserID),
+		Username: copyPtr(&player.Username),
+		Clue:     copyPtr(&cleaned),
 	}, now)
 
-	return g.currentTurn.Clone(), nil
+	return g.currentTurn.clone(), nil
 }
 
-func (g *Game) finish(winner Team, reason EndReason, now time.Time) {
+func (g *Game) finish(winner *Team, reason EndReason, now time.Time) {
 	g.currentTurn.Phase = PhaseGameOver
 	g.currentTurn.Clue = nil
 	g.currentTurn.GuessesRemaining = nil
 	g.currentTurn.DeadlineAt = nil
-	g.winner = &winner
+	g.winner = copyPtr(winner)
 	g.endReason = &reason
 	g.finishedAt = &now
 
-	winnerTeam := winner
 	reasonText := string(reason)
 	g.addHistory(HistoryEntry{
 		Type:   HistoryGameEnded,
-		Team:   &winnerTeam,
+		Team:   copyPtr(winner),
 		Reason: &reasonText,
 	}, now)
+}
+
+func (g *Game) GameID() int64 {
+	return g.gameID
 }
 
 func (g *Game) Status() GameStatus {

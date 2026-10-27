@@ -7,21 +7,6 @@ import (
 
 const staffingTimeout = 120 * time.Second
 
-type TeamStaffing struct {
-	MissingRoles []game.Role `json:"missing_roles"`
-	DeadlineAt   *time.Time  `json:"deadline_at"`
-}
-
-type StaffingView struct {
-	Red  TeamStaffing `json:"red"`
-	Blue TeamStaffing `json:"blue"`
-}
-
-type StaffingDeadlines struct {
-	Red  *time.Time `gorm:"column:red_staffing_deadline_at"`
-	Blue *time.Time `gorm:"column:blue_staffing_deadline_at"`
-}
-
 func missingRoles(members []RoomMember, team game.Team) []game.Role {
 	hasSpymaster := false
 	hasOperative := false
@@ -49,32 +34,8 @@ func missingRoles(members []RoomMember, team game.Team) []game.Role {
 	return missing
 }
 
-func nextDeadline(missing []game.Role, current *time.Time, now time.Time) *time.Time {
-	if len(missing) == 0 {
-		return nil
-	}
-	if current != nil {
-		return current
-	}
-	deadline := now.Add(staffingTimeout)
-	return &deadline
-}
-
-func UpdateStaffing(members []RoomMember, deadlines *StaffingDeadlines, now time.Time) StaffingView {
+func sendTeamStatusToGame(currentGame *game.Game, members []RoomMember, departed *game.Player, now time.Time) error {
 	redMissing := missingRoles(members, game.TeamRed)
 	blueMissing := missingRoles(members, game.TeamBlue)
-
-	deadlines.Red = nextDeadline(redMissing, deadlines.Red, now)
-	deadlines.Blue = nextDeadline(blueMissing, deadlines.Blue, now)
-
-	return StaffingView{
-		Red: TeamStaffing{
-			MissingRoles: redMissing,
-			DeadlineAt:   deadlines.Red,
-		},
-		Blue: TeamStaffing{
-			MissingRoles: blueMissing,
-			DeadlineAt:   deadlines.Blue,
-		},
-	}
+	return currentGame.UpdateStaffing(redMissing, blueMissing, departed, now)
 }

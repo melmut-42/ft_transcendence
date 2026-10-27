@@ -1,14 +1,13 @@
 package game
 
 import (
-	"fmt"
 	"time"
 )
 
 func handleTeamCard(g *Game, cardTeam Team, now time.Time) *ChangeReason {
-	target := 8
+	target := OtherTeamCardsSize
 	if g.board.startingTeam == cardTeam {
-		target = 9
+		target = StartTeamCardsSize
 	}
 	score := g.Score()
 	revealed := score.Red
@@ -16,7 +15,7 @@ func handleTeamCard(g *Game, cardTeam Team, now time.Time) *ChangeReason {
 		revealed = score.Blue
 	}
 	if revealed >= target {
-		g.finish(cardTeam, EndReasonAllTeamCardsRevealed, now)
+		g.finish(&cardTeam, EndReasonAllTeamCardsRevealed, now)
 		return nil
 	}
 	if g.currentTurn.Team != cardTeam {
@@ -40,11 +39,12 @@ func opposite(t Team) Team {
 	return TeamRed
 }
 
-func handleCardColor(g *Game, card *card, now time.Time) *ChangeReason {
+func handleCardColor(g *Game, color CardColor, now time.Time) *ChangeReason {
 	activeTeam := g.currentTurn.Team
-	switch card.color {
+	switch color {
 	case CardColorAssassin:
-		g.finish(opposite(activeTeam), EndReasonAssassinRevealed, now)
+		winner := opposite(activeTeam)
+		g.finish(&winner, EndReasonAssassinRevealed, now)
 	case CardColorNeutral:
 		reason := ChangeReasonNeutralCardRevealed
 		g.switchTurn(reason, now)
@@ -61,39 +61,30 @@ func (g *Game) GuessCard(player *Player, cardID int, now time.Time) (GuessResult
 	if err := validateTurnAction(g, player, PhaseGuessing, RoleOperative, now); err != nil {
 		return GuessResult{}, err
 	}
-	if *g.currentTurn.GuessesRemaining <= 0 {
-		return GuessResult{}, fmt.Errorf("%w: no guesses remaining", ErrNoGuessesRemaining)
-	}
 	card, err := g.board.reveal(cardID)
 	if err != nil {
 		return GuessResult{}, err
 	}
-	team := player.Team
-	userID := player.UserID
-	username := player.Username
-	revealedID := card.cardID
-	word := card.word
-	color := card.color
 	g.addHistory(HistoryEntry{
 		Type:     HistoryCardRevealed,
-		Team:     &team,
-		UserID:   &userID,
-		Username: &username,
-		CardID:   &revealedID,
-		Word:     &word,
-		Color:    &color,
+		Team:     copyPtr(&player.Team),
+		UserID:   copyPtr(&player.UserID),
+		Username: copyPtr(&player.Username),
+		CardID:   copyPtr(&card.cardID),
+		Word:     copyPtr(&card.word),
+		Color:    copyPtr(&card.color),
 	}, now)
 
-	changeReason := handleCardColor(g, &card, now)
+	changeReason := handleCardColor(g, card.color, now)
 	winner, endReason, finishedAt := g.cloneGameResult()
 
 	return GuessResult{
-		GameID:         g.GameID,
+		GameID:         g.gameID,
 		Card:           newCardView(card),
 		GuessingTeam:   player.Team,
 		IsCorrectGuess: (player.Team == TeamRed && card.color == CardColorRed) || (player.Team == TeamBlue && card.color == CardColorBlue),
 		Score:          g.Score(),
-		CurrentTurn:    g.currentTurn.Clone(),
+		CurrentTurn:    g.currentTurn.clone(),
 		ChangeReason:   changeReason,
 		Winner:         winner,
 		EndReason:      endReason,

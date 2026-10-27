@@ -22,17 +22,6 @@ type Board struct {
 	startingTeam Team
 }
 
-func (b *Board) StartingTeam() Team {
-	return b.startingTeam
-}
-
-func (b *Board) Cards() []card {
-	cards := make([]card, BoardSize)
-	copy(cards, b.cards[:])
-
-	return cards
-}
-
 func NewBoard(wordPool []Word, language string, r *rand.Rand) (*Board, error) {
 	if r == nil {
 		return nil, ErrNilRandomSource

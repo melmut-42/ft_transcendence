@@ -31,7 +31,7 @@ func TestNewGameTurnTimer(t *testing.T) {
 	wordPack := loadTestWordPack(t, "wordpack.json")
 	seed := [32]byte{42}
 
-	game, err := NewGameWithSeed(wordPack.Words, "en", seed, nil, testNow)
+	game, err := NewGameWithSeed(wordPack.Words, testSettings, seed, testNow)
 	if err != nil {
 		t.Fatalf("NewGameWithSeed without timer: %v", err)
 	}
@@ -40,7 +40,9 @@ func TestNewGameTurnTimer(t *testing.T) {
 	}
 
 	timer := testTimer
-	game, err = NewGameWithSeed(wordPack.Words, "en", seed, &timer, testNow)
+	timedSettings := testSettings
+	timedSettings.TurnTimer = &timer
+	game, err = NewGameWithSeed(wordPack.Words, timedSettings, seed, testNow)
 	if err != nil {
 		t.Fatalf("NewGameWithSeed with timer: %v", err)
 	}
@@ -50,7 +52,9 @@ func TestNewGameTurnTimer(t *testing.T) {
 	}
 
 	zero := time.Duration(0)
-	if _, err := NewGameWithSeed(wordPack.Words, "en", seed, &zero, testNow); !errors.Is(err, ErrInvalidArgument) {
+	zeroTimerSettings := testSettings
+	zeroTimerSettings.TurnTimer = &zero
+	if _, err := NewGameWithSeed(wordPack.Words, zeroTimerSettings, seed, testNow); !errors.Is(err, ErrInvalidArgument) {
 		t.Fatalf("expected ErrInvalidArgument for zero timer, got %v", err)
 	}
 }
@@ -158,9 +162,7 @@ func TestCommandAfterDeadlineIsRejected(t *testing.T) {
 func TestPauseKeepsRemainingTime(t *testing.T) {
 	game := newTimedTestGame()
 
-	if err := game.PauseForPlayers(Player{UserID: 1, Username: "player_one", Team: TeamRed, Role: RoleSpymaster}, testNow.Add(20*time.Second)); err != nil {
-		t.Fatalf("PauseForPlayers: %v", err)
-	}
+	game.pauseForPlayers(Player{UserID: 1, Username: "player_one", Team: TeamRed, Role: RoleSpymaster}, testNow.Add(20*time.Second))
 	if game.currentTurn.DeadlineAt != nil {
 		t.Fatalf("deadline must be nil while paused, got %v", game.currentTurn.DeadlineAt)
 	}
@@ -173,9 +175,7 @@ func TestPauseKeepsRemainingTime(t *testing.T) {
 	}
 
 	resumeAt := testNow.Add(5 * time.Minute)
-	if err := game.ResumeAfterPlayersRestored(resumeAt); err != nil {
-		t.Fatalf("ResumeAfterPlayersRestored: %v", err)
-	}
+	game.resumeAfterPlayersRestored(resumeAt)
 	checkDeadline(t, game.currentTurn, resumeAt.Add(40*time.Second))
 	if game.remainingOnPause != nil {
 		t.Fatal("remaining time must be cleared after resume")
@@ -198,10 +198,8 @@ func TestGameOverClearsDeadline(t *testing.T) {
 	}
 
 	game = newTimedTestGame()
-	if err := game.PauseForPlayers(Player{UserID: 1, Username: "player_one", Team: TeamRed, Role: RoleSpymaster}, testNow); err != nil {
-		t.Fatalf("PauseForPlayers: %v", err)
-	}
-	if err := game.CancelForInsufficientPlayers(testNow); err != nil {
+	game.pauseForPlayers(Player{UserID: 1, Username: "player_one", Team: TeamRed, Role: RoleSpymaster}, testNow)
+	if err := game.cancelForInsufficientPlayers(testNow); err != nil {
 		t.Fatalf("CancelForInsufficientPlayers: %v", err)
 	}
 	if game.currentTurn.DeadlineAt != nil || game.remainingOnPause != nil {

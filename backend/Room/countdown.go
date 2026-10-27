@@ -11,17 +11,10 @@ type CountdownView struct {
 
 const countdownDuration = 3 * time.Second
 
-func (r *Room) startCountDown(members []RoomMember, now time.Time) error {
-	if r.Status != StatusWaiting {
-		return ErrInvalidRoomState
-	}
-	if !r.IsStartableRoom(members) {
-		return ErrRoomNotStartable
-	}
+func (r *Room) startCountDown(now time.Time) {
 	endsAt := now.Add(countdownDuration)
 	r.CountdownEndsAt = &endsAt
 	r.Status = StatusCountDown
-	return nil
 }
 
 func (r *Room) Countdown(now time.Time) *CountdownView {

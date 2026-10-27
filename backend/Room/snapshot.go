@@ -6,10 +6,10 @@ import (
 )
 
 type RoomSnapshot struct {
-	RoomID           int                `json:"room_id"`
+	RoomID           int64              `json:"room_id"`
 	RoomCode         string             `json:"room_code"`
 	Status           Status             `json:"status"`
-	HostUserID       *int               `json:"host_user_id"`
+	HostUserID       *int64             `json:"host_user_id"`
 	PlayerCount      int                `json:"player_count"`
 	MaxPlayers       int                `json:"max_players"`
 	TurnTimerSeconds *TurnTimer         `json:"turn_timer_seconds"`
@@ -26,7 +26,7 @@ type RoomSnapshot struct {
 }
 
 type RoomMemberView struct {
-	UserID    int        `json:"user_id"`
+	UserID    int64      `json:"user_id"`
 	Username  string     `json:"username"`
 	AvatarURL string     `json:"avatar_url"`
 	Team      *game.Team `json:"team"`
@@ -37,23 +37,18 @@ type RoomMemberView struct {
 	JoinedAt  time.Time  `json:"joined_at"`
 }
 
-func newRoomMemberView(member RoomMember, username, avatarURL string, hostUserID *int) RoomMemberView {
-	var team *game.Team
-	if member.Team != nil {
-		teamCopy := *member.Team
-		team = &teamCopy
-	}
-	var role *game.Role
-	if member.Role != nil {
-		roleCopy := *member.Role
-		role = &roleCopy
-	}
+type Profile struct {
+	Username  string
+	AvatarURL string
+}
+
+func newRoomMemberView(member RoomMember, username, avatarURL string, hostUserID *int64) RoomMemberView {
 	return RoomMemberView{
 		UserID:    member.UserID,
 		Username:  username,
 		AvatarURL: avatarURL,
-		Team:      team,
-		Role:      role,
+		Team:      copyPtr(member.Team),
+		Role:      copyPtr(member.Role),
 		Ready:     member.Ready,
 		State:     member.State,
 		IsHost:    hostUserID != nil && member.UserID == *hostUserID,
@@ -61,161 +56,78 @@ func newRoomMemberView(member RoomMember, username, avatarURL string, hostUserID
 	}
 }
 
-func teamCheck(members []RoomMember) bool {
-	redSpymasters := 0
-	blueSpymasters := 0
-	redOperatives := 0
-	blueOperatives := 0
-
-	for _, player := range members {
-		if *player.Role == game.RoleSpymaster && *player.Team == game.TeamRed {
-			redSpymasters++
-		}
-		if *player.Role == game.RoleOperative && *player.Team == game.TeamRed {
-			redOperatives++
-		}
-		if *player.Role == game.RoleSpymaster && *player.Team == game.TeamBlue {
-			blueSpymasters++
-		}
-		if *player.Role == game.RoleOperative && *player.Team == game.TeamBlue {
-			blueOperatives++
-		}
-	}
-	if redSpymasters != 1 || redOperatives < 1 ||
-		blueSpymasters != 1 || blueOperatives < 1 {
-		return false
-	}
-	return true
-}
-
-func (r *Room) IsStartableRoom(members []RoomMember) bool {
-	if r.Status != StatusWaiting && r.Status != StatusCountDown {
-		return false
-	}
-	if len(members) < 4 {
-		return false
-	}
-	for _, player := range members {
-		if player.Team == nil ||
-			(*player.Team != game.TeamBlue && *player.Team != game.TeamRed) {
-			return false
-		}
-		if player.Role == nil ||
-			(*player.Role != game.RoleSpymaster && *player.Role != game.RoleOperative) {
-			return false
-		}
-		if !player.Ready || player.State != StateInLobby {
-			return false
-		}
-	}
-	return teamCheck(members)
-}
-
-func (r *Room) SnapshotForRoom(
-	members []RoomMember,
-	currentGame *game.Game,
-	userID int,
-	countdown *CountdownView,
-	lastGame *LastGameView,
-	profiles map[int]RoomMemberView,
-) (RoomSnapshot, error) {
-	if r.Status == StatusClosed {
-		return RoomSnapshot{}, ErrRoomNotFound
-	}
-
-	var player *RoomMember
-	for i := range members {
-		if members[i].UserID == userID &&
-			members[i].RoomID == r.RoomID {
-			player = &members[i]
-			break
-		}
-	}
-	if player == nil {
-		return RoomSnapshot{}, ErrNotRoomMember
-	}
-
-	roomMembers := make([]RoomMember, 0, len(members))
-	for _, member := range members {
-		if member.RoomID == r.RoomID {
-			roomMembers = append(roomMembers, member)
-		}
-	}
-
-	for i := 1; i < len(roomMembers); i++ {
-		member := roomMembers[i]
-		j := i
-		for j > 0 && (member.JoinedAt.Before(roomMembers[j-1].JoinedAt) ||
-			(member.JoinedAt.Equal(roomMembers[j-1].JoinedAt) && member.UserID < roomMembers[j-1].UserID)) {
-			roomMembers[j] = roomMembers[j-1]
-			j--
-		}
-		roomMembers[j] = member
-	}
-
-	players := make([]RoomMemberView, 0, len(roomMembers))
-	for _, member := range roomMembers {
-		profile, ok := profiles[member.UserID]
-		if !ok {
-			return RoomSnapshot{}, ErrInvalidRoomState
-		}
-		players = append(players, newRoomMemberView(member, profile.Username, profile.AvatarURL, r.HostUserID))
-	}
-
-	var gameView *game.GameSnapshot
-	var lastGameView *LastGameView
+func gameDataFor(player *RoomMember, currentGame *game.Game, lastGame *LastGameView) (*game.GameSnapshot, *LastGameView, error) {
 	switch player.State {
 	case StateInGame, StatePostGame:
 		if currentGame == nil {
-			return RoomSnapshot{}, ErrInvalidRoomState
+			return nil, nil, ErrGameNotFound
 		}
 		if err := currentGame.ValidateGameState(); err != nil {
-			return RoomSnapshot{}, err
+			return nil, nil, err
 		}
 		snapshot, err := currentGame.SnapshotForRole(player.Role)
 		if err != nil {
-			return RoomSnapshot{}, err
+			return nil, nil, err
 		}
-		gameView = &snapshot
+		return &snapshot, nil, nil
 	case StateInLobby:
-		if lastGame != nil {
-			lastGameCopy := *lastGame
-			lastGameView = &lastGameCopy
-		}
+		return nil, copyPtr(lastGame), nil
 	default:
-		return RoomSnapshot{}, ErrInvalidRoomState
+		return nil, nil, ErrUnknownMemberState
 	}
+}
 
-	var hostUserID *int
-	if r.HostUserID != nil {
-		hostCopy := *r.HostUserID
-		hostUserID = &hostCopy
+func (r *Room) membersWithProfiles(members []RoomMember, profiles map[int64]Profile) ([]RoomMemberView, error) {
+	players := make([]RoomMemberView, 0, len(members))
+	for _, member := range members {
+		profile, ok := profiles[member.UserID]
+		if !ok {
+			return nil, ErrMemberProfileNotFound
+		}
+		players = append(players, newRoomMemberView(member, profile.Username, profile.AvatarURL, r.HostUserID))
 	}
-	var turnTimerSeconds *TurnTimer
-	if r.TurnTimerSeconds != nil {
-		timerCopy := *r.TurnTimerSeconds
-		turnTimerSeconds = &timerCopy
+	return players, nil
+}
+
+func (r *Room) SnapshotForRoom(input RoomInput, userID int64) (RoomSnapshot, error) {
+	if r.Status == StatusClosed {
+		return RoomSnapshot{}, ErrRoomNotFound
+	}
+	player := findMember(input.Members, userID)
+	if player == nil {
+		return RoomSnapshot{}, ErrNotRoomMember
+	}
+	roomMembers := membersInJoinOrder(input.Members)
+	players, err := r.membersWithProfiles(roomMembers, input.Profiles)
+	if err != nil {
+		return RoomSnapshot{}, err
+	}
+	gameView, lastGameView, err := gameDataFor(player, input.CurrentGame, input.LastGame)
+	if err != nil {
+		return RoomSnapshot{}, err
 	}
 	var countdownView *CountdownView
-	if r.Status == StatusCountDown && countdown != nil {
-		countdownCopy := *countdown
-		countdownView = &countdownCopy
+	if r.Status == StatusCountDown {
+		countdownView = copyPtr(input.Countdown)
 	}
+
 	return RoomSnapshot{
 		RoomID:           r.RoomID,
 		RoomCode:         r.RoomCode,
 		Status:           r.Status,
-		HostUserID:       hostUserID,
+		HostUserID:       copyPtr(r.HostUserID),
 		PlayerCount:      len(roomMembers),
 		MaxPlayers:       r.MaxPlayers,
-		TurnTimerSeconds: turnTimerSeconds,
+		TurnTimerSeconds: copyPtr(r.TurnTimerSeconds),
 		Language:         r.Language,
-		Startable:        r.IsStartableRoom(roomMembers),
+		Startable:        r.isStartableRoom(roomMembers),
 		Countdown:        countdownView,
 		Players:          players,
 		Game:             gameView,
 		CreatedAt:        r.CreatedAt,
-		PostGame:         r.PostGame(roomMembers),
+		PostGame:         r.postGame(roomMembers),
 		LastGame:         lastGameView,
+		EmptySince:       copyPtr(r.EmptySince),
+		CloseAt:          copyPtr(r.CloseAt),
 	}, nil
 }

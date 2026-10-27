@@ -10,7 +10,7 @@ const (
 )
 
 type Player struct {
-	UserID   int
+	UserID   int64
 	Username string
 	Team     Team
 	Role     Role
@@ -75,20 +75,11 @@ type CurrentTurn struct {
 	DeadlineAt       *time.Time `json:"deadline_at"`
 }
 
-func (t CurrentTurn) Clone() CurrentTurn {
+func (t CurrentTurn) clone() CurrentTurn {
 	copied := t
-	if t.Clue != nil {
-		clue := *t.Clue
-		copied.Clue = &clue
-	}
-	if t.GuessesRemaining != nil {
-		guesses := *t.GuessesRemaining
-		copied.GuessesRemaining = &guesses
-	}
-	if t.DeadlineAt != nil {
-		deadline := *t.DeadlineAt
-		copied.DeadlineAt = &deadline
-	}
+	copied.Clue = copyPtr(t.Clue)
+	copied.GuessesRemaining = copyPtr(t.GuessesRemaining)
+	copied.DeadlineAt = copyPtr(t.DeadlineAt)
 	return copied
 }
 
@@ -123,7 +114,7 @@ const (
 )
 
 type GuessResult struct {
-	GameID         int           `json:"game_id"`
+	GameID         int64         `json:"game_id"`
 	Card           CardView      `json:"card"`
 	GuessingTeam   Team          `json:"guessing_team"`
 	IsCorrectGuess bool          `json:"-"`
@@ -136,7 +127,7 @@ type GuessResult struct {
 }
 
 type PassResult struct {
-	GameID       int          `json:"game_id"`
+	GameID       int64        `json:"game_id"`
 	Score        Score        `json:"score"`
 	CurrentTurn  CurrentTurn  `json:"current_turn"`
 	ChangeReason ChangeReason `json:"-"`

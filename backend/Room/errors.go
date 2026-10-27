@@ -27,5 +27,8 @@ var (
 
 // Room-specific errors
 var (
-	ErrRoomNotStartable = errors.New("room is not startable")
+	ErrRoomNotStartable      = errors.New("room is not startable")
+	ErrMemberProfileNotFound = errors.New("room member profile not found")
+	ErrGameNotFound          = errors.New("room's game not found")
+	ErrUnknownMemberState    = errors.New("unknown room member state")
 )

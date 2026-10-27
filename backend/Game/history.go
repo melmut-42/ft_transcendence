@@ -21,7 +21,7 @@ type HistoryEntry struct {
 	At   time.Time        `json:"at"`
 	Team *Team            `json:"team"`
 
-	UserID       *int       `json:"user_id,omitempty"`
+	UserID       *int64     `json:"user_id,omitempty"`
 	Username     *string    `json:"username,omitempty"`
 	Clue         *Clue      `json:"clue,omitempty"`
 	CardID       *int       `json:"card_id,omitempty"`

@@ -20,12 +20,12 @@ func TestCheckInitialGameState(t *testing.T) {
 	for testseed := byte(1); testseed < 200; testseed++ {
 		seed[0] = testseed
 
-		game, err := NewGameWithSeed(wordPack.Words, "en", seed, nil, testNow)
+		game, err := NewGameWithSeed(wordPack.Words, testSettings, seed, testNow)
 		if err != nil {
 			t.Fatalf("NewGameWithSeed returned an error: %v", err)
 		}
-		if game.currentTurn.Team != game.board.StartingTeam() {
-			t.Errorf("CurrentTurn.Team (%v) does not match Board.StartingTeam() (%v)", game.currentTurn.Team, game.board.StartingTeam())
+		if game.currentTurn.Team != game.board.startingTeam {
+			t.Errorf("CurrentTurn.Team (%v) does not match Board.startingTeam (%v)", game.currentTurn.Team, game.board.startingTeam)
 		}
 		if game.currentTurn.Phase != PhaseWaitingForClue {
 			t.Errorf("CurrentTurn.Phase is not PhaseWaitingForClue, got: %v", game.currentTurn.Phase)
@@ -46,13 +46,13 @@ func TestScoreCalculation(t *testing.T) {
 	wpOriginal := "wordpack.json"
 	wordPack := loadTestWordPack(t, wpOriginal)
 	seed := [32]byte{42}
-	game, err := NewGameWithSeed(wordPack.Words, "en", seed, nil, testNow)
+	game, err := NewGameWithSeed(wordPack.Words, testSettings, seed, testNow)
 	if err != nil {
 		t.Fatalf("NewGameWithSeed returned an error: %v", err)
 	}
 
 	expectedRed, expectedBlue := 0, 0
-	for i, card := range game.board.Cards() {
+	for i, card := range game.board.cards {
 		if i < 9 {
 			revealed, err := game.board.reveal(card.cardID)
 			if err != nil {
@@ -75,7 +75,7 @@ func TestValidateGameState(t *testing.T) {
 	wpOriginal := "wordpack.json"
 	wordPack := loadTestWordPack(t, wpOriginal)
 	seed := [32]byte{42}
-	game, err := NewGameWithSeed(wordPack.Words, "en", seed, nil, testNow)
+	game, err := NewGameWithSeed(wordPack.Words, testSettings, seed, testNow)
 	if err != nil {
 		t.Fatalf("NewGameWithSeed returned an error: %v", err)
 	}
@@ -84,7 +84,7 @@ func TestValidateGameState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ValidateGameState returned an error: %v", err)
 	}
-	team := game.board.StartingTeam()
+	team := game.board.startingTeam
 	game.winner = &team
 	err = game.ValidateGameState()
 	if !errors.Is(err, ErrInvalidGameState) {
@@ -96,9 +96,33 @@ func TestValidateGameState(t *testing.T) {
 
 var testNow = time.Date(2026, 9, 10, 8, 43, 15, 0, time.UTC)
 
+var testSettings = GameSettings{
+	Language:        "en",
+	TurnTimer:       nil,
+	StaffingTimeout: 120 * time.Second,
+	GameID:          5001,
+}
+
+func TestNewGameRejectsInvalidStaffingTimeout(t *testing.T) {
+	wordPack := loadTestWordPack(t, "wordpack.json")
+	seed := [32]byte{42}
+
+	zeroSettings := testSettings
+	zeroSettings.StaffingTimeout = 0
+	if _, err := NewGameWithSeed(wordPack.Words, zeroSettings, seed, testNow); !errors.Is(err, ErrInvalidArgument) {
+		t.Fatalf("expected ErrInvalidArgument for zero staffing timeout, got %v", err)
+	}
+
+	negativeSettings := testSettings
+	negativeSettings.StaffingTimeout = -time.Second
+	if _, err := NewGameWithSeed(wordPack.Words, negativeSettings, seed, testNow); !errors.Is(err, ErrInvalidArgument) {
+		t.Fatalf("expected ErrInvalidArgument for negative staffing timeout, got %v", err)
+	}
+}
+
 func newTestGame() *Game {
 	game := &Game{
-		GameID: 5000,
+		gameID: 5000,
 		board: &Board{
 			startingTeam: TeamRed,
 		},
@@ -336,7 +360,7 @@ func cloneTestGame(g *Game) *Game {
 		copied.board = &board
 	}
 
-	copied.currentTurn = g.currentTurn.Clone()
+	copied.currentTurn = g.currentTurn.clone()
 
 	if g.winner != nil {
 		winner := *g.winner
@@ -555,7 +579,7 @@ func TestNewGameStartedAt(t *testing.T) {
 	wordPack := loadTestWordPack(t, "wordpack.json")
 	seed := [32]byte{42}
 
-	game, err := NewGameWithSeed(wordPack.Words, "en", seed, nil, testNow)
+	game, err := NewGameWithSeed(wordPack.Words, testSettings, seed, testNow)
 	if err != nil {
 		t.Fatalf("NewGameWithSeed: %v", err)
 	}
@@ -584,11 +608,10 @@ func TestAssassinSetsFinishedAt(t *testing.T) {
 func TestCancelSetsFinishedAt(t *testing.T) {
 	game := newTestGame()
 
-	if err := game.PauseForPlayers(Player{UserID: 1, Username: "player_one", Team: TeamRed, Role: RoleSpymaster}, testNow); err != nil {
-		t.Fatalf("PauseForPlayers: %v", err)
-	}
+	game.pauseForPlayers(Player{UserID: 1, Username: "player_one", Team: TeamRed, Role: RoleSpymaster}, testNow)
+
 	cancelAt := testNow.Add(2 * time.Minute)
-	if err := game.CancelForInsufficientPlayers(cancelAt); err != nil {
+	if err := game.cancelForInsufficientPlayers(cancelAt); err != nil {
 		t.Fatalf("CancelForInsufficientPlayers: %v", err)
 	}
 	if game.finishedAt == nil || !game.finishedAt.Equal(cancelAt) {

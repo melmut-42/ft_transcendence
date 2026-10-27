@@ -3,7 +3,7 @@ package game
 import "time"
 
 type GameSnapshot struct {
-	GameID       int            `json:"game_id"`
+	GameID       int64          `json:"game_id"`
 	StartingTeam Team           `json:"starting_team"`
 	CurrentTurn  CurrentTurn    `json:"current_turn"`
 	Score        Score          `json:"score"`
@@ -14,17 +14,23 @@ type GameSnapshot struct {
 	StartedAt    time.Time      `json:"started_at"`
 	FinishedAt   *time.Time     `json:"finished_at"`
 	History      []HistoryEntry `json:"history"`
+	Staffing     *StaffingView  `json:"staffing,omitempty"`
 }
 
-func cardViewForRole(card card, role *Role) (CardView, error) {
-	if role != nil && *role != RoleOperative && *role != RoleSpymaster {
-		return CardView{}, ErrInvalidRole
+func copyPtr[T any](value *T) *T {
+	if value == nil {
+		return nil
 	}
+	valueCopy := *value
+	return &valueCopy
+}
+
+func cardViewForRole(card card, role *Role) CardView {
 	view := newCardView(card)
 	if role != nil && *role == RoleSpymaster {
 		view.Color = &card.color
 	}
-	return view, nil
+	return view
 }
 
 func (b *Board) boardViewForRole(role *Role) ([]CardView, error) {
@@ -33,28 +39,40 @@ func (b *Board) boardViewForRole(role *Role) ([]CardView, error) {
 	}
 	views := make([]CardView, len(b.cards))
 	for i := range b.cards {
-		view, err := cardViewForRole(b.cards[i], role)
-		if err != nil {
-			return nil, err
-		}
+		view := cardViewForRole(b.cards[i], role)
 		views[i] = view
 	}
 	return views, nil
 }
 
-func (g *Game) SnapshotForRole(role *Role) (GameSnapshot, error) {
-	if role != nil && *role != RoleOperative && *role != RoleSpymaster {
-		return GameSnapshot{}, ErrInvalidRole
+func (g *Game) staffingView() StaffingView {
+	return StaffingView{
+		Red: TeamStaffing{
+			MissingRoles: append([]Role{}, g.redMissing...),
+			DeadlineAt:   copyPtr(g.redStaffingDeadline),
+		},
+		Blue: TeamStaffing{
+			MissingRoles: append([]Role{}, g.blueMissing...),
+			DeadlineAt:   copyPtr(g.blueStaffingDeadline),
+		},
 	}
+}
+
+func (g *Game) SnapshotForRole(role *Role) (GameSnapshot, error) {
 	view, err := g.board.boardViewForRole(role)
 	if err != nil {
 		return GameSnapshot{}, err
 	}
+	var staffing *StaffingView
+	if g.currentTurn.Phase == PhasePausedForPlayers {
+		staffingView := g.staffingView()
+		staffing = &staffingView
+	}
 	winner, endReason, finishedAt := g.cloneGameResult()
 	return GameSnapshot{
-		GameID:       g.GameID,
+		GameID:       g.gameID,
 		StartingTeam: g.board.startingTeam,
-		CurrentTurn:  g.currentTurn.Clone(),
+		CurrentTurn:  g.currentTurn.clone(),
 		Score:        g.Score(),
 		Board:        view,
 		Winner:       winner,
@@ -63,5 +81,6 @@ func (g *Game) SnapshotForRole(role *Role) (GameSnapshot, error) {
 		StartedAt:    g.startedAt,
 		FinishedAt:   finishedAt,
 		History:      g.cloneHistory(),
+		Staffing:     staffing,
 	}, nil
 }

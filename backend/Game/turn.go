@@ -20,11 +20,10 @@ func (g *Game) switchTurn(reason ChangeReason, now time.Time) {
 	g.currentTurn.GuessesRemaining = nil
 	g.startTurnTimer(now)
 
-	newTeam := g.currentTurn.Team
 	reasonText := string(reason)
 	g.addHistory(HistoryEntry{
 		Type:         HistoryTurnChanged,
-		Team:         &newTeam,
+		Team:         copyPtr(&g.currentTurn.Team),
 		PreviousTeam: &previousTeam,
 		Reason:       &reasonText,
 	}, now)
@@ -34,30 +33,27 @@ func (g *Game) PassTurn(player *Player, now time.Time) (PassResult, error) {
 	if err := validateTurnAction(g, player, PhaseGuessing, RoleOperative, now); err != nil {
 		return PassResult{}, err
 	}
-	if *g.currentTurn.GuessesRemaining <= 0 {
-		return PassResult{}, ErrNoGuessesRemaining
-	}
-	team := player.Team
-	userID := player.UserID
-	username := player.Username
 	g.addHistory(HistoryEntry{
 		Type:     HistoryTurnPassed,
-		Team:     &team,
-		UserID:   &userID,
-		Username: &username,
+		Team:     copyPtr(&player.Team),
+		UserID:   copyPtr(&player.UserID),
+		Username: copyPtr(&player.Username),
 	}, now)
 
 	g.switchTurn(ChangeReasonPassed, now)
 	return PassResult{
-		GameID:       g.GameID,
+		GameID:       g.gameID,
 		Score:        g.Score(),
-		CurrentTurn:  g.currentTurn.Clone(),
+		CurrentTurn:  g.currentTurn.clone(),
 		ChangeReason: ChangeReasonPassed,
 	}, nil
 }
 
-func (g *Game) turnExpired(now time.Time) bool {
-	return g.currentTurn.DeadlineAt != nil && !now.Before(*g.currentTurn.DeadlineAt)
+func deadlinePassed(deadline *time.Time, now time.Time) bool {
+	if deadline == nil {
+		return false
+	}
+	return !now.Before(*deadline)
 }
 
 func (g *Game) PassTurnIfExpired(now time.Time) (*PassResult, error) {
@@ -67,14 +63,14 @@ func (g *Game) PassTurnIfExpired(now time.Time) (*PassResult, error) {
 	if g.currentTurn.Phase != PhaseWaitingForClue && g.currentTurn.Phase != PhaseGuessing {
 		return nil, nil
 	}
-	if !g.turnExpired(now) {
+	if !deadlinePassed(g.currentTurn.DeadlineAt, now) {
 		return nil, nil
 	}
 	g.switchTurn(ChangeReasonTurnTimerExpired, now)
 	return &PassResult{
-		GameID:       g.GameID,
+		GameID:       g.gameID,
 		Score:        g.Score(),
-		CurrentTurn:  g.currentTurn.Clone(),
+		CurrentTurn:  g.currentTurn.clone(),
 		ChangeReason: ChangeReasonTurnTimerExpired,
 	}, nil
 }
