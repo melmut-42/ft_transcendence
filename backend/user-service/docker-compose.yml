@@ -26,6 +26,7 @@ services:
       APP_ENV: development
       DATABASE_URL: postgres://user:change-me-local-only@postgres:5432/user?sslmode=disable
       MIGRATE_ON_START: "true"
+      INTERNAL_API_TOKEN: change-me-local-only-token
     ports:
       - "127.0.0.1:8081:8080"
     depends_on:

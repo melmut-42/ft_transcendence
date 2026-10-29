@@ -10,7 +10,10 @@ import (
 	"github.com/melmut-42/ft_transcendence/backend/shared/logging"
 )
 
-const defaultPort = "8080"
+const (
+	defaultPort            = "8080"
+	minInternalTokenLength = 16
+)
 
 type Config struct {
 	Environment    string
@@ -18,6 +21,7 @@ type Config struct {
 	LogLevel       string
 	Port           string
 	DatabaseURL    string `json:"-"`
+	InternalToken  string `json:"-"`
 	MigrateOnStart bool
 }
 
@@ -25,6 +29,7 @@ type Config struct {
 //
 // It takes no parameters and does not load .env files. Missing optional settings
 // use the default port, migration behavior and environment-specific logging settings.
+// INTERNAL_API_TOKEN is optional: without it the private internal routes are not served.
 //
 // It returns the validated Config, or a zero Config on failure.
 //
@@ -41,6 +46,7 @@ func Load() (Config, error) {
 		LogLevel:       strings.TrimSpace(os.Getenv("LOG_LEVEL")),
 		Port:           strings.TrimSpace(os.Getenv("PORT")),
 		DatabaseURL:    strings.TrimSpace(os.Getenv("DATABASE_URL")),
+		InternalToken:  strings.TrimSpace(os.Getenv("INTERNAL_API_TOKEN")),
 		MigrateOnStart: true,
 	}
 
@@ -96,6 +102,10 @@ func (cfg Config) validate() error {
 	port, err := strconv.Atoi(cfg.Port)
 	if err != nil || port < 1 || port > 65535 {
 		return errors.New("PORT must be an integer between 1 and 65535")
+	}
+
+	if cfg.InternalToken != "" && len(cfg.InternalToken) < minInternalTokenLength {
+		return errors.New("INTERNAL_API_TOKEN must be at least 16 characters")
 	}
 
 	if cfg.DatabaseURL == "" {

@@ -21,7 +21,8 @@ import (
 //   - logger: Configured service logger.
 //
 // It applies pending migrations when cfg.MigrateOnStart is set, opens the
-// schema-scoped connection pool and wires the layers together.
+// schema-scoped connection pool and wires the layers together. Internal routes
+// are served only when cfg.InternalToken is set.
 //
 // It returns an unstarted server and a cleanup function that closes the pool.
 // The caller must invoke cleanup after HTTP shutdown. On failure, both values are nil.
@@ -49,5 +50,13 @@ func setup(ctx context.Context, cfg config.Config, logger *slog.Logger) (*http.S
 	healthService := service.NewHealth(healthRepository)
 	healthController := controller.NewHealth(healthService)
 
-	return server.New(cfg.Port, healthController, logger), pool.Close, nil
+	var extra []server.RouteRegistrar
+	if cfg.InternalToken != "" {
+		profileService := service.NewProfile(userpostgres.NewProfile(pool))
+		extra = append(extra, controller.NewInternalProfile(profileService, cfg.InternalToken))
+	} else {
+		logger.WarnContext(ctx, "INTERNAL_API_TOKEN is not set; internal routes are disabled")
+	}
+
+	return server.New(cfg.Port, healthController, logger, extra...), pool.Close, nil
 }
