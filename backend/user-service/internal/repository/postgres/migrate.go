@@ -76,7 +76,14 @@ func Migrate(ctx context.Context, dsn string) error {
 	return nil
 }
 
+// schemaLockKey is the advisory lock key serializing schema creation across instances.
+const schemaLockKey int64 = 0x7573657273 // "users"
+
 // ensureSchema creates Schema when it does not exist yet.
+//
+// CREATE SCHEMA IF NOT EXISTS is not safe under concurrency: two sessions can both
+// see the schema missing and one fails with a duplicate key error. A transaction-level
+// advisory lock makes concurrent starts take turns; it is released on commit.
 func ensureSchema(ctx context.Context, dsn string) error {
 	pool, err := sharedpostgres.Open(ctx, sharedpostgres.Config{DSN: dsn})
 	if err != nil {
@@ -84,7 +91,19 @@ func ensureSchema(ctx context.Context, dsn string) error {
 	}
 	defer pool.Close()
 
-	if _, err := pool.Exec(ctx, "CREATE SCHEMA IF NOT EXISTS "+pgx.Identifier{Schema}.Sanitize()); err != nil {
+	tx, err := pool.Begin(ctx)
+	if err != nil {
+		return ErrMigrationSetup
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	if _, err := tx.Exec(ctx, "SELECT pg_advisory_xact_lock($1)", schemaLockKey); err != nil {
+		return ErrMigrationSetup
+	}
+	if _, err := tx.Exec(ctx, "CREATE SCHEMA IF NOT EXISTS "+pgx.Identifier{Schema}.Sanitize()); err != nil {
+		return ErrMigrationSetup
+	}
+	if err := tx.Commit(ctx); err != nil {
 		return ErrMigrationSetup
 	}
 
