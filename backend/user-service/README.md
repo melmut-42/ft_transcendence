@@ -29,6 +29,17 @@ environment only and does not load `.env` itself.
 | `APP_ENV`                   | `development` | `development`, `production` or `test`. Sets log defaults.             |
 | `LOG_FORMAT`, `LOG_LEVEL` | by `APP_ENV`  | `text` or `json`; `debug`, `info`, `warn` or `error`.           |
 | `MIGRATE_ON_START`          | `true`        | Apply embedded migrations at startup.                                       |
+| `INTERNAL_API_TOKEN`        | none, optional | 16+ character secret for internal routes. Unset disables them.          |
+
+## Internal API
+
+Private routes are for other services, not browsers. They require the header
+`X-Internal-Token` and must never be proxied publicly.
+
+`POST /internal/v1/profiles/provision` (Auth only) takes `operation_id` (UUID),
+`user_id`, `username` and `created_at`. It returns `201` for a new profile and
+`200` with the same body for an identical retry. Errors: `400 VALIDATION_ERROR`,
+`422 INVALID_USERNAME`, `409 USERNAME_TAKEN`, `409 OPERATION_CONFLICT`, `401 UNAUTHORIZED`.
 
 ## Run locally
 
