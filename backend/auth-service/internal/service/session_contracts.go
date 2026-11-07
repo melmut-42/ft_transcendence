@@ -15,6 +15,8 @@ var (
 	ErrUnauthorized       = errors.New("a valid active session is required")
 	ErrSessionExpired     = errors.New("the refresh token is invalid or expired; log in again")
 	ErrSessionUnavailable = errors.New("session dependencies are not configured")
+	// ErrUnavailable reports that the database could not be reached.
+	ErrUnavailable = errors.New("service dependency unavailable")
 )
 
 // SessionRepository separates session reads and transactions from account registration.
@@ -22,6 +24,11 @@ type SessionRepository interface {
 	FindUserByEmail(context.Context, string) (model.User, error)
 	FindSessionUser(context.Context, string) (model.User, model.Session, error)
 	WithSessionTransaction(context.Context, func(SessionTx) error) error
+}
+
+// AccountReader reads one account by id for private metadata reads.
+type AccountReader interface {
+	FindAccount(context.Context, int64) (model.User, error)
 }
 
 // SessionTx locks a session before its refresh rows, serializing rotation and revocation.

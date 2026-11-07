@@ -40,8 +40,47 @@ func New(port string, auth *controller.AuthController, logger *slog.Logger) *htt
 	}
 }
 
+// RouteRegistrar adds a controller's routes to a router.
+type RouteRegistrar interface {
+	RegisterRoutes(routes gin.IRoutes)
+}
+
+// NewInternal assembles the private listener for service-to-service routes.
+//
+// Parameters:
+//
+//   - port: Private port (INTERNAL_PORT). Attach it only to the private service network.
+//   - logger: Service logger receiving access and panic records.
+//   - routes: Controllers whose /internal/v1 routes this listener serves.
+//
+// It returns an unstarted server with the same middleware and error envelope
+// as the public server, but no public routes.
+func NewInternal(port string, logger *slog.Logger, routes ...RouteRegistrar) *http.Server {
+	router := baseRouter(logger)
+	for _, registrar := range routes {
+		registrar.RegisterRoutes(router)
+	}
+
+	return &http.Server{
+		Addr:              ":" + port,
+		Handler:           router,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		ReadHeaderTimeout: readHeaderTimeout,
+		IdleTimeout:       idleTimeout,
+	}
+}
+
 // newRouter wires auth routes and the common HTTP middleware.
 func newRouter(auth *controller.AuthController, logger *slog.Logger) *gin.Engine {
+	router := baseRouter(logger)
+	auth.RegisterRoutes(router.Group("/api/v1/auth"))
+
+	return router
+}
+
+// baseRouter returns a Gin engine with the common middleware and error envelopes.
+func baseRouter(logger *slog.Logger) *gin.Engine {
 	router := gin.New()
 	router.Use(requestid.Middleware(), requestLogger(logger), gin.CustomRecoveryWithWriter(io.Discard, func(c *gin.Context, _ any) {
 		logger.ErrorContext(c.Request.Context(), "http_panic", "request_id", requestid.Get(c))
@@ -55,7 +94,6 @@ func newRouter(auth *controller.AuthController, logger *slog.Logger) *gin.Engine
 	router.NoMethod(authrouter.Wrap(func(c *gin.Context) error {
 		return &httpresponse.Error{Status: http.StatusMethodNotAllowed, Code: "METHOD_NOT_ALLOWED", Message: "The HTTP method is not allowed for this endpoint."}
 	}, nil))
-	auth.RegisterRoutes(router.Group("/api/v1/auth"))
 
 	return router
 }

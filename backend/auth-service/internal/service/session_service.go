@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/melmut-42/ft_transcendence/backend/auth-service/internal/model"
 	"github.com/melmut-42/ft_transcendence/backend/auth-service/internal/security"
 )
 
@@ -28,7 +29,7 @@ func (s *AuthService) Authenticate(ctx context.Context, raw string) (Identity, e
 	if err != nil {
 		return Identity{}, err
 	}
-	if session.RevokedAt != nil || session.UserID != claims.UserID || user.ID != claims.UserID {
+	if session.RevokedAt != nil || session.UserID != claims.UserID || user.ID != claims.UserID || user.Status != model.AccountActive {
 		return Identity{}, ErrUnauthorized
 	}
 	return Identity{User: user, SessionID: session.ID, ExpiresAt: claims.ExpiresAt}, nil
@@ -64,7 +65,7 @@ func (s *AuthService) checkIdentity(ctx context.Context, identity Identity) erro
 	if err != nil {
 		return err
 	}
-	if session.RevokedAt != nil || session.UserID != identity.User.ID || user.ID != identity.User.ID {
+	if session.RevokedAt != nil || session.UserID != identity.User.ID || user.ID != identity.User.ID || user.Status != model.AccountActive {
 		return ErrUnauthorized
 	}
 	return nil

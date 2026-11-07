@@ -40,14 +40,14 @@ func run() error {
 	slog.SetDefault(logger)
 	configureGin(cfg.Environment)
 
-	server, cleanup, err := setup(ctx, cfg, logger)
+	servers, cleanup, err := setup(ctx, cfg, logger)
 	if err != nil {
 		return err
 	}
 
 	defer cleanup()
 
-	return runHTTPServer(ctx, server)
+	return runHTTPServers(ctx, servers...)
 }
 
 func configureGin(environment string) {
