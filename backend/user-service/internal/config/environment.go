@@ -11,25 +11,30 @@ import (
 )
 
 const (
-	defaultPort            = "8080"
-	minInternalTokenLength = 16
+	defaultPort         = "8080"
+	defaultInternalPort = "8090"
 )
 
 type Config struct {
-	Environment    string
-	LogFormat      string
-	LogLevel       string
-	Port           string
-	DatabaseURL    string `json:"-"`
-	InternalToken  string `json:"-"`
-	MigrateOnStart bool
+	Environment  string
+	LogFormat    string
+	LogLevel     string
+	Port         string
+	InternalPort string
+	DatabaseURL  string `json:"-"`
+	// CallerCredentials maps each private caller to its accepted service
+	// credentials, read from mounted secret files.
+	CallerCredentials map[string][]string `json:"-"`
+	MigrateOnStart    bool
 }
 
 // Load reads and validates application settings from the process environment.
 //
 // It takes no parameters and does not load .env files. Missing optional settings
 // use the default port, migration behavior and environment-specific logging settings.
-// INTERNAL_API_TOKEN is optional: without it the private internal routes are not served.
+// Private routes are served on INTERNAL_PORT. Service credentials are read from
+// the files named by each caller's credential variables; a caller without a
+// configured file is accepted by no private route.
 //
 // It returns the validated Config, or a zero Config on failure.
 //
@@ -38,15 +43,17 @@ type Config struct {
 //   - Missing settings: DATABASE_URL was not supplied.
 //   - Malformed values: PORT, DATABASE_URL or MIGRATE_ON_START could not be parsed.
 //   - Logging settings: APP_ENV, LOG_FORMAT or LOG_LEVEL has an unsupported value.
-//   - Invalid bounds: Port is outside the valid TCP range.
+//   - Invalid bounds: PORT or INTERNAL_PORT is outside the valid TCP range, or both are equal.
+//   - Credentials: a configured credential file is unreadable, too short, or
+//     holds a credential already assigned to another caller.
 func Load() (Config, error) {
 	cfg := Config{
 		Environment:    strings.TrimSpace(os.Getenv("APP_ENV")),
 		LogFormat:      strings.TrimSpace(os.Getenv("LOG_FORMAT")),
 		LogLevel:       strings.TrimSpace(os.Getenv("LOG_LEVEL")),
 		Port:           strings.TrimSpace(os.Getenv("PORT")),
+		InternalPort:   strings.TrimSpace(os.Getenv("INTERNAL_PORT")),
 		DatabaseURL:    strings.TrimSpace(os.Getenv("DATABASE_URL")),
-		InternalToken:  strings.TrimSpace(os.Getenv("INTERNAL_API_TOKEN")),
 		MigrateOnStart: true,
 	}
 
@@ -55,6 +62,9 @@ func Load() (Config, error) {
 	}
 	if cfg.Port == "" {
 		cfg.Port = defaultPort
+	}
+	if cfg.InternalPort == "" {
+		cfg.InternalPort = defaultInternalPort
 	}
 	if raw := strings.TrimSpace(os.Getenv("MIGRATE_ON_START")); raw != "" {
 		value, err := strconv.ParseBool(raw)
@@ -66,6 +76,11 @@ func Load() (Config, error) {
 	if err := cfg.validate(); err != nil {
 		return Config{}, err
 	}
+	credentials, err := loadCallerCredentials()
+	if err != nil {
+		return Config{}, err
+	}
+	cfg.CallerCredentials = credentials
 
 	return cfg, nil
 }
@@ -99,13 +114,14 @@ func (cfg *Config) configureLogging() error {
 }
 
 func (cfg Config) validate() error {
-	port, err := strconv.Atoi(cfg.Port)
-	if err != nil || port < 1 || port > 65535 {
+	if !validPort(cfg.Port) {
 		return errors.New("PORT must be an integer between 1 and 65535")
 	}
-
-	if cfg.InternalToken != "" && len(cfg.InternalToken) < minInternalTokenLength {
-		return errors.New("INTERNAL_API_TOKEN must be at least 16 characters")
+	if !validPort(cfg.InternalPort) {
+		return errors.New("INTERNAL_PORT must be an integer between 1 and 65535")
+	}
+	if cfg.Port == cfg.InternalPort {
+		return errors.New("INTERNAL_PORT must differ from PORT")
 	}
 
 	if cfg.DatabaseURL == "" {
@@ -117,4 +133,10 @@ func (cfg Config) validate() error {
 	}
 
 	return nil
+}
+
+func validPort(raw string) bool {
+	port, err := strconv.Atoi(raw)
+
+	return err == nil && port >= 1 && port <= 65535
 }

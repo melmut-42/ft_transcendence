@@ -46,8 +46,45 @@ func New(port string, health *controller.HealthController, logger *slog.Logger, 
 	}
 }
 
-// newRouter wires the routes and the common HTTP middleware.
+// NewInternal assembles the private listener for service-to-service routes.
+//
+// Parameters:
+//
+//   - port: Private port (INTERNAL_PORT). Attach it only to the private service network.
+//   - logger: Service logger receiving access and panic records.
+//   - routes: Controllers whose /internal/v1 routes this listener serves.
+//
+// It returns an unstarted server with the same request IDs, access logging,
+// panic recovery and error envelope as the public server, but no public routes.
+func NewInternal(port string, logger *slog.Logger, routes ...RouteRegistrar) *http.Server {
+	engine := baseEngine(logger)
+	for _, registrar := range routes {
+		registrar.RegisterRoutes(engine)
+	}
+
+	return &http.Server{
+		Addr:              ":" + port,
+		Handler:           engine,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		ReadHeaderTimeout: readHeaderTimeout,
+		IdleTimeout:       idleTimeout,
+	}
+}
+
+// newRouter wires the public routes and the common HTTP middleware.
 func newRouter(health *controller.HealthController, logger *slog.Logger, extra ...RouteRegistrar) *gin.Engine {
+	engine := baseEngine(logger)
+	health.RegisterRoutes(engine)
+	for _, registrar := range extra {
+		registrar.RegisterRoutes(engine)
+	}
+
+	return engine
+}
+
+// baseEngine returns a Gin engine with the common middleware and error envelopes.
+func baseEngine(logger *slog.Logger) *gin.Engine {
 	engine := gin.New()
 	engine.Use(requestid.Middleware(), requestLogger(logger), gin.CustomRecoveryWithWriter(io.Discard, func(c *gin.Context, _ any) {
 		logger.ErrorContext(c.Request.Context(), "http_panic", "request_id", requestid.Get(c))
@@ -61,10 +98,6 @@ func newRouter(health *controller.HealthController, logger *slog.Logger, extra .
 	engine.NoMethod(router.Wrap(func(c *gin.Context) error {
 		return &httpresponse.Error{Status: http.StatusMethodNotAllowed, Code: "METHOD_NOT_ALLOWED", Message: "The HTTP method is not allowed for this endpoint."}
 	}, nil))
-	health.RegisterRoutes(engine)
-	for _, registrar := range extra {
-		registrar.RegisterRoutes(engine)
-	}
 
 	return engine
 }

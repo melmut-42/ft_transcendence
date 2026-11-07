@@ -25,27 +25,50 @@ environment only and does not load `.env` itself.
 | Variable                      | Default         | Meaning                                                                     |
 | ----------------------------- | --------------- | --------------------------------------------------------------------------- |
 | `DATABASE_URL`              | none, required  | `postgres://` URL. The service creates and uses its own `users` schema. |
-| `PORT`                      | `8080`        | HTTP port.                                                                  |
+| `PORT`                      | `8080`        | Public HTTP port (health routes).                                           |
+| `INTERNAL_PORT`             | `8090`        | Private listener for `/internal/v1/*`. Must differ from `PORT`.             |
 | `APP_ENV`                   | `development` | `development`, `production` or `test`. Sets log defaults.             |
 | `LOG_FORMAT`, `LOG_LEVEL` | by `APP_ENV`  | `text` or `json`; `debug`, `info`, `warn` or `error`.           |
 | `MIGRATE_ON_START`          | `true`        | Apply embedded migrations at startup.                                       |
-| `INTERNAL_API_TOKEN`        | none, optional | 16+ character secret for internal routes. Unset disables them.          |
+| `AUTH_SERVICE_CREDENTIAL_FILE` | none, optional | File holding Auth Service's service credential (32+ characters).      |
+| `AUTH_SERVICE_PREVIOUS_CREDENTIAL_FILE` | none, optional | Previous Auth credential, accepted during a rotation.       |
 
 ## Internal API
 
-Private routes are for other services, not browsers. They require the header
-`X-Internal-Token` and must never be proxied publicly.
+Private routes serve other services, never browsers. They are served only on
+the private listener (`INTERNAL_PORT`), which belongs on the private service
+network; the public listener does not serve `/internal/*`. The contract is the
+`Internal REST v1 - Services` Bruno collection on the `bruno` branch.
 
-`POST /internal/v1/profiles/provision` (Auth only) takes `operation_id` (UUID),
-`user_id`, `username` and `created_at`. It returns `201` for a new profile and
-`200` with the same body for an identical retry. Errors: `400 VALIDATION_ERROR`,
-`422 INVALID_USERNAME`, `409 USERNAME_TAKEN`, `409 OPERATION_CONFLICT`, `401 UNAUTHORIZED`.
+Every request carries `Authorization: Bearer <service credential>`. Each caller
+has its own credential, read from a mounted secret file, and a fixed set of
+scopes on this service. A missing, malformed or unknown credential gets
+`401 SERVICE_UNAUTHENTICATED`; a known caller without the scope gets
+`403 SERVICE_FORBIDDEN`. Without configured credentials every private request
+is rejected. To rotate a credential, set the new file as current and the old
+one as previous, switch the caller, then remove the previous file.
+
+| Route | Caller and scope | Purpose |
+| --- | --- | --- |
+| `PUT /internal/v1/provisioning-operations/{operation_id}` | `auth-service`, `profile.provision` | Create the profile once per operation |
+| `GET /internal/v1/provisioning-operations/{operation_id}` | `auth-service`, `provisioning.read` | Read an operation's receipt |
+| `GET /internal/v1/provisioning-operations?user_id=` | `auth-service`, `provisioning.read` | Read the receipt of a user's operation |
+
+Provisioning takes `user_id`, `username` and `created_at` in the body. It
+answers `201` with a new receipt or `200` with the stored receipt for an
+identical retry. The receipt (`operation_id`, `user_id`, `outcome`,
+`completed_at`) comes from the operation record and never changes. Conflicts are
+decided in this order: `409 USER_DELETED`, `409 OPERATION_CONFLICT`,
+`409 USER_ALREADY_PROVISIONED`, `409 USERNAME_TAKEN`. A database outage answers
+`503 SERVICE_UNAVAILABLE`. Requests for one user are serialized with a
+transaction-scoped advisory lock; account deletion must take the same lock.
 
 ## Run locally
 
 With Docker, from this directory:
 
 ```sh
+mkdir -p .secrets && openssl rand -hex 32 > .secrets/auth_to_user_credential
 docker compose up --build
 curl localhost:8081/readyz
 ```

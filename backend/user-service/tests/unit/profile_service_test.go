@@ -20,6 +20,14 @@ func (s *recordingStore) Provision(_ context.Context, record service.ProvisionRe
 	return service.ProvisionResult{Created: true}, nil
 }
 
+func (s *recordingStore) ReceiptByOperation(context.Context, string) (service.Receipt, error) {
+	return service.Receipt{}, nil
+}
+
+func (s *recordingStore) ReceiptByUser(context.Context, int64) (service.Receipt, error) {
+	return service.Receipt{}, nil
+}
+
 // input builds a ProvisionInput with named fields.
 func input(operation string, userID int64, username string, createdAt time.Time) service.ProvisionInput {
 	return service.ProvisionInput{OperationID: operation, UserID: userID, Username: username, CreatedAt: createdAt}
@@ -37,25 +45,25 @@ var validCreatedAt = time.Date(2026, 10, 1, 12, 0, 0, 123456789, time.FixedZone(
 //
 // Expected output:
 //
-//   - *ValidationError for a bad operation id, user id or created_at, naming each
-//     field; ErrInvalidUsername for a bad username; the store is never called.
+//   - *ValidationError for a bad operation id, user id or created_at, naming the
+//     first bad field; ErrInvalidUsername for a bad username; the store is never called.
 func TestProvisionValidation(t *testing.T) {
 	tests := []struct {
-		name       string
-		in         service.ProvisionInput
-		wantFields []string
-		wantName   bool
+		name      string
+		in        service.ProvisionInput
+		wantField string
+		wantName  bool
 	}{
-		{"operation not a uuid", input("nope", 1, "alice", validCreatedAt), []string{"operation_id"}, false},
-		{"zero user", input(validOperation, 0, "alice", validCreatedAt), []string{"user_id"}, false},
-		{"negative user", input(validOperation, -3, "alice", validCreatedAt), []string{"user_id"}, false},
-		{"missing created_at", input(validOperation, 1, "alice", time.Time{}), []string{"created_at"}, false},
-		{"several bad fields", input("", 0, "alice", time.Time{}), []string{"operation_id", "user_id", "created_at"}, false},
-		{"too short", input(validOperation, 1, "ab", validCreatedAt), nil, true},
-		{"too long", input(validOperation, 1, strings.Repeat("a", 21), validCreatedAt), nil, true},
-		{"bad characters", input(validOperation, 1, "bad name!", validCreatedAt), nil, true},
-		{"blank", input(validOperation, 1, "   ", validCreatedAt), nil, true},
-		{"non-ascii letter", input(validOperation, 1, "Ömer_42", validCreatedAt), nil, true},
+		{"operation not a uuid", input("nope", 1, "alice", validCreatedAt), "operation_id", false},
+		{"zero user", input(validOperation, 0, "alice", validCreatedAt), "user_id", false},
+		{"negative user", input(validOperation, -3, "alice", validCreatedAt), "user_id", false},
+		{"missing created_at", input(validOperation, 1, "alice", time.Time{}), "created_at", false},
+		{"several bad fields", input("", 0, "alice", time.Time{}), "operation_id", false},
+		{"too short", input(validOperation, 1, "ab", validCreatedAt), "", true},
+		{"too long", input(validOperation, 1, strings.Repeat("a", 21), validCreatedAt), "", true},
+		{"bad characters", input(validOperation, 1, "bad name!", validCreatedAt), "", true},
+		{"blank", input(validOperation, 1, "   ", validCreatedAt), "", true},
+		{"non-ascii letter", input(validOperation, 1, "Ömer_42", validCreatedAt), "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -75,13 +83,8 @@ func TestProvisionValidation(t *testing.T) {
 			if !errors.As(err, &invalid) {
 				t.Fatalf("error = %v, want *ValidationError", err)
 			}
-			if len(invalid.Fields) != len(tt.wantFields) {
-				t.Fatalf("fields = %v, want %v", invalid.Fields, tt.wantFields)
-			}
-			for _, name := range tt.wantFields {
-				if _, ok := invalid.Fields[name]; !ok {
-					t.Fatalf("fields = %v, missing %s", invalid.Fields, name)
-				}
+			if invalid.Field != tt.wantField {
+				t.Fatalf("field = %q, want %q", invalid.Field, tt.wantField)
 			}
 		})
 	}
