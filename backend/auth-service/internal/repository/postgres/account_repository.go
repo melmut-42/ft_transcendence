@@ -67,9 +67,9 @@ type authTx struct {
 func (t *authTx) CreateUser(ctx context.Context, user model.User) (model.User, error) {
 	err := t.tx.QueryRow(ctx, `
 		INSERT INTO users (email, username, password_hash) VALUES ($1, $2, $3)
-		RETURNING id, email, username, password_hash, created_at, updated_at`,
+		RETURNING id, email, username, password_hash, status, created_at, updated_at`,
 		user.Email, user.Username, user.PasswordHash,
-	).Scan(&user.ID, &user.Email, &user.Username, &user.PasswordHash, &user.CreatedAt, &user.UpdatedAt)
+	).Scan(&user.ID, &user.Email, &user.Username, &user.PasswordHash, &user.Status, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return model.User{}, accountError(err)
 	}

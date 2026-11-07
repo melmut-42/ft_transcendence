@@ -62,6 +62,24 @@ func (r *MemoryRepository) FindSessionUser(ctx context.Context, id string) (mode
 	return model.User{}, model.Session{}, service.ErrNotFound
 }
 
+// FindAccount returns the account with id.
+func (r *MemoryRepository) FindAccount(ctx context.Context, id int64) (model.User, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return model.User{}, err
+	}
+	if r.FailAt == "find_account" {
+		return model.User{}, errors.New("private account lookup error")
+	}
+	for _, user := range r.Users {
+		if user.ID == id {
+			return user, nil
+		}
+	}
+	return model.User{}, service.ErrNotFound
+}
+
 // WithSessionTransaction serializes draft changes and publishes only on commit.
 func (r *MemoryRepository) WithSessionTransaction(ctx context.Context, fn func(service.SessionTx) error) error {
 	r.mu.Lock()

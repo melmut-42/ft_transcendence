@@ -38,7 +38,11 @@ func TestAuthConfig(t *testing.T) {
 	defaults := map[string]string{
 		"APP_ENV": "", "LOG_FORMAT": "", "LOG_LEVEL": "",
 		"PORT": "", "DATABASE_URL": "postgres://test@localhost/test", "JWT_SECRET": testutil.TestSigningKey,
-		"ACCESS_TOKEN_TTL": "", "REFRESH_TOKEN_TTL": "",
+		"ACCESS_TOKEN_TTL": "", "REFRESH_TOKEN_TTL": "", "INTERNAL_PORT": "",
+		"WEB_BFF_CREDENTIAL_FILE": "", "WEB_BFF_PREVIOUS_CREDENTIAL_FILE": "",
+		"GAME_GATEWAY_CREDENTIAL_FILE": "", "GAME_GATEWAY_PREVIOUS_CREDENTIAL_FILE": "",
+		"CHAT_GATEWAY_CREDENTIAL_FILE": "", "CHAT_GATEWAY_PREVIOUS_CREDENTIAL_FILE": "",
+		"USER_SERVICE_CREDENTIAL_FILE": "", "USER_SERVICE_PREVIOUS_CREDENTIAL_FILE": "",
 	}
 
 	for key, value := range defaults {
@@ -52,6 +56,8 @@ func TestAuthConfig(t *testing.T) {
 		{"JWT_SECRET", ""}, {"JWT_SECRET", "short"}, {"PORT", "0"}, {"DATABASE_URL", ""},
 		{"ACCESS_TOKEN_TTL", "bad"}, {"ACCESS_TOKEN_TTL", "0s"},
 		{"REFRESH_TOKEN_TTL", "30days"}, {"REFRESH_TOKEN_TTL", "5m"},
+		{"INTERNAL_PORT", "x"}, {"INTERNAL_PORT", "8080"},
+		{"USER_SERVICE_CREDENTIAL_FILE", "/nonexistent/credential"},
 	} {
 		t.Run(tt.key+"="+tt.value, func(t *testing.T) {
 			t.Setenv(tt.key, tt.value)

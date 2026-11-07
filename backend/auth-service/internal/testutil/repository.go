@@ -101,6 +101,9 @@ func (t *memoryTx) CreateUser(_ context.Context, user model.User) (model.User, e
 	}
 
 	user.ID, user.CreatedAt = int64(len(t.Users)+1), time.Now().UTC()
+	if user.Status == "" {
+		user.Status = model.AccountActive
+	}
 	t.Users = append(t.Users, user)
 	return user, nil
 }
