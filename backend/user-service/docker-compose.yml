@@ -26,11 +26,22 @@ services:
       APP_ENV: development
       DATABASE_URL: postgres://user:change-me-local-only@postgres:5432/user?sslmode=disable
       MIGRATE_ON_START: "true"
+      INTERNAL_PORT: "8090"
+      AUTH_SERVICE_CREDENTIAL_FILE: /run/secrets/auth_to_user_credential
+    secrets:
+      - auth_to_user_credential
     ports:
       - "127.0.0.1:8081:8080"
+      # Local testing only; in deployment the private port stays on the private network.
+      - "127.0.0.1:8091:8090"
     depends_on:
       postgres:
         condition: service_healthy
+
+secrets:
+  # Create locally, never commit: openssl rand -hex 32 > .secrets/auth_to_user_credential
+  auth_to_user_credential:
+    file: .secrets/auth_to_user_credential
 
 volumes:
   user-postgres-data:

@@ -1,6 +1,9 @@
 package unit_test
 
 import (
+	"os"
+	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -17,7 +20,8 @@ const validDatabaseURL = "postgres://user:secret@localhost:5432/user?sslmode=dis
 //   - values: Setting names and values; names missing here are set to empty.
 func setEnvironment(t *testing.T, values map[string]string) {
 	t.Helper()
-	for _, name := range []string{"APP_ENV", "LOG_FORMAT", "LOG_LEVEL", "PORT", "DATABASE_URL", "MIGRATE_ON_START"} {
+	for _, name := range []string{"APP_ENV", "LOG_FORMAT", "LOG_LEVEL", "PORT", "INTERNAL_PORT", "DATABASE_URL", "MIGRATE_ON_START",
+		"AUTH_SERVICE_CREDENTIAL_FILE", "AUTH_SERVICE_PREVIOUS_CREDENTIAL_FILE"} {
 		t.Setenv(name, values[name])
 	}
 }
@@ -30,7 +34,8 @@ func setEnvironment(t *testing.T, values map[string]string) {
 //
 // Expected output:
 //
-//   - Development environment, port 8080, text logs at debug level, migrations on.
+//   - Development environment, port 8080, internal port 8090, text logs at debug
+//     level, migrations on and no service credentials.
 func TestLoadDefaults(t *testing.T) {
 	setEnvironment(t, map[string]string{"DATABASE_URL": validDatabaseURL})
 
@@ -38,7 +43,8 @@ func TestLoadDefaults(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load() error = %v", err)
 	}
-	if cfg.Environment != "development" || cfg.Port != "8080" || cfg.LogFormat != "text" ||
+	if cfg.Environment != "development" || cfg.Port != "8080" || cfg.InternalPort != "8090" ||
+		len(cfg.CallerCredentials) != 0 || cfg.LogFormat != "text" ||
 		cfg.LogLevel != "debug" || !cfg.MigrateOnStart || cfg.DatabaseURL != validDatabaseURL {
 		t.Fatalf("Load() = %+v, want development defaults", cfg)
 	}
@@ -129,6 +135,9 @@ func TestLoadRejectsInvalidSettings(t *testing.T) {
 		{"url without host", map[string]string{"DATABASE_URL": "postgres:///db"}, "postgres://"},
 		{"port not a number", map[string]string{"DATABASE_URL": validDatabaseURL, "PORT": "http"}, "PORT"},
 		{"port too large", map[string]string{"DATABASE_URL": validDatabaseURL, "PORT": "70000"}, "PORT"},
+		{"internal port not a number", map[string]string{"DATABASE_URL": validDatabaseURL, "INTERNAL_PORT": "x"}, "INTERNAL_PORT"},
+		{"internal port equals port", map[string]string{"DATABASE_URL": validDatabaseURL, "PORT": "9000", "INTERNAL_PORT": "9000"}, "INTERNAL_PORT"},
+		{"missing credential file", map[string]string{"DATABASE_URL": validDatabaseURL, "AUTH_SERVICE_CREDENTIAL_FILE": "/nonexistent/secret"}, "AUTH_SERVICE_CREDENTIAL_FILE"},
 		{"unknown environment", map[string]string{"DATABASE_URL": validDatabaseURL, "APP_ENV": "staging"}, "APP_ENV"},
 		{"unknown log format", map[string]string{"DATABASE_URL": validDatabaseURL, "LOG_FORMAT": "xml"}, "LOG_FORMAT"},
 		{"unknown log level", map[string]string{"DATABASE_URL": validDatabaseURL, "LOG_LEVEL": "loud"}, "LOG_LEVEL"},
@@ -148,5 +157,50 @@ func TestLoadRejectsInvalidSettings(t *testing.T) {
 				t.Fatalf("error %q leaks the database password", err)
 			}
 		})
+	}
+}
+
+// writeSecret stores value in a temporary file and returns its path.
+func writeSecret(t *testing.T, value string) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "credential")
+	if err := os.WriteFile(path, []byte(value), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	return path
+}
+
+// TestLoadCallerCredentials checks reading service credentials from secret files.
+//
+// Expected output:
+//
+//   - Current and previous credentials are trimmed and both accepted.
+//   - A credential shorter than 32 characters is rejected without echoing it or its path.
+func TestLoadCallerCredentials(t *testing.T) {
+	current := strings.Repeat("c", 40)
+	previous := strings.Repeat("p", 40)
+	setEnvironment(t, map[string]string{
+		"DATABASE_URL":                          validDatabaseURL,
+		"AUTH_SERVICE_CREDENTIAL_FILE":          writeSecret(t, current+"\n"),
+		"AUTH_SERVICE_PREVIOUS_CREDENTIAL_FILE": writeSecret(t, previous),
+	})
+	cfg, err := config.Load()
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+	got := cfg.CallerCredentials["auth-service"]
+	if len(got) != 2 || !slices.Contains(got, current) || !slices.Contains(got, previous) {
+		t.Fatalf("auth-service credentials = %d values, want current and previous", len(got))
+	}
+
+	short := writeSecret(t, "too-short-secret")
+	setEnvironment(t, map[string]string{"DATABASE_URL": validDatabaseURL, "AUTH_SERVICE_CREDENTIAL_FILE": short})
+	_, err = config.Load()
+	if err == nil || !strings.Contains(err.Error(), "AUTH_SERVICE_CREDENTIAL_FILE") {
+		t.Fatalf("error = %v, want a short credential rejected", err)
+	}
+	if strings.Contains(err.Error(), "too-short-secret") || strings.Contains(err.Error(), short) {
+		t.Fatalf("error %q leaks the credential or its path", err)
 	}
 }

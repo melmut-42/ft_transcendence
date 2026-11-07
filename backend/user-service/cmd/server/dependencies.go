@@ -7,6 +7,7 @@ import (
 
 	"github.com/melmut-42/ft_transcendence/backend/user-service/internal/config"
 	"github.com/melmut-42/ft_transcendence/backend/user-service/internal/controller"
+	"github.com/melmut-42/ft_transcendence/backend/user-service/internal/middleware/serviceauth"
 	userpostgres "github.com/melmut-42/ft_transcendence/backend/user-service/internal/repository/postgres"
 	"github.com/melmut-42/ft_transcendence/backend/user-service/internal/server"
 	"github.com/melmut-42/ft_transcendence/backend/user-service/internal/service"
@@ -21,16 +22,18 @@ import (
 //   - logger: Configured service logger.
 //
 // It applies pending migrations when cfg.MigrateOnStart is set, opens the
-// schema-scoped connection pool and wires the layers together.
+// schema-scoped connection pool and wires the layers together. Private routes
+// are served only on the internal listener and accept only configured callers.
 //
-// It returns an unstarted server and a cleanup function that closes the pool.
-// The caller must invoke cleanup after HTTP shutdown. On failure, both values are nil.
+// It returns the unstarted public and internal servers and a cleanup function
+// that closes the pool. The caller must invoke cleanup after HTTP shutdown.
+// On failure, every value is nil.
 //
 // Errors:
 //
 //   - Migration errors: A migration could not be applied; see repository Migrate.
 //   - PostgreSQL errors: Invalid connection settings or failed connectivity checks, including context cancellation and deadlines.
-func setup(ctx context.Context, cfg config.Config, logger *slog.Logger) (*http.Server, func(), error) {
+func setup(ctx context.Context, cfg config.Config, logger *slog.Logger) ([]*http.Server, func(), error) {
 	if cfg.MigrateOnStart {
 		if err := userpostgres.Migrate(ctx, cfg.DatabaseURL); err != nil {
 			return nil, nil, err
@@ -49,5 +52,12 @@ func setup(ctx context.Context, cfg config.Config, logger *slog.Logger) (*http.S
 	healthService := service.NewHealth(healthRepository)
 	healthController := controller.NewHealth(healthService)
 
-	return server.New(cfg.Port, healthController, logger), pool.Close, nil
+	if len(cfg.CallerCredentials) == 0 {
+		logger.WarnContext(ctx, "no service credentials configured; private routes accept no caller")
+	}
+	auth := serviceauth.New(cfg.CallerCredentials, serviceauth.DefaultMatrix())
+	profileService := service.NewProfile(userpostgres.NewProfile(pool))
+	internal := server.NewInternal(cfg.InternalPort, logger, controller.NewInternalProvisioning(profileService, auth))
+
+	return []*http.Server{server.New(cfg.Port, healthController, logger), internal}, pool.Close, nil
 }

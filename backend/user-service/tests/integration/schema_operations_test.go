@@ -14,15 +14,15 @@ import (
 //   - A second operation id for the same user is refused.
 //   - Bad ids, states, attempts and a completed state without a time are refused.
 func TestOperationTables(t *testing.T) {
-	tables := []struct{ table, prefix string }{
-		{"provisioning_operations", "provisioning"},
-		{"deletion_operations", "deletion"},
+	tables := []struct{ table, prefix, extraColumn, extraValue string }{
+		{"provisioning_operations", "provisioning", ", payload_fingerprint", ", repeat('a', 64)"},
+		{"deletion_operations", "deletion", "", ""},
 	}
 	for _, tb := range tables {
 		t.Run(tb.table, func(t *testing.T) {
 			pool := schemaPool(t)
 			const op = "11111111-1111-1111-1111-111111111111"
-			insert := "INSERT INTO " + tb.table + " (operation_id, user_id) VALUES ($1, $2)"
+			insert := "INSERT INTO " + tb.table + " (operation_id, user_id" + tb.extraColumn + ") VALUES ($1, $2" + tb.extraValue + ")"
 
 			mustExec(t, pool, insert, op, 42)
 			mustExec(t, pool, insert+" ON CONFLICT (operation_id) DO NOTHING", op, 42)
@@ -58,7 +58,7 @@ func TestOperationsKeepNoProfileLink(t *testing.T) {
 	pool := schemaPool(t)
 
 	mustExec(t, pool, "INSERT INTO deletion_operations (operation_id, user_id) VALUES ('44444444-4444-4444-4444-444444444444', 99)")
-	mustExec(t, pool, "INSERT INTO provisioning_operations (operation_id, user_id) VALUES ('55555555-5555-5555-5555-555555555555', 98)")
+	mustExec(t, pool, "INSERT INTO provisioning_operations (operation_id, user_id, payload_fingerprint) VALUES ('55555555-5555-5555-5555-555555555555', 98, repeat('b', 64))")
 }
 
 // TestOutbox checks the outbox constraints and the unpublished-rows index.
